@@ -1,0 +1,679 @@
+<html>
+<head>
+<title>Scikit Optimize: Bayesian Hyperparameter Optimization in Python </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>scikit Optimize:Python中的贝叶斯超参数优化</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/scikit-optimize#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/scikit-optimize#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>需要调整机器学习模型的超参数，但不想手动完成？</p>
+
+
+
+<p>正在考虑执行贝叶斯超参数优化，但您不确定具体如何操作？</p>
+
+
+
+<p>听说过各种超参数优化库，想知道<a href="https://web.archive.org/web/20221008042213/https://scikit-optimize.github.io/" target="_blank" rel="noreferrer noopener nofollow"> Scikit Optimize </a>是否是适合您的工具？</p>
+
+
+
+<p>你来对地方了。</p>
+
+
+
+<p>在本文中，我将:</p>
+
+
+<div class="custom-point-list">
+<ul><li>向您展示一个使用skopt 在实际问题上运行贝叶斯超参数优化的<strong>示例，</strong></li><li><strong>根据API、速度和实验结果等各种标准评估该库</strong>，</li><li>给你我的<strong>总评分和何时使用的建议</strong>。</li></ul>
+</div>
+
+
+<p>我们开始吧，好吗？</p>
+
+
+
+
+
+
+<h2 id="content">评定标准</h2>
+
+
+
+
+
+<h2 id="1">易用性和API</h2>
+
+
+
+<p>API太棒了。它是如此简单，以至于你几乎不用看文档就能猜到。说真的，让我给你看看。</p>
+
+
+
+<p>您定义搜索空间:</p>
+
+
+
+<pre class="hljs">SPACE = [
+   skopt.space.Real(<span class="hljs-number">0.01</span>, <span class="hljs-number">0.5</span>, name=<span class="hljs-string">'learning_rate'</span>, prior=<span class="hljs-string">'log-uniform'</span>),
+   skopt.space.Integer(<span class="hljs-number">1</span>, <span class="hljs-number">30</span>, name=<span class="hljs-string">'max_depth'</span>),
+   skopt.space.Integer(<span class="hljs-number">2</span>, <span class="hljs-number">100</span>, name=<span class="hljs-string">'num_leaves'</span>),
+   skopt.space.Integer(<span class="hljs-number">10</span>, <span class="hljs-number">1000</span>, name=<span class="hljs-string">'min_data_in_leaf'</span>),
+   skopt.space.Real(<span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>, name=<span class="hljs-string">'feature_fraction'</span>, prior=<span class="hljs-string">'uniform'</span>),
+   skopt.space.Real(<span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>, name=<span class="hljs-string">'subsample'</span>, prior=<span class="hljs-string">'uniform'</span>)]</pre>
+
+
+
+<p>您定义想要最小化的目标函数(修饰它，以保留参数名称):</p>
+
+
+
+<pre class="hljs"><span class="hljs-meta">@skopt.utils.use_named_args(SPACE)</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(**params)</span>:</span>
+    all_params = {**params, **STATIC_PARAMS}
+    <span class="hljs-keyword">return</span> <span class="hljs-number">-1.0</span> * train_evaluate(X, y, all_params)</pre>
+
+
+
+<p>并运行优化:</p>
+
+
+
+<pre class="hljs">results = skopt.forest_minimize(objective, SPACE, **HPO_PARAMS)
+</pre>
+
+
+
+<p>就是这样。您需要的所有信息，比如每次迭代的最佳参数或分数，都保存在results对象中。这里是一个完整脚本的例子，带有一些额外的附加功能。</p>
+
+
+
+<p>超级简单的设置和直观的API。</p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p><strong> 10 / 10 </strong></p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2 id="2">选项、方法和(超级)参数</h2>
+
+
+
+<h3 id="3">搜索空间</h3>
+
+
+
+<p>对于超参数搜索空间，您可以从三个选项中进行选择:</p>
+
+
+<div class="custom-point-list">
+<ul><li><em>空间。实数</em>-浮点参数由(a，b)范围内的均匀对数均匀采样，</li><li><em>空间。整数</em>-整数参数从(a，b)范围内均匀采样，</li><li><em>空间。分类</em>-用于分类(文本)参数。将从选项列表中抽取一个值。例如，如果你正在训练lightGBM，你可以通过['gbdt '，' dart '，' goss']。</li></ul>
+</div>
+
+
+<p>没有对嵌套搜索空间的支持，嵌套搜索空间考虑了超参数的一些组合完全无效的情况。有时候真的很方便。</p>
+
+
+
+
+
+<h3 id="4">优化方法</h3>
+
+
+
+<p>有四种优化算法可以尝试。</p>
+
+
+
+<p><strong> dummy_minimize </strong></p>
+
+
+
+<p>您可以对参数进行简单的随机搜索。这里没有什么特别的，但是如果需要的话，在同一个API中使用这个选项进行比较是很有用的。</p>
+
+
+
+<p><strong> forest_minimize和gbrt_minimize </strong></p>
+
+
+
+<p>这两种方法以及下一节中的方法都是贝叶斯超参数优化的例子，也称为基于序列模型的优化SMBO。这种方法背后的思想是用<a href="/web/20221008042213/https://neptune.ai/blog/random-forest-regression-when-does-it-fail-and-why" target="_blank" rel="noreferrer noopener">随机森林</a>、额外的树或者梯度增强树<strong>回归量</strong>来<strong>估计</strong>用户定义的<strong>目标函数</strong> <strong>。</strong></p>
+
+
+
+<p>在目标函数上每次运行超参数后，算法进行<strong>有根据的猜测，哪组超参数最有可能提高分数</strong>，并且应该在下一次运行中尝试。它是通过获得许多点(超参数集)上的回归预测，并根据所谓的获取函数选择最佳猜测点来完成的。</p>
+
+
+
+<p>有许多采集功能选项可供选择:</p>
+
+
+<div class="custom-point-list">
+<ul><li><em> <strong> EI和PI </strong> </em>:负预期改善和负概率改善。如果你选择其中一个，你也应该调整<strong><em>【Xi】</em></strong>参数。基本上，当您的算法寻找下一组超参数时，您可以决定您愿意在实际目标函数上尝试的预期改进有多小。该值越高，回归变量预期的改善(或改善概率)就越大。</li><li><strong><em>【LCB】</em></strong>:置信下限。在这种情况下，你要谨慎选择你的下一个点，限制下行风险。你可以决定每次跑步要冒多大的风险。通过使<strong><em>κ</em></strong>参数变小，你倾向于<strong>利用</strong>你所知道的，通过使其变大，你倾向于<strong>探索</strong>搜索空间。</li></ul>
+</div>
+
+
+<p>还有选项<strong><em>【EIPS】</em></strong>和<strong> <em> PIPS </em> </strong>考虑到目标函数产生的分数和执行时间，但我没有尝试过</p>
+
+
+
+<p><strong> gp_minimize </strong></p>
+
+
+
+<p>不使用树形回归，目标函数由高斯过程近似。</p>
+
+
+
+<p>从用户的角度来看，这种方法的附加价值是，你可以让算法在每次迭代中选择EI、PI和LCB中最好的一个，而不是事先决定一个采集函数。只需将采集功能设置为<em> gp_hedge </em>并试用即可。</p>
+
+
+
+<p>还有一点要考虑的是每次迭代使用的<strong>优化方法</strong>、<em>采样</em>或<em> lbfgs </em>。对于这两者，采集函数是在搜索空间中随机选择的点数(<em> n_points </em>)上计算的。如果进行采样，则选择具有最低值的点。如果您选择<em> lbfgs </em>，该算法将从一些(n _ restarts _ optimizer)最佳的、随机尝试的点中选取，并将从每个点开始运行<em> lbfgs </em>优化。所以如果你不在乎执行时间，基本上<em> lbfgs </em>方法只是对采样方法的一个改进。</p>
+
+
+
+
+
+<h3 id="5">回收</h3>
+
+
+
+<p>我真的很喜欢有一个通过回调的简单选项。例如，我可以通过简单地添加3行代码来监控我的训练:</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">monitor</span><span class="hljs-params">(res)</span>:</span>
+    neptune.send_metric(<span class="hljs-string">'run_score'</span>, res.func_vals[<span class="hljs-number">-1</span>])
+    neptune.send_text(<span class="hljs-string">'run_parameters'</span>, 
+                      str(to_named_params(res.x_iters[<span class="hljs-number">-1</span>])))
+...
+results = skopt.forest_minimize(objective, SPACE, 
+                                callback=[monitor], **HPO_PARAMS)</pre>
+
+
+
+<p>您可以使用此选项的其他事情是，在每次迭代中提前停止或保存结果。</p>
+
+
+
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-background">请注意，由于最近的<a href="/web/20221008042213/https://neptune.ai/blog/neptune-new" target="_blank" rel="noreferrer noopener"> API更新</a>，这篇文章也需要一些改变——我们正在努力！与此同时，请检查<a href="https://web.archive.org/web/20221008042213/https://docs.neptune.ai/" target="_blank" rel="noreferrer noopener">海王星文档</a>，那里的一切都是最新的！🥳</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h3 id="6">持续和重新启动</h3>
+
+
+
+<p>有<em>目的转储</em>和<em>目的加载</em>函数处理<em>结果</em>对象的保存和加载；</p>
+
+
+
+<pre class="hljs">results = skopt.forest_minimize(objective, SPACE, **HPO_PARAMS)
+skopt.dump(results, <span class="hljs-string">'artifacts/results.pkl'</span>)
+old_results = skopt.load(<span class="hljs-string">'artifacts/results.pkl'</span>)</pre>
+
+
+
+<p>您可以通过<em> x0 </em>和<em> y0 </em>参数从保存的结果重新开始训练。例如:</p>
+
+
+
+<pre class="hljs">results = skopt.forest_minimize(objective, SPACE,
+                                x0=old_results.x_iters,
+                                y0=old_results.func_vals,
+                                **HPO_PARAMS)</pre>
+
+
+
+<p>简单和工程没有问题。</p>
+
+
+
+<p>总的来说，有很多调整(超)超参数的选项，您可以通过回调来控制训练。另一方面，您只能在平坦的空间中搜索，并且您需要自己处理那些被禁止的参数组合。</p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p><strong>2010年7月</strong></p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2 id="7">证明文件</h2>
+
+
+
+<p>一件艺术品。</p>
+
+
+
+<p>它有很多例子，所有函数和方法的文档字符串。我只花了几分钟就进入了最佳状态，并把事情做好了。</p>
+
+
+
+<p>去<a href="https://web.archive.org/web/20221008042213/https://scikit-optimize.github.io/" target="_blank" rel="noreferrer noopener nofollow">文档网页</a>自己看。</p>
+
+
+
+
+
+
+
+<p>它可以更好一点，在docstrings中有更多的解释，但总体体验非常好。</p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p><strong> 9 / 10 </strong></p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2 id="8">形象化</h2>
+
+
+
+<p>这是这个图书馆我最喜欢的特色之一。在<em> skopt.plots </em>模块中有三个绘图工具，我非常喜欢:</p>
+
+
+<div class="custom-point-list">
+<ul><li><em>plot _ convergence</em>-它通过显示每次迭代的最佳结果来可视化您的优化进度。</li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> skopt.plots
+
+skopt.plots.plot_convergence(results)</pre>
+
+
+
+
+
+
+
+<p>它的酷之处在于，你可以通过简单地传递一个<em> results </em>对象列表或者一个(name，results)元组的<strong>列表来比较许多策略的进展。</strong></p>
+
+
+
+<pre class="hljs">results = [(<span class="hljs-string">'random_results'</span>, random_results),
+           (<span class="hljs-string">'forest_results'</span>, forest_results),
+           (<span class="hljs-string">'gbrt_results'</span>, gbrt_results),
+           (<span class="hljs-string">'gp_results'</span>, gp_results)]
+
+skopt.plots.plot_convergence(*results)</pre>
+
+
+
+
+
+
+<div class="custom-point-list">
+<ul><li>这个图让你看到搜索的发展。对于每个超参数，我们可以看到探测值的直方图。对于每一对超参数，采样值的散点图用颜色表示，从蓝色到黄色。</li></ul>
+</div>
+
+
+<p>例如，当我们查看<strong>随机搜索策略</strong>时，我们可以看到没有进化。它只是随机搜索:</p>
+
+
+
+
+
+
+
+<p>但是对于<em>forest _ minimize</em><strong>策略，</strong>我们可以清楚地看到，它收敛到它探索得更多的空间的某些部分。</p>
+
+
+
+
+
+
+<div class="custom-point-list">
+<ul><li><em>plot _ objective</em>-它让你获得对超参数的分数敏感度的直觉。您可以决定空间的哪些部分可能需要更细粒度的搜索，以及哪些超参数几乎不影响分数，并且可能会从搜索中删除。</li></ul>
+</div>
+
+
+
+
+
+
+<p>总的来说，可视化非常好。</p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p><strong> 10 / 10 </strong></p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+<div class="note">
+    <h3>注意:</h3>
+    <div class="content">
+                    <div class="wysiwyg_editor">
+                                    <p>我非常喜欢它，所以我创建了一组函数来帮助不同HPO库之间的转换，这样你就可以对每个库使用这些可视化。我已经把它们放在了neptune-contrib包中，你可以查看一下。</p>
+                            </div>
+            </div>
+</div>
+
+
+
+
+
+
+
+
+<h2 id="9">速度和并行化</h2>
+
+
+
+<p>每个优化函数都带有<em> n_jobs </em>参数，该参数被传递给<em> base_estimator </em>。这意味着，即使优化运行按顺序进行，您也可以通过利用更多的资源来加速每次运行。</p>
+
+
+
+<p>我还没有为所有的优化方法和n_jobs运行一个合适的计时基准。然而，因为我记录了所有实验的总执行时间，所以我决定给出我运行的所有实验的平均时间:</p>
+
+
+
+
+
+
+
+<p>显然，<strong>随机搜索方法是最快的</strong>，因为它在两次运行之间不需要任何计算。其次是<strong>梯度增强树回归器</strong>和<strong>随机森林方法</strong>。通过<strong>优化高斯过程是最慢的</strong>，但我只测试了<em> gp_hedge </em>采集函数，这可能就是原因。</p>
+
+
+
+<p>因为没有在运行级别上，在一个工人集群上分配它的选项，所以我必须拿走几个点。</p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p><strong>2010年6月</strong></p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2 id="10">实验结果</h2>
+
+
+
+<p>作为一个例子，让我们在一个表格，<strong>二元分类</strong>问题上调整<strong> lightGBM </strong>模型的超参数。如果您想像我一样使用相同的数据集，您应该:</p>
+
+
+
+
+
+<p>为了让训练更快，我将<strong>的助推轮数固定为300，并提前30轮停止</strong>。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> lightgbm <span class="hljs-keyword">as</span> lgb
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+NUM_BOOST_ROUND = <span class="hljs-number">300</span>
+EARLY_STOPPING_ROUNDS = <span class="hljs-number">30</span>
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train_evaluate</span><span class="hljs-params">(X, y, params)</span>:</span>
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, 
+                                                          test_size=<span class="hljs-number">0.2</span>, 
+                                                          random_state=<span class="hljs-number">1234</span>)
+
+    train_data = lgb.Dataset(X_train, label=y_train)
+    valid_data = lgb.Dataset(X_valid, label=y_valid, reference=train_data)
+
+    model = lgb.train(params, train_data,
+                      num_boost_round=NUM_BOOST_ROUND,
+                      early_stopping_rounds=EARLY_STOPPING_ROUNDS,
+                      valid_sets=[valid_data], 
+                      valid_names=[<span class="hljs-string">'valid'</span>])
+    
+    score = model.best_score[<span class="hljs-string">'valid'</span>][<span class="hljs-string">'auc'</span>]
+    <span class="hljs-keyword">return</span> score</pre>
+
+
+
+<p>所有的训练和评估逻辑都放在<strong> train_evaluate </strong>函数中。我们可以<strong>将其视为一个黑盒</strong>，它获取数据和超参数集并生成AUC评估分数。</p>
+
+
+<div class="note">
+    <h3>注意:</h3>
+    <div class="content">
+                    <div class="wysiwyg_editor">
+                                    <p>你可以把每一个以参数为输入，输出分数的脚本都变成这样的<strong> train_evaluate。</strong>完成后，您可以将其视为一个黑盒，并调整您的参数。</p>
+                            </div>
+                    
+                    
+            </div>
+</div>
+
+
+<p id="block_5ffc820bf4002" class="separator separator-5"/>
+
+
+
+<p>要根据一组参数训练模型，您可以运行如下内容:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+
+N_ROWS=<span class="hljs-number">10000</span>
+TRAIN_PATH = <span class="hljs-string">'/mnt/ml-team/minerva/open-solutions/santander/data/train.csv'</span>
+
+data = pd.read_csv(TRAIN_PATH, nrows=N_ROWS)
+X = data.drop([<span class="hljs-string">'ID_code'</span>, <span class="hljs-string">'target'</span>], axis=<span class="hljs-number">1</span>)
+y = data[<span class="hljs-string">'target'</span>]
+    
+MODEL_PARAMS = {<span class="hljs-string">'boosting'</span>: <span class="hljs-string">'gbdt'</span>,
+                <span class="hljs-string">'objective'</span>:<span class="hljs-string">'binary'</span>,
+                <span class="hljs-string">'metric'</span>: <span class="hljs-string">'auc'</span>,
+                <span class="hljs-string">'num_threads'</span>: <span class="hljs-number">12</span>,
+                <span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.3</span>,
+                }
+
+score = train_evaluate(X, y, MODEL_PARAMS)
+print(<span class="hljs-string">'Validation AUC: {}'</span>.format(score))</pre>
+
+
+
+<p>对于这项研究，我将尝试在<strong> 100次运行预算</strong>内找到最佳参数。</p>
+
+
+
+<p>如果你<strong>在超参数<strong>上随机搜索</strong>，你可以得到0.864 </strong>，正如我在这个<a href="https://web.archive.org/web/20221008042213/https://ui.neptune.ai/jakub-czakon/blog-hpo/e/BLOG-90/logs" target="_blank" rel="noreferrer noopener"> ml实验</a>中所示。</p>
+
+
+
+<p>为了找到最佳模型，我尝试了来自<a href="/web/20221008042213/https://neptune.ai/blog/scikit-optimize#2" target="_blank" rel="noreferrer noopener">选项、方法和hyper(超参数)</a>部分的优化器和hyper(超参数)的各种配置。您也可以在这里查看示例<a href="https://web.archive.org/web/20221008042213/https://ui.neptune.ai/jakub-czakon/blog-hpo/e/BLOG-90/source-code?file=search_random.py" target="_blank" rel="noreferrer noopener"> skopt参数调整</a>脚本。</p>
+
+
+
+<p>我总共进行了87次实验，让我们来看看前几项:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter"><a href="https://web.archive.org/web/20221008042213/https://ui.neptune.ai/jakub-czakon/blog-hpo/experiments?viewId=817cbbbb-103e-11ea-9a39-42010a840083&amp;trashed=false&amp;searchMode=simple&amp;lbViewUnpacked=true&amp;tags=%5B%22skopt%22%5D"><img src="../Images/85f17807424c45dad12e85bfb99aecfb.png" alt="skopt experiments" data-lazy-src="https://web.archive.org/web/20221008042213/https://i0.wp.com/neptune.ai/wp-content/uploads/skopt_best_results-1.png?fit=893%2C499&amp;ssl=1&amp;is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221008042213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/skopt_best_results-1.png?fit=893%2C499&amp;ssl=1"/><noscript><img data-lazy-fallback="1" src="../Images/85f17807424c45dad12e85bfb99aecfb.png" alt="skopt experiments" data-original-src="https://web.archive.org/web/20221008042213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/skopt_best_results-1.png?fit=893%2C499&amp;ssl=1"/></noscript></a><figcaption><em>Experiments for different skopt configurations</em></figcaption></figure></div>
+
+
+
+<p>如果你想更详细地探索所有这些实验，你可以简单地进入<a href="https://web.archive.org/web/20221008042213/https://ui.neptune.ai/jakub-czakon/blog-hpo/experiments?viewId=817cbbbb-103e-11ea-9a39-42010a840083&amp;trashed=false&amp;searchMode=simple&amp;lbViewUnpacked=true&amp;tags=%5B%22skopt%22%5D" target="_blank" rel="noreferrer noopener">实验仪表板</a>。</p>
+
+
+
+<p><em> forest_minimize </em> <strong>方法是明显的赢家</strong>，但是为了获得好的结果，稍微调整一下(超级)超参数是至关重要的。对于<em> LCB </em>采集函数来说，<em>κ</em>(剥削)的值越低越好。让我们来看看这个实验的评估图:</p>
+
+
+
+
+
+
+
+<p>它利用了低<em> num_leaves </em>子空间，但对于<em> max_depth </em>和<em> feature_fraction </em>来说，它非常具有探索性。值得一提的是，这些图在不同的实验中差别很大。这让你想知道陷入局部最小值有多容易。</p>
+
+
+
+<p>然而，<strong>最佳结果是通过EI采集</strong>功能获得的。再次，调整<em> xi </em>参数是必要的。看这个实验的客观情节:</p>
+
+
+
+
+
+
+
+<p>我觉得，通过删除一些不敏感的维度(<em>子样本</em>、<em>最大深度</em>)并对其他超参数进行更细粒度的搜索，我可能会得到更好的结果。</p>
+
+
+
+<p>令我惊讶的是，当我使用lbfgs采集函数优化时，<em>gp _ minimize</em>的结果明显更差。他们不能打败随机搜索。将优化改为采样获得了更好的AUC，但仍然比<em> forest_minimize </em>和<em> gbrt_minimize </em>差。去<a href="https://web.archive.org/web/20221008042213/https://ui.neptune.ai/jakub-czakon/blog-hpo/experiments?viewId=dc5bdd19-0ff3-4ac8-9d4a-b695545ab68d" target="_blank" rel="noreferrer noopener">高斯工艺实验</a>自己看。</p>
+
+
+
+<p>总的来说，我能得到的最高分是0.8566 ，比随机搜索的0.8464高出0.01。我将把它翻译成<strong> 10点</strong> (0.01*100)。</p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p><strong> 10/10 </strong></p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2>结论</h2>
+
+
+
+<p>让我们来看看所有标准的结果:</p>
+
+
+
+
+
+
+
+<p>总的来说，<strong>我非常喜欢Scikit-Optimize </strong>。这是一个愉快的使用，给你很大的结果，和有用的可视化。此外，它有许多选项，可以用强大的文档来指导您完成它。</p>
+
+
+
+<p>另一方面，很难<strong/>(如果不是不可能的话)<strong>将它并行化运行</strong>并分布在一个机器集群上。我认为今后，这将变得更加重要，并可能使这个库不适合某些应用程序。</p>
+
+
+
+<p>我的建议是，如果你不太关心速度和并行化，就使用它，但是如果这些对你的项目至关重要，就去别处看看。</p>
+
+
+
+
+<div id="author-box-new-format-block_605d8dd517661" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">雅各布·查肯</h3>
+    
+          <p class="article__authorContent-text">大部分是ML的人。构建MLOps工具，编写技术资料，在Neptune进行想法实验。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>如何跟踪机器学习模型的超参数？</h2>
+
+
+
+<p class="has-small-font-size">卡米尔·卡什马雷克|发布于2020年7月1日</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p><strong>机器学习算法可通过称为超参数</strong>的多个量规进行调整。最近的深度学习模型可以通过数十个超参数进行调整，这些超参数与数据扩充参数和训练程序参数一起创建了非常复杂的空间。在强化学习领域，您还应该计算环境参数。</p>
+
+
+
+<p>数据科学家要<strong>控制好</strong> <strong>超参数</strong> <strong>空间</strong>，才能<strong>使</strong> <strong>进步</strong>。</p>
+
+
+
+<p>在这里，我们将向您展示<strong>最近的</strong> <strong>实践</strong>，<strong>提示&amp;技巧，</strong>和<strong>工具</strong>以最小的开销高效地跟踪超参数。你会发现自己掌控了最复杂的深度学习实验！</p>
+
+
+
+<h2>为什么我应该跟踪我的超参数？也就是为什么这很重要？</h2>
+
+
+
+<p>几乎每一个深度学习实验指南，像<a href="https://web.archive.org/web/20221008042213/https://www.deeplearningbook.org/contents/guidelines.html" target="_blank" rel="noreferrer noopener">这本深度学习书籍</a>，都建议你如何调整超参数，使模型按预期工作。在<strong>实验-分析-学习循环</strong>中，数据科学家必须控制正在进行的更改，以便循环的“学习”部分正常工作。</p>
+
+
+
+<p>哦，忘了说<strong>随机种子也是一个超参数</strong>(特别是在RL领域:例如检查<a href="https://web.archive.org/web/20221008042213/https://www.reddit.com/r/MachineLearning/comments/76th74/d_why_random_seeds_sometimes_have_quite_large/" target="_blank" rel="noreferrer noopener">这个Reddit </a>)。</p>
+
+
+
+<h2>超参数跟踪的当前实践是什么？</h2>
+
+
+
+<p>让我们逐一回顾一下管理超参数的常见做法。我们关注于如何构建、保存和传递超参数给你的ML脚本。</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221008042213/https://neptune.ai/blog/how-to-track-hyperparameters" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

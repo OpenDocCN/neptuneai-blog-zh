@@ -1,0 +1,973 @@
+<html>
+<head>
+<title>How to Build MLOps Pipelines with GitHub Actions [Step by Step Guide] </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何使用GitHub操作构建MLOps管道[分步指南]</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/build-mlops-pipelines-with-github-actions-guide#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/build-mlops-pipelines-with-github-actions-guide#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>一段时间以来，<a href="/web/20220926085139/https://neptune.ai/blog/mlops" target="_blank" rel="noreferrer noopener"> MLOps </a>已经成为所有日常使用机器学习和深度学习的公司的一个至关重要的流程。事实上，已经有许多专门为解决与MLOps管道相关的问题而构建的解决方案。</p>
+
+
+
+<p>然而，对于许多只有少量模型投入生产的公司来说，学习和使用新工具(在本例中为<a href="/web/20220926085139/https://neptune.ai/blog/best-mlops-tools"> MLOps管道工具</a>和自动化工具)的成本超过了它将带来的收益。</p>
+
+
+
+<p>事实是，要构建简单的MLOps管道，不需要学习新的复杂工具，如Kubeflow或Airflow。事实上，您可以使用软件开发中最常用的工具之一:GitHub来构建简单(但有效)的MLOps管道。</p>
+
+
+
+<p>在这篇文章中，我将解释如何用Github、<a href="https://web.archive.org/web/20220926085139/https://github.com/features/actions" target="_blank" rel="noreferrer noopener nofollow"> Github Actions </a>和一个云服务提供商以一种非常简单的方式创建MLOps管道。听起来很有趣？我们开始吧！</p>
+
+
+
+
+
+
+<h2 id="what-is-github-actions">什么是GitHub Actions？</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20220926085139/https://github.com/features/actions" target="_blank" rel="noreferrer noopener nofollow"> GitHub Actions </a>是GitHub提供的一款工具，用于自动化软件工作流程。例如，软件开发人员使用GitHub动作来自动化分支合并，处理GitHub中的问题，进行应用程序测试等。</p>
+
+
+
+<p>然而，我们作为数据科学家也可以在很多事情上使用GitHub动作。在我们的案例中，我们将使用它来自动化MLOps工作流的几个步骤，例如:</p>
+
+
+<div class="custom-point-list">
+<ul><li>自动化ETL过程。</li><li>检查模型是否应该重新训练。</li><li>将新模型上传到您的云提供商并进行部署。</li></ul>
+</div>
+
+
+<p>如你所见，GitHub动作将会在我们的MLOps管道中被大量使用。好的一面是，如果你不知道GitHub Actions是如何工作的，它非常容易学习:你只需要在。工作流/github文件夹。在这。yaml文件中，您将指定几项内容，例如:</p>
+
+
+<div class="custom-point-list">
+<ul><li>工作流的名称。</li><li>工作流何时触发:基于cron计划、http请求、手动等。</li><li>工作流将运行的操作系统(Ubuntu、Windows或MAC)。</li><li>工作流应该执行的每个步骤。</li></ul>
+</div>
+
+
+<p>注意:因为这不是Github动作教程，所以我不会深入这个话题。然而，这里你有一个<a href="https://web.archive.org/web/20220926085139/https://anderfernandez.com/en/blog/github-actions-for-data-science/" target="_blank" rel="noreferrer noopener nofollow">教程</a>，它将帮助你学习如何使用GitHub动作。</p>
+
+
+
+<h3 id="pros-and-cons-of-using-github-actions-as-mlops-workflows">使用GitHub动作作为MLOps工作流的利弊</h3>
+
+
+
+<p>为MLOps使用GitHub动作的好处不仅仅是我们不必学习新工具，它还有许多其他优点:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong> GitHub Actions与用于数据科学的主要编程语言</strong>一起工作:Python、R、Julia等。</li><li>可以利用学习GitHub动作的经验<strong>自动化其他流程</strong>。</li><li><strong> GitHub Actions对公共库是免费的</strong>。此外，关于私有存储库，GitHub Actions提供了以下内容:<ul><li>免费账号:每月2000分钟的GitHub行动。</li><li>团队账户:每月3000分钟的GitHub行动。</li><li>团队账户:每月50，000分钟的GitHub行动。</li></ul></li><li><strong>这种自动化与AWS、Azure和Google Cloud </strong>等主要云提供商完美合作，因此您不会被单一云提供商束缚。</li><li><strong>每次工作流程失败，您都会自动收到一封电子邮件</strong>。</li></ul>
+</div>
+
+
+<p>如您所见，为MLOps使用GitHub动作有很多好处。然而，正如你可能想象的那样<strong>它并不是所有情况下的完美解决方案</strong>。在我看来，我不建议在以下场景中使用GitHub作为<a href="/web/20220926085139/https://neptune.ai/blog/best-open-source-mlops-tools"> MLOps工作流工具</a>:</p>
+
+
+<div class="custom-point-list">
+<ul><li>你有<strong>许多你必须投入生产的模型</strong>或者少数但是<strong>复杂的模型</strong>(比如深度学习模型)。在这种情况下，你将需要大量的计算能力来训练你的模型，而GitHub Action的机器不适合这样做。</li><li><strong>您已经在使用可用于MLOps </strong>的工具。例如，假设您正在使用Apache Airflow进行ETL过程。在这种情况下，将这个工具用于MLOps可能比用GitHub构建MLOps管道更好。</li></ul>
+</div>
+
+
+
+
+
+<p>好了，现在你已经知道GitHub Actions是什么，什么时候你应该或者不应该把它作为MLOps管道工具，让我们学习如果你决定使用它，你如何用GitHub Actions构建MLOps管道。</p>
+
+
+
+<h2 id="how-to-build-mlops-pipelines-with-github-and-google-cloud-step-by-step-guide">如何使用GitHub和Google Cloud构建MLOps管道[分步指南]</h2>
+
+
+
+<p>在接下来的章节中，我们将讨论如何使用GitHub、GitHub Actions和Google Cloud构建MLOps管道并将其投入生产。为此，我们建立了一个模型来预测每小时的比特币交易量。</p>
+
+
+
+<p><strong>更具体地说，您将了解:</strong></p>
+
+
+<div class="custom-point-list">
+<ol><li>如何用GitHub动作设置数据提取管道？</li><li>如何用GitHub动作构建模型训练和选择管道？</li><li>如何将你的模型包装成API？</li><li>如何对你的API进行Docker化，以便你的代码可以移植并部署在任何Docker友好的云服务中。</li><li>如何用云和GitHub动作设置一个持续部署管道？</li><li>如何用GitHub动作自动化模型重训练？</li></ol>
+</div>
+
+
+<p>如果你已经有了部署机器学习管道的经验，其中的一些步骤你可能已经很熟悉了。我仍然鼓励您阅读它们，这样您就可以了解GitHub操作是如何完成的。</p>
+
+
+
+<p>让我们从带有GitHub动作的MLOps教程开始吧！</p>
+
+
+
+
+
+
+
+
+
+
+
+<p>为了创建模型，我们首先需要获取数据。此外，由于我们想要创建一个MLOps管道，我们将需要创建一个ETL过程来提取数据、转换数据并将其加载到某个地方，比如数据湖、数据仓库或数据库。通过这样做，我们将能够随时用新的数据重新训练模型，并将其投入生产。</p>
+
+
+
+<p>如果我们想用GitHub操作来做这件事，我们将需要创建一个或多个脚本来承担ETL过程。这些脚本应该是可自动执行的，理想情况下，还应该处理异常并在出现错误时发出警告。</p>
+
+
+
+<p>例如，如果您需要从外部数据源提取数据，那么当外部数据源不工作时，向某人发送警告通常是一种好的做法。这将有助于调试过程，并且肯定会使事情变得容易得多。</p>
+
+
+
+<p>此外，需要注意的是，不是所有的过程都应该在一个脚本中完成。唯一的限制是带有GitHub动作的脚本的执行是不可并行的。</p>
+
+
+
+<p>发送完毕后，让我们看看带有GitHub动作的数据提取管道在实践中是怎样的:</p>
+
+
+
+
+
+
+
+<p>在我们的例子中，区块链为<a href="https://web.archive.org/web/20220926085139/https://api.blockchain.info/charts/transactions-per-second?timespan=all&amp;sampled=false&amp;metadata=false&amp;cors=true&amp;format=json" target="_blank" rel="noreferrer noopener nofollow">提供了这个API </a>，它显示了每分钟添加到池中的交易数量。</p>
+
+
+
+<p>考虑到这一点，由于我们希望预测每小时的事务数量，我们的ETL管道将由以下内容组成:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>提取</strong>:从API中读取信息。</li><li><strong>转换</strong>:分组求和得到小时交易数。</li><li><strong> Load </strong>:将信息上传到数据库，存储所有历史信息。</li></ul>
+</div>
+
+
+<p>也就是说，我在下面的Python脚本中总结了所有这些过程，该脚本执行了上述步骤。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime
+<span class="hljs-keyword">from</span> sqlalchemy <span class="hljs-keyword">import</span> create_engine
+<span class="hljs-keyword">import</span> os
+uri = os.environ.get(<span class="hljs-string">'URI'</span>)
+
+
+url = <span class="hljs-string">'https://api.blockchain.info/charts/transactions-per-second?timespan=all&amp;sampled=false&amp;metadata=false&amp;cors=true&amp;format=json'</span>
+resp = requests.get(url)
+data = pd.DataFrame(resp.json()[<span class="hljs-string">'values'</span>])
+
+
+data[<span class="hljs-string">'x'</span>] = [datetime.utcfromtimestamp(x).strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> data[<span class="hljs-string">'x'</span>]]
+data[<span class="hljs-string">'x'</span>] = pd.to_datetime(data[<span class="hljs-string">'x'</span>])
+
+
+engine = create_engine(uri)
+query = engine.execute(<span class="hljs-string">'SELECT MAX(reality_date) FROM reality;'</span>)
+last_reality_date = query.fetchall()[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]
+query.close()
+
+
+engine = create_engine(uri)
+query = engine.execute(<span class="hljs-string">'SELECT MIN(prediction_date), MAX(prediction_date) FROM predictions;'</span>)
+prediction_date= query.fetchall()[<span class="hljs-number">0</span>]
+query.close()
+
+first_prediction_date = prediction_date[<span class="hljs-number">0</span>]
+last_prediction_date = prediction_date[<span class="hljs-number">1</span>]
+
+<span class="hljs-keyword">if</span> last_reality_date <span class="hljs-keyword">is</span> <span class="hljs-keyword">None</span>:
+    date_extract = first_prediction_date
+
+<span class="hljs-keyword">elif</span>  last_reality_date &lt;= last_prediction_date:
+    date_extract = last_reality_date
+
+<span class="hljs-keyword">else</span>:
+    date_extract = last_reality_date
+
+
+data[<span class="hljs-string">'x'</span>] = data[<span class="hljs-string">'x'</span>].dt.round(<span class="hljs-string">'H'</span>)
+
+
+data_grouped = data.groupby(<span class="hljs-string">'x'</span>).sum().reset_index()
+
+
+data_grouped = data_grouped.loc[data_grouped[<span class="hljs-string">'x'</span>] &gt;= date_extract,:]
+
+
+upload_data = list(zip(data_grouped[<span class="hljs-string">'x'</span>], round(data_grouped[<span class="hljs-string">'y'</span>],<span class="hljs-number">4</span>)))
+upload_data[:<span class="hljs-number">3</span>]
+
+
+<span class="hljs-keyword">for</span> upload_day <span class="hljs-keyword">in</span> upload_data:
+    timestamp, reality= upload_day
+    result = engine.execute(f<span class="hljs-string">"INSERT INTO reality(reality_date, reality) VALUES('{timestamp}', '{reality}') ON CONFLICT (reality_date) DO UPDATE SET reality_date = '{timestamp}', reality= '{reality}';"</span>)
+    result.close()
+</pre>
+
+
+
+<p>最后，我使用GitHub Actions自动化了这个工作流，这样每小时都会执行一次脚本并向数据库中插入新数据。这种自动化是通过以下YAML文件完成的:</p>
+
+
+
+<pre class="hljs">name: update-ddbb
+
+on:
+  schedule:
+    - cron: <span class="hljs-string">'0 0/6 * * *'</span> 
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Access the repo
+        uses: actions/checkout@v2 
+    
+      - name: Configure Python
+        uses: actions/setup-python@v2
+        <span class="hljs-keyword">with</span>:
+          python-version: <span class="hljs-string">'3.9.7'</span> 
+      
+      - name: Install necessary libraries
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Execute Python Script
+        env: 
+          URI: ${{ secrets.URI }}
+        run: python update_real_data.py
+</pre>
+
+
+
+<p>正如您所看到的，仅仅用两个简单的文件，我们就构建并自动化了一个ETL过程。正如我之前所说的，您也可以使用其他工具，如Apache Airflow，但是如果您没有它，您可以使用GitHub Actions。</p>
+
+
+
+<p>既然我们已经了解了如何获取数据，现在让我们看看如何用GitHub操作构建模型训练和选择管道。</p>
+
+
+
+<h3 id="model-train-and-selection-pipeline-with-github-actions">使用GitHub操作的模型训练和选择管道</h3>
+
+
+
+<h4 id="how-to-build-model-train-and-selection-pipeline-requirements-with-github-actions">如何用GitHub动作建立模型训练和选择管道需求</h4>
+
+
+
+<p>用GitHub动作构建模型选择管道非常简单。您只需要创建一个脚本来读取您之前在数据提取管道中清理的数据，并使用它构建几个模型。</p>
+
+
+
+<p>在建立了几个模型之后，你需要使用足够的性能模型来评估它们(你可以在这篇文章的<a href="https://web.archive.org/web/20220926085139/https://neptune.ai/blog/performance-metrics-in-machine-learning-complete-guide">中了解更多关于机器学习的性能指标)。</a></p>
+
+
+
+<p>一旦你做到了这一点，你就找到了你训练过的表现最好的模型。这个模型是我们将用来进行预测的模型，它将由我们的API提供服务。</p>
+
+
+
+<p><em>注:在分类和回归模型中，比较新模型和生产模型的预测能力通常是一种好的做法。然而，在预测模型中，这通常是不需要的，因为具有较新数据的模型通常比过去的模型效果更好。</em></p>
+
+
+
+<h4 id="example-of-model-train-selection-pipeline">模型训练和选择流程示例</h4>
+
+
+
+<p>首先，为了将模型投入生产，我们必须创建一个脚本来创建和调优几个模型。为此，我使用随机森林作为自回归模型进行了网格搜索。</p>
+
+
+
+<p>为此，我使用了<a href="https://web.archive.org/web/20220926085139/https://github.com/JoaquinAmatRodrigo/skforecast" target="_blank" rel="noreferrer noopener nofollow"> skforecast库</a>，这是一个使用<a href="https://web.archive.org/web/20220926085139/https://scikit-learn.org/stable/" target="_blank" rel="noreferrer noopener nofollow"> sklearn的</a>模型作为时间序列预测的自回归模型的库(你可以在这里了解更多关于它的<a href="https://web.archive.org/web/20220926085139/https://github.com/JoaquinAmatRodrigo/skforecast" target="_blank" rel="noreferrer noopener nofollow">)。</a></p>
+
+
+
+<p>在现实世界的场景中，我们不应该使用一个带有超参数调整的单一模型，而是应该训练几个模型，并调整每个模型的超参数。然而，为了使教程更加动态，我将只训练一个模型。</p>
+
+
+
+<p>最后，在建立模型后，我将获得并保存最佳表现模型和最后的训练数据到一个文件中。这两个文件是进行预测所必需的。</p>
+
+
+
+<p>在这一点上，我建议保存已经在元数据存储(比如Neptune)中构建的所有模型的信息。通过这样做，您将获得关于已经构建的所有模型的信息，以及为什么选择生产中的模型。</p>
+
+
+
+
+
+
+<p>在我们的比特币每小时交易预测示例中，这个过程是使用以下Python脚本进行的:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> pickle
+
+
+<span class="hljs-keyword">from</span> utils <span class="hljs-keyword">import</span> create_predictors
+<span class="hljs-keyword">from</span> skforecast.model_selection <span class="hljs-keyword">import</span> grid_search_forecaster
+<span class="hljs-keyword">from</span> skforecast.ForecasterAutoregCustom <span class="hljs-keyword">import</span> ForecasterAutoregCustom
+<span class="hljs-keyword">from</span> sklearn.ensemble <span class="hljs-keyword">import</span> RandomForestRegressor
+
+
+<span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime
+
+
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">from</span> dotenv <span class="hljs-keyword">import</span> load_dotenv
+<span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+load_dotenv()
+
+
+NEPTUNE_API_KEY = os.environ.get(<span class="hljs-string">'NEPTUNE_API_KEY'</span>)
+NEPTUNE_PROJECT = os.environ.get(<span class="hljs-string">'NEPTUNE_PROJECT'</span>)
+
+
+
+steps = <span class="hljs-number">36</span>
+n_datos_entrenar = <span class="hljs-number">200</span>
+path_fichero = <span class="hljs-string">'bitcoin.csv'</span>
+path_modelo = <span class="hljs-string">'model.pickle'</span>
+uri_mlflow = <span class="hljs-string">'http://104.198.136.57:8080/'</span>
+experiment_name = <span class="hljs-string">"bictoin_transactions"</span>
+
+
+url = <span class="hljs-string">'https://api.blockchain.info/charts/transactions-per-second?timespan=all&amp;sampled=false&amp;metadata=false&amp;cors=true&amp;format=json'</span>
+resp = requests.get(url)
+
+data = pd.DataFrame(resp.json()[<span class="hljs-string">'values'</span>])
+
+
+data[<span class="hljs-string">'x'</span>] = [datetime.utcfromtimestamp(x).strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> data[<span class="hljs-string">'x'</span>]]
+data[<span class="hljs-string">'x'</span>] = pd.to_datetime(data[<span class="hljs-string">'x'</span>])
+
+
+data.columns = [<span class="hljs-string">'date'</span>, <span class="hljs-string">'transactions'</span>]
+
+
+data[<span class="hljs-string">'date'</span>] = data[<span class="hljs-string">'date'</span>].dt.round(<span class="hljs-string">'H'</span>)
+grouped_data = data.groupby(<span class="hljs-string">'date'</span>).sum().reset_index()
+
+
+grouped_data = grouped_data.set_index(<span class="hljs-string">'date'</span>)
+grouped_data = grouped_data[<span class="hljs-string">'transactions'</span>]
+
+
+train_data = grouped_data[ -n_datos_entrenar:-steps]
+test_data  = grouped_data[-steps:]
+
+
+forecaster_rf = ForecasterAutoregCustom(
+                    regressor      = RandomForestRegressor(random_state=<span class="hljs-number">123</span>),
+                    fun_predictors = create_predictors,
+                    window_size    = <span class="hljs-number">20</span>
+                )
+
+
+param_grid = { <span class="hljs-string">'n_estimators'</span>: [<span class="hljs-number">100</span>, <span class="hljs-number">500</span>], <span class="hljs-string">'max_depth'</span>: [<span class="hljs-number">3</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>] }
+
+grid_results = grid_search_forecaster(
+                        forecaster  = forecaster_rf,
+                        y           = train_data,
+                        param_grid  = param_grid,
+                        steps       = <span class="hljs-number">10</span>,
+                        method      = <span class="hljs-string">'cv'</span>,
+                        metric      = <span class="hljs-string">'mean_squared_error'</span>,
+                        initial_train_size    = int(len(train_data)*<span class="hljs-number">0.5</span>),
+                        allow_incomplete_fold = <span class="hljs-keyword">True</span>,
+                        return_best = <span class="hljs-keyword">True</span>,
+                        verbose     = <span class="hljs-keyword">False</span>
+                    )
+
+
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(grid_results.shape[<span class="hljs-number">0</span>]):
+
+  run = neptune.init(
+      project= NEPTUNE_PROJECT,
+      api_token=NEPTUNE_API_KEY,
+  ) 
+  
+  params = grid_results[<span class="hljs-string">'params'</span>][i]
+  run[<span class="hljs-string">"parameters"</span>] = params
+  run[<span class="hljs-string">"mean_squared_error"</span>] = grid_results[<span class="hljs-string">'metric'</span>][i]
+  
+  run.stop()
+
+
+last_training_date = test_data.index[<span class="hljs-number">-1</span>].strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>)
+pickle.dump(last_training_date, open(<span class="hljs-string">'last_training_date.pickle'</span>, <span class="hljs-string">'wb'</span>))
+pickle.dump(forecaster_rf, open(path_modelo, <span class="hljs-string">'wb'</span>))
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example.png?ssl=1" data-lbwps-width="1600" data-lbwps-height="756" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example.png"><img data-attachment-id="62029" data-permalink="https://web.archive.org/web/20220926085139/https://neptune.ai/attachment/neptune-with-github-actions-example" data-orig-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example.png?fit=1600%2C756&amp;ssl=1" data-orig-size="1600,756" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Neptune-with-Github-Actions-example" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example.png?fit=300%2C142&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example.png?fit=1024%2C484&amp;ssl=1" src="../Images/5e7d9243454ff22e81a8b7a4ab3735a6.png" alt="Neptune with Github Actions example" class="wp-image-62029 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example-1024x484.png?resize=1024%2C484&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926085139im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example-1024x484.png?resize=1024%2C484&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62029" data-permalink="https://web.archive.org/web/20220926085139/https://neptune.ai/attachment/neptune-with-github-actions-example" data-orig-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example.png?fit=1600%2C756&amp;ssl=1" data-orig-size="1600,756" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Neptune-with-Github-Actions-example" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example.png?fit=300%2C142&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example.png?fit=1024%2C484&amp;ssl=1" src="../Images/5e7d9243454ff22e81a8b7a4ab3735a6.png" alt="Neptune with Github Actions example" class="wp-image-62029" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926085139im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Neptune-with-Github-Actions-example-1024x484.png?resize=1024%2C484&amp;ssl=1"/></noscript></a><figcaption><em>Tracked runs visible in the Neptune UI | <a href="https://web.archive.org/web/20220926085139/https://app.neptune.ai/anderfernandezj/mlops-github-example/experiments?compare=IwFgDANMU8Q&amp;split=tbl&amp;dash=leaderboard&amp;viewId=standard-view" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+<p>现在我们已经构建了模型，让我们看看如何将它包装成一个API来使模型服务。</p>
+
+
+
+<h3 id="wrapping-the-model-as-an-api">将模型包装成API</h3>
+
+
+
+<p>一旦创建了模型，为了将它投入生产，我们将创建一个API来接收模型参数作为输入并返回预测。</p>
+
+
+
+<p>此外，除了返回预测，API将输入数据和预测保存在数据库中也很重要。通过这种方式，我们可以稍后将预测与现实进行比较，从而了解我们的模型表现如何，如果它表现不正常，我们可以重新训练它。</p>
+
+
+
+<p>如何在API中包装模型将取决于您使用的语言类型，以及您的偏好。在使用R的情况下，最正常的事情是你使用<a href="https://web.archive.org/web/20220926085139/https://www.rplumber.io/" target="_blank" rel="noreferrer noopener nofollow"> plumber </a>库，而在Python中你有几个库，如<a href="https://web.archive.org/web/20220926085139/https://fastapi.tiangolo.com/" target="_blank" rel="noreferrer noopener nofollow"> FastAPI </a>或<a href="https://web.archive.org/web/20220926085139/https://flask.palletsprojects.com/en/1.1.x/api/" target="_blank" rel="noreferrer noopener nofollow"> Flask </a>。</p>
+
+
+
+<p>说到这里，让我们看看如何在我们的例子中实现这一点。</p>
+
+
+
+<h4 id="example-of-wrapping-the-model-as-an-api">将模型包装成API的例子</h4>
+
+
+
+<p>为了用Python创建API，我选择使用FastAPI作为API生成框架，因为它允许轻松创建API，还可以检查输入的数据类型。</p>
+
+
+
+<p>此外，为了保存模型的预测，我在Postgres数据库中创建了一个表。通过这样做，因为真实数据在一个表中，而预测在另一个表中，所以我创建了一个视图，其中有:</p>
+
+
+<div class="custom-point-list">
+<ol><li>我预测的时间</li><li>我对那个小时的预测。</li><li>那一小时的实际交易数量。</li><li>预测绝对误差。</li></ol>
+</div>
+
+
+<p>通过这样做，创建一个可视化的视图来显示模型随时间推移的性能，就像连接到这个视图并显示一些图表和KPI一样简单。</p>
+
+
+
+<p>关于API，内部发生的事情非常简单，你只需加载模型，进行预测，然后将其插入数据库。</p>
+
+
+
+<p>然而，在我们的例子中，由于它是一个时间序列模型，它有一个额外的复杂性层，因为我们可能会对某个日期进行预测，而我们之前已经对该日期进行了预测。在这种情况下，在数据库中进行插入是不够的，还必须替换以前的值。</p>
+
+
+
+<p>因此，在下面的脚本中，您可以看到我是如何创建API的:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> fastapi <span class="hljs-keyword">import</span> FastAPI
+app = FastAPI()
+<span class="hljs-meta">@app.post("/forecast")</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forecast</span><span class="hljs-params">(num_predictions = <span class="hljs-number">168</span>, return_predictions = True)</span>:</span>
+    
+    <span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+    <span class="hljs-keyword">import</span> requests
+    <span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime
+    <span class="hljs-keyword">from</span> sqlalchemy <span class="hljs-keyword">import</span> create_engine
+    <span class="hljs-keyword">import</span> pickle
+    <span class="hljs-keyword">import</span> os
+    uri = os.environ.get(<span class="hljs-string">'URI'</span>)
+    
+    
+    forecaster_rf = pickle.load(open(<span class="hljs-string">'model.pickle'</span>, <span class="hljs-string">'rb'</span>))
+    last_training_date = pickle.load(open(<span class="hljs-string">'last_training_date.pickle'</span>, <span class="hljs-string">'rb'</span>))
+    last_training_date = datetime.strptime(last_training_date, <span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>) 
+
+    
+    url = <span class="hljs-string">'https://api.blockchain.info/charts/transactions-per-second?timespan=all&amp;sampled=false&amp;metadata=false&amp;cors=true&amp;format=json'</span>
+    resp = requests.get(url)
+    data = pd.DataFrame(resp.json()[<span class="hljs-string">'values'</span>])
+
+    
+    data[<span class="hljs-string">'x'</span>] = [datetime.utcfromtimestamp(x).strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> data[<span class="hljs-string">'x'</span>]]
+    data[<span class="hljs-string">'x'</span>] = pd.to_datetime(data[<span class="hljs-string">'x'</span>])
+    
+    
+    engine = create_engine(uri)
+    query = engine.execute(<span class="hljs-string">'SELECT MAX(prediction_date) FROM predictions;'</span>)
+    last_prediction_date= query.fetchall()[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]
+    query.close()        
+
+    
+    <span class="hljs-keyword">if</span>  (last_prediction_date <span class="hljs-keyword">is</span> <span class="hljs-keyword">None</span>) <span class="hljs-keyword">or</span> (last_prediction_date &gt; last_training_date):
+        
+        
+        predictions = forecaster_rf.predict(num_predictions)
+
+        fechas = pd.date_range(
+            start = last_training_date.strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>),
+            periods = num_predictions,
+            freq = <span class="hljs-string">'1H'</span>
+            )
+
+    <span class="hljs-keyword">elif</span> last_prediction_date &gt; last_training_date:
+        
+        dif_seg= last_prediction_date - last_training_date
+        hours_extract = num_predictions + dif_seg.seconds//<span class="hljs-number">3600</span>
+        predictions = forecaster_rf.predict(num_predictions)
+        
+        predictions = predictions[-num_predictions:]
+        
+        fechas = pd.date_range(
+            start = last_prediction_date.strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>),
+            periods = num_predictions,
+            freq = <span class="hljs-string">'1H'</span>
+            )
+    <span class="hljs-keyword">else</span>:
+        
+        predictions = forecaster_rf.predict(num_predictions)
+
+        fechas = pd.date_range(
+            start = last_training_date.strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>),
+            periods = num_predictions,
+            freq = <span class="hljs-string">'1H'</span>
+            )
+    
+    upload_data = list(zip([
+    datetime.now().strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>)] * num_predictions,
+    [fecha.strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>) <span class="hljs-keyword">for</span> fecha <span class="hljs-keyword">in</span> fechas ],
+        predictions
+    ))
+
+    
+    <span class="hljs-keyword">for</span> upload_day <span class="hljs-keyword">in</span> upload_data:
+        timestamp, fecha_pred, pred = upload_day
+        pred = round(pred, <span class="hljs-number">4</span>)
+
+        result = engine.execute(f<span class="hljs-string">"INSERT INTO predictions (timestamp, prediction_date,  prediccion)\
+            VALUES('{timestamp}', '{fecha_pred}', '{pred}') \
+            ON CONFLICT (prediction_date) DO UPDATE \
+            SET timestamp = '{timestamp}', \
+                prediccion = '{pred}'\
+            ;"</span>)
+        result.close()
+    <span class="hljs-keyword">if</span> return_predictions:
+        predictions
+    <span class="hljs-keyword">else</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-string">'New data inserted'</span>
+</pre>
+
+
+
+<p>现在我们已经创建了API，我们进入MLOps部分，看看如何将模型进行dockerize以将其投入生产。让我们去吧！</p>
+
+
+
+<h3 id="dockerizing-the-api">将API归档</h3>
+
+
+
+<p>一旦我们创建了返回预测的API，我们将把它包含在Docker容器中。通过这样做，我们将能够在任何使用Docker或Kubernetes的环境中把我们的代码投入生产，使我们的代码更加可移植和独立。</p>
+
+
+
+<p><em>注意:如果你是Docker的新手，我推荐你阅读<a href="https://web.archive.org/web/20220926085139/https://anderfernandez.com/en/blog/docker-tutorial-for-data-science/" target="_blank" rel="noreferrer noopener nofollow">这篇关于如何使用Docker进行数据科学的教程</a>。另一方面，如果你已经有了一些经验，肯定会对Docker最佳实践中的这篇文章感兴趣。</em></p>
+
+
+
+<p>因此，为了对我们的API进行Docker化，我们必须创建一个Docker文件，因为它是告诉Docker如何构建映像的文件。从这个意义上说，Dockerfile文件包含以下几点非常重要:</p>
+
+
+<div class="custom-point-list">
+<ol><li>安装我们使用的编程语言和API框架。</li><li>安装必要的库来正确执行我们的代码。</li><li>复制API、模型和API正确运行所需的所有文件。</li><li>在我们想要的端口中执行API。</li></ol>
+</div>
+
+
+<p>一旦我们创建了docker文件，验证它是否正常工作是很重要的。为此，我们必须执行以下命令:</p>
+
+
+
+<pre class="hljs">cd &lt;folder_where_Dockerfile_is_located&gt;
+docker build -t &lt;image_name&gt; .
+docker run -p &lt;port:port&gt; &lt;image_name&gt;
+</pre>
+
+
+
+<p>之后，我们可以访问我们的端口并检查API是否正常工作。如果是的话，我们可以进入下一步:将我们的模型投入生产。</p>
+
+
+
+<h3 id="setting-up-a-continuous-deployment-pipeline-with-cloud-and-github">使用云和GitHub建立持续部署管道</h3>
+
+
+
+<p>这是我们用GitHub动作开始MLOps过程的地方。因此，当使用GitHub操作执行MLOps时，我们要做的是，将我们的GitHub存储库与我们的云提供商连接起来，这样，每当我们在GitHub中推送我们的repo时，Docker映像就会在我们想要的云服务中构建和部署。而且，正如你可能想象的那样，一切都会自动发生。</p>
+
+
+
+<p>换句话说，我们将不再需要在我们的云环境中手动部署我们的代码，而是每次我们推送到我们的存储库时自动完成。是不是很酷？</p>
+
+
+
+
+
+
+<p>好消息是，对于这一点，过程总是相同的:</p>
+
+
+<div class="custom-point-list">
+<ol><li>将我们的云服务与GitHub连接起来，每次推送时，Docker图像都会上传到我们的云服务的容器注册中心。</li><li>创建一个文件，告诉我们的云服务应该对Docker映像执行哪些步骤。</li></ol>
+</div>
+
+
+<p>对于谷歌云，我们将使用以下工具:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong> Google Cloud Build: </strong>用于构建docker映像的服务。</li><li><strong>容器注册:</strong>存放容器的服务。</li><li><strong> Cloud Run: </strong>将容器化的API部署到一个服务的服务，该服务自动向下扩展到0，也就是说，如果该服务没有收到任何请求，就不会有虚拟机在运行。这意味着您只需在请求部署在Cloud Run中的服务时付费。</li></ul>
+</div>
+
+
+<p>主要想法是将Cloud Build与GitHub连接起来，这样每次推送回购时，Cloud Build都会构建映像。然后，运行一个脚本，将该映像推送到容器注册中心，并将其从容器注册中心部署到云运行。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="62071" data-permalink="https://web.archive.org/web/20220926085139/https://neptune.ai/attachment/github-actions-deployment_workflow" data-orig-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?fit=1503%2C325&amp;ssl=1" data-orig-size="1503,325" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GitHub-Actions-deployment_workflow" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?fit=300%2C65&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?fit=1024%2C221&amp;ssl=1" src="../Images/f1cb4e942c747916cc5f2b1e23045998.png" alt="" class="wp-image-62071 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?resize=1024%2C221&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926085139im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?resize=1024%2C221&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62071" data-permalink="https://web.archive.org/web/20220926085139/https://neptune.ai/attachment/github-actions-deployment_workflow" data-orig-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?fit=1503%2C325&amp;ssl=1" data-orig-size="1503,325" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GitHub-Actions-deployment_workflow" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?fit=300%2C65&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926085139/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?fit=1024%2C221&amp;ssl=1" src="../Images/f1cb4e942c747916cc5f2b1e23045998.png" alt="" class="wp-image-62071" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926085139im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GitHub-Actions-deployment_workflow.png?resize=1024%2C221&amp;ssl=1"/></noscript><figcaption><em>MLOps with GitHub Actions: deployment workflow | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>为此，我们必须遵循以下步骤:</p>
+
+
+
+
+
+
+
+
+<div class="custom-point-list">
+<ol start="3"><li>在事件部分，我们选择我们想要的触发器。在我们的例子中，我们将其保留为默认值:Push to a branch。</li></ol>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ol start="4"><li>在资源库下的Source中，点击“Connect new Repository”按钮，如下图所示，选择GitHub作为您的资源库。</li></ol>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ol start="5"><li>一个窗口将提示您授权GitHub帐户上的云构建应用程序。我们需要对它进行授权，并将应用程序安装在特定的存储库中或所有存储库中。</li></ol>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ol start="6"><li>为MLOPs流程选择存储库。从云构建触发器菜单构建到存储库。</li><li>选择云构建配置模式。在这种情况下，我们必须选择云构建配置文件选项，如下图所示:</li></ol>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ol start="8"><li>最后，我们选择一个服务帐户，然后单击“Create”按钮。</li></ol>
+</div>
+
+
+<p>很好，我们现在已经将GitHub帐户与Google容器注册中心连接起来了。这种自动化将在我们每次推送容器时执行。</p>
+
+
+
+<p>然而，我们仍然必须定义一个重要的并且经常被忽略的东西:云构建配置文件。我们来看看怎么做。</p>
+
+
+
+<h4 id="specifying-cloud-build-configuration-file">指定云构建配置文件</h4>
+
+
+
+<p>云构建配置文件是这样一个文件，它告诉云构建每当我们已经指出的触发器被触发时要执行什么云命令。</p>
+
+
+
+<p>在我们的例子中，我们只希望执行三个命令:</p>
+
+
+<div class="custom-point-list">
+<ol><li>使用来自GitHub库的文件创建Docker映像。</li><li>将Docker图像上传到Google Cloud Container注册表。</li><li>在Google云服务中部署docker映像，Kubernetes或Cloud Run(在我们的例子中，我们将使用后者)。</li></ol>
+</div>
+
+
+<p>我们将在一个. yaml文件中定义所有这些内容，指出每一点都是要执行的步骤。在下面的代码中，我们看到。我在比特币交易示例中使用的yaml文件:</p>
+
+
+
+<pre class="hljs">steps:
+- name: <span class="hljs-string">'gcr.io/cloud-builders/docker'</span>
+   args: [<span class="hljs-string">'build'</span>, <span class="hljs-string">'-t'</span>, <span class="hljs-string">'gcr.io/mlops-example/github.com/anderdecidata/mlops-example:$SHORT_SHA'</span>, <span class="hljs-string">'.'</span>]
+- name: <span class="hljs-string">'gcr.io/cloud-builders/docker'</span>
+  args: [<span class="hljs-string">'push'</span>, <span class="hljs-string">'gcr.io/mlops-example/github.com/anderdecidata/mlops-example:$SHORT_SHA'</span>]
+- name: <span class="hljs-string">'gcr.io/cloud-builders/gcloud'</span>
+  args: [<span class="hljs-string">'beta'</span>, <span class="hljs-string">'run'</span>, <span class="hljs-string">'deploy'</span>, <span class="hljs-string">'mlops-example'</span>, <span class="hljs-string">'--image=gcr.io/mlops-example/github.com/anderdecidata/mlops-example:$SHORT_SHA'</span>, <span class="hljs-string">'- -region=europe-west1'</span>, <span class="hljs-string">'--platform=managed'</span>]
+</pre>
+
+
+
+<p>此外，好消息是这个过程适用于所有三个主要的云环境:AWS、Azure和Google Cloud。虽然我们只讨论了Google Cloud，但这里有一个关于如何使用其他服务的简单解释:</p>
+
+
+<div class="custom-point-list">
+<ul><li>使用GitHub和Azure的MLOPs工作流:你需要创建一个GitHub动作，它在每次推送时运行，并使用Azure CLI登录，构建和推送映像，然后部署它。这里可以找到一个<a href="https://web.archive.org/web/20220926085139/https://docs.microsoft.com/en-us/azure/container-instances/container-instances-github-action" target="_blank" rel="noreferrer noopener nofollow">的例子。</a></li><li><strong>使用GitHub和AWS的MLOPs工作流</strong>:与Azure类似，您需要创建一个GitHub动作，该动作在每次推送时运行，登录AWS ECR并推送图像。这里可以找到一个<a href="https://web.archive.org/web/20220926085139/https://aws.amazon.com/es/blogs/containers/create-a-ci-cd-pipeline-for-amazon-ecs-with-github-actions-and-aws-codebuild-tests/" target="_blank" rel="noreferrer noopener nofollow">的例子。</a></li></ul>
+</div>
+
+
+<p>这样，我们就用GitHub操作创建了MLOps管道。这样，我们每推一款新机型到我们的GitHub，它就会自动投产。</p>
+
+
+
+<p>然而，这并不完全理想，因为我们需要定期手动重新训练模型。因此，让我们看看如何将我们的MLOps GitHub管道提升到一个新的水平。</p>
+
+
+
+<h3 id="automating-model-retrain-with-github-actions">用GitHub动作自动化模型重训练</h3>
+
+
+
+<p>根据我们到目前为止所看到的一切，要将重新训练的模型投入生产，我们只需创建一个脚本:</p>
+
+
+<div class="custom-point-list">
+<ol><li>运行模型训练文件。</li><li>将新模型推送到我们的GitHub库。</li></ol>
+</div>
+
+
+<p>这样，当推送完成时，Google Cloud Build会自动检测到它，并使用新的模型构建映像，上传到云容器注册表，最后部署到Cloud Run。</p>
+
+
+
+
+
+
+<p>正如您可能已经猜到的，我们可以使用GitHub动作自动执行模型再训练。我们只需创建一个GitHub动作，定期执行训练文件并将新文件推送到GitHub。</p>
+
+
+
+<p>然而，这一点也不理想。因为，如果预测足够好，我们为什么要重新训练一个模型呢？或者，如果当前模型返回错误的预测，我们为什么要等到下一个模型重新训练？</p>
+
+
+
+<p>因此，如果我们想更进一步，我们可以在模型的预测能力不好时重新训练模型。为此，我们只需:</p>
+
+
+<div class="custom-point-list">
+<ol><li>使用http请求触发模型重新训练工作流。</li><li>创建一个脚本来检查模型的预测能力。如果模型的预测能力小于我们设置的阈值，脚本将通过对它的http调用来执行重新训练工作流。</li></ol>
+</div>
+
+
+<p>后者是我如何用GitHub将它组装到MLOps工作流中，以预测比特币的交易数量。使用以下代码，我们可以检查MAE是否低于特定阈值，并在低于特定阈值的情况下启动重新训练工作流:</p>
+
+
+
+<pre class="hljs">
+
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">from</span> sqlalchemy <span class="hljs-keyword">import</span> create_engine
+<span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime, timedelta
+<span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">import</span> os
+
+
+user = <span class="hljs-string">'anderDecidata'</span>
+repo = <span class="hljs-string">'Ejemplo-MLOps'</span>
+event_type = <span class="hljs-string">'execute-retrain'</span>
+GITHUB_TOKEN = os.environ.get(<span class="hljs-string">'TOKEN'</span>)
+uri = os.environ.get(<span class="hljs-string">'URI'</span>)
+max_mae = <span class="hljs-number">6</span>
+n_observations_analyze = <span class="hljs-number">48</span>
+
+
+days_substract = round(n_observations_analyze/<span class="hljs-number">24</span>)
+
+
+engine = create_engine(uri)
+
+
+resp = engine.execute(<span class="hljs-string">'SELECT MAX(fecha) FROM tablon;'</span>)
+largest_date = resp.fetchall()
+resp.close()
+
+
+initial_date = largest_date[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>] - timedelta(days = days_subsctract)
+
+
+resp = engine.execute(f<span class="hljs-string">"SELECT * FROM tablon WHERE fecha &gt;'{initial_date}';"</span>)
+data = resp.fetchall()
+colnames = resp.keys()
+resp.close()
+
+
+data = pd.DataFrame(data, columns=colnames)
+
+
+print(data[<span class="hljs-string">'mae'</span>].mean())
+
+
+<span class="hljs-keyword">if</span> data[<span class="hljs-string">'mae'</span>].mean() &gt; max_mae:
+    url = f<span class="hljs-string">'https://api.github.com/repos/{user}/{repo}/dispatches'</span>
+    resp = requests.post(url, headers={<span class="hljs-string">'Authorization'</span>: f<span class="hljs-string">'token  {GITHUB_TOKEN}'</span>}, data = json.dumps({<span class="hljs-string">'event_type'</span>: event_type}))
+</pre>
+
+
+
+<p>此外，我们可以通过下面的GitHub动作自动执行这个脚本:</p>
+
+
+
+<pre class="hljs">name: Check retrain
+
+on:
+  schedule:
+    - cron: <span class="hljs-string">'0 0/2 * * *'</span> 
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v2 
+    
+      - name: Configure Python
+        uses: actions/setup-python@v2
+        <span class="hljs-keyword">with</span>:
+          python-version: <span class="hljs-string">'3.9.7'</span> 
+      
+      - name: Install libraries
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Execute python script 
+        env:
+          URI: ${{ secrets.URI }}
+          TOKEN: ${{secrets.TOKEN}}
+        run: python check_retrain.py
+</pre>
+
+
+
+<h2 id="conclusion">结论</h2>
+
+
+
+<p>正如您在本教程中可能已经看到的，可以通过GitHub操作以相对简单的方式创建MLOps工作流，只需在我们当前的工作工具中添加一些工具。</p>
+
+
+
+<p>在我看来，使用GitHub执行MLOps是一种非常好的方式来进行模型的持续部署，特别是在那些机器学习和高级分析不够重视或没有很多数据特定工具的组织中。</p>
+
+
+
+<p>我希望本教程能够帮助您了解如何使用GitHub构建MLOps管道。如果你从来没有做过，我个人建议你创建一个，因为这是一个非常好的学习方法。</p>
+
+
+
+<p>此外，如果你想学习其他工具而不是GitHub动作来构建MLOps管道，我会鼓励你学习<a href="https://web.archive.org/web/20220926085139/https://circleci.com/" target="_blank" rel="noreferrer noopener nofollow"> CircleCI </a>或<a href="https://web.archive.org/web/20220926085139/https://docs.gitlab.com/ee/ci/" target="_blank" rel="noreferrer noopener nofollow"> Gitlab CI </a>。这两个工具是公司用来代替GitHub Actions的替代品，但是构建MLOps管道的方式与本文中解释的方式相同。</p>
+
+
+
+<p><strong>相关资料:</strong></p>
+
+
+
+
+
+
+<div id="author-box-new-format-block_620f964916237" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">安德尔·费尔南德斯·黄雷盖</h3>
+    
+          <p class="article__authorContent-text">Decidata的高级数据科学家和德乌斯托大学大数据和商业智能研究生学位的教授(他在那里教授各种科目，从受监督的机器学习模型到创建ETL流程并将其放入云中)。他还试图通过他的博客与数据科学家社区分享所有这些知识，在他的博客中，他解释了数据世界中的各种主题:从从头开始的算法编程到云中的自动化脚本，所有这一切都是用R和Python编写的。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>最佳MLOps工具以及如何评估它们</h2>
+
+
+
+<p class="has-small-font-size">12分钟阅读| Jakub Czakon |年8月25日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>在我们的一篇文章中——<a href="https://web.archive.org/web/20220926085139/https://neptune.ai/blog/tools-libraries-frameworks-methodologies-ml-startups-roundup" target="_blank" rel="noreferrer noopener">机器学习团队实际使用的最好的工具、库、框架和方法——我们从41家ML初创公司学到的东西</a>——Acerta的CTO Jean-Christophe Petkovich解释了他们的ML团队如何接近MLOps。</p>
+
+
+
+<p><strong>据他所说，一个完整的MLOps系统有几个要素:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>您需要能够构建包含预处理数据和生成结果所需的所有信息的模型工件。</li><li>一旦您能够构建模型工件，您必须能够跟踪构建它们的代码，以及它们被训练和测试的数据。</li><li>您需要跟踪所有这三样东西，模型、它们的代码和它们的数据，是如何关联的。</li><li>一旦您可以跟踪所有这些内容，您还可以将它们标记为准备就绪，进行生产，并通过CI/CD流程运行它们。</li><li>最后，为了在该过程的最后实际部署它们，您需要某种方法来基于该模型工件旋转服务。</li></ul>
+</div>
+
+
+<p>这是对如何在公司中成功实施MLOps的高度概括。但是理解高层需要什么只是拼图的一部分。另一个是采用或创建适当的工具来完成工作。</p>
+
+
+
+<p>这就是为什么我们编制了一份<strong>最佳MLOps工具</strong>的清单。我们将它们分为六类，以便您可以为您的团队和业务选择合适的工具。让我们开始吧！</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20220926085139/https://neptune.ai/blog/best-mlops-tools" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

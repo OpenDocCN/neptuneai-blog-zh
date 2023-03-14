@@ -1,0 +1,181 @@
+<html>
+<head>
+<title>This Is Our MLOps Tool Stack: Continuum Industries </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>这是我们的MLOps工具堆栈:连续产业</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/mlops-tool-stack-continuum-industries#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/mlops-tool-stack-continuum-industries#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p><a href="https://web.archive.org/web/20220928194708/https://www.continuum.industries/" target="_blank" rel="noreferrer noopener nofollow"> Continuum Industries </a>是一家基础设施行业的公司，希望自动化和优化线性基础设施资产的设计，如水管、架空传输线、海底电力线或电信电缆。</p>
+
+
+
+<p>它的核心产品Optioneer允许客户输入工程设计假设和地理空间数据，并使用进化优化算法来寻找可能的解决方案，以在给定约束的情况下连接A点到B点。</p>
+
+
+
+<figure class="wp-block-video"><video controls="" src="https://web.archive.org/web/20220928194708im_/https://neptune.ai/wp-content/uploads/Continuum-Industries-video.mp4"/></figure>
+
+
+<div class="case-study-quote">
+    <p>“建造像电力线这样的东西是一个巨大的项目，所以你必须在开始之前获得正确的设计。你看到的设计越合理，你就能做出更好的决定。Optioneer可以在几分钟内为您提供设计资产，而成本只是传统设计方法的一小部分。”</p>
+    
+
+</div>
+
+
+
+<p>但是，创建和操作Optioneer引擎比看起来更具挑战性:</p>
+
+
+<div class="custom-point-list">
+<ul><li>目标函数不代表现实；</li><li>有大量土木工程师事先不知道的假设；</li><li>不同的客户会给它提出完全不同的问题，算法需要足够健壮来处理这些问题。</li></ul>
+</div>
+
+
+<p>与其构建完美的解决方案，不如向他们展示一系列有趣的设计选项，以便他们做出明智的决策。</p>
+
+
+
+
+
+
+<p>作为一个工程师团队，我们利用来自机械工程、电气工程、计算物理、应用数学和软件工程的各种技能来实现这一目标。我们还使用各种工具和框架。</p>
+
+
+
+
+
+
+
+<p>目前，我们的目标是开发和采用强大的QA流程，确保返回给最终用户的解决方案:</p>
+
+
+<div class="custom-point-list">
+<ul><li>好，意味着这是一个土木工程师可以看到并同意的结果。</li><li>正确，意味着计算并返回给最终用户的所有不同的工程数量尽可能正确。</li></ul>
+</div>
+
+
+<p>对我们发动机性能的持续监控和可重复测试将是这些流程的核心。</p>
+
+
+
+<p>“引擎”代码是用<strong> Python编写的，我们在那里使用通常的嫌疑对象:scipy、numpy、pandas和matplotlib </strong>。</p>
+
+
+
+<p>我们有一组“测试问题”,算法就是针对这些问题运行的。每个测试问题都由一个配置和一个包含所需地理空间数据的相对较大的文件来定义。代码使用<strong> <a href="https://web.archive.org/web/20220928194708/https://git-scm.com/" target="_blank" rel="noreferrer noopener nofollow"> git </a> </strong>版本化，地理空间数据使用<strong> <a href="https://web.archive.org/web/20220928194708/https://dvc.org/" target="_blank" rel="noreferrer noopener nofollow"> DVC </a> </strong>版本化。</p>
+
+
+
+<p>通常，当我们试图对算法进行改进时，我们从这些测试问题中的一个开始，然后用我们希望进行的任何修改来运行它。我们通常在这部分过程中使用<strong> <a href="/web/20220928194708/https://neptune.ai/product/experiment-tracking">【海王星】</a> </strong>，以便<a href="/web/20220928194708/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">跟踪实验</a>。这使我们能够轻松回顾到目前为止我们已经尝试过的内容，并计划接下来的步骤。</p>
+
+
+
+<p>一旦我们设法在那个测试问题中产生更好的结果，我们就将测试扩展到整个测试问题集。开发人员可以运行完整的测试管道(见下图)，然后将结果与主分支上的最新运行进行比较。这让我们知道在我们做出改变后，是否在我们所有的测试问题上有显著的统计改进。这条管道运行在<strong> <a href="https://web.archive.org/web/20220928194708/https://docs.github.com/en/actions" target="_blank" rel="noreferrer noopener nofollow"> Github Actions </a> </strong>上，并使用一个名为<a href="https://web.archive.org/web/20220928194708/https://cml.dev/" target="_blank" rel="noreferrer noopener nofollow"> <strong> CML </strong> </a>的工具来部署<strong> <a href="https://web.archive.org/web/20220928194708/https://aws.amazon.com/ec2/?ec2-whats-new.sort-by=item.additionalFields.postDateTime&amp;ec2-whats-new.sort-order=desc" target="_blank" rel="noreferrer noopener nofollow"> EC2 </a> </strong>实例。</p>
+
+
+<div class="wp-block-image custom-border-image">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?ssl=1" data-lbwps-width="2846" data-lbwps-height="1784" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png"><img data-attachment-id="50155" data-permalink="https://web.archive.org/web/20220928194708/https://neptune.ai/customers/continuum-industries/attachment/continuum-industries-pipeline-1" data-orig-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?fit=2846%2C1784&amp;ssl=1" data-orig-size="2846,1784" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Continuum Industries pipeline 1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?fit=300%2C188&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?fit=1024%2C642&amp;ssl=1" src="../Images/03896fd137d774212f00763f59d2332a.png" alt="Continuum Industries pipeline" class="wp-image-50155 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?resize=1024%2C642&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928194708im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?resize=1024%2C642&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="50155" data-permalink="https://web.archive.org/web/20220928194708/https://neptune.ai/customers/continuum-industries/attachment/continuum-industries-pipeline-1" data-orig-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?fit=2846%2C1784&amp;ssl=1" data-orig-size="2846,1784" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Continuum Industries pipeline 1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?fit=300%2C188&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?fit=1024%2C642&amp;ssl=1" src="../Images/03896fd137d774212f00763f59d2332a.png" alt="Continuum Industries pipeline" class="wp-image-50155" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928194708im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-pipeline-1.png?resize=1024%2C642&amp;ssl=1"/></noscript></a><figcaption><em><strong>Continuum Industries MLOps pipeline | Click to enlarge the image</strong></em></figcaption></figure></div>
+
+
+<p>如果我们对结果满意，我们就开始“生产”我们写的任何代码:我们清理它，写单元测试，等等。对于单元测试，我们使用<strong> <a href="https://web.archive.org/web/20220928194708/https://docs.pytest.org/en/6.2.x/" target="_blank" rel="noreferrer noopener nofollow"> pytest </a> </strong>和<a href="https://web.archive.org/web/20220928194708/https://hypothesis.readthedocs.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow"> <strong>假设</strong> </a>。后者是python单元测试的一个聪明的数据生成器，通常允许我们找到破坏代码的边缘情况并处理它们。</p>
+
+
+
+<p>对于算法本身，我们使用的是python中<strong> <a href="https://web.archive.org/web/20220928194708/https://platypus.readthedocs.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow">鸭嘴兽</a> </strong>库的大幅修改版本。我们进行了广泛的修改，以实现更好的并行计算，并更好地适应我们的总体用例。</p>
+
+
+
+<p>最后，我们使用<strong> <a href="https://web.archive.org/web/20220928194708/https://ray.io/" target="_blank" rel="noreferrer noopener nofollow">射线</a> </strong>来并行计算。我们发现它比python中的多处理模块要快得多，并且它有可能轻松地跨多台机器进行水平伸缩(尽管我们还没有利用这一功能)。</p>
+
+
+
+<p>对于我们的云，我们也使用<strong> <a href="https://web.archive.org/web/20220928194708/https://kubernetes.io/" target="_blank" rel="noreferrer noopener nofollow"> Kubernetes </a> </strong>，以及<strong> <a href="https://web.archive.org/web/20220928194708/https://argoproj.github.io/" target="_blank" rel="noreferrer noopener nofollow"> Argo </a> </strong>工作流。</p>
+
+
+<div class="wp-block-image custom-border-image">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?ssl=1" data-lbwps-width="1341" data-lbwps-height="750" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png"><img data-attachment-id="50793" data-permalink="https://web.archive.org/web/20220928194708/https://neptune.ai/blog/mlops-tool-stack-continuum-industries/attachment/continuum-industries-tool-stack-final" data-orig-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?fit=1341%2C750&amp;ssl=1" data-orig-size="1341,750" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Continuum Industries tool stack final" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?fit=300%2C168&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?fit=1024%2C573&amp;ssl=1" src="../Images/13ce7250c1e672d9751a50947264976f.png" alt="Continuum Industries tool stack final" class="wp-image-50793 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?resize=1024%2C573&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928194708im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?resize=1024%2C573&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="50793" data-permalink="https://web.archive.org/web/20220928194708/https://neptune.ai/blog/mlops-tool-stack-continuum-industries/attachment/continuum-industries-tool-stack-final" data-orig-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?fit=1341%2C750&amp;ssl=1" data-orig-size="1341,750" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Continuum Industries tool stack final" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?fit=300%2C168&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928194708/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?fit=1024%2C573&amp;ssl=1" src="../Images/13ce7250c1e672d9751a50947264976f.png" alt="Continuum Industries tool stack final" class="wp-image-50793" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928194708im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Continuum-Industries-tool-stack-final.png?resize=1024%2C573&amp;ssl=1"/></noscript></a><figcaption><em><strong>Continuum Industries tool stack |  Click to enlarge the image </strong></em></figcaption></figure></div>
+
+
+<h2 id="what-we-like-about-our-current-setup">我们喜欢当前设置的什么</h2>
+
+
+<div class="custom-point-list">
+<ul><li>整个测试管道都经过每个PR的单元测试，这意味着它运行可靠，不会在我们身上失败。</li><li>所有相关数据都记录在一个地方:git版本、多次运行的度量、配置数据等。</li><li>通过CUSTOM_RUN_ID功能，我们可以在CI/CD管道的不同阶段轻松处理和聚合数据，然后更新相关的运行。</li><li>Neptune的UI相当光滑，它使得跟踪、标记和管理跑步非常容易。</li><li>由于一切都是版本化的(用git编码，通过DVC的地理空间数据)，可重复性更容易实现。</li></ul>
+</div>
+
+
+<h2 id="what-we-don-t-like-about-our-current-setup">我们不喜欢当前的设置</h2>
+
+
+<div class="custom-point-list">
+<ul><li>我们的runners是spot实例，因此它们被AWS杀死的频率比我们希望的要高，这意味着我们需要重启管道。</li><li>因为完整的管道需要几个小时来运行，并且因为我们的CI/CD的其余部分是如何设置的，所以它不部署任何东西。更确切地说，它是一个“健全检查”,看看我们是否在上周破坏了什么。理想情况下，我们希望将结果的批准与新版本算法的部署联系起来。</li><li>该过程的最后一步仍然是手动的。一个人必须进入并运行一个脚本，从两次运行中下载数据，并在它们之间执行统计比较，以便告诉我们哪一次更好。因为它是手动的，它不是真正的管道的一部分，因此信息没有存储在Neptune中，这是一个遗憾。</li></ul>
+</div>
+
+
+
+<div id="author-box-new-format-block_610d4ffa0bdc0" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">安德烈亚斯·马莱科斯</h3>
+    
+          <p class="article__authorContent-text">首席科学家@Continuum Industries</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>最佳MLOps工具以及如何评估它们</h2>
+
+
+
+<p class="has-small-font-size">12分钟阅读| Jakub Czakon |年8月25日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>在我们的一篇文章中——<a href="https://web.archive.org/web/20220928194708/https://neptune.ai/blog/tools-libraries-frameworks-methodologies-ml-startups-roundup" target="_blank" rel="noreferrer noopener">机器学习团队实际使用的最好的工具、库、框架和方法——我们从41家ML初创公司学到的东西</a>——Acerta的CTO Jean-Christophe Petkovich解释了他们的ML团队如何接近MLOps。</p>
+
+
+
+<p><strong>据他所说，一个完整的MLOps系统有几个要素:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>您需要能够构建包含预处理数据和生成结果所需的所有信息的模型工件。</li><li>一旦您能够构建模型工件，您必须能够跟踪构建它们的代码，以及它们被训练和测试的数据。</li><li>您需要跟踪所有这三样东西，模型、它们的代码和它们的数据，是如何关联的。</li><li>一旦您可以跟踪所有这些内容，您还可以将它们标记为准备就绪，进行生产，并通过CI/CD流程运行它们。</li><li>最后，为了在该过程的最后实际部署它们，您需要某种方法来基于该模型工件旋转服务。</li></ul>
+</div>
+
+
+<p>这是对如何在公司中成功实施MLOps的高度概括。但是理解高层需要什么只是拼图的一部分。另一个是采用或创建适当的工具来完成工作。</p>
+
+
+
+<p>这就是为什么我们编制了一份<strong>最佳MLOps工具</strong>的清单。我们将它们分为六类，以便您可以为您的团队和业务选择合适的工具。让我们开始吧！</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20220928194708/https://neptune.ai/blog/best-mlops-tools" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

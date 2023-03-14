@@ -1,0 +1,2156 @@
+<html>
+<head>
+<title>Most Popular Programming Languages &amp; Why They’re Useful in Machine Learning </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>最流行的编程语言&amp;为什么它们在机器学习中有用</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/programming-languages-machine-learning#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/programming-languages-machine-learning#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>在线论坛和数据科学博客有很多建议:学习那种语言，跟上那个框架，你看过那个库吗？很难跟上所有最新的技术，尤其是在机器学习领域，这个领域几乎每天都在变化。</p>
+
+
+
+<p>在本文中，我们将带它回到基础，并讨论对机器学习最有用的编程语言。除了简要概述这些语言如何工作，我们还将涵盖机器学习的基础知识、数据科学家的流行趋势、有用的库、用例以及范例。让我们开始吧！</p>
+
+
+
+
+
+<h2 id="h-basic-overview-of-building-a-machine-learning-model">构建机器学习模型的基本概述</h2>
+
+
+
+<p>在了解为什么某些编程语言更适合ML之前，理解构建ML模型的基础是很重要的。</p>
+
+
+
+<p>机器学习是最接近模仿人脑的东西。ML算法在大量数据(图像、数字或单词)中搜索模式，以便做出预测。在搜索引擎和内容推荐系统的引擎盖下，是这些强大的机器学习算法。</p>
+
+
+
+<p>构建机器学习模型有4个基本步骤:</p>
+
+
+
+<h3>步骤1:整合数据集</h3>
+
+
+
+<p>数据集必须反映模型将做出的真实生活预测。训练数据可以分类；该模型将挑选出不同类别之间的不同特征和模式，以学习如何区分它们。例如，如果您训练一个模型对斑马和长颈鹿进行分类，数据集将包含这两种动物的图像，并进行适当的标记。</p>
+
+
+
+<p>您希望准备一个包含一切的数据集，这样模型的预测就不会不准确或有偏差。数据集应该是随机的、经过重复数据删除的、全面的，并分成训练集和测试集。</p>
+
+
+
+<p>您使用训练集来训练模型，使用测试集来确定模型的准确性，并确定潜在的警告和改进。训练集和测试集不应该有重叠的数据。</p>
+
+
+
+
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/70d2f11b465d00fae54ed257dd19ea8e.png" alt="Image dataset example" class="wp-image-42559" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230104135859im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Image-dataset-example.jpg?ssl=1"/><figcaption><em>Example of an image dataset that could be used for object detection | <a href="https://web.archive.org/web/20230104135859/https://scx2.b-cdn.net/gfx/news/hires/2018/restoringbal.jpg" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<h3>步骤2:选择合适的算法</h3>
+
+
+
+<p>根据手头的任务、训练数据量以及数据是否有标签，可以使用特定的算法。</p>
+
+
+
+<p>标记数据的常见算法包括:</p>
+
+
+
+<ul><li>回归算法</li><li>决策树</li><li>基于实例的算法</li></ul>
+
+
+
+<p>无标签数据的常见算法包括:</p>
+
+
+
+
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/565c5723febdda2f4d0823d78af61eeb.png" alt="Neural network" class="wp-image-42558" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230104135859im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-network.jpg?resize=597%2C437&amp;ssl=1"/><figcaption><em>A neural network acts as a human brain in order to recognize relationships within huge amounts of data. | <a href="https://web.archive.org/web/20230104135859/https://miro.medium.com/max/1592/1*yGMk1GSKKbyKr_cMarlWnA.jpeg" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+
+
+
+
+
+
+
+<h3>步骤3:在数据集上训练算法</h3>
+
+
+
+<p>该模型在数据集上反复训练，根据不正确的输出调整权重和偏差。例如，如果我们有一条直线的方程:y = mx + b，训练的可调值是“m”和“b”，或者我们的权重和偏差。我们无法影响输入(y)或输出(x ),因此我们必须在训练过程中调整m(斜率)和b (y截距),随机值被分配给m和b，直到线的位置受到影响，从而获得最正确的预测。随着不断迭代，模型的精度不断提高。</p>
+
+
+
+
+
+<h3>步骤4:测试+改进模型</h3>
+
+
+
+<p>您可以通过对以前从未用于训练的新数据进行测试或评估来检查模型的准确性。这将帮助你理解你的ML模型在现实世界中的表现。评估后，您可以微调我们在训练过程中最初假设的超参数；根据数据集、模型和训练过程的具体情况，调整这些超参数在某种程度上可以成为一个不断变化的实验过程。</p>
+
+
+
+<h2 id="h-applications-of-machine-learning">机器学习的应用</h2>
+
+
+
+<p>既然我们已经学习了构建简单机器学习模型背后的理论，让我们来探索现实世界中的各种应用。一旦你学会了机器学习，这就是你将能够建立的！</p>
+
+
+
+<h3>推荐引擎</h3>
+
+
+
+<p>几乎各大平台都有推荐系统。他们收集用户数据来推荐产品、服务或信息。推荐系统可能会跟踪数据，如用户的观看历史、用户观看某个内容的时间、他们对该内容的反应等。</p>
+
+
+
+
+
+
+
+<h3>社会化媒体</h3>
+
+
+
+<p>社交媒体平台使用各种各样的ML工具来保持它们的使用。例如，脸书分析你喜欢什么内容，以便提供相关的广告。Instagram通过图像处理识别视觉效果。Snapchat跟踪你的面部运动，同时使用计算机视觉对其进行过滤。</p>
+
+
+
+<h3>无人驾驶汽车</h3>
+
+
+
+<p>为了避开附近的物体，如行人和其他汽车，自动驾驶汽车通过传感器和摄像头收集周围的数据。使用SIFT(尺度不变特征变换)等ML算法，汽车可以表现得好像有人真的在方向盘后面一样。</p>
+
+
+
+
+
+<h3>教育</h3>
+
+
+
+<p>ML可用于识别苦苦挣扎的学生或教育平台中的差距。Anki和Quizlet等抽认卡工具使用算法来跟踪记忆和保持率。</p>
+
+
+
+<h3>医学+健康</h3>
+
+
+
+<p>ML技术正在成为医疗保健行业的重要组成部分。ML算法可用于确定最佳治疗过程，帮助进行更准确的诊断和药物开发，等等。医疗保健管理系统使用ML来绘制和治疗传染病，并为患者提供个性化护理。</p>
+
+
+
+
+
+
+
+<h3>人物检测</h3>
+
+
+
+<p>人物检测让您可以通过摄像机或视频来识别和跟踪人物。这项技术用于安全设备，最近正在亚马逊Go杂货店实施，该技术在顾客购物时跟踪他们，所以他们不必结账。</p>
+
+
+
+
+
+<h2 id="h-programming-languages-for-ml">ML编程语言</h2>
+
+
+
+<p>您现在已经对ML及其现实世界的应用程序有了基本的了解，但是可能很难知道从哪里或者如何开始。最重要的第一步是了解至少一种用于机器学习的主要编程语言。</p>
+
+
+
+<p>在我们深入讨论之前，我们先来谈谈数据科学家的受欢迎程度。Stack Overflow在2018年进行的开发者调查显示，Python是最受欢迎的编程语言，其次是Java和Javascript。</p>
+
+
+
+
+
+
+
+
+
+<p>Python拥有无可争议的受欢迎程度。Python的创造者Guido Van Rossum说:“我当然没有打算创造一种面向大众消费的语言。”可以肯定地说，他做了相反的事情，因为Python为那些回避编码的人带来了编码的前沿——过于复杂的语法早已成为过去。</p>
+
+
+
+
+
+<p>这个描述流行Python用例的图表是开发者调查的另一个成果。最初，web开发似乎是Python最受欢迎的用途，约占26%。然而，数据分析和机器学习的结合揭示了惊人的27%。那么为什么<em>对ML来说</em> Python这么受欢迎呢？</p>
+
+
+
+<p>在我们深入研究之前，我们必须了解人工智能项目在技术栈和所需技能方面不同于传统的软件项目。因此，选择一种稳定、灵活、拥有多样化工具的编程语言是非常重要的。Python满足了所有这些。</p>
+
+
+
+<p>除了简单性和一致性，它还有一个很棒的社区，可以帮助构建各种ML框架和库。这些是预先编写的Python代码包，可以帮助机器学习工程师快速解决常见任务，并更快地开发产品。</p>
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10"> </p>
+
+
+
+<div id="medium-table-block_a394db28e74cfb89a97b28f4d7471c8d" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">大众图书馆</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">特定用途</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">利益</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>支持多个后端神经计算引擎</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>用户友好，易于学习和建立模型，广泛采用</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>大型数值计算/多层神经网络</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>漂亮的计算图，库管理，调试，可扩展性，流水线</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p>ML和统计建模工具</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>进行各种任务，包括预处理、聚类、模型选择等。大量的功能，以及为各种目的而建造的</p>T3</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>从事线性代数、傅立叶变换和矩阵领域的工作</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>减少存储数据的内存使用量</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>构建在NumPy扩展之上，让用户操作和可视化数据</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>为了可视化和操纵数据的高级命令和类</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>用于数据分析、清理、探索、转换、可视化</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>多种功能，处理大数据，精简数据表现形式</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>建立在Matplotlib的基础上，创建漂亮而丰富的统计图形</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>美学与内置剧情</p> </div></td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_4208d943268219525e6b2f55f0ffa874" class="block-separator block-separator--25">正如您所看到的，Python为ML提供了一种其他语言无法提供的简单体验:您不必重新发明轮子。</p>
+
+
+
+<p>Python比其他编程语言更直观，因为它的语法非常简单，是团队实现的最佳选择。开发人员可以专注于手头的ML任务，如复杂的算法或通用的工作流，而不是语言的细节。看一下这个简单的例子:</p>
+
+
+
+<p><strong> C: </strong></p>
+
+
+
+<p><strong> Java: </strong></p>
+
+
+
+<pre class="hljs">
+
+main()
+{
+    printf(<span class="hljs-string">"Hello World"</span>);
+}</pre>
+
+
+
+<p>Python还具有难以置信的灵活性和平台无关性，因为它不需要Python解释器就能得到Linux、Windows和macOS的支持。这也使得在使用自己的GPU时，训练变得更加便宜和简单。57%的机器学习工程师报告使用Python，其中33%的人更喜欢将其用于开发。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloWorld</span> </span>{
+   <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>{
+      System.out.println(<span class="hljs-string">"Hello, World"</span>);
+   }
+}</pre>
+
+
+
+<p>然而，对于任何事情，我们也必须考虑Python的缺点:</p>
+
+
+
+<p>几乎没有统计模型包</p>
+
+
+
+<ul><li>由于全局解释器锁(GIL ), Python中的线程化很成问题，多线程CPU绑定的应用程序比单线程运行得慢。</li><li>稀有</li></ul>
+
+
+
+
+
+
+
+<h3>现在让我们来看看R。R是为高级统计和数据可视化而构建的。对于任何想要理解机器学习或统计中涉及的数学计算的人来说，这是适合你的语言。</h3>
+
+
+
+
+
+<p>在数据分析和可视化方面，Python中的R beats。它允许快速原型和数据集工作，以建立您的ML模型。例如，如果你想将大段文字分解成单词或短语来寻找模式，R会击败Python。</p>
+
+
+
+<p>r还附带了一个令人印象深刻的库和工具集，以帮助您的机器学习追求。这些高级数据分析包涵盖了建模前和建模后阶段，是为模型验证或数据可视化等特定任务而设计的。</p>
+
+
+
+<p>有用的包和库包括:</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10">大众图书馆</p>
+
+
+
+<div id="medium-table-block_ef60a9c97c5d2fa010cd517c848c3c44" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">特定用途</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">利益</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>用来“整理”你的数据并使其易于与</p> </div>一起工作的集合</td>
+
+                    
+                        <td class="c-ceil">用于“整理”您的数据并使其易于使用的集合</td>
+
+                    
+                        <td class="c-ceil">更高效的代码、有组织的数据</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p>Tidyr的一部分，将图形分解成语义组件的数据可视化包</p> </div></td>
+
+                    
+                        <td class="c-ceil">Tidyr的一部分，数据可视化包，将图形分解成语义组件</td>
+
+                    
+                        <td class="c-ceil">更轻松地浏览数据，同时创建复杂的可视化效果</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p>Tidyr的一部分，帮助挑战</p> </div></td>
+
+                    
+                        <td class="c-ceil">Tidyr的一部分，帮助应对数据操作挑战</td>
+
+                    
+                        <td class="c-ceil">快速，直接连接到外部数据库，链函数，以减少混乱和编码，语法简单</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>用于业务和财务分析</p> </div></td>
+
+                    
+                        <td class="c-ceil">用于业务和财务分析</td>
+
+                    
+                        <td class="c-ceil">模型和规模财务分析</td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_4208d943268219525e6b2f55f0ffa874" class="block-separator block-separator--25">除了一个活跃而有用的开源社区，R还可以免费下载并附带GNU包，这使它跻身于SAS和Matlab等昂贵的替代软件之列。R Studio是一个IDE，它允许开发人员创建ML算法的统计可视化。r附带了一个控制台、语法高亮编辑器和其他有用的工具，比如绘图、历史、调试、工作空间管理。</p>
+
+
+
+<p>要开始使用R并下载R studio，请查看其<a href="https://web.archive.org/web/20230104135859/https://rstudio.com/" target="_blank" rel="noreferrer noopener nofollow">网站</a>。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/846c485e87fd008ee05efe80e830f7a7.png" alt="rstudio-windows" class="wp-image-42566" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230104135859im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/rstudio-windows.png?resize=712%2C593&amp;ssl=1"/><figcaption><em>Screenshot of R Studio | <a href="https://web.archive.org/web/20230104135859/http://www.rstudio.com/wp-content/uploads/2014/04/rstudio-windows.png" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>现在我们来谈谈不那么有趣的部分。R的缺点包括:</p>
+
+
+
+<p>陡峭的学习曲线: R是一门难学的语言，这可能会增加为一个项目或团队寻找专家的难度。您使用的任何新包都需要学习，并且没有完整的r文档。</p>
+
+
+
+<ul><li>r可能不一致，因为它的算法来自第三方。</li><li>说到ML，最大的问题往往是R或Python。两者各有优缺点，但Python更适合数据操作和重复性任务。如果你想构建某种使用ML的产品，那就用Python吧。如果你需要一些深入的分析，R是你最好的选择。</li></ul>
+
+
+
+<p>朱莉娅</p>
+
+
+
+<h3>我们已经相当深入地讨论了ML的两种巨型语言。但是Julia是一个真正的失败者:虽然不像Python和R那样受欢迎，但它的功能与Python、MATLAB和R相当，并且具有C++和Java的执行速度。现在这个理由足够让你记住它了！Java有两个巨大的优势:速度+为并行而设计。因为它感觉像一种脚本语言，所以转换起来也不困难，所以Python / R开发人员可以很容易地掌握它。</h3>
+
+
+
+
+
+<p>在AI方面，Julia最适合深度学习(仅次于Python)，并且非常适合快速执行基础数学和科学。Julia专注于科学计算领域，非常适合这个领域。由于这些计算能力，Julia具有可伸缩性，并且比Python和r更快。</p>
+
+
+
+<p>其强大的本地工具包括:</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10">大众图书馆</p>
+
+
+
+<div id="medium-table-block_6f951eef04d604f37e1a86e38bb0bd36" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">特定用途</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">利益</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>轻量级的ML库，有用的工具，帮助你使用朱莉娅的全部力量</p> </div></td>
+
+                    
+                        <td class="c-ceil">轻量级ML库，有用的工具，帮助您使用朱莉娅的全部权力</td>
+
+                    
+                        <td class="c-ceil">用Julia编写，具有与Tensorflow相同的功能</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>深度学习框架，在Julia </p> </div>中使用模型的动态计算图支持GPU运算和自动微分</td>
+
+                    
+                        <td class="c-ceil">深度学习框架，使用Julia中的模型的动态计算图支持GPU操作和自动微分</td>
+
+                    
+                        <td class="c-ceil">用朱莉娅写的，活跃社区</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>可用于数据处理&amp;操纵、性能评估、交叉验证、模型调整等。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">可用于数据处理和操作、性能评估、交叉验证、模型调整等。</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> Julia版Tensorflow </p> </div></td>
+
+                    
+                        <td class="c-ceil">张量流的Julia版本</td>
+
+                    
+                        <td class="c-ceil">用Julia编写，提供了将计算表示为数据流图的灵活性</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>茱莉亚版Scikit学</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">朱莉娅版Scikit Learn</td>
+
+                    
+                        <td class="c-ceil">用Julia写的，让你进行预处理，聚类，模型选择等。:多种用途</td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_4208d943268219525e6b2f55f0ffa874" class="block-separator block-separator--25">Julia还可以调用Python、C和Fortran库，并带有交互式命令行和全功能调试器。</p>
+
+
+
+<p>然而，与Python相比，Julia在面向对象编程、可伸缩性、社区和各种库方面有所欠缺。它还处于初级阶段。大多数ML专家都使用两者:Julia用于后端深度学习，在那里它实现了最佳的性能比率，Python用于前端。</p>
+
+
+
+<p>Java Script语言</p>
+
+
+
+<h3>当您想到ML时，JavaScript肯定不是第一个想到的。虽然JavaScript主要用于web开发，但它已经用TensorFlow.js滑入了机器学习，TensorFlow.js是Google创建的开源库，它使用JavaScript在浏览器中构建机器学习模型，或者在Node.js中，JavaScript。对于那些只熟悉web开发的人来说，TensorFlow.js是进入ML的绝佳入口。TensorFlow.js支持WebGL，所以你的ML模型可以在有GPU的情况下运行；例如，如果用户在手机上打开网页，该模型可以利用感官数据。Tensorflow.js允许您导入现有的预训练模型，重新训练导入的模型，并在浏览器中创建模型。我们来看看TensorFlow.js的利弊</h3>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/af8fb47ceb48e66719eb7f305402837b.png" alt="Javascript tensorflow" class="wp-image-42568" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230104135859im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Javascript-tensorflow.png?resize=512%2C434&amp;ssl=1"/><figcaption><em>An example of what you can do with TensorFlow.js | <a href="https://web.archive.org/web/20230104135859/https://miro.medium.com/max/3200/0*hfplSJ9gMJCjluG-" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p> </p>
+
+
+
+
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10">赞成的意见</p>
+
+
+
+<div id="medium-table-block_9aff7cfcb3e81bfa4f55e995b01f9e11" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">骗局</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner"><div class="c-ceil__inner"> <p>具有很高的计算性能</p> </div></p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">具有很高的计算性能</td>
+
+                    
+                        <td class="c-ceil">数据限制:无法访问浏览器，这意味着数据资源有限</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">高度安全，设备在运行应用程序时可抵御外部威胁</td>
+
+                    
+                        <td class="c-ceil">对硬件加速的有限支持</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">几个用例:浏览器中的Javascript应用程序、Node.js环境中的服务器、桌面、移动设备等。</td>
+
+                    
+                        <td class="c-ceil">单线程，这会限制性能</td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_4208d943268219525e6b2f55f0ffa874" class="block-separator block-separator--25">许多开发人员将ML从后端服务器带到前端应用程序。TensorFlow.js允许开发人员在没有复杂后端系统的情况下，用纯HTML创建和运行ML模型。这种简单性让您可以轻松地创建伟大的项目。这里有几个例子:</p>
+
+
+
+<p>自动图片处理:通过卷积神经网络生成艺术</p>
+
+
+
+<ul><li>使用人工智能的游戏</li><li>内容推荐引擎</li><li>了解本地网络/设备使用模式的活动监控</li><li>对象检测，例如识别照片中的许可证</li><li>斯卡拉</li></ul>
+
+
+
+<h3>Scala比Python快得多，并且将面向对象和函数式编程的精华带到了一种高级语言中。它最初是为Java虚拟机(JVM)构建的，非常容易与Java代码交互。开发人员可以轻松构建高性能系统，同时通过Scala使用静态类型来避免错误。</h3>
+
+
+
+
+
+<p>Scala有几个用于线性代数、随机数生成、科学计算等的库。：</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10">大众图书馆</p>
+
+
+
+<div id="medium-table-block_bbc63ad3547212356432225ddecdd62a" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">特定用途</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">利益</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>用于通过数组支持、2D数据结构等进行数据操作。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">用于通过阵列支持、2D数据结构等进行数据操作。</td>
+
+                    
+                        <td class="c-ceil">构建在阵列支持的数据结构之上</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>一个快速GPU和CPU加速库</p> </div></td>
+
+                    
+                        <td class="c-ceil">快速GPU和CPU加速库</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>主要科学计算库，最好来自MATLAB的数据结构和来自Python的Numpy类</p> </div></td>
+
+                    
+                        <td class="c-ceil">主要的科学计算库，最好来自MATLAB的数据结构和Python的Numpy类</td>
+
+                    
+                        <td class="c-ceil">对数据阵列进行快速高效的操作</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> Scala版MATLAB计算功能</p> </div></td>
+
+                    
+                        <td class="c-ceil">MATLAB计算功能的Scala版本</td>
+
+                    
+                        <td class="c-ceil">附带Scala的可伸缩性和强大功能</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>用于自然语言处理</p> </div></td>
+
+                    
+                        <td class="c-ceil">用于自然语言处理</td>
+
+                    
+                        <td class="c-ceil">由于高速和GPU的使用，可以解析成千上万的句子</td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_4208d943268219525e6b2f55f0ffa874" class="block-separator block-separator--25">从性能、学习曲线和易用性来看，Scala也是Apache Spark的绝佳选择(Apache Spark是一个数据处理框架，用于在巨型数据集上处理任务，并将数据处理任务分布到多台计算机上)。</p>
+
+
+
+<p>现在我们来比较一下Scala的优缺点:</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10">赞成的意见</p>
+
+
+
+<div id="medium-table-block_b036e33b2d3a7f370a61cb7bcc455a95" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">骗局</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner"><div class="c-ceil__inner"> <p>允许利用JVM库，常用于企业代码</p> </div></p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">允许利用JVM库，经常在企业代码中使用</td>
+
+                    
+                        <td class="c-ceil">陡峭的学习曲线结合了函数式编程和面向对象编程</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">几个可读的语法特性</td>
+
+                    
+                        <td class="c-ceil">有限的开发人员社区、资源</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">功能特性，如字符串比较、模式匹配等。</td>
+
+                    
+                        <td class="c-ceil">
+                            <p class="c-ceil__inner">C/C++</p>
+                        </td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_6ce324eca2dad0119970dd8dec490481" class="block-separator block-separator--0">C/C++和机器学习是一对困难的组合。从一开始，Python似乎就比C/C++有许多优势:</p>
+
+
+
+<h3>Python更灵活，语法简单，也更容易学习</h3>
+
+
+
+
+
+<p>使用Python可以让你专注于ML的细微差别，而不是语言</p>
+
+
+
+<ul><li>大量的库和包</li><li>您可以通过Python解释器，仅通过命令行与数据交互工作</li><li>用C/C++调试ML算法要困难得多</li><li>然而，使用C/C++也有一些优点:</li><li>C/C++是最有效的语言之一，机器学习算法需要很快。</li></ul>
+
+
+
+<p>使用C/C++可以让你控制从内存、CPU等开始的单个资源。</p>
+
+
+
+<ul><li>很多ML框架比如TensorFlow，caffe，vowpal，wabbit，libsvm等等。实际上是用C++实现的</li><li>你一定会在招聘人员和公司面前脱颖而出</li><li>作为最古老的编程语言之一，C和C++在机器学习方面是一个利基。C可以用来补充现有的机器学习项目，计算机硬件工程师更喜欢C，因为它的速度和控制水平-你可以使用C/C++从头实现算法。</li><li>通常，在以下情况下使用C/C++:</li></ul>
+
+
+
+<p>速度极其重要</p>
+
+
+
+<p>没有适合您的用例的Python库</p>
+
+
+
+<ul><li>您希望控制内存的使用，因为您将达到系统的极限</li><li> </li><li>大众图书馆</li></ul>
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10">特定用途</p>
+
+
+
+<div id="medium-table-block_cbed0130ab28eda3efa478c22e0d462d" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">利益</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner"><div class="c-ceil__inner"> <p>大型数值计算/多层神经网络</p> </div></p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">大型数值计算/多层神经网络</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>漂亮的计算图，库管理，调试，可扩展性，流水线</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>微软认知工具包</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>深度学习工具包，使用有向图描绘神经网络一系列计算步骤</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>开源，让你使用庞大的数据集</p> </div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">深度学习框架，让您可以使用富有表现力的架构、可扩展的代码等。</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>让你更快的实现ML算法</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">让您更快地实现ML算法</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>强调扩展性和速度，易于使用</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p>【DyNet】</p></div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>支持NLP、图结构、强化学习等的神经网络库。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>高性能，在CPU或GPU上高效运行</p> </div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">有各种各样的ML方法，如多种数据表示，算法类，通用工具等。</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>开源，各种工具</p> </div></td>
+
+                    
+                        <td class="c-ceil">Java 语言(一种计算机语言，尤用于创建网站)</td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_f4849eeeb3a9365db870382b8f9d0dc4" class="block-separator block-separator--15">许多公司的基础设施、软件、应用程序等。都是用Java构建的，这意味着集成和兼容性问题被最小化了</p>
+
+
+
+<h3>许多流行的数据科学框架，如Fink、Hadoop、Hive和Spark都是用Java编写的</h3>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/0aa4f0a0250c1fb02836047c9e9b115f.png" alt="Java language" class="wp-image-42572" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230104135859im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Java-language.png?resize=599%2C448&amp;ssl=1"/><figcaption><em>Screenshot of the Weka Machine Learning Workbench | <a href="https://web.archive.org/web/20230104135859/https://machinelearningmastery.com/wp-content/uploads/2016/06/Weka-Explorer-Preprocess-Tab.png" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>Java可用于数据科学中的各种过程，如清理数据、数据导入和导出、统计分析、深度学习、NLP和数据可视化</p>
+
+
+
+<ul><li>Java虚拟机允许开发人员编写跨多个平台的相同代码，并且可以更快地构建工具</li><li>用Java构建的应用程序易于扩展</li><li>Java像C/C++一样运行迅速，这就是为什么Linkedin、脸书和Twitter使用Java来满足他们的一些ML需求</li><li>Java是一种强类型编程语言，这意味着开发人员必须对变量和数据类型有明确而具体的了解</li><li>生产代码库通常用Java编写</li><li>Java也为ML配备了各种工具和库:</li><li> </li><li>大众图书馆</li></ul>
+
+
+
+<p>特定用途</p>
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10">利益</p>
+
+
+
+<div id="medium-table-block_9eb5053485200b875402813884cc6411" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner"><div class="c-ceil__inner"> <p>用于通用机器学习:算法、数据挖掘、数据分析、预测建模</p> </div></p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">用于通用机器学习:算法、数据挖掘、数据分析、预测建模</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>开源，各种工具</p> </div></td>
+
+                    
+                        <td class="c-ceil">开源，各种各样的工具</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>用于创建可扩展的机器学习算法</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>可扩展的、现成的大型数据挖掘任务框架</p> </div></td>
+
+                    
+                        <td class="c-ceil">适用于大型数据挖掘任务的可扩展、即用型框架</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>开源软件，用于实时对数据流进行数据挖掘</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">广泛支持深度学习算法的框架</td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>开源，提供高处理能力</p> </div></td>
+
+                    
+                        <td class="c-ceil">开源，提供高处理能力</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>专门用于自然语言处理的工具包，可以用于主题建模、文档分类、聚类、信息抽取</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>建立在Java之上，让你用ML来处理文本文档</p> </div></td>
+
+                    
+                        <td class="c-ceil">构建于Java之上，允许您使用ML来处理文本文档</td>
+
+                    
+                        <td class="c-ceil">所有编程语言的能源数据</td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_f4849eeeb3a9365db870382b8f9d0dc4" class="block-separator block-separator--15">正如所料，在我们今天讨论的所有语言中，C语言被证明是最快和最节能的。</p>
+
+
+
+<h2 id="h-energy-data-for-all-the-programming-languages">所有编程语言的比较</h2>
+
+
+
+<p>让我们最后看一下这些语言提供的各种特性:</p>
+
+
+
+
+
+<p> </p>
+
+
+
+<h2 id="h-comparison-of-all-the-programming-languages">Comparison of all the programming languages  </h2>
+
+
+
+<p>计算机编程语言</p>
+
+
+
+<p id="separator-block_3dd91df81e651f57929a65b23560eb40" class="block-separator block-separator--10">稀有</p>
+
+
+
+<section id="large-table-block_6e5ef0ce2c3e01b982c81d103aac61d6" class="block-large-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+                <tr>
+                    <td class="c-item">朱莉娅</td>
+
+                                            <td class="c-item">
+                            <p class="c-item__inner">java描述语言</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">斯卡拉</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">C/C++</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">Java 语言(一种计算机语言，尤用于创建网站)</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">                                                                              </p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner"><strong>面向对象、命令式、函数式、面向方面、反射式</strong></p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner"><strong>面向对象和函数式编程的混合，命令式，反射式</strong></p>
+                        </td>
+                    
+                </tr>
+            </thead>
+        
+
+        <tbody class="c-table__body">
+
+                            
+                    <tr class="c-row">
+
+                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>多重调度，因此易于表达面向对象和函数式编程模式</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>命令式、面向对象、功能性、反思性</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>面向对象、功能性、通用性</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>祈使句</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>命令式、面向对象、通用、反射式</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否，因为语言参考包含在每个版本的文档中</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong> </strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>强</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>强</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>强</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>虚弱</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>强</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>虚弱</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>强</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>安全</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>安全</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>安全</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>安全</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>不安全</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>安全</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>隐含的</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>隐含的</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>隐含的</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>隐含的</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>部分隐式</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>显式</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>显式</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>鸭子，结构</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong> </strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>主格结构</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>主格</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>主格</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>动态</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>动态</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>动态</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>动态</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>静态</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>静态</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>静态</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>按值</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>所需值</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>“路过共享”</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>按值</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>按值+名称</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>通过值/指针</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>按值</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>是</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> Optional </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">ML，网络开发。，游戏开发。，软件开发。</p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>统计计算与图形、数值计算、可视化</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><div class="c-ceil__inner"> <p>并行性，//r//n//r//n“我们想要像Python一样可用于一般编程，像R一样易于统计，像Perl一样自然地处理字符串，像Matlab一样强大地处理线性代数，像shell一样善于将程序粘在一起。”<a href="https://web.archive.org/web/20230104135859/https://julialang.org/blog/2012/02/why-we-created-julia/" target="_blank" rel="noopener noreferrer">出处</a></p>T5】</div></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">并行性，//r//n//r//n“我们想要像Python一样适用于一般编程，像R一样易于统计，像Perl一样自然地处理字符串，像Matlab一样强大地处理线性代数，像shell一样善于将程序粘合在一起。”<a href="https://web.archive.org/web/20230104135859/https://julialang.org/blog/2012/02/why-we-created-julia/" target="_blank" rel="noopener noreferrer">来源</a></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">Web脚本、Web +移动开发、Web服务器+游戏开发。</p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil"><strong>通用语言、并行计算、DSL和计算</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">应用程序、服务器端、后端开发、Android开发。</p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>生产力、代码可读性、简单性、模块化</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>交互式、全面的数据集分析，高级数据分析</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>通用、全面的数据集分析、强大且快速</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">Web开发。</p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>Java的更好替代方案，简洁、类型安全、可伸缩、平台独立</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>低级别访问</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>简单、安全、分布式、面向对象、健壮、可移植的“一次编写，随处运行”</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><div class="c-ceil__inner"> <p> <strong>人气:</strong> <br/> <strong>【按优先级排列】</strong> </p> </div></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>人气:</strong> <br/> <strong>【优先顺位】</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 57% </strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong> 31% </strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 28% </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>不适用</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 43% </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 41% </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 33% </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 5% </strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>不适用</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 7% </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>不适用</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 19% </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 16% </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>情感分析、NLP/chatots、网络挖掘</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>情感分析、生物工程/生物信息学、欺诈检测</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>科学计算</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">搜索引擎，网络开发。</p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>大数据</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>游戏中的人工智能、机器人移动、网络安全+网络攻击检测</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>客户支持管理、网络安全+网络攻击检测+欺诈检测</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><div class="c-ceil__inner"> <p> <strong>进入ML前的专业背景* </strong> </p> </div></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>进入ML前的专业背景* </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>数据科学</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>数据分析师/统计师</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>前端web开发人员</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>不适用</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>嵌入式计算硬件，电子工程师</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>前端桌面应用开发者</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>对ML好奇</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>数据科学</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong> </strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">增加获得工作的机会</p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>将机器学习添加到现有应用中</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>公司</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                              </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> Keras, Tensorflow, Scikit learn, NumPy, SciPy, Pandas, Seaborn </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> Tidyr，Ggplot2，Dplyr，tidy quat</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>流动、膝、MLBase.jl、tensorflow . jl、ScikitLearn.jl </strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> TensorFlow.js </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>鞍座、气雾、微风、标量、NLP </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> Tensorflow，微软认知工具包，Caffe，MLpack，DyNet，幕府将军</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> Weka，Apache mahout，海量在线分析，Deeplearning4j，Mallet </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><div class="c-ceil__inner"> <p> <strong>资源/文档/社区</strong></p>T5】</div></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>资源/文档/社区</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>伟大的</strong></p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first"><strong>伟大的</strong></td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>可能对ML更好</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>可能更大</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>好的</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>好的</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">
+                                                                                            <strong>
+                                                    Could be bigger                                                </strong>
+                                            
+                                            
+                                                                                    </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">
+                                                                                            <strong>
+                                                    Good                                                </strong>
+                                            
+                                            
+                                                                                    </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">
+                                                                                            <strong>
+                                                    Good                                                </strong>
+                                            
+                                            
+                                                                                    </p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                            
+        </tbody>
+
+    </table>
+
+</section>
+        </div>
+        
+    </div>    
+</body>
+</html>

@@ -1,0 +1,882 @@
+<html>
+<head>
+<title>XGBoost: Everything You Need to Know </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>XGBoost:您需要知道的一切</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/xgboost-everything-you-need-to-know#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/xgboost-everything-you-need-to-know#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p><a href="/web/20230304041944/https://neptune.ai/blog/gradient-boosted-decision-trees-guide" target="_blank" rel="noreferrer noopener">梯度推进(GBM)树</a>在没有指定模型的情况下从数据中学习，它们进行无监督学习。<a href="https://web.archive.org/web/20230304041944/https://xgboost.readthedocs.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow"> XGBoost </a>是一个流行的梯度推进库，用于GPU训练、分布式计算和并行化。它是精确的，它很好地适应所有类型的数据和问题，它有很好的文档，总体来说它非常容易使用。</p>
+
+
+
+<p>目前，它是通过机器学习从预测建模中获得准确结果的事实上的标准算法。对于R、Python和C++来说，它是速度最快的梯度提升库，具有非常高的准确性。</p>
+
+
+
+<p>我们将探索如何使用该模型，同时使用Neptune来呈现和详述ML项目管理的一些最佳实践。</p>
+
+
+
+<p>如果您不确定XGBoost对您来说是不是一个很好的选择，请跟随教程直到结束，然后您将能够做出一个完全明智的决定。</p>
+
+
+
+<h2 id="algorithms">集成算法–解释</h2>
+
+
+
+<p><a href="/web/20230304041944/https://neptune.ai/blog/ensemble-learning-guide" target="_blank" rel="noreferrer noopener">集成学习</a>结合几个<em>学习器</em>(模型)来提高整体性能，增加机器学习和预测建模的预测性和准确性。</p>
+
+
+
+<p>从技术上来说，集成模型的力量很简单:它可以结合成千上万个在原始数据子集上训练的较小的学习者。这可能会导致有趣的观察结果，例如:</p>
+
+
+
+<ul>
+<li>由于<strong>装袋</strong>，通用模型的方差显著降低</li>
+
+
+
+<li>由于<strong>升压</strong>，偏置也会降低</li>
+
+
+
+<li>由于<strong>叠加</strong>，整体预测能力提高</li>
+</ul>
+
+
+
+<h3>集合方法的类型</h3>
+
+
+
+<p>基于子学习器是如何产生的，集成方法可以分为两组:</p>
+
+
+
+<ol>
+<li><strong> <em>顺序</em> </strong>系综方法——学习者被<strong>顺序生成</strong>。这些方法使用基础学习者之间的依赖性。每个学习者都会影响下一个学习者，同样，也可以推导出一般的父性行为。顺序集成算法的一个流行例子是<strong> AdaBoost。</strong></li>
+
+
+
+<li><strong> <em>并行</em> </strong>集成方法——学习者是<strong>并行生成</strong>。基础学习者是独立创建的，以研究和利用与他们的独立性相关的效果，并通过平均结果来减少错误。实现这种方法的一个例子是<strong>随机森林</strong>。</li>
+</ol>
+
+
+
+<p>集成方法可以使用<strong>同质学习者</strong>(来自同一个家庭的学习者)或<strong>异质学习者</strong>(来自多个类别的学习者，尽可能准确和多样)。</p>
+
+
+
+<h3>同质和异质ML算法</h3>
+
+
+
+<p>一般来说，同质集成方法具有单一类型的基学习算法。通过给训练样本分配权重，训练数据是多样化的，但是它们通常利用单一类型的基本学习者。</p>
+
+
+
+<p>另一方面，异类集成由具有不同基本学习算法的成员组成，这些算法可以被组合并同时用于形成预测模型。</p>
+
+
+
+<p>一般的经验法则是:</p>
+
+
+
+<ul>
+<li><strong> <em>同构</em> </strong>集成对各种数据使用相同的特征选择，并将数据集分布在几个节点上。</li>
+
+
+
+<li><strong><em/></strong>异类集成对相同的数据使用不同的特征选择方法</li>
+</ul>
+
+
+
+<p>同质系综:</p>
+
+
+
+
+
+
+
+<p>异质系综:</p>
+
+
+
+
+
+
+
+<h3>集成算法的重要特征</h3>
+
+
+
+<h4>制袋材料</h4>
+
+
+
+<p>通过平均多个估计值的性能来减少总体方差。聚合原始数据集的若干个采样子集，用替换法训练随机选择的不同学习者，符合bootstrap聚合的核心思想。Bagging通常使用投票机制进行<strong>分类</strong>(随机森林)和<strong>回归平均</strong>。</p>
+
+
+
+
+
+<p><strong> <em>注:</em> </strong> <em>记住有些学习者比较稳定，对训练扰动不太敏感。这样的学习器，组合在一起，并不能帮助通用模型提高泛化性能。</em></p>
+
+
+
+<h4>助推</h4>
+
+
+
+<p>这种技术将<em>弱学习者</em>——预测能力差且比随机猜测略好的学习者——与原始数据集的特定加权子集相匹配。对先前分类错误的子集给予较高的权重。</p>
+
+
+
+<p>然后，在分类或加权和回归的情况下，将学习者预测与投票机制相结合。</p>
+
+
+
+
+
+<h3>众所周知的升压算法</h3>
+
+
+
+<h4>adaboost算法</h4>
+
+
+
+<p>AdaBoost代表<strong> <em>自适应增压。</em> </strong>算法中实现的逻辑是:</p>
+
+
+
+<ul>
+<li>第一轮分类器(学习器)都使用相等的加权系数来训练，</li>
+
+
+
+<li>在随后的提升回合中，自适应过程增加被学习者在先前回合中错误分类的数据点的权重，并减少正确分类的数据点的权重。</li>
+</ul>
+
+
+
+<p>如果你对算法的描述很好奇，看看这个:</p>
+
+
+
+
+
+<h4>梯度推进</h4>
+
+
+
+<p>梯度提升使用来自弱学习者的可微分函数损失来概括。在每个提升阶段，学习器被用来最小化给定当前模型的损失函数。提升算法可用于分类或回归。</p>
+
+
+
+
+
+<h2 id="architecture">什么是XGBoost架构？</h2>
+
+
+
+<p>XGBoost代表极端梯度增强。这是梯度推进算法的并行化和精心优化版本。并行化整个增强过程极大地缩短了训练时间。</p>
+
+
+
+<p>我们不是在数据上训练最好的可能模型(像传统方法一样)，而是在训练数据集的各个子集上训练成千上万个模型，然后投票选出表现最好的模型。</p>
+
+
+
+<p>在许多情况下，XGBoost比通常的梯度增强算法更好。Python实现提供了对大量内部参数的访问，以获得更好的精度和准确度。</p>
+
+
+
+<p>XGBoost的一些重要特性是:</p>
+
+
+
+<ul>
+<li><strong> <em>并行化:</em> </strong>模型实现用多个CPU核进行训练。</li>
+
+
+
+<li><strong> <em>正则化:</em> </strong> XGBoost包括不同的正则化惩罚，以避免过拟合。惩罚正则化产生成功的训练，因此模型可以充分地概括。</li>
+
+
+
+<li><strong> <em>非线性:</em> </strong> XGBoost可以检测和学习非线性数据模式。</li>
+
+
+
+<li><strong> <em>交叉验证:</em> </strong>内置和开箱即用。</li>
+
+
+
+<li><strong> <em>可扩展性:</em> </strong> XGBoost可以分布式运行得益于Hadoop和Spark这样的分布式服务器和集群，所以你可以处理海量数据。它也适用于许多编程语言，如C++、JAVA、Python和Julia。</li>
+</ul>
+
+
+
+<h3>XGBoost算法是如何工作的？</h3>
+
+
+
+<ul>
+<li>考虑一个函数或估计值<a href="https://web.archive.org/web/20230304041944/https://www.codecogs.com/eqnedit.php?latex=F(x)#0"/>。首先，我们构建一个从函数梯度导出的序列。下面的等式模拟了一种特殊形式的梯度下降。<a href="https://web.archive.org/web/20230304041944/https://www.codecogs.com/eqnedit.php?latex=F_%7Bxt%7D#0"/>代表最小化的损失函数，因此它给出了函数<a href="https://web.archive.org/web/20230304041944/https://www.codecogs.com/eqnedit.php?latex=F_%7Bxt%20%2B%201%7D#0"/>减小的方向。<a href="https://web.archive.org/web/20230304041944/https://www.codecogs.com/eqnedit.php?latex=%5Cfrac%7B%5Cpartial%20F%7D%7B%5Cpartial%20x%7D#0"/>是损失函数拟合的变化率，相当于梯度下降中的学习率。<a href="https://web.archive.org/web/20230304041944/https://www.codecogs.com/eqnedit.php?latex=%5Cfrac%7B%5Cpartial%20F%7D%7B%5Cpartial%20x%7D#0"/>被期望适当地近似损失的行为。</li>
+</ul>
+
+
+
+
+
+<ul>
+<li>为了迭代模型并找到最佳定义，我们需要将整个公式表示为一个序列，并找到一个有效函数，该函数将收敛到函数的最小值。该函数将作为一种误差度量，帮助我们降低损耗并保持性能。序列<a href="https://web.archive.org/web/20230304041944/https://www.codecogs.com/eqnedit.php?latex=X_%7Bi%7D#0"/>收敛到函数<a href="https://web.archive.org/web/20230304041944/https://www.codecogs.com/eqnedit.php?latex=F#0"/>的最小值。这种特殊的符号定义了在评估梯度推进回归量时应用的误差函数。</li>
+</ul>
+
+
+
+
+
+<p><em>要了解更多细节和深入了解渐变增强背后的数学原理，我推荐你查看由</em> <a href="https://web.archive.org/web/20230304041944/https://towardsdatascience.com/demystifying-maths-of-gradient-boosting-bd5715e82b7c" target="_blank" rel="noreferrer noopener nofollow">克里希纳·库马尔·马赫托</a>撰写的这篇文章。</p>
+
+
+
+<h3>其他梯度提升方法</h3>
+
+
+
+<h4>梯度推进机</h4>
+
+
+
+<p>GBM结合了多个决策树的预测，所有弱学习者都是决策树。该算法的关键思想是，这些树的每个节点采用不同的特征子集来选择最佳分割。由于这是一个提升算法，每个新的树都会从以前的错误中学习。</p>
+
+
+
+<p><em>有用的参考- &gt; </em> <a href="https://web.archive.org/web/20230304041944/https://towardsdatascience.com/understanding-gradient-boosting-machines-9be756fe76ab" target="_blank" rel="noreferrer noopener nofollow"> <em>了解渐变增压机</em> </a></p>
+
+
+
+<h4>光梯度推进机(LightGBM)</h4>
+
+
+
+<p>LightGBM可以处理海量数据。这是训练和预测最快的算法之一。它的通用性很好，这意味着它可以用来解决类似的问题。它可以很好地扩展到大量的内核，并且具有开源代码，因此您可以在您的项目中免费使用它。</p>
+
+
+
+<p><em>有用参考- &gt; </em> <a href="/web/20230304041944/https://neptune.ai/blog/lightgbm-parameters-guide" target="_blank" rel="noreferrer noopener"> <em>了解LightGBM参数(以及如何调优它们)</em> </a></p>
+
+
+
+<h4>分类增强(CatBoost)</h4>
+
+
+
+<p>这一组特定的梯度增强变量通常具有处理分类变量和数据的特定能力。CatBoost对象可以处理分类变量或数值变量，以及混合类型的数据集。这还不是全部。它还可以使用未标记的示例，并在训练过程中探索内核大小对速度的影响。</p>
+
+
+
+<p><em>有用参考- &gt; </em> <a href="https://web.archive.org/web/20230304041944/https://www.analyticsvidhya.com/blog/2017/08/catboost-automated-categorical-data/" target="_blank" rel="noreferrer noopener nofollow"> <em> CatBoost:一个自动处理分类(CAT)数据的机器学习库</em> </a></p>
+
+
+
+<h2 id="xgboost-and-neptune">将XGBoost与Neptune集成在一起</h2>
+
+
+
+<h3>开始创建您的项目</h3>
+
+
+
+<p>安装所需的Neptune客户端库:</p>
+
+
+
+<pre class="hljs">pip install neptune-client
+</pre>
+
+
+
+<p>安装Neptune笔记本插件，保存你所有的工作，并与Neptune UI平台链接:</p>
+
+
+
+<pre class="hljs">pip install -U neptune-notebooks</pre>
+
+
+
+<p>启用jupyter集成:</p>
+
+
+
+<pre class="hljs">jupyter nbextension enable --py neptune-notebooks</pre>
+
+
+
+<p>在Neptune平台上注册，获取您的API密钥，并将您的笔记本与您的Neptune会话连接起来:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/0f9f200d7c3aaf514e197608173468e1.png" alt="ML-development-API" class="wp-image-43537" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230304041944im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/ML-development-API.png?ssl=1"/></figure>
+
+
+
+<p>要完成设置，请在笔记本中导入Neptune客户端库，并调用neptune.init()方法初始化连接:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune
+neptune.init(project_qualified_name=<span class="hljs-string">'aymane.hachcham/XGBoostStudy)</span></pre>
+
+
+
+<h3>准备好您的数据集以供使用</h3>
+
+
+
+<p>为了说明我们可以用XGBoost做的一些工作，我挑选了一个数据集，它包含了决定和预测学校学生考试分数的因素。该数据集基于在不同学校水平学习了4至6个月的学生的数据，包括他们每周的小时数和他们的表现。</p>
+
+
+
+<p>该数据集将决定学习质量对学生考试成绩的影响程度。该数据集包含表示在三次考试中获得的关于几个社会、经济和金融因素的结果的数据。</p>
+
+
+
+<p>数据集具有以下特征:</p>
+
+
+
+<ul>
+<li>性别</li>
+
+
+
+<li>种族/民族</li>
+
+
+
+<li>父母的教育水平</li>
+
+
+
+<li>午餐</li>
+
+
+
+<li>备考课程</li>
+</ul>
+
+
+
+<p>我们可以仔细看看种族和性别的分布情况:</p>
+
+
+
+<ul>
+<li><em>按种族分列的数学、阅读和写作成绩</em>:</li>
+</ul>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> plotly.graph_objects <span class="hljs-keyword">as</span> go
+
+
+groupe_math_eth = data_exams.groupby([<span class="hljs-string">'race/ethnicity'</span>])[<span class="hljs-string">'math score'</span>].sum().reset_index()
+groupe_reading_eth = data_exams.groupby(<span class="hljs-string">'race/ethnicity'</span>)[<span class="hljs-string">'reading score'</span>].sum().reset_index()
+groupe_writing_eth = data_exams.groupby(<span class="hljs-string">'race/ethnicity'</span>)[<span class="hljs-string">'writing score'</span>].sum().reset_index()
+fig = go.Figure(data=[
+    go.Bar(name=<span class="hljs-string">'Math Score'</span>, x=groupe_math_eth[<span class="hljs-string">'race/ethnicity'</span>], y=groupe_math_eth[<span class="hljs-string">'math score'</span>]),
+    go.Bar(name=<span class="hljs-string">'Reading Score'</span>, x=groupe_reading_eth[<span class="hljs-string">'race/ethnicity'</span>], y=groupe_reading_eth[<span class="hljs-string">'reading score'</span>]),
+    go.Bar(name=<span class="hljs-string">'Writing Score'</span>, x=groupe_writing_eth[<span class="hljs-string">'race/ethnicity'</span>], y=groupe_writing_eth[<span class="hljs-string">'writing score'</span>])
+])
+
+fig.update_layout(barmode=<span class="hljs-string">'group'</span>)
+fig.show()</pre>
+
+
+
+<p>C组在所有得分指标上都很突出。这表明，在与种族和民族血统相关的学习成绩方面会有差异。</p>
+
+
+
+
+
+<ul>
+<li>按性别分列的数学、阅读和写作成绩</li>
+</ul>
+
+
+
+<pre class="hljs">
+groupe_math_gen = data_exams.groupby([<span class="hljs-string">'gender'</span>])[<span class="hljs-string">'math score'</span>].sum().reset_index()
+groupe_reading_gen = data_exams.groupby(<span class="hljs-string">'gender'</span>)[<span class="hljs-string">'reading score'</span>].sum().reset_index()
+groupe_writing_gen = data_exams.groupby(<span class="hljs-string">'gender'</span>)[<span class="hljs-string">'writing score'</span>].sum().reset_index()
+
+fig = go.Figure(data=[
+    go.Bar(name=<span class="hljs-string">'Math Score'</span>, x=groupe_math_gen[<span class="hljs-string">'gender'</span>], y=groupe_math_gen[<span class="hljs-string">'math score'</span>]),
+    go.Bar(name=<span class="hljs-string">'Reading Score'</span>, x=groupe_reading_gen[<span class="hljs-string">'gender'</span>], y=groupe_reading_gen[<span class="hljs-string">'reading score'</span>]),
+    go.Bar(name=<span class="hljs-string">'Writing Score'</span>, x=groupe_writing_gen[<span class="hljs-string">'gender'</span>], y=groupe_writing_gen[<span class="hljs-string">'writing score'</span>])
+])
+
+fig.update_layout(barmode=<span class="hljs-string">'group'</span>)
+fig.show()</pre>
+
+
+
+<p>相反，我们发现性别对所有三个学科的总体得分没有太大影响。性别似乎不是决定性因素。</p>
+
+
+
+
+
+<h4>对数据进行采样</h4>
+
+
+
+<p>为了对数据进行采样，我们将使用XGBoost Python库中的DMatrix对象。将数据采样到子集的过程称为数据分离。DMatrix是一种内部数据结构，有助于内存管理和数据优化。我们将把数据分成训练和测试子集，然后开始训练。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> xgboost <span class="hljs-keyword">as</span> xgb
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+features = data_exams.iloc[:,:<span class="hljs-number">-3</span>]
+target = data_exams.iloc[:,<span class="hljs-number">-3</span>:] </pre>
+
+
+
+<p><strong>将分类变量转换为数值:</strong></p>
+
+
+
+<p>所有特征仍被注册为分类值。为了训练模型，我们需要将每个变量与一个数字代码相关联来识别它，并因此相应地转换5个特征列。</p>
+
+
+
+<ol>
+<li>首先，使用pandas将对象数据类型转换为字符串:</li>
+</ol>
+
+
+
+<pre class="hljs">features[<span class="hljs-string">'gender'</span>].astype(<span class="hljs-string">'string'</span>)
+features[<span class="hljs-string">'race/ethnicity'</span>].astype(<span class="hljs-string">'string'</span>)
+features[<span class="hljs-string">'parental level of education'</span>].astype(<span class="hljs-string">'string'</span>)
+features[<span class="hljs-string">'test preparation course'</span>].astype(<span class="hljs-string">'string'</span>)</pre>
+
+
+
+<ol start="2">
+<li>将性别转换为0/1值:</li>
+</ol>
+
+
+
+<pre class="hljs">features.loc[features[<span class="hljs-string">'gender'</span>] == <span class="hljs-string">'male'</span>, <span class="hljs-string">'gender'</span>] = <span class="hljs-number">0</span>
+features.loc[features[<span class="hljs-string">'gender'</span>] == <span class="hljs-string">'female'</span>, <span class="hljs-string">'gender'</span>] = <span class="hljs-number">1</span></pre>
+
+
+
+<ol start="3">
+<li>改变父母的教育水平:</li>
+</ol>
+
+
+
+<pre class="hljs">features.loc[features[<span class="hljs-string">'parental level of education'</span>] == <span class="hljs-string">'high school'</span>, <span class="hljs-string">'parental level of education'</span>] = <span class="hljs-number">1</span>
+features.loc[features[<span class="hljs-string">'parental level of education'</span>] == <span class="hljs-string">'some college'</span>, <span class="hljs-string">'parental level of education'</span>] = <span class="hljs-number">2</span>
+features.loc[features[<span class="hljs-string">'parental level of education'</span>] == <span class="hljs-string">'some high school'</span>, <span class="hljs-string">'parental level of education'</span>] = <span class="hljs-number">3</span>
+features.loc[features[<span class="hljs-string">'parental level of education'</span>] == <span class="hljs-string">'associate's degree'</span>, <span class="hljs-string">'parental level of education'</span>] = <span class="hljs-number">4</span>
+features.loc[features[<span class="hljs-string">'parental level of education'</span>] == <span class="hljs-string">'bachelor's degree'</span>, <span class="hljs-string">'parental level of education'</span>] = <span class="hljs-number">5</span>
+features.loc[features[<span class="hljs-string">'parental level of education'</span>] == <span class="hljs-string">'master's degree'</span>, <span class="hljs-string">'parental level of education'</span>] = <span class="hljs-number">6</span></pre>
+
+
+
+<ol start="4">
+<li>转变午餐价值观:</li>
+</ol>
+
+
+
+<pre class="hljs">features.loc[features[<span class="hljs-string">'lunch'</span>] == <span class="hljs-string">'standard'</span>, <span class="hljs-string">'lunch'</span>] = <span class="hljs-number">0</span>
+features.loc[features[<span class="hljs-string">'lunch'</span>] == <span class="hljs-string">'free/reduced'</span>, <span class="hljs-string">'lunch'</span>] = <span class="hljs-number">1</span>
+</pre>
+
+
+
+<ol start="5">
+<li>转变备考课程:</li>
+</ol>
+
+
+
+<pre class="hljs">features.loc[features[<span class="hljs-string">'test preparation course'</span>] == <span class="hljs-string">'none'</span>, <span class="hljs-string">'test preparation course'</span>] = <span class="hljs-number">0</span>
+features.loc[features[<span class="hljs-string">'test preparation course'</span>] == <span class="hljs-string">'completed'</span>, <span class="hljs-string">'test preparation course'</span>] = <span class="hljs-number">1</span></pre>
+
+
+
+<p>区分数据特征、我们将尝试用于预测的列以及数据目标，数据目标是代表这些学生获得的数学、阅读和写作分数的最后3列。</p>
+
+
+
+<pre class="hljs">x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=<span class="hljs-number">0.30</span>, random_state=<span class="hljs-number">123</span>)
+d_matrix_train = xgb.DMatrix(x_train, y_train, enable_categorical=<span class="hljs-keyword">True</span>)
+d_matrix_test = xgb.DMatrix(x_test, y_test, enable_categorical=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<h4>将您的脚本连接到海王星</h4>
+
+
+
+<ul>
+<li>首先创建一个新项目，给它一个名字和一个有意义的描述<a href="https://web.archive.org/web/20230304041944/https://docs.neptune.ai/getting-started/installation" target="_blank" rel="noreferrer noopener">。</a></li>
+</ul>
+
+
+
+<ul>
+<li>使用您的Neptune凭据连接您的脚本<a href="https://web.archive.org/web/20230304041944/https://docs.neptune.ai/getting-started/hello-world" target="_blank" rel="noreferrer noopener">阅读如何</a>。</li>
+</ul>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+experiment = neptune.init(project=<span class="hljs-string">'aymane.hachcham/XGBoost-Complete-Guide'</span>, api_token=<span class="hljs-string">'API TOKEN'</span>)</pre>
+
+
+
+<ul>
+<li>前往你的jupyter笔记本，启用Neptune扩展来访问你的项目<a href="https://web.archive.org/web/20230304041944/https://docs.neptune.ai/integrations-and-supported-tools/ide-and-notebooks/jupyter-lab-and-jupyter-notebook" target="_blank" rel="noreferrer noopener">阅读如何</a>。</li>
+</ul>
+
+
+
+<p><strong> <em>注意</em> </strong> <em>:我强烈建议你看一下<a href="https://web.archive.org/web/20230304041944/https://docs.neptune.ai/" target="_blank" rel="noreferrer noopener">为新的Neptune Python AP </a> I发布的新文档，它结构良好，非常直观。</em></p>
+
+
+
+<h3>训练模型</h3>
+
+
+
+<p>一旦我们正确地分离了我们的训练和测试样本，我们就可以开始将数据拟合到模型中了。在培训过程中，我们将尝试共同记录所有即将到来的评估结果，以便实时了解我们的模型性能。</p>
+
+
+
+<p>为了开始使用Neptune进行日志记录，我们创建了一个实验和一个定义每个模型版本的超参数列表。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">from</span> neptunecontrib.monitoring.xgboost <span class="hljs-keyword">import</span> neptune_callback
+
+params = {
+    <span class="hljs-string">'max_depth'</span>:<span class="hljs-number">7</span>,
+    <span class="hljs-string">'learning_rate'</span>:<span class="hljs-number">0.1</span>,
+    <span class="hljs-string">'objective'</span>: <span class="hljs-string">'reg:squarederror'</span>,
+    <span class="hljs-string">'num_estimators'</span>:<span class="hljs-number">1000</span>,
+    <span class="hljs-string">'num_boost_round'</span>:<span class="hljs-number">1000</span>
+}
+
+neptune.create_experiment(
+    name=<span class="hljs-string">'XGBoost-V1'</span>,
+    tags=[<span class="hljs-string">'XGBoost'</span>, <span class="hljs-string">'Version1'</span>],
+    params=params
+)</pre>
+
+
+
+<p>使用我们之前设置的参数和DMatrix数据开始训练过程。我们还添加了neptune_callback()函数，它自动完成所有必要的工作，以实时监控损失和评估指标。</p>
+
+
+
+<pre class="hljs">watchlist = [(d_matrix_test, <span class="hljs-string">'test'</span>), (d_matrix_train, <span class="hljs-string">'train'</span>)]
+num_round = <span class="hljs-number">20</span>
+
+xgb.train(params, d_matrix_train, num_round, watchlist, callbacks=[neptune_callback()])
+neptune.stop()</pre>
+
+
+
+<p>一旦您的项目连接到平台，Neptune就会跟踪和监控您的物理资源的当前状态，比如GPU、内存、CPU和GPU内存。在你做培训的时候，总是密切关注你的资源是非常方便的。</p>
+
+
+
+
+
+<p><strong>让我们仔细看看，并尝试解释XGBRegressor超参数:</strong></p>
+
+
+
+<ul>
+<li><strong> Learning_rate </strong>:用于控制和调整内部模型估计器的权重。learning_rate应该始终是一个小值，以强制进行长期学习。</li>
+
+
+
+<li><strong> Max_depth: </strong>表示估计器(本例中为树)的深度程度。小心操作此参数，因为它会导致模型过度拟合。</li>
+
+
+
+<li><strong> Alpha: </strong>一种特定类型的惩罚正则化(L1)来帮助避免过度拟合</li>
+
+
+
+<li><strong> Num_estimators: </strong>模型将基于的估计器的数量。</li>
+
+
+
+<li><strong> Num_boost_round: </strong>升压级数。虽然<em> num_estimators </em>和<em> num_boost_round </em>保持不变，但你应该记住，每次更新参数时，num_boost_round都应该重新调整。</li>
+</ul>
+
+
+
+<p>如果你回到Neptune，在<strong> <em>所有元数据</em> </strong>下，你会看到注册的模型和登录的所有初始参数。</p>
+
+
+
+
+
+<p>培训启动后，您可以通过单击当前实验并转到“图表”部分来监督培训和评估指标日志。Neptune提供的直观和符合人体工程学的UI，以及与大量ML算法和框架的紧密集成，使您能够快速迭代和改进不同版本的模型。</p>
+
+
+
+
+
+<p>使用Neptune回调，我们可以访问关于模型的更多信息，比如特性重要性图和内部估计器的结构。</p>
+
+
+
+<h4>特征重要性图</h4>
+
+
+
+<p>XGBRegressor通常对用于预测的每个特征的重要性顺序进行分类。使用梯度提升的一个好处是，在构建提升的树之后，检索每个属性的重要性分数相对简单。这可以通过计算特征重要性图、可视化提升树中每个特征之间的相似性(特征方面或属性方面)来完成。</p>
+
+
+
+<p><em>这篇文章解释了如何在R</em>-&gt;-<a href="https://web.archive.org/web/20230304041944/https://arxiv.org/pdf/1901.04055.pdf" target="_blank" rel="noreferrer noopener nofollow">中使用GBM包计算每个特征的重要性分数</a></p>
+
+
+
+
+
+<p>我们可以看到,<strong>种族/民族</strong>和<strong>父母的教育水平</strong>是学生成功的主要因素。</p>
+
+
+
+<h4>版本化您的模型</h4>
+
+
+
+<p>您可以在Neptune中以二进制格式对模型的多个版本进行版本化和存储。一旦训练完成，Neptune会自动保存模型的当前版本，因此您可以随时返回并加载以前的模型版本进行比较。</p>
+
+
+
+<p>在'<em>All Metadata-&gt;Artifacts '</em>下，您将找到所有已存储的相关元数据:</p>
+
+
+
+
+
+<h3>与您的团队协作和共享工作</h3>
+
+
+
+<p>该平台还允许你以无缝的方式交叉比较你的所有实验。只需检查您想要的实验，就会出现一个显示所有必需信息的特定视图。</p>
+
+
+
+<p>你可以通过发送一个链接来分享任何Neptune实验。</p>
+
+
+
+<p><strong> <em>注</em> </strong> <em>:使用团队计划，你可以和队友分享你所有的工作和项目。</em></p>
+
+
+
+<h2 id="xgbregressor">如何超调XGBRegressor</h2>
+
+
+
+<p>当时间和资源不成问题时，处理参数调整的最有效方法是对所有参数运行巨大的网格搜索，并等待算法输出最优解。如果您正在开发一个小型或中型数据集，这样做是有好处的。但是对于更大的数据集，这种方法会很快变成一场噩梦，消耗太多的时间和资源。</p>
+
+
+
+<h2 id="h-tips-for-hyper-tuning-xgboost-when-dealing-with-huge-datasets">处理大型数据集时超调XGBoost的技巧</h2>
+
+
+
+<p>数据科学家中有一句广为人知的话:“如果你的数据有信号，你可以让你的模型创造奇迹，如果没有信号，就没有信号”。</p>
+
+
+
+<p>当有大量训练数据时，我建议最直接的方法是尝试手动研究具有重大预测影响的特征。</p>
+
+
+
+<ul>
+<li>首先尝试减少你的特征。100或200个功能是很多的，你应该尽量缩小功能选择的范围。您还可以根据特定的标准依靠<a href="https://web.archive.org/web/20230304041944/https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html" target="_blank" rel="noreferrer noopener nofollow"> Sele </a> ctKBest来选择最佳表现者，在该标准中，每项功能都获得K分，并据此进行选择。</li>
+
+
+
+<li>糟糕的性能也可能与测试数据集的质量评估有关。与您的训练数据相比，测试数据可能代表完全不同的数据子集。因此，您应该尝试进行交叉验证，以便要素的R平方值足够可信且足够可靠。</li>
+
+
+
+<li>最后，如果您发现您的超参数调整仍然影响很小，请尝试切换到更简单的回归方法，如线性、套索、弹性网，而不是坚持XGBRegression。</li>
+</ul>
+
+
+
+<p>因为我们例子中的数据不是很大，我们可以选择第一个选项。然而，由于这里的目标是公开您可以利用的更可靠的模型调优选项，我们将毫不犹豫地选择这个选项。请记住，如果您知道哪些超参数对数据有更大的影响，那么您的工作范围就会小得多。</p>
+
+
+
+<h4>网格搜索方法</h4>
+
+
+
+<p>幸运的是，XGBoost实现了scikit-learn API，因此使用网格搜索并基于原始超参数集开始为模型推出最佳结果非常容易。</p>
+
+
+
+<p>让我们创建一个每个超参数可以取值的范围:</p>
+
+
+
+<pre class="hljs">parameters = {
+    <span class="hljs-string">'learning_rate'</span>: [<span class="hljs-number">0.1</span>, <span class="hljs-number">0.01</span>, <span class="hljs-number">0.05</span>],
+    <span class="hljs-string">'max_depth'</span>: range (<span class="hljs-number">2</span>, <span class="hljs-number">10</span>, <span class="hljs-number">1</span>),
+    <span class="hljs-string">'n_estimators'</span>: range(<span class="hljs-number">60</span>, <span class="hljs-number">220</span>, <span class="hljs-number">500</span>, <span class="hljs-number">1000</span>),
+    <span class="hljs-string">'num_boost_round'</span>: range(<span class="hljs-number">60</span>, <span class="hljs-number">250</span>, <span class="hljs-number">500</span>, <span class="hljs-number">1000</span>)
+}</pre>
+
+
+
+<p>配置您的GridSearchCV。在这种情况下，评估性能的最佳指标是比较10倍交叉验证结果的<a href="https://web.archive.org/web/20230304041944/https://towardsdatascience.com/understanding-auc-roc-curve-68b2303cc9c5"> ROC AUC曲线</a>。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> GridSearchCV
+
+grid_search = GridSearchCV(
+    estimator=estimator,
+    param_grid=parameters,
+    scoring = <span class="hljs-string">'roc_auc'</span>,
+    n_jobs = <span class="hljs-number">10</span>,
+    cv = <span class="hljs-number">10</span>,
+    verbose=<span class="hljs-keyword">True</span>
+)</pre>
+
+
+
+<p>发布培训:</p>
+
+
+
+<pre class="hljs">grid_search.fit(x_train, y_train)</pre>
+
+
+
+<p>处理步骤如下所示:</p>
+
+
+
+<pre class="hljs">Fitting <span class="hljs-number">10</span> folds <span class="hljs-keyword">for</span> each of <span class="hljs-number">96</span> candidates, totalling <span class="hljs-number">960</span> fits
+[Parallel(n_jobs=<span class="hljs-number">10</span>)]: Using backend LokyBackend <span class="hljs-keyword">with</span> <span class="hljs-number">10</span> concurrent workers.
+[Parallel(n_jobs=<span class="hljs-number">10</span>)]: Done  <span class="hljs-number">30</span> tasks      | elapsed:   <span class="hljs-number">11.0</span>s
+[Parallel(n_jobs=<span class="hljs-number">10</span>)]: Done <span class="hljs-number">180</span> tasks      | elapsed:   <span class="hljs-number">40.1</span>s
+[Parallel(n_jobs=<span class="hljs-number">10</span>)]: Done <span class="hljs-number">430</span> tasks      | elapsed:  <span class="hljs-number">1.7</span>min
+[Parallel(n_jobs=<span class="hljs-number">10</span>)]: Done <span class="hljs-number">780</span> tasks      | elapsed:  <span class="hljs-number">3.1</span>min
+[Parallel(n_jobs=<span class="hljs-number">10</span>)]: Done <span class="hljs-number">960</span> out of <span class="hljs-number">960</span> | elapsed:  <span class="hljs-number">4.0</span>min </pre>
+
+
+
+<p>可以使用字段best_estimator_访问最佳估计值:</p>
+
+
+
+<pre class="hljs">xgb_best = grid_search.best_estimator_</pre>
+
+
+
+<h2 id="h-xgboost-pros-and-cons">XGBoost利弊</h2>
+
+
+
+<h3>优势</h3>
+
+
+
+<ul>
+<li>梯度推进带有一个易于阅读和解释的算法，使其大多数预测易于处理。</li>
+
+
+
+<li>增强是一种弹性和稳健的方法，可以很容易地防止和避免过度拟合</li>
+
+
+
+<li>XGBoost在具有子组的中型、小型数据和没有太多特征的结构化数据集上表现非常好。</li>
+
+
+
+<li>这是一个很好的方法，因为现实世界中的大多数问题都涉及到分类和回归，而XGBoost是这两个任务的主宰。</li>
+</ul>
+
+
+
+<h3>不足之处</h3>
+
+
+
+<ul>
+<li>XGBoost在稀疏和非结构化数据上表现不佳。</li>
+
+
+
+<li>一个经常被遗忘的事情是，梯度提升对异常值非常敏感，因为每个分类器都被迫修复前一个学习器中的错误。</li>
+
+
+
+<li>整个方法很难扩展。这是因为估计者将他们的正确性建立在先前的预测值上，因此这个过程需要很大的努力来简化。</li>
+</ul>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>我们已经涵盖了梯度推进的许多方面，从理论的角度出发，到更实际的路径。现在，您可以看到将<a href="/web/20230304041944/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>和模型管理添加到XGBoost训练和Neptune超调中是多么容易。</p>
+
+
+
+<p>和往常一样，我会在下面给你留下一些有用的参考资料，这样你就可以扩大你的知识面，提高你的编码技能。</p>
+
+
+
+<p>敬请关注更多内容！</p>
+
+
+
+<p><strong>参考文献:</strong></p>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

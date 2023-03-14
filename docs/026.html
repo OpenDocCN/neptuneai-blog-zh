@@ -1,0 +1,765 @@
+<html>
+<head>
+<title>Best Tools to Do ML Model Monitoring </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>进行ML模型监控的最佳工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/ml-model-monitoring-best-tools#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/ml-model-monitoring-best-tools#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>如果您迟早将模型部署到生产中，您将开始寻找ML模型监控工具。</p>
+
+
+
+<p>当你的ML模型影响业务时(它们应该影响)，你只需要了解“事情是如何工作的”。</p>
+
+
+
+<p>你第一次真正感觉到这一点是当事情停止工作的时候。在没有建立模型监控的情况下，您可能不知道哪里出了问题，也不知道从哪里开始寻找问题和解决方案。人们希望你尽快解决这个问题。</p>
+
+
+
+<p>但是在这个上下文中“事物”和“工作”是什么意思呢？</p>
+
+
+
+<p>有趣的是，根据团队/问题/管道/设置的不同，人们的意思完全不同。</p>
+
+
+
+<p>在一家MLOps公司工作的一个好处是你可以和许多ML团队交谈并获得第一手信息。因此，事实证明，当人们说“我想监控ML模型”时，他们可能想:</p>
+
+
+
+<ul><li><strong>监控模型在生产中的表现</strong>:查看模型的预测准确度。看看模型性能是否随时间衰减，你应该重新训练它。</li><li><strong>监控模型输入/输出分布</strong>:查看进入模型的输入数据和特征的分布是否改变？预测的阶级分布是否随时间而改变？这些事情可能与<a target="_blank" href="/web/20221117203620/https://neptune.ai/blog/concept-drift-best-practices" rel="noreferrer noopener">数据和概念漂移</a>有关。</li><li><strong>监控模型训练和再训练</strong>:在训练和再训练期间，查看学习曲线、训练模型预测分布或混淆矩阵。</li><li><strong>监控模型评估和测试</strong>:为您的自动化评估或测试管道记录度量、图表、预测和其他元数据</li><li><strong>监控硬件指标</strong>:查看您的模型在训练和推断过程中使用了多少CPU/GPU或内存。</li><li><strong>监控CI/CD管道的ML </strong>:查看您的CI/CD管道作业的评估，并进行直观比较。在ML中，度量标准通常只能告诉你这么多，需要有人实际看到结果。</li></ul>
+
+
+
+
+
+
+
+<p>你指的是哪个ML模型监控？</p>
+
+
+
+<p>无论哪种方式，我们都将研究有助于所有这些用例的工具。</p>
+
+
+
+<p>但是首先…</p>
+
+
+
+
+
+
+
+<p>显然，根据您想要监控的内容，您的需求会发生变化，但是在选择ML模型监控工具之前，您应该明确考虑一些事情:</p>
+
+
+
+<ul><li><strong>易于集成</strong>:将其连接到您的模型培训和部署工具有多容易</li><li><strong>灵活性和表现力</strong>:你能记录并看到你想要的东西和你想要的方式吗</li><li><strong>开销</strong>:日志记录给你的模型训练和部署基础设施带来了多少开销</li><li><strong>监控功能</strong>:能监控数据/特征/概念/模型漂移吗？你能比较同时运行的多个模型吗(A/B测试)？</li><li><strong>警报</strong>:当性能或输入变得疯狂时，它是否提供自动警报？</li></ul>
+
+
+
+<p>好了，现在让我们来看看实际的模型监控工具！</p>
+
+
+
+
+
+
+
+<p>首先，让我们回到不同的监控功能，看看哪个工具选中了这些框。</p>
+
+
+
+<section id="large-table-block_632060e90703d" class="block-large-table ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+                <tr>
+                    <td class="c-item"/>
+
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                                            <td class="c-item">                                                      </td>
+                    
+                </tr>
+            </thead>
+        
+
+        <tbody class="c-table__body">
+
+                            
+                    <tr class="c-row">
+
+                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>模型评估和测试</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>有限</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>有限</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                                                                    
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>硬件指标</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                                                                    
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>模型输入/输出分配</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>有限</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                                    
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>模型训练和再训练</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>有限</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>有限</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                                                                    
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>生产中的模型性能</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>有限</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                                                                    
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>ML的CI/CD管道</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>是</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>否</strong></p>
+                                    </td>
+
+                                                                                    
+                    </tr>
+
+                            
+        </tbody>
+
+    </table>
+
+</section>
+
+
+
+<p>现在，我们将更详细地回顾一下这些工具。</p>
+
+
+
+
+
+
+
+
+
+<p>Neptune是为运行大量实验的研究和生产团队构建的MLOps的<strong>元数据存储。</strong></p>
+
+
+
+<p>您可以<a target="_blank" href="https://web.archive.org/web/20221117203620/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display" rel="noreferrer noopener">记录和显示几乎任何ML元数据</a>，从指标和损失、预测图像、硬件指标到交互式可视化。</p>
+
+
+
+<p>说到监控ML模型，人们通常将其用于:</p>
+
+
+
+<ul><li>模型训练，评估，测试，</li><li>硬件指标显示</li><li>但是您可以(有些团队确实这样做了)记录来自生产作业的性能指标，并从ML CI/CD管道中查看元数据。</li></ul>
+
+
+
+<p>它有一个<a target="_blank" href="https://web.archive.org/web/20221117203620/https://docs.neptune.ai/you-should-know/logging-metadata#run-structure-namespaces" rel="noreferrer noopener">灵活的元数据结构</a>，允许你以你想要的方式组织培训和生产元数据。您可以将它想象成一个字典或文件夹结构，您用代码创建并显示在UI中。</p>
+
+
+
+<p>您可以<a target="_blank" href="https://web.archive.org/web/20221117203620/https://docs.neptune.ai/you-should-know/displaying-metadata#creating-dashboards" rel="noreferrer noopener">构建仪表板</a>，显示您想要查看的性能和硬件指标，以便更好地组织您的模型监控信息。</p>
+
+
+
+<p>您可以<a target="_blank" href="https://web.archive.org/web/20221117203620/https://app.neptune.ai/o/common/org/example-project-tensorflow-keras/experiments?compare=KwGgjCBM4gzFQ&amp;split=cmp&amp;dash=charts&amp;viewId=44675986-88f9-4182-843f-49b9cfa48599" rel="noreferrer noopener">比较模型和运行之间的指标</a>,以了解模型更新如何改变性能或硬件消耗，以及您是否应该中止实时模型训练，因为它不会超过基线。</p>
+
+
+
+<p>您可以通过<a target="_blank" href="https://web.archive.org/web/20221117203620/https://docs.neptune.ai/you-should-know/logging-metadata" rel="noreferrer noopener">易于使用的API </a>和25+ <a target="_blank" href="https://web.archive.org/web/20221117203620/https://docs.neptune.ai/integrations-and-supported-tools/intro#list-of-all-integrations" rel="noreferrer noopener">与来自ML生态系统的工具</a>集成来记录您想要监控的元数据。</p>
+
+
+
+<p>如果您想知道它是否适合您的工作流程:</p>
+
+
+
+
+
+
+
+
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/a0584390b36c560b4609535ee8f5a8b3.png" alt="Arize - drift monitor" class="wp-image-53676" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221117203620im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Arize-drift-monitor-scaled.jpg?resize=768%2C407&amp;ssl=1"/><figcaption><em>Example drift monitor | <a href="https://web.archive.org/web/20221117203620/https://arize.com/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>2021年，Arize AI被福布斯宣称为<a href="https://web.archive.org/web/20221117203620/https://www.forbes.com/sites/frederickdaso/2020/09/01/arize-ai-helps-us-understand-how-ai-works/" target="_blank" rel="noreferrer noopener nofollow">最有前途的AI工具之一。这是一个<strong> ML模型监控平台，能够增强您项目的可观察性，帮助您解决生产AI </strong>的问题。</a></p>
+
+
+
+<p>如果ML团队在没有强大的可观察性和实时分析工具的情况下工作，工程师可能会浪费几天时间来试图识别潜在的问题。Arize AI获得了1900万美元的投资，因为它可以很容易地找出问题所在，以便软件工程师立即找到并修复问题。此外，它允许ML工程师稳健地更新现有模型。Arize AI有以下特点:</p>
+
+
+
+<ul><li><strong>简单整合。</strong> Arize AI可用于增强任何环境下任何模型的可观测性。详细的文档和社区支持使您能够在几分钟内集成并投入使用。</li><li><strong>上市前验证。</strong>在部署之前，检查您的模型的行为是否符合预期非常重要。发布前验证工具包可帮助您增强对模型性能的信心，并执行发布前和发布后验证检查。</li><li><strong>自动监控。</strong> <a href="https://web.archive.org/web/20221117203620/https://arize.com/model-monitoring/" target="_blank" rel="noreferrer noopener nofollow">模型监控</a>应该是主动的，而不是被动的，这样您就可以尽早发现性能下降或预测偏差。自动化监控系统可以帮助你做到这一点。它要求零设置，并为易于定制的仪表板提供空间。</li></ul>
+
+
+
+
+
+
+
+
+
+<p>WhyLabs是一个<strong>模型监控一个</strong> d可观察性工具，帮助ML团队用<strong>监控数据管道和ML应用</strong>。监控已部署模型的性能对于主动解决这个问题至关重要。您可以确定重新训练和更新模型的适当时间和频率。它有助于检测数据质量下降、数据漂移和数据偏差。WhyLabs很快在开发人员中变得非常受欢迎，因为它可以很容易地在混合团队中使用，经验丰富的开发人员可以与初级员工并肩工作。</p>
+
+
+
+<p>该工具使您能够:</p>
+
+
+
+<ul><li>使用现成的或定制的指标自动监控模型性能。</li><li>检测整体模型性能下降，并成功识别导致性能下降的问题。</li><li>通过其开源数据记录库whylogs，在保持高隐私保护标准的同时，与其他工具轻松集成。</li><li>使用流行的库和框架，如MLFlow、Spark、Sagemaker等。让WhyLabs的采用顺利进行。</li><li>使用内置工具轻松调试数据和模型问题。</li><li>通过易于使用的零配置设置，在几秒钟内设置好该工具。</li><li>通过您喜欢的渠道(如Slack、SMS等)获得当前工作流程的通知。</li></ul>
+
+
+
+<p>WhyLabs用于模型监控的最大优势之一是，它消除了手动解决问题的需要，从而节省了资金和时间。无论规模如何，您都可以使用该工具处理结构化和非结构化数据。WhyLabs用的是AWS云。它使用亚马逊ECS运行容器，并使用亚马逊EMR进行大规模数据处理。</p>
+
+
+
+
+
+
+
+<p>Prometheus是一款流行的<strong>开源ML模型监控工具</strong>，最初由SoundCloud开发，用于收集多维数据和查询。</p>
+
+
+
+<p>Prometheus的主要优势是与Kubernetes和许多可用的导出器和客户端库紧密集成，以及一种快速查询语言。Prometheus也与Docker兼容，可在Docker Hub上获得。</p>
+
+
+
+<p>Prometheus服务器有自己的独立单元，不依赖于网络存储或外部服务。因此，部署额外的基础架构或软件并不需要做很多工作。它的主要任务是存储和监控某些对象。对象可以是任何东西:Linux服务器、进程之一、数据库服务器或系统的任何其他组件。您想要监控的每个元素称为一个指标。</p>
+
+
+
+<p>Prometheus服务器以您定义的时间间隔读取目标，以收集指标并将它们存储在时序数据库中。您可以设置目标和读取指标的时间间隔。您使用PromQL查询语言查询Prometheus时间序列数据库中存储指标的位置。</p>
+
+
+
+
+
+<p>Grafana允许您<strong>可视化监控指标。rafana擅长时间序列分析。它可以以线形图、热图和直方图的形式显示监测工作的结果。</strong></p>
+
+
+
+<p>您不用直接向Prometheus服务器编写PromQL查询，而是使用Grafana GUI板从Prometheus服务器请求指标，并在Grafana仪表板中呈现它们。</p>
+
+
+
+<p>Grafana的主要特点:</p>
+
+
+
+<ul><li><strong>警报。</strong>您可以通过从信使到Slack的各种渠道接收警报。如果您喜欢其他选项，您可以使用少量代码手动添加自己的提醒。</li><li><strong>仪表板模板。</strong>您可以为不同的任务创建定制的仪表盘，并在一个界面中管理您需要的一切。</li><li><strong>自动化。</strong>您可以使用脚本在Grafana中自动完成工作。</li><li><strong>注解。</strong>如果出现问题，您可以对来自不同仪表板和来源的事件进行时间匹配，以分析故障原因。您可以通过向所需的点和地块片段添加注释来手动创建注释。</li></ul>
+
+
+
+
+
+
+
+
+
+<p>显然是一个开源的ML模型监控系统。它有助于在开发、验证或生产监控期间分析机器学习模型。工具<strong>从熊猫数据帧</strong>生成交互式报告。</p>
+
+
+
+<p>目前，有6种报告可供使用:</p>
+
+
+
+<ol><li><strong>数据漂移:</strong>检测特征分布的变化</li><li><strong>数字目标漂移</strong>:检测数字目标和特征行为的变化</li><li><strong>分类目标漂移</strong>:检测分类目标和特征行为的变化</li><li><strong>回归模型性能</strong>:分析回归模型的性能和模型误差</li><li><strong>分类模型性能</strong>:分析分类模型的性能和错误。适用于二进制和多类模型</li><li><strong>概率分类模型性能</strong>:分析概率分类模型的性能、模型校准质量和模型误差。适用于二进制和多类模型</li></ol>
+
+
+
+
+
+
+
+
+
+<p>Qualdo是Azure、Google和AWS中的机器学习模型性能监控工具。这个工具有一些很好的基本特性，允许你在整个生命周期中观察你的模型。</p>
+
+
+
+<p>借助Qualdo，您可以从生产ML输入/预测数据、日志和应用数据中获得洞察力，以观察和改进您的模型性能。有模型部署和自动监控数据漂移和数据异常，您可以看到质量指标和可视化。</p>
+
+
+
+<p>它还提供工具来监控Tensorflow中的ML管道性能，并利用Tensorflow的数据验证和模型评估功能。</p>
+
+
+
+<p>此外，它还集成了许多人工智能、机器学习和通信工具，以改善您的工作流程并使协作更容易。</p>
+
+
+
+<p>这是一个相当简单的工具，没有提供很多高级功能。因此，如果您正在寻找一个简单的ML模型监控性能解决方案，这是最好的选择。</p>
+
+
+
+
+
+
+
+
+
+<p>Fiddler是一个模型监控工具，它有一个用户友好的、清晰的、简单的界面。它允许您监控模型性能，解释和调试模型预测，分析整个数据和切片的模型行为，大规模部署机器学习模型，以及管理您的机器学习模型和数据集</p>
+
+
+
+<p>以下是Fiddler的ML模型监控特性:</p>
+
+
+
+<ul><li><strong>性能监控</strong>—一种直观的方式来探索数据漂移，并确定哪些数据正在漂移、何时漂移以及如何漂移</li><li><strong>数据完整性</strong>—确保没有不正确的数据进入您的模型，并且不会对最终用户体验产生负面影响</li><li><strong>跟踪异常值</strong> —Fiddler在异常值检测选项卡中显示单变量和多变量异常值</li><li><strong>服务指标</strong>—让您基本了解生产中ML服务的运行状况</li><li><strong> Alerts </strong> —Fiddler允许您为项目中的一个模型或一组模型设置警报，以警告生产中的问题</li></ul>
+
+
+
+<p>总的来说，它是一个监控机器学习模型的伟大工具，具有所有必要的功能。</p>
+
+
+
+
+
+
+
+
+
+<p>亚马逊SageMaker模型监视器亚马逊SageMaker工具之一。它会自动<strong>检测部署在生产中的模型的不准确预测</strong>并发出警报，因此您可以保持模型的准确性。</p>
+
+
+
+<p>以下是SageMaker型号监控功能的总结:</p>
+
+
+
+<ul><li><strong>可定制的数据收集和监控</strong>–您可以选择想要监控和分析的数据，而无需编写任何代码</li><li>统计规则形式的内置分析，用于检测数据和模型质量的偏差</li><li>您可以编写<strong>自定义规则，并为每个规则</strong>指定阈值。然后，可以使用这些规则来分析模型性能</li><li>指标的可视化，以及在SageMaker笔记本实例中运行特别分析</li><li>模型预测–导入您的数据以计算模型性能</li><li>计划监控作业</li><li>该工具与Amazon SageMaker Clarify集成，因此您可以<strong>识别您的ML模型中的潜在偏差</strong></li></ul>
+
+
+
+<p>当与ML的其他工具一起使用时，SageMaker模型监视器可以让您完全控制您的实验。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>Seldon Core是一个开源平台，用于在Kubernetes 上部署机器学习模型。这是一个MLOps框架，允许您打包、部署、监控和管理数千个生产机器学习模型。</p>
+
+
+
+<p>它运行在任何云上和内部，与框架无关，支持顶级的ML库、工具包和语言。此外，它将您的ML模型(例如Tensorflow、Pytorch、H2o)或语言包装器(Python、Java)转换为生产REST/GRPC微服务。</p>
+
+
+
+<p>基本上，Seldon Core拥有扩展大量ML模型的所有必要功能。您可以期待高级度量、离群点检测器、金丝雀、由预测器、转换器、路由器或组合器组成的丰富的推理图等功能。</p>
+
+
+
+
+
+
+
+<p>Censius是一个人工智能模型可观察性平台，允许您监控整个ML管道，解释预测，并主动解决问题以改善业务成果。</p>
+
+
+
+
+
+<p>Censius的主要特点:</p>
+
+
+
+<ul><li>完全可配置的监控器，可检测漂移、数据质量问题和性能下降</li><li>实时通知，让您提前了解模型服务渠道中的问题</li><li>可定制的仪表板，您可以在其中切割您的模型培训和生产数据，并观察任何业务KPI</li><li>对A/B测试框架的本机支持，您可以在生产中继续试验和迭代不同的模型</li><li>利用表格、图像和文本数据的可解释性，深入到问题的根本原因</li></ul>
+
+
+
+<h2 id="conclusion">结论</h2>
+
+
+
+<p>既然您已经知道了如何评估ML模型监控工具以及现有的工具，那么最好的方法就是测试您喜欢的工具！</p>
+
+
+
+<p>如果你想尝试海王星，接下来的步骤是:</p>
+
+
+
+
+
+
+
+<p>您还可以通过查看mlops.community 准备的资源<a target="_blank" href="https://web.archive.org/web/20221117203620/https://mlops.community/learn/monitoring/" rel="noreferrer noopener"> ml模型监控工具比较来继续评估工具。</a></p>
+
+
+
+<p>不管怎样，监控愉快！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

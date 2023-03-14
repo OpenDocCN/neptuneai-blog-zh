@@ -1,0 +1,1604 @@
+<html>
+<head>
+<title>Kubernetes vs Docker: What You Should Know as a Machine Learning Engineer </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>Kubernetes vs Docker:作为机器学习工程师你应该知道什么</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/kubernetes-vs-docker-for-machine-learning-engineer#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/kubernetes-vs-docker-for-machine-learning-engineer#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>今年早些时候(2020年)，我决定从数据科学完全转向机器学习的工程部分。我想体验一种更高效、更可扩展的方式来部署机器学习模型，将我的模型从我的应用程序中分离出来，并正确地对它们进行版本控制。</p>
+
+
+
+<p>通常，在训练完模型后，我主要做的是将模型导入flask应用程序，然后在调用模型的API端点时执行推理。嗯，当我试图打包我的应用程序并部署到谷歌云或任何其他平台时，我会使用docker，但我认为还有更多。</p>
+
+
+
+
+
+
+
+<p>我开始<a href="/web/20221206024243/https://neptune.ai/blog/how-to-serve-machine-learning-models-with-tensorflow-serving-and-docker" target="_blank" rel="noreferrer noopener">深入TensorFlow服务</a>。TensorFlow extended和<a href="/web/20221206024243/https://neptune.ai/vs/kubeflow" target="_blank" rel="noreferrer noopener"> Kubeflow </a> (Kubernetes使机器学习项目变得更容易)。沿着这条路线，我发现我需要了解更多(也许只是一点点)部署、编排和扩展机器学习应用程序所需的Kubernetes。</p>
+
+
+
+<p>旅程和好奇心导致了这篇文章。因此，如果你和我一样，准备升级你的游戏并添加一个工具成为独角兽数据科学家，正如Elle O'Brien在这篇文章中所描述的，那么这篇文章就是为你准备的。</p>
+
+
+
+<blockquote class="wp-block-quote is-style-default"><p>“…太难了，这位罕见的数据科学家既能开发高质量的软件，又能扮演工程师的角色，被称为<em>独角兽</em>！”艾尔·奥布莱恩</p></blockquote>
+
+
+
+<p>在本文中，我们还将遵循一种基于项目的方法，这将使您有可能将所示的想法和代码直接移植到您的机器学习项目中。</p>
+
+
+
+<p>总的来说，我们将看到如何消除在遵循常规方法时出现的一些困难，例如:</p>
+
+
+
+<ul><li>无法将模型服务与应用程序分开</li><li>回滚更新的困难</li><li>轻松推出新更新的困难</li><li>当用户流量增加时，应用程序难以扩展</li><li>对模型和应用程序进行版本控制的困难。</li></ul>
+
+
+
+<p>为了消除上述困难，我们需要实现以下一些目标:</p>
+
+
+
+<ul><li>在web应用中集成TensorFlow服务模型</li><li>使用docker-compose管理web应用程序和Tensorflow服务</li><li>构建docker映像并将其推送到Docker-hub</li><li>介绍Kubernetes</li><li>使用Kubernetes提供Tensorflow web应用程序。</li></ul>
+
+
+
+<p><strong>先决条件</strong></p>
+
+
+
+<ul><li>Tensorflow中的训练模型</li><li>码头工人，至少是基层</li><li>tensorflow发球(如果不是，这里快速介绍一下<a href="/web/20221206024243/https://neptune.ai/blog/how-to-serve-machine-learning-models-with-tensorflow-serving-and-docker" target="_blank" rel="noreferrer noopener"> TensorFlow发球</a></li></ul>
+
+
+
+<p><strong>注</strong>:您可以在这里获得<a href="https://web.archive.org/web/20221206024243/https://github.com/steveoni/tensorflow-serving-docker-k8s" target="_blank" rel="noreferrer noopener nofollow">商品的编码。</a></p>
+
+
+
+<p>让我们开始吧。</p>
+
+
+
+<h2 id="h-building-ml-models">构建ML模型</h2>
+
+
+
+<p>在本文中，我们将创建一个简单的ML模型，用于巩固将要介绍的概念。</p>
+
+
+
+<p>该模型是一个AND逻辑门模型，由于本文的主要重点既不是如何创建模型，也不是如何训练模型，因此这一部分将较少解释。</p>
+
+
+
+<p>让我们创建一个名为<code>model.py</code>的文件，并输入下面的代码:</p>
+
+
+
+<pre class="hljs">Import TensorFlow <span class="hljs-keyword">as</span> tf
+
+data=tf.constant([[<span class="hljs-number">1</span>,<span class="hljs-number">1</span>],[<span class="hljs-number">0</span>,<span class="hljs-number">0</span>],[<span class="hljs-number">2</span>,<span class="hljs-number">0</span>],[<span class="hljs-number">2</span>,<span class="hljs-number">1</span>],[<span class="hljs-number">3</span>,<span class="hljs-number">0</span>],[<span class="hljs-number">0</span>,<span class="hljs-number">4</span>],[<span class="hljs-number">5</span>,<span class="hljs-number">6</span>],[<span class="hljs-number">0</span>,<span class="hljs-number">10</span>]])
+label = tf.constant([<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>])
+
+model = tf.keras.Sequential(
+    [
+        tf.keras.Input(shape=(<span class="hljs-number">2</span>,)),
+        tf.keras.layers.Dense(<span class="hljs-number">20</span>,activation=<span class="hljs-string">"relu"</span>),
+        tf.keras.layers.Dense(<span class="hljs-number">2</span>,activation=<span class="hljs-string">"softmax"</span>)
+    ]
+)
+
+print(model.summary())
+
+model.compile(optimizer=<span class="hljs-string">'adam'</span>,
+              loss=tf.keras.losses.BinaryCrossentropy(),
+              metrics=[<span class="hljs-string">'accuracy'</span>])
+
+model.fit(data,label,batch_size=<span class="hljs-number">2</span>, epochs=<span class="hljs-number">5</span>)
+</pre>
+
+
+
+<p>在创建和训练模型后，需要以一种可以使用TensorFlow服务的方式保存模型，因此我们不会只保存模型权重。</p>
+
+
+
+<pre class="hljs">Import time
+
+Save_time = int(time.time()) 
+Path  = f’./saved_models/{saved_time}’ 
+model.save(path, save_format=’tf’)
+</pre>
+
+
+
+<p>在上面的代码中，我们注入了使用时间模块进行版本控制的思想。获取保存模型时的时间戳，用于在<code>saved_models/</code>中创建一个内部文件夹，然后将模型保存到该文件夹中。</p>
+
+
+
+<p>创建一些Tensorflow服务所需的文件。</p>
+
+
+
+
+
+
+
+<p>现在我们的模型已经准备好，可以服务了。</p>
+
+
+
+<h2 id="h-docker-essentials">码头工人必备</h2>
+
+
+
+<p>在本节中，我们将讨论将我们的机器学习项目投入生产所需的最基本的docker API，并了解如何使用docker-compose编排我们的应用程序。</p>
+
+
+
+<h3><strong>将web应用与Tensorflow服务图像相结合</strong></h3>
+
+
+
+<p>本节展示了如何将tensorflow服务注入flask web应用程序。它展示了如何在flask中调用tensorflow服务端点API。</p>
+
+
+
+<p>首先，让我们服务于我们的AND逻辑门模型，使用Tensorflow服务于docker映像。第一步是从docker-hub提取tensorflow服务图像。</p>
+
+
+
+<p><strong>注:</strong>Neptune . ai上有一篇文章，详细解释了Tensorflow服务的<a href="/web/20221206024243/https://neptune.ai/blog/how-to-serve-machine-learning-models-with-tensorflow-serving-and-docker" target="_blank" rel="noreferrer noopener">。</a></p>
+
+
+
+<pre class="hljs">docker pull tensorflow/serving</pre>
+
+
+
+<p>现在让我们运行张量流/服务图像:</p>
+
+
+
+<pre class="hljs">docker run -p 8501:8501 --mount <span class="hljs-built_in">type</span>=<span class="hljs-built_in">bind</span>,<span class="hljs-built_in">source</span>=path/to/directory/saved_models,target=/saved_models/1602624873 <span class="hljs-_">-e</span> MODEL_NAME=1602624873 <span class="hljs-_">-e</span> MODEL_BASE_PATH=/saved_models -t tensorflow/serving
+</pre>
+
+
+
+<p>上面的命令启动tensorflow/serving映像，首先使用以下命令将模型从我们的本地目录挂载到Docker容器中的文件路径:</p>
+
+
+
+<pre class="hljs">---mount <span class="hljs-built_in">type</span>=<span class="hljs-built_in">bind</span>,<span class="hljs-built_in">source</span>=path/to/directory/saved_models,target=/saved_models/1602624873</pre>
+
+
+
+<p>因此，为AND逻辑门模型创建<code>saved_models</code>的<code>source</code>路径被绑定到docker容器中同名的<code>target</code>路径。</p>
+
+
+
+<p>运行映像时，会创建两个端点，如下图所示。其中一个端点是为GRPC创建的，但是我们将关注第二个端点，即REST API端点。</p>
+
+
+
+
+
+
+
+<p>为了访问docker环境外部的REST API端点，我们通过在上面的命令中使用<code>-p 8501:8501</code>来公开端口。</p>
+
+
+
+<p>让我们测试一下端点，看看它是如何工作的。我们将首先使用POSTMAN来测试REST API。</p>
+
+
+
+
+
+
+
+<p>输入被传递给模型，通过rest API提供服务。在POSTMAN中，我们使用这种格式“{"instances": [[1，0]]}”指定JSON输入，并获得JSON格式的响应，这是模型输出。</p>
+
+
+
+<p>这表明我们的服务模型工作正常。现在是将Tensorflow服务API端点与我们的web应用程序集成的时候了。</p>
+
+
+
+<p>但是在我们开始之前，不要忘记镜像仍在运行，以防我们想要停止镜像运行，下面是执行此操作的代码:</p>
+
+
+
+<pre class="hljs">docker ps</pre>
+
+
+
+<p>上面的命令列出了正在运行的图像。</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/7be033657df8f9f80a486cb3d8ba125e.png" alt="terminal" class="wp-image-31942" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206024243im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/terminal7.png?ssl=1"/></figure>
+
+
+
+<p>复制要停止的图像的容器id:</p>
+
+
+
+<pre class="hljs">docker stop e74fe1336768
+</pre>
+
+
+
+<p>该命令停止运行张量流/服务图像。</p>
+
+
+
+<p>现在让我们创建Web界面和服务器来呈现页面，因为我们的模型现在可以使用tensorflow服务。</p>
+
+
+
+<p>模型web界面将是一个有两个输入和一个提交按钮的表单，如下图所示:</p>
+
+
+
+
+
+
+
+<p>以下是位于<code>index.html</code>的UI代码:</p>
+
+
+
+<pre class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/css"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"../static/css/bootstrap-theme.min.css"</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/css"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"../static/css/bootstrap.min.css"</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/css"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"../static/css/responsive.bootstrap.min.css"</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/css"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"../static/css/style.css"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"container"</span>&gt;</span>
+            {%include 'includes/_messages.html' %}
+            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"row"</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">h1</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"text-center"</span>&gt;</span>AND GATE TEST<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+
+                    <span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">action</span>=<span class="hljs-string">"{{url_for('home')}}"</span> <span class="hljs-attr">method</span>=<span class="hljs-string">"post"</span>&gt;</span>
+                        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"form-row"</span>&gt;</span>
+                            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"col"</span>&gt;</span>
+                              <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"form-control"</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"inp1"</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">"input 1"</span>&gt;</span>
+                            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+                            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"col"</span>&gt;</span>
+                              <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"form-control"</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"inp2"</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">"input 2"</span>&gt;</span>
+                            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+                            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"col"</span>&gt;</span>
+                                <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"submit"</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"btn btn-primary ml-4"</span>&gt;</span>Submit<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+                            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+
+                          <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+                    <span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</pre>
+
+
+
+<p>现在我们已经创建了用户界面，让我们创建flask应用程序来呈现用户界面，并处理对TensorFlow服务API的请求。</p>
+
+
+
+<p>创建一个文件名app.py，并输入下面的代码:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask, render_template, flash, request
+<span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">from</span> os <span class="hljs-keyword">import</span> environ
+
+app = Flask(__name__)
+</pre>
+
+
+
+<p>上面的代码导入了必要的模块，如Flask、request和os模块。此外，上面的代码初始化flask应用程序。</p>
+
+
+
+<p>添加到app.py的下一行代码是管理和调用TensorFlow服务API的代码。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">tfserving_request</span><span class="hljs-params">(req_input, model_name)</span>:</span> 
+    url = f<span class="hljs-string">"http://localhost:8501/v1/models/{model_name}:predict"</span> 
+    input_request = {<span class="hljs-string">"instances"</span>: [req_input]} 
+    response = requests.post(url=url, json=input_request) 
+    <span class="hljs-keyword">return</span> response
+</pre>
+
+
+
+<p>基于注释编号:</p>
+
+
+
+<ul><li># 1<code>tfserving_request</code>接受两个输入，一个名为<code>re_input</code>的请求输入和模型的名称</li><li>#2定义API端点基础</li><li>#3将输入结构化为TensorFlow服务API端点接受的格式</li><li>#4通过传入请求输入向API端点发出请求</li></ul>
+
+
+
+<p>下一步是添加将用于在浏览器中呈现Web界面的路由:</p>
+
+
+
+<pre class="hljs"><span class="hljs-meta">@app.route("/home",methods=["GET","POST"]) #1</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">home</span><span class="hljs-params">()</span>:</span>
+
+    <span class="hljs-keyword">if</span> request.method == <span class="hljs-string">"POST"</span>: 
+
+        inp1 = int(request.form[<span class="hljs-string">"inp1"</span>]) 
+        inp2 = int(request.form[<span class="hljs-string">"inp2"</span>])
+
+        response = tfserving_request([inp1,inp2], <span class="hljs-string">"1602624873"</span>) 
+
+        resp = response.json() 
+        flash(f<span class="hljs-string">"obtained {inp1} and {inp2} have a prediction of {resp['predictions']}"</span>, <span class="hljs-string">'success'</span>) 
+
+    <span class="hljs-keyword">return</span> render_template(<span class="hljs-string">"index.html"</span>) 
+</pre>
+
+
+
+<ul><li>#1我们定义了加载呈现html has `/home '的路由，我们还定义了路由接受的请求方法为` GET '和` POST '</li><li>#2检查所做的请求是否是POST请求</li><li>#3如果post请求，我们使用` request.form["inp1"]`记住` inp1 '是输入名。</li><li>#4调用“tfserving_request”函数，并将模型名称旁边的表单输入传递给该函数。</li><li>#5从TensorFlow服务返回的响应被转换为JSON</li><li>#6使用包含概率得分的' resp['predictions']获得预测。“flash”功能用于将结果作为消息打印出来</li><li>#7从` index.html `呈现用户界面</li></ul>
+
+
+
+<p>最后，让我们添加代码行来启动flask服务器:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>:
+    app.run(debug=<span class="hljs-keyword">True</span>, host=<span class="hljs-string">'0.0.0.0'</span>, port=int(environ.get(<span class="hljs-string">'PORT'</span>, <span class="hljs-number">8080</span>)))
+</pre>
+
+
+
+<p>当我们运行脚本时，上面的代码使主机成为端口8080的服务器。</p>
+
+
+
+<p>让我们使用以下代码运行app.py:</p>
+
+
+
+<pre class="hljs">python run app.py
+</pre>
+
+
+
+<p>这将像这样启动服务器:</p>
+
+
+
+
+
+
+
+<p>现在服务器启动了，我们可以通过<a href="https://web.archive.org/web/20221206024243/http://0.0.0.0:8080/home&amp;nbsp" rel="nofollow">http://0 . 0 . 0 . 0:8080/home&amp;nbsp</a>查看web app</p>
+
+
+
+<p>如果我们访问该链接，我们将看到网络界面:</p>
+
+
+
+
+
+
+
+<p>如果我们在渲染页面的文本框中键入输入内容并单击“提交”按钮，如果TensorFlow服务docker图像关闭，我们会得到一个错误页面。因此，我们需要启动张量流服务图像。</p>
+
+
+
+<pre class="hljs">docker run -p 8501:8501 --mount <span class="hljs-built_in">type</span>=<span class="hljs-built_in">bind</span>,<span class="hljs-built_in">source</span>=path/to/directory/saved_models,target=/saved_models/1602624873 <span class="hljs-_">-e</span> MODEL_NAME=1602624873 <span class="hljs-_">-e</span> MODEL_BASE_PATH=/saved_models -t tensorflow/serving</pre>
+
+
+
+<p>一旦我们运行了上面的命令，我们就可以返回到web界面并键入我们的输入。我们将在输入字段中输入“1”和“0 ”,然后按提交按钮，我们将得到如下响应，如下图所示:</p>
+
+
+
+
+
+
+
+<p>响应显示在页面顶部，显示服务器收到的输入和预测输出。</p>
+
+
+
+<p>既然这样做效果很好，让我们创建一个docker映像来管理flask应用程序。在包含flask应用程序的同一个目录中，我们创建一个Docker文件:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">FROM</span> python:<span class="hljs-number">3.8</span>-slim //<span class="hljs-number">1</span>
+
+<span class="hljs-keyword">ENV</span> PYTHONUNBUFFER ED True //<span class="hljs-number">2</span>
+ADD requirements.txt requirements.txt //<span class="hljs-number">3</span>
+RUN pip install -r requirements.txt //<span class="hljs-number">4</span>
+<span class="hljs-keyword">ENV</span> APP_HOME /app //<span class="hljs-number">5</span>
+WORKDIR $APP_HOME //<span class="hljs-number">6</span>
+
+<span class="hljs-keyword">COPY</span> <span class="bash">. ./    //7
+</span>
+<span class="hljs-keyword">CMD</span> <span class="bash">[<span class="hljs-string">"python"</span>,<span class="hljs-string">"app.py"</span>] //8
+</span></pre>
+
+
+
+<p>基于注释编号的代码解释:</p>
+
+
+
+<ol><li>获取3.8版的轻量级python映像-slim</li><li>防止应用程序崩溃而不打印相关消息</li><li>将包含要安装的软件包列表的requirements.txt文件添加到同名的虚拟文件中</li><li>安装requirements.txt中的所有包</li><li>在docker中创建一个目录，并将其分配给环境变量</li><li>根据5中创建的目录指定工作目录</li><li>将flask app目录中的所有文件复制到工作目录中</li><li>创建映像后运行flask应用程序的命令</li></ol>
+
+
+
+<p>在我们运行docker文件之前，让我们创建<code>requirements.txt</code>，一个简单的方法是通过下面的命令:</p>
+
+
+
+<pre class="hljs">Pip freeze &gt; requirements.txt
+</pre>
+
+
+
+<p>这将创建requirements.txt并在python环境中的包安装中添加必要包的基础</p>
+
+
+
+<p>但是对于这个项目，唯一需要的包是<code>Flask</code>和<code>requests</code>包。</p>
+
+
+
+<p>创建requirements.txt后，让我们为flask应用程序创建一个图像:</p>
+
+
+
+<pre class="hljs">docker build -t flaskweb .</pre>
+
+
+
+<p>如果我们运行上面的代码，在成功创建图像的情况下，我们应该会获得下面的输出。</p>
+
+
+
+
+
+
+
+<p>既然映像已成功创建，让我们运行映像:</p>
+
+
+
+<pre class="hljs">docker run -p 8080:8080 <span class="hljs-_">-e</span> PORT=8080  -t flaskweb</pre>
+
+
+
+<p>这将启动flask服务器，如前所述。</p>
+
+
+
+
+
+
+
+<p>让我们访问前面提到的相同链接，以便查看web界面。键入之前的输入，让我们看看输出的是什么:</p>
+
+
+
+
+
+
+
+<p>正在输出一个错误，该错误是由于<code>flaskweb</code>可以与外部主机通信。因此，为了解决这个问题，我们想到了Docker-compose。</p>
+
+
+
+<p id="separator-block_5fc65cb633060" class="block-separator block-separator--5"> </p>
+
+
+
+<h3><strong>使用Docker compose管理服务</strong></h3>
+
+
+
+<p>Docker-compose使我们有机会用一个文件和命令创建两个Docker服务(TensorFlow serving和flaskweb ),并使我们能够管理这两个服务。</p>
+
+
+
+<p><strong>注意:</strong>要在不同的操作系统上安装docker-compose，请访问此<a href="https://web.archive.org/web/20221206024243/https://docs.docker.com/compose/install/" target="_blank" rel="noreferrer noopener nofollow">链接</a>。</p>
+
+
+
+<p>为了启用docker-compose，让我们将为我们的模型创建的<code>flask</code> app目录和<code>saved_models</code>文件夹放在同一个目录中。然后在flask app目录下创建一个名为<code>Dockerfile.dev</code>的文件，然后将<code>Dockerfile</code>中的所有内容复制到<code>Dockerfile.dev</code>中。</p>
+
+
+
+<p>复制后，<code>Dockerfile.dev</code>'将看起来像这样:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">FROM</span> python:<span class="hljs-number">3.8</span>-slim
+
+<span class="hljs-keyword">ENV</span> PYTHONUNBUFFERED True
+<span class="hljs-keyword">ADD</span> <span class="bash">requirements.txt requirements.txt
+</span><span class="hljs-keyword">RUN</span> <span class="bash">pip install -r requirements.txt
+</span><span class="hljs-keyword">ENV</span> APP_HOME /app
+<span class="hljs-keyword">WORKDIR</span> <span class="bash"><span class="hljs-variable">$APP_HOME</span>
+</span><span class="hljs-keyword">COPY</span> <span class="bash">. ./
+</span>
+<span class="hljs-keyword">CMD</span> <span class="bash">[<span class="hljs-string">"python"</span>,<span class="hljs-string">"app.py"</span>]
+</span></pre>
+
+
+
+<p>确保目录的文件系统如下所示:</p>
+
+
+
+<p>/主目录<br/>-/flask _ app<br/>-/saved _ models</p>
+
+
+
+<p>创建完成后，让我们创建一个名为<code>docker-compose.yml</code>的YAML文件来定义TensorFlow服务和flask web服务。</p>
+
+
+
+<pre class="hljs"><span class="hljs-attr">version:</span> <span class="hljs-string">"3.8"</span>
+<span class="hljs-attr">services:</span>
+<span class="hljs-attr">  server:</span>
+<span class="hljs-attr">    image:</span> tensorflow/serving
+<span class="hljs-attr">    volumes:</span>
+<span class="hljs-bullet">      -</span> ./saved_models:/saved_models/<span class="hljs-number">1602624873</span>
+<span class="hljs-attr">    ports:</span>
+<span class="hljs-bullet">      -</span> <span class="hljs-string">'8501:8501'</span>
+<span class="hljs-attr">    environment:</span>
+<span class="hljs-attr">        MODEL_NAME:</span> <span class="hljs-number">1602624873</span>
+<span class="hljs-attr">        MODEL_BASE_PATH:</span> /saved_models/
+
+<span class="hljs-attr">  web:</span>
+<span class="hljs-attr">    image:</span> flaskweb
+<span class="hljs-attr">    build:</span>
+<span class="hljs-attr">        context:</span> ./flask_app
+<span class="hljs-attr">        dockerfile:</span> Dockerfile.dev
+<span class="hljs-attr">    ports:</span>
+<span class="hljs-bullet">      -</span> <span class="hljs-string">'8080:8080'</span>
+</pre>
+
+
+
+<p>在<code>docker-compose.yml</code>中，我们使用<code>version</code>指定docker-compose版本，我们还定义了<code>service</code>对象中的服务类型。我们将这两个服务命名为<code>server</code>和<code>web</code>。</p>
+
+
+
+<p>在<code>server</code>服务对象中，我们指定要从中提取的图像。然后，我们通过将模型从<code>./saved_models</code>复制到Docker容器中名为<code>/saved_models/1602624873</code>的目录中来定义<code>volumes</code>。然后，我们为服务指定端口，就像我们在启动普通docker映像时所做的那样。同样，所需的环境变量在<code>environment</code>对象中指定。</p>
+
+
+
+<p>如您所见，相同的过程类似于我们在前面部分中描述的运行docker映像的方式。</p>
+
+
+
+<p>同样对于<code>web</code>服务对象，我们指定图像的名称。然后我们创建一个<code>build</code>对象，我们定义如何构建图像。我们通过指向<code>flask_app</code>目录来定义上下文。</p>
+
+
+
+<p>我们告诉docker-compose使用名为<code>Dockerfile.dev</code>的目录中的<code>dockerfile</code>。我们定义端口。</p>
+
+
+
+<p>为了启动服务，我们在包含<code>docker-compose.yml</code>的目录中运行以下命令。</p>
+
+
+
+<pre class="hljs">docker-compose up
+</pre>
+
+
+
+<p>这将启动两个服务，如下所示:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/260017fdc23a0d99775484f9f5a1720a.png" alt="docker" class="wp-image-31964" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206024243im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/docker2.png?ssl=1"/></figure>
+
+
+
+<p>TensorFlow服务和flaskweb服务正在运行，如果我们访问URL http:localhost:8080/home，它将加载web界面，但是如果我们键入我们的输入并单击submit，我们仍然会获得相同的错误。</p>
+
+
+
+<p>为了解决这个错误，我们没有在app.py的<code>tfserving_request</code>函数中使用TensorFlow服务API端点define中的<code>localhost</code>，而是用名为<code>server</code>的TensorFlow服务的名称来替换它:</p>
+
+
+
+<pre class="hljs">
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">tfserving_request</span><span class="hljs-params">(req_input, model_name)</span>:</span>
+    url = f<span class="hljs-string">"http://server:8501/v1/models/{model_name}:predict"</span>
+    input_request = {<span class="hljs-string">"instances"</span>: [req_input]}
+    response = requests.post(url=url, json=input_request)
+    <span class="hljs-keyword">return</span> response
+</pre>
+
+
+
+<p>要查看更改，我们需要使用以下命令停止服务运行:</p>
+
+
+
+<pre class="hljs">docker-compose stop</pre>
+
+
+
+<p>一旦两项服务都停止，我们将再次启动它:</p>
+
+
+
+<pre class="hljs">docker -compose up
+</pre>
+
+
+
+<p>完成后，我们可以进入web界面，键入输入内容，然后单击“提交”。应用程序运行良好。</p>
+
+
+
+
+
+
+
+<p>要了解更多关于docker-compose的信息，请访问此<a href="https://web.archive.org/web/20221206024243/https://docs.docker.com/compose/" target="_blank" rel="noreferrer noopener nofollow">链接</a>。</p>
+
+
+
+<p id="separator-block_5fc65cec33061" class="block-separator block-separator--5"> </p>
+
+
+
+<h3><strong>构建docker映像并将其推送到docker hub </strong></h3>
+
+
+
+<p>为了将我们的docker图像与Kubernetes集成(这将在下一节讨论)，我们需要将我们的图像推送到docker hub。</p>
+
+
+
+<p>要构建我们的图像并将其推送到docker-hub，首先，访问<a href="https://web.archive.org/web/20221206024243/https://hub.docker.com/" target="_blank" rel="noreferrer noopener nofollow"> docker-hub </a>，然后创建一个帐户。创建帐户后。我们需要从系统终端登录docker hub。</p>
+
+
+
+<p>出于安全目的，将您的docker密码存储在一个文本文件中，给它取任意名称，我将自己的命名为“my_password.txt ”,然后运行下面的命令:</p>
+
+
+
+<pre class="hljs">$ cat ~/my_password.txt | docker login --username steveoni --password-stdin
+</pre>
+
+
+
+<p>在上面的命令中，我使用` ~/`是因为` my_password.txt `,因此docker登录从。使用标准输入。</p>
+
+
+
+<p>如果登录成功，您将看到一条消息，显示登录成功。</p>
+
+
+
+<p>让我们为flask应用程序创建一个图像，然后推送到docker hub:</p>
+
+
+
+<pre class="hljs">$ docker build -t steveoni/tfweb:1.0
+</pre>
+
+
+
+<p>这将创建一个图像，包含标签1.1，它也是图像的版本。名称“steveoni/tfweb”指定您的“用户名/图像名称”。</p>
+
+
+
+<p>映像准备就绪后，我们现在可以推送至Docker hub:</p>
+
+
+
+<pre class="hljs">$ docker push steveoni/tfweb:1.0
+</pre>
+
+
+
+<p>这将图像推送到docker hub，如下所示:</p>
+
+
+
+
+
+
+
+<p>我们已经完成了flask应用程序部分，现在让我们做tensorflow服务部分。请记住，我们没有为tensorflow服务创建docker文件，但我们使用了tensor flow/服务图像。</p>
+
+
+
+<p>我们需要建立在tensor flow/服务形象之上。让我们在<code>/saved_models</code>所在的目录中创建一个docker文件。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">From</span> tensorflow/serving
+
+<span class="hljs-keyword">ENV</span> APP_HOME /saved_models/<span class="hljs-number">1602624873</span>
+WORKDIR $APP_HOME
+<span class="hljs-keyword">COPY</span> <span class="bash">./saved_models ./
+</span></pre>
+
+
+
+<p>上面的docker文件中使用的方法与创建以前的docker映像时使用的方法相同。</p>
+
+
+
+<p>在构建和推送docker hub之前，让我们为本地测试构建映像。</p>
+
+
+
+<pre class="hljs">$ docker build -t tfs .
+</pre>
+
+
+
+<p>让我们测试一下图像是否工作正常:</p>
+
+
+
+<pre class="hljs"><span class="hljs-variable">$docker</span> run -p 8501:8501 <span class="hljs-_">-e</span> MODEL_NAME=1602624873 <span class="hljs-_">-e</span> MODEL_BASE_PATH=/saved_models -t tfs
+</pre>
+
+
+
+<p>这将启动tensorflow服务服务器。</p>
+
+
+
+<p>现在，我们可以正式创建映像，然后推送:</p>
+
+
+
+<pre class="hljs">$ docker build -t steveoni/tfupdate:1.1
+$ docker push steveoni/tfupdate:1.1
+</pre>
+
+
+
+<p>下图显示了在没有检查docker-hub的情况下成功推送的情况:</p>
+
+
+
+
+
+
+
+<p id="separator-block_5fc65d1c33062" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-what-is-kubernetes-introduction">什么是Kubernetes简介</h2>
+
+
+
+<p>为什么是Kubernetes？假设您已经将docker应用程序部署到云服务，一切都很好，运行正常。但是过了一段时间，您的应用程序现在每秒钟有数千个用户发出请求。</p>
+
+
+
+<p>不幸的是，由于每秒发出请求的用户数量，你的应用程序不断崩溃，你无法避免崩溃，用户不断抱怨。</p>
+
+
+
+<p>为了解决这个问题，你可以制作应用程序的多个副本，并使其始终可用(如果一个出现故障，另一个可以出现)。另一个要问的问题是，如果所有副本都宕机了，您如何缩减规模？如何设置网络端点？谁来检查每次的状态？您如何以一种相互通信的方式管理副本？</p>
+
+
+
+<p>由于上述问题，需要Kubernetes来解决上述情况。</p>
+
+
+
+<blockquote class="wp-block-quote is-style-default"><p>“这是一个容器编排平台，由几个组件组成，它不知疲倦地工作，以保持您的服务器处于您想要的状态。”法尔汉·哈辛·乔杜里。</p></blockquote>
+
+
+
+<p id="separator-block_5fc65d2933063" class="block-separator block-separator--5"> </p>
+
+
+
+<h3><strong>非立方簇</strong></h3>
+
+
+
+<p>对于本文，我们将在本地机器上运行kubernetes，而不是云服务。为了让kubernetes在我们的系统上运行，我们需要安装两套程序</p>
+
+
+
+<p>首先，我们需要安装Minikube这允许我们在本地计算机上运行单节点Kubernetes集群。然后我们安装Kubernetes命令行工具Kubectl。</p>
+
+
+
+<p>要安装这两个程序，请访问下面的链接:</p>
+
+
+
+
+
+
+
+<p><strong>注意:</strong>在本文中，我将总结一些与本文中使用的项目相关的想法。要了解Kubernetes的概况和实际知识，请访问Farhan Hasin Chowdhury的这篇<a href="https://web.archive.org/web/20221206024243/https://www.freecodecamp.org/news/the-kubernetes-handbook/#introduction-to-container-orchestration-and-kubernetes">文章</a>。我将用他的一些插图来介绍kubernetes。</p>
+
+
+
+<p>安装完成后，您可以使用下面的命令测试程序:</p>
+
+
+
+<pre class="hljs">$ minikube version
+$ kubectl version
+</pre>
+
+
+
+<p>在我们开始使用minikube之前，让我们为它设置一个hypervisor驱动程序。在本文中，我们将使用Docker作为虚拟机管理程序驱动器。</p>
+
+
+
+<p><strong>注意:</strong> Hypervisor作为一个抽象层，将虚拟机与系统硬件分离开来。</p>
+
+
+
+<p>以下命令有助于为minikube设置虚拟机管理程序:</p>
+
+
+
+<pre class="hljs">$ minikube config <span class="hljs-built_in">set</span> driver docker</pre>
+
+
+
+<p>完成后，我们可以开始minikube:</p>
+
+
+
+<pre class="hljs">$ minikube start</pre>
+
+
+
+<p>在终端中，运行上面的命令后，我们将看到下面的输入。尽管有时完成整个加载过程可能需要一些时间。</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/fc82fe3596bb8fec637fc1e150255e99.png" alt="minikube" class="wp-image-31985" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206024243im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/minikube.png?ssl=1"/></figure>
+
+
+
+<p>在我们开始使用我们刚刚开始的minikube程序之前，让我们对Kubernetes的一些术语和概念有一个总体的了解。</p>
+
+
+
+<p>Kubernetes包含我们所说的节点。节点可以是分配特定任务虚拟机或物理机。一组通过共享网络相互通信的机器称为集群。</p>
+
+
+
+<p>因为在这个项目中我们使用了Minikube。我们只能访问一台虚拟机作为我们的服务器。因此，我们称之为单节点Kubernetes集群。</p>
+
+
+
+<p>你可以把它想象成，你不需要访问多台可以用作服务器的计算机，你只需要访问一台，也就是你的个人计算机，它可以作为服务器来承载你的应用程序。</p>
+
+
+
+<p>下图显示了minikube的概况。</p>
+
+
+
+
+
+
+
+<p>通常，库贝内石含有两种成分；</p>
+
+
+
+<ul><li>控制平面组件</li><li>节点平面组件</li></ul>
+
+
+
+<p>控制平面组件负责根据可用资源向节点分配和调度任务。它们还负责保存节点的状态，并验证对节点的请求。请记住，节点是一个虚拟机。</p>
+
+
+
+<p>节点平面组件负责维护每个节点服务器上的网络规则。它们还负责维护，并在控制面板和群集中的每个节点之间提供网关。</p>
+
+
+
+<p>根据Kubernetes文档，每个节点包含我们称之为<strong>的pod</strong></p>
+
+
+
+<p>“Pod是您可以在Kubernetes中创建和管理的最小可部署计算单元”。</p>
+
+
+
+
+
+
+
+<p>该图显示了一个集群的概况。上面的集群是一个单节点集群，因为我们使用的是minikube。</p>
+
+
+
+<p>一个pod容纳了我们的应用程序容器。即使一个pod可以包含多个容器，也建议为其分配一个Pod。使用更高的对象来管理Pod也是明智的。这个更高的对象有能力在任何时候创建和删除pod，因此它们帮助管理pod。我们将在本节稍后讨论这些更高级的对象。</p>
+
+
+
+<p>一个节点可以包含多个单元，每个单元执行相同的功能。在我们称之为<strong>服务的帮助下，</strong>我们可以将所有这些pod合并到一个节点中作为一个实体。服务使我们能够定义如何访问pod。</p>
+
+
+
+<p>有了这些关于Kubernetes的小知识，我们继续手头的项目，并解释一些其他需要的概念。</p>
+
+
+
+<p id="separator-block_5fc65d8a33064" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-serving-ml-powered-web-app-with-kubernetes">使用Kubernetes提供ML驱动的web应用程序</h2>
+
+
+
+<p>本节展示了如何使用kubernetes来编排您的应用程序。它展示了创建pod和负载平衡器的不同方法。它还引入了“发展”和“集群”的概念</p>
+
+
+
+<p id="separator-block_5fc65d9333065" class="block-separator block-separator--5"> </p>
+
+
+
+<h3><strong>创建pod和负载平衡器的显式方法</strong></h3>
+
+
+
+<p>首先，让我们使用我们在前面几节中创建的tensorflow服务图像来测试服务、pod等概念。</p>
+
+
+
+<p>记住我们已经开始了minikube，现在让我们使用tensorflow服务图像创建我们的第一个pod。</p>
+
+
+
+<pre class="hljs">$ kubectl run tf-kube --image=steveoni/tfupdate:1.1 --port=8501 --env=”MODEL_NAME=1602624873”  --env=<span class="hljs-string">"MODEL_BASE_PATH=/saved_models/"</span>
+</pre>
+
+
+
+<p>上面的代码类似于上一节中运行docker映像时使用的相同命令。命令中的<code>tf-kube</code>是我们试图创建的pod的名称，使用<code>--env</code>定义环境变量。</p>
+
+
+
+<p>然后，我们获得一条消息，表明pod已经创建。要查看已创建的pod列表，我们可以使用如下所示的<code>get pods</code>命令:</p>
+
+
+
+<pre class="hljs">$ kubectl get pods</pre>
+
+
+
+<p>这是创建的窗格列表:</p>
+
+
+
+
+
+
+
+<p>你可以看到我创建的pod列表，有些是三天前创建的。我忘记删除它们了。在pod列表中，我们可以看到我们刚刚创建的pod，其状态为正在运行。</p>
+
+
+
+<p>要删除任何pod，我们只需运行以下命令:</p>
+
+
+
+<pre class="hljs">$ kubectl delete pod-name
+</pre>
+
+
+
+<p>我们的<code>tf-kube</code> pod正在运行，但我们无法从集群外部访问它。为了访问集群外部的pod，让我们创建一个名为<strong> LoadBalancer的服务。</strong>该服务有助于将pod暴露在集群之外。</p>
+
+
+
+<pre class="hljs">$ kubectl expose pod tf-kube --type=LoadBalancer --port=8501
+</pre>
+
+
+
+<p>上面的命令创建了名为tf-kube的负载平衡器服务:</p>
+
+
+
+
+
+
+
+<p>一旦负载平衡器服务开始读取，我们就可以使用minikube启动“tf-kube”负载平衡器服务。</p>
+
+
+
+<pre class="hljs">$ minikube service tf-kube
+</pre>
+
+
+
+
+
+
+
+<p>上面的命令启动了如上图所示的服务。它还将“目标端口”映射到图像中显示的“URL”。因此，我们将访问URL“http://172 . 17 . 0 . 2:30116 ”,而不是访问“http://localhost:8501”来访问TensorFlow服务API端点。</p>
+
+
+
+<p>让我们使用Postman测试TensorFlow服务API端点，如Tensorflow服务部分所示。</p>
+
+
+
+
+
+
+
+<p>我们可以看到API端点工作正常。现在，我们已经能够创建我们的第一个pod和第一个服务。</p>
+
+
+
+<p>要删除创建的服务:</p>
+
+
+
+<pre class="hljs">$ kubectl delete service tf-kube</pre>
+
+
+
+<p>我们用来创建第一个pod和服务的方法并不是创建pod和服务的理想方式。</p>
+
+
+
+<p>在下一小节中，我们将展示如何以一种更具可再现性和可管理性的方式创建pod。</p>
+
+
+
+<p id="separator-block_5fc65da933066" class="block-separator block-separator--5"> </p>
+
+
+
+<h3><strong>创建pod和负载平衡器的声明性方法</strong></h3>
+
+
+
+<p>让我们采用一种更具声明性的方法，就像我们在docker-compose部分所做的那样。这种方法使我们更容易配置我们的Kubernetes。也让其他人更容易设置。</p>
+
+
+
+<p>首先，让我们创建一个名为“tf-kube-pod.yml”的YAML文件，并输入以下代码:</p>
+
+
+
+<pre class="hljs"><span class="hljs-attr">apiVersion:</span> v1
+<span class="hljs-attr">kind:</span> Pod
+<span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> tf-kube-pod
+<span class="hljs-attr">  labels:</span>
+	component: server
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  containers:</span>
+	- name: tf-kube
+  	image: steveoni/tfupdate:<span class="hljs-number">1.1</span>
+  	ports:
+    	- containerPort: <span class="hljs-number">8501</span>
+  	env:
+    	- name: MODEL_NAME
+      	value: <span class="hljs-string">"1602624873"</span>
+    	- name: MODEL_BASE_PATH
+      	value: /saved_models/</pre>
+
+
+
+<p>在YAML文件中，我们定义了以下内容</p>
+
+
+
+<ul><li>定义了我们想要使用的Kubernetes API的版本</li><li>指定我们想要创建的对象的<code>kind</code>,即Pod</li><li>我们定义了<code>metadata</code>,通过给<code>component</code>属性赋值<code>server</code>,我们给pod一个名称和一个<code>label</code>标签</li><li>然后我们定义<code>spec</code>,它包含了我们想要的pod的状态。我们定义了要使用的容器映像，即<code>steveoni/tfupdate:1.1</code>，我们还定义了容器端口<code>8501</code></li><li>同样在<code>spec.containers</code>中，我们在<code>env</code>中指定环境变量，包含它们的<code>name</code>和<code>value</code>。</li></ul>
+
+
+
+<p>现在让我们使用“tf-kube-pod.yml”文件创建一个pod:</p>
+
+
+
+<pre class="hljs">$ kubectl apply <span class="hljs-_">-f</span> tf-kube-pod.yml</pre>
+
+
+
+<p>这将创建pod，您可以使用<code>kubectl get pods</code>查看pod的创建。</p>
+
+
+
+<p>现在，让我们为刚刚创建的pod创建负载平衡器服务配置文件。创建一个名为“tf-kube-load-balancer.yml”的文件。</p>
+
+
+
+<pre class="hljs"><span class="hljs-attr">apiVersion:</span> v1
+<span class="hljs-attr">kind:</span> Service
+<span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> tf-kube-load-balancer-service
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  type:</span> LoadBalancer
+<span class="hljs-attr">  ports:</span>
+	- port: <span class="hljs-number">8501</span>
+  	targetPort: <span class="hljs-number">8501</span>
+<span class="hljs-attr">  selector:</span>
+	component: server
+</pre>
+
+
+
+<p>和前一个文件一样，这次我们将<code>kind</code>对象指定为<code>service</code>，并且在<code>spec</code>中我们将类型定义为<code>LoadBalancer</code>。在<code>spec.ports</code>中，我们定义了主机pod的端口和作为<code>pod tf-kube-pod</code>端口的<code>targetport</code>。在<code>spec.selector</code>中，我们将负载平衡器指向<code>server</code>组件，这是上面创建的<code>tf-kube-pod</code> pod的标签。</p>
+
+
+
+<p>然后，我们使用下面的命令从“tf-kube-load-balancer.yml”创建服务:</p>
+
+
+
+<pre class="hljs">$ kubectl apply <span class="hljs-_">-f</span> tf-kube-load-balancer.yml</pre>
+
+
+
+<p>我们还可以检查使用<code>kubectl get services</code>创建的服务列表。要启动服务运行，请执行以下操作:</p>
+
+
+
+<pre class="hljs">$ minikube service tf-kube-load-balancer.yml</pre>
+
+
+
+<p>这将启动服务并打开web浏览器。</p>
+
+
+
+<p>整个过程按预期进行。但是不要忘记，在本节开始描述pod时，我们提到了用更高的对象来管理Pod是很好的；它们具有创建和删除Pod的能力。我们将在下一节讨论这个问题。</p>
+
+
+
+<p id="separator-block_5fc65dc233067" class="block-separator block-separator--5"> </p>
+
+
+
+<h3>使用多容器应用程序</h3>
+
+
+
+<p>我们已经能够为我们的TensorFlow服务创建一个Pod，它只是一个容器。别忘了，我们的主要目标是将TensorFlow服务融入到web应用中。</p>
+
+
+
+<p>正如我们在docker-compose部分看到的，我们能够创建一个程序来管理Tensroflow服务和flask-web应用程序服务。我们将在这一部分做同样的事情。</p>
+
+
+
+<p>在本节中，我们将使用名为<strong> Deployment </strong>的更高级对象，还将向我们介绍<strong> ClusterIP。</strong></p>
+
+
+
+<p><strong>部署</strong>:部署是一个控制器，它让我们能够轻松地创建一个Pod的多个副本，也让我们能够轻松地推出和回滚更新。</p>
+
+
+
+<blockquote class="wp-block-quote"><p>“在Kubernetes中，控制器是监控集群状态的控制回路，然后根据需要做出或请求更改。每个控制器都试图将当前的群集状态移至更接近所需的状态。控制回路是调节系统状态的非终止回路。<br/>–Kubernetes<a href="https://web.archive.org/web/20221206024243/https://kubernetes.io/docs/concepts/architecture/controller/" target="_blank" rel="noreferrer noopener nofollow">文档</a></p></blockquote>
+
+
+
+<p>ClusterIP:  ClusterIP是另一种类型的服务，就像负载平衡器一样。与LoadBalancer服务相反，clusterIP只公开集群中的一个应用程序。也就是说，它防止应用程序被群集外的人访问。</p>
+
+
+
+<p>在Kubernetes中部署我们的Web应用程序时，我们将使用刚刚定义的两个术语。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/51aabfb2bd38b5f72f6865a425ef9737.png" alt="tf-kube" class="wp-image-32007" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206024243im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/tf-kube.png?resize=767%2C461&amp;ssl=1"/><figcaption><em>App architecture</em></figcaption></figure></div>
+
+
+
+<p>上图展示了在Kubernetes中部署的应用架构。我们将创建Flask Web应用程序和Tensorflow服务的三个副本。</p>
+
+
+
+<p>我们不想在集群之外公开我们的Tensorflow服务，正如我们在上一节创建pod时所做的那样，因此我们将为Tensorflow服务创建一个ClusterIP。</p>
+
+
+
+<p>为Flask web应用程序创建了一个负载平衡器，因为我们只想向用户公开应用程序。</p>
+
+
+
+<p>为了实现这个架构，让我们为Flask Web应用程序创建一个部署配置文件和一个负载平衡器配置文件。在创建时，我们将使用部署到docker hub的flask web应用程序映像；` steveoni/tfweb:1.0 '</p>
+
+
+
+<p>让我们创建一个名为“k8s”的文件夹，你可以给它取任何名字。在这个文件中，我们将创建所有需要的配置文件。</p>
+
+
+
+<p>在文件夹中创建一个文件名“tf-web-dev.yml ”,在文件中输入以下文本:</p>
+
+
+
+<pre class="hljs"><span class="hljs-attr">apiVersion:</span> apps/v1
+<span class="hljs-attr">kind:</span> Deployment
+<span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> tfweb-dev
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  replicas:</span> <span class="hljs-number">3</span>
+<span class="hljs-attr">  selector:</span>
+<span class="hljs-attr">    matchLabels:</span>
+<span class="hljs-attr">      component:</span> web
+<span class="hljs-attr">  template:</span>
+<span class="hljs-attr">    metadata:</span>
+<span class="hljs-attr">      labels:</span>
+<span class="hljs-attr">        component:</span> web
+<span class="hljs-attr">    spec:</span>
+<span class="hljs-attr">      containers:</span>
+<span class="hljs-attr">        - name:</span> web
+<span class="hljs-attr">          image:</span> steveoni/tfweb:<span class="hljs-number">1.0</span>
+<span class="hljs-attr">          ports:</span>
+<span class="hljs-attr">            - containerPort:</span> <span class="hljs-number">8080</span>
+</pre>
+
+
+
+<p>像我们创建的所有其他yml文件一样；</p>
+
+
+
+<ul><li>我们使用该文件作为“部署”对象来指定要创建的对象的“种类”。</li><li>在“规范”中，我们将“副本”的数量指定为3。</li><li>在“spec.selector”中，我们使用“component”属性给对象一个标签“web”。</li><li>我们还将图像定义为“steveoni/tfweb:1，0 ”,</li><li>并且使用“容器端口”来指定要展示的端口</li></ul>
+
+
+
+<p>我们可以决定通过使用“kubectl apply -f tf-web-dev.yml”立即创建部署对象，但我们创建文件夹“k8s”或您称之为该文件夹的任何名称的主要原因是，能够使用一个命令立即创建应用部署所需的整个对象。</p>
+
+
+
+<p>因此，让我们为上面定义的部署对象(我们的flask web应用程序)创建LoadBalancer服务。创建一个文件，并将其命名为“TF web-load-balancer-service . yml”。</p>
+
+
+
+<pre class="hljs"><span class="hljs-attr">apiVersion:</span> v1
+<span class="hljs-attr">kind:</span> Service
+<span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> tfweb-load-balancer-service
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  type:</span> LoadBalancer
+<span class="hljs-attr">  ports:</span>
+<span class="hljs-attr">    - port:</span> <span class="hljs-number">8080</span>
+<span class="hljs-attr">      targetPort:</span> <span class="hljs-number">8080</span>
+<span class="hljs-attr">  selector:</span>
+<span class="hljs-attr">    component:</span> web
+</pre>
+
+
+
+<p>负载平衡器与上一节中创建的负载平衡器相同，只是这一次它通过标记名“spec.selector.component:web”指向flask web应用程序。</p>
+
+
+
+<p>现在flask web对象已经准备好了。然后，让我们创建Tensorflow服务服务器。创建一个名为“tf-kube-dev.yml”的文件:</p>
+
+
+
+<pre class="hljs"><span class="hljs-attr">apiVersion:</span> apps/v1
+<span class="hljs-attr">kind:</span> Deployment
+<span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> tf-kube-dev
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  replicas:</span> <span class="hljs-number">3</span>
+<span class="hljs-attr">  selector:</span>
+<span class="hljs-attr">    matchLabels:</span>
+<span class="hljs-attr">      component:</span> server
+<span class="hljs-attr">  template:</span>
+<span class="hljs-attr">    metadata:</span>
+<span class="hljs-attr">      labels:</span>
+<span class="hljs-attr">        component:</span> server
+<span class="hljs-attr">    spec:</span>
+<span class="hljs-attr">      containers:</span>
+<span class="hljs-attr">        - name:</span> server
+<span class="hljs-attr">          image:</span> steveoni/tfupdate:<span class="hljs-number">1.1</span>
+<span class="hljs-attr">          ports:</span>
+<span class="hljs-attr">            - containerPort:</span> <span class="hljs-number">8501</span>
+<span class="hljs-attr">          env:</span>
+<span class="hljs-attr">            - name:</span> MODEL_NAME
+<span class="hljs-attr">              value:</span> <span class="hljs-string">"1602624873"</span>
+<span class="hljs-attr">            - name:</span> MODEL_BASE_PATH
+<span class="hljs-attr">              value:</span> /saved_models/
+</pre>
+
+
+
+<p>上面的配置类似于为砂箱网创建的配置；但是标签被设置为“组件:服务器”</p>
+
+
+
+<p>让我们为Tensorflow服务对象创建一个CLusterIP服务。创建一个文件，并将其命名为“tf-cluster-ip-service.yml ”:</p>
+
+
+
+<pre class="hljs"><span class="hljs-attr">apiVersion:</span> v1
+<span class="hljs-attr">kind:</span> Service
+<span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> tf-cluster-ip-service
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  type:</span> ClusterIP
+<span class="hljs-attr">  ports:</span>
+<span class="hljs-attr">    - port:</span> <span class="hljs-number">8501</span>
+<span class="hljs-attr">      targetPort:</span> <span class="hljs-number">8501</span>
+<span class="hljs-attr">  selector:</span>
+<span class="hljs-attr">    component:</span> server
+</pre>
+
+
+
+<p>上面的文件与为“LoadBalancer”服务创建的文件相同，只是“spec.type”被赋值为“ClusterIP”。</p>
+
+
+
+<p>应用程序架构已经设置好，可以在Kubernetes上部署了。以下命令同时初始化Flask web app服务(web)和Tensorflow服务服务(server)的创建。</p>
+
+
+
+<pre class="hljs">$ kubectl apply -f k8s
+</pre>
+
+
+
+<p>如果您位于包含“k8s”文件夹的目录中，上述命令将会起作用。但是，如果您的工作目录在“k8s”中，使用下面的命令:</p>
+
+
+
+<pre class="hljs">$ kubectl apply -f .
+</pre>
+
+
+
+<p>这将基于“k8s”目录中的文件创建所需的服务，如下所示:</p>
+
+
+
+
+
+
+
+<p>从图像中，我们可以看到对象和服务都已创建</p>
+
+
+
+<p>让我们检查一下pod是否在运行:</p>
+
+
+
+<pre class="hljs">$ kubectl get pods
+</pre>
+
+
+
+
+
+
+
+<p>请记住，我们为每个部署对象创建了3个副本，因此运行的pod总数应该是6个，从上图可以看出这是正确的。</p>
+
+
+
+<p>要查看部署对象:</p>
+
+
+
+<pre class="hljs">$ kubectl get deployments</pre>
+
+
+
+
+
+
+
+<p>部署对象已正确创建。</p>
+
+
+
+<p>让我们检查为这两个对象创建的服务:</p>
+
+
+
+<pre class="hljs">$ kubectl get services
+</pre>
+
+
+
+
+
+
+
+<p>“ClusterIP”的“tf-cluster-ip-service”和“LoadBalancer”的“tfweb-load-balancer-service”已正确创建。</p>
+
+
+
+<p>现在我们已经设置好了一切，让我们启动“负载平衡器”服务:</p>
+
+
+
+<pre class="hljs">$ minikube service tfweb-load-balancer-service
+</pre>
+
+
+
+
+
+
+
+<p>这将打开位于URL的web浏览器:` http://172.17.0.2:32640/`要查看应用程序，让我们转到呈现web界面的route `/home'。</p>
+
+
+
+<p>当输入值并提交表单时，服务器响应一个错误:</p>
+
+
+
+
+
+
+
+<p>请记住，我们以前在尝试让flask web应用程序docker与TensorFlow服务docker通信时遇到过这种类型的错误。我们通过用“服务器”替换“本地主机”来解决这个问题，服务器是docker-compose创建的TensorFlow服务的名称。</p>
+
+
+
+<p>为了解决这个问题，我们需要将“app.py”中“tfserving_request”中使用的“server”主机替换为托管TensorFlow服务的CLusterIP服务名称。因此，我们将app.py中的“服务器”替换为“tf-cluster-ip-service”</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">tfserving_request</span><span class="hljs-params">(req_input, model_name)</span>:</span>
+ur=<span class="hljs-string">"http://tf-cluster-ip-service:8501/v1/models/{}:predict"</span>.format(model_name)
+input_request = {<span class="hljs-string">"instances"</span>: [req_input]}
+response = requests.post(url=url, json=input_request)
+<span class="hljs-keyword">return</span> response
+</pre>
+
+
+
+<p>完成后，我们重建“tfweb”映像并将其推送到docker-hub。现在新图像的版本为“1.2”。</p>
+
+
+
+<pre class="hljs"><span class="hljs-variable">$docker</span> build -t steveoni/tfweb:1.2 .
+$ docker push steveoni/tfweb:1.2
+</pre>
+
+
+
+<p>因此，我们需要将“tfweb-dev.yml”中的“图像”更改为“steveoni/tfweb:1.2”</p>
+
+
+
+<p>让我们删除以前创建的部署对象和服务:</p>
+
+
+
+<pre class="hljs">$ kubectl delete deployments --all
+$ kubectl delete services --all
+</pre>
+
+
+
+<p>然后，我们再次创建新的部署对象和服务:</p>
+
+
+
+<pre class="hljs">$ kubectl apply <span class="hljs-_">-f</span> k8s
+</pre>
+
+
+
+<p>然后，我们启动LoadBalacer服务:</p>
+
+
+
+<pre class="hljs">$ minikube service tfweb-load-balancer-service</pre>
+
+
+
+<p>网页会自动加载，让我们转到“/home”路线来测试web应用程序:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/2336c50895e192e97a8de0a912ee99ce.png" alt="gate test " class="wp-image-32026" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206024243im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/gate-test-4.png?ssl=1"/></figure>
+
+
+
+<p>现在该应用程序工作正常。</p>
+
+
+
+<p>如果将这种方法应用于任何其他项目，并且您的pod拒绝启动，您可以通过运行以下命令来查看pod的全部详细信息:</p>
+
+
+
+<pre class="hljs">$ kubectl describe pods</pre>
+
+
+
+<p>这将给出所创建的整个pod的全部细节，但是要获取特定的pod，请运行“kubectl get pods”。获取pod的名称，然后运行:</p>
+
+
+
+<pre class="hljs">$ kubectl describe pod pod-name
+</pre>
+
+
+
+<p>要查看任何pod的日志，我们使用下面的命令:</p>
+
+
+
+<pre class="hljs">$ kubectl logs pod-name</pre>
+
+
+
+<p id="separator-block_5fc6587f2131e" class="block-separator block-separator--0">结论</p>
+
+
+
+<h2 id="h-conclusion">在本文中，我们已经能够看到如何从构建机器学习应用程序的传统方法中迁移出来。我相信这篇文章已经向您展示了如何构建高效且可扩展的机器学习应用程序。</h2>
+
+
+
+<p>此外，您还增加了成为独角兽数据科学家的工具。好吧，还有一些其他的工具和概念需要学习，以便有效地构建和生产ML产品，例如:</p>
+
+
+
+<p>CI/CD:如何将单元测试添加到您的模型中，并使用一次推送将您的应用程序推送到github，通过一系列测试，然后推向生产</p>
+
+
+
+<ul><li>TFX/Kubeflow:定制工具，使您的应用程序的编排和使用kubernetes的部署更容易。</li><li>参考</li></ul>
+
+
+
+<h2 id="h-reference">Reference</h2>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

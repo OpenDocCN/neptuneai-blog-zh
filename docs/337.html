@@ -1,0 +1,389 @@
+<html>
+<head>
+<title>How to Do Hyperparameter Tuning on Any Python Script in 3 Easy Steps </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何通过3个简单的步骤在任何Python脚本上进行超参数调优</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/hyperparameter-tuning-on-any-python-script#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/hyperparameter-tuning-on-any-python-script#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>你写了一个Python脚本，用来训练和评估你的机器学习模型。现在，您想自动调整超参数以提高其性能吗？</p>
+
+
+
+<p>我抓住你了！</p>
+
+
+
+<p>在本文中，我将向您展示如何将您的脚本转换成可以用任何超参数优化库进行优化的目标函数。</p>
+
+
+
+
+
+
+
+<p>只需3个步骤，你就可以像没有明天一样调整模型参数。</p>
+
+
+
+<p>准备好了吗？</p>
+
+
+
+<p>我们走吧！</p>
+
+
+
+<p>我想你的<code>main.py</code>脚本应该是这样的:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> lightgbm <span class="hljs-keyword">as</span> lgb
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+data = pd.read_csv(<span class="hljs-string">'data/train.csv'</span>, nrows=<span class="hljs-number">10000</span>)
+X = data.drop([<span class="hljs-string">'ID_code'</span>, <span class="hljs-string">'target'</span>], axis=<span class="hljs-number">1</span>)
+y = data[<span class="hljs-string">'target'</span>]
+(X_train, X_valid, 
+y_train, y_valid )= train_test_split(X, y, test_size=<span class="hljs-number">0.2</span>, random_state=<span class="hljs-number">1234</span>)
+
+train_data = lgb.Dataset(X_train, label=y_train)
+valid_data = lgb.Dataset(X_valid, label=y_valid, reference=train_data)
+
+params = {<span class="hljs-string">'objective'</span>: <span class="hljs-string">'binary'</span>,
+          <span class="hljs-string">'metric'</span>: <span class="hljs-string">'auc'</span>,
+          <span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.4</span>,
+          <span class="hljs-string">'max_depth'</span>: <span class="hljs-number">15</span>,
+          <span class="hljs-string">'num_leaves'</span>: <span class="hljs-number">20</span>,
+          <span class="hljs-string">'feature_fraction'</span>: <span class="hljs-number">0.8</span>,
+          <span class="hljs-string">'subsample'</span>: <span class="hljs-number">0.2</span>}
+
+model = lgb.train(params, train_data,
+                  num_boost_round=<span class="hljs-number">300</span>,
+                  early_stopping_rounds=<span class="hljs-number">30</span>,
+                  valid_sets=[valid_data],
+                  valid_names=[<span class="hljs-string">'valid'</span>])
+
+score = model.best_score[<span class="hljs-string">'valid'</span>][<span class="hljs-string">'auc'</span>]
+print(<span class="hljs-string">'validation AUC:'</span>, score)</pre>
+
+
+
+<h2>步骤1:从代码中分离搜索参数</h2>
+
+
+
+<p>获取您想要调整的参数，并将它们放在脚本顶部的字典中。这样做可以有效地将搜索参数从代码的其余部分中分离出来。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> lightgbm <span class="hljs-keyword">as</span> lgb
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+SEARCH_PARAMS = {<span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.4</span>,
+                 <span class="hljs-string">'max_depth'</span>: <span class="hljs-number">15</span>,
+                 <span class="hljs-string">'num_leaves'</span>: <span class="hljs-number">20</span>,
+                 <span class="hljs-string">'feature_fraction'</span>: <span class="hljs-number">0.8</span>,
+                 <span class="hljs-string">'subsample'</span>: <span class="hljs-number">0.2</span>}
+
+data = pd.read_csv(<span class="hljs-string">'../data/train.csv'</span>, nrows=<span class="hljs-number">10000</span>)
+X = data.drop([<span class="hljs-string">'ID_code'</span>, <span class="hljs-string">'target'</span>], axis=<span class="hljs-number">1</span>)
+y = data[<span class="hljs-string">'target'</span>]
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=<span class="hljs-number">0.2</span>, random_state=<span class="hljs-number">1234</span>)
+
+train_data = lgb.Dataset(X_train, label=y_train)
+valid_data = lgb.Dataset(X_valid, label=y_valid, reference=train_data)
+
+params = {<span class="hljs-string">'objective'</span>: <span class="hljs-string">'binary'</span>,
+          <span class="hljs-string">'metric'</span>: <span class="hljs-string">'auc'</span>,
+          **SEARCH_PARAMS}
+
+model = lgb.train(params, train_data,
+                  num_boost_round=<span class="hljs-number">300</span>,
+                  early_stopping_rounds=<span class="hljs-number">30</span>,
+                  valid_sets=[valid_data],
+                  valid_names=[<span class="hljs-string">'valid'</span>])
+
+score = model.best_score[<span class="hljs-string">'valid'</span>][<span class="hljs-string">'auc'</span>]
+print(<span class="hljs-string">'validation AUC:'</span>, score)</pre>
+
+
+
+<h2>步骤2:将培训和评估打包成一个功能</h2>
+
+
+
+<p>现在，您可以将整个训练和评估逻辑放在一个<code>train_evaluate</code>函数中。该函数将参数作为输入，并输出验证分数。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> lightgbm <span class="hljs-keyword">as</span> lgb
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+SEARCH_PARAMS = {<span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.4</span>,
+                 <span class="hljs-string">'max_depth'</span>: <span class="hljs-number">15</span>,
+                 <span class="hljs-string">'num_leaves'</span>: <span class="hljs-number">20</span>,
+                 <span class="hljs-string">'feature_fraction'</span>: <span class="hljs-number">0.8</span>,
+                 <span class="hljs-string">'subsample'</span>: <span class="hljs-number">0.2</span>}
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train_evaluate</span><span class="hljs-params">(search_params)</span>:</span>
+    data = pd.read_csv(<span class="hljs-string">'../data/train.csv'</span>, nrows=<span class="hljs-number">10000</span>)
+    X = data.drop([<span class="hljs-string">'ID_code'</span>, <span class="hljs-string">'target'</span>], axis=<span class="hljs-number">1</span>)
+    y = data[<span class="hljs-string">'target'</span>]
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=<span class="hljs-number">0.2</span>, random_state=<span class="hljs-number">1234</span>)
+
+    train_data = lgb.Dataset(X_train, label=y_train)
+    valid_data = lgb.Dataset(X_valid, label=y_valid, reference=train_data)
+
+    params = {<span class="hljs-string">'objective'</span>: <span class="hljs-string">'binary'</span>,
+              <span class="hljs-string">'metric'</span>: <span class="hljs-string">'auc'</span>,
+              **search_params}
+
+    model = lgb.train(params, train_data,
+                      num_boost_round=<span class="hljs-number">300</span>,
+                      early_stopping_rounds=<span class="hljs-number">30</span>,
+                      valid_sets=[valid_data],
+                      valid_names=[<span class="hljs-string">'valid'</span>])
+
+    score = model.best_score[<span class="hljs-string">'valid'</span>][<span class="hljs-string">'auc'</span>]
+    <span class="hljs-keyword">return</span> score
+
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:
+    score = train_evaluate(SEARCH_PARAMS)
+    print(<span class="hljs-string">'validation AUC:'</span>, score)</pre>
+
+
+
+<h2>步骤3:运行hypeparameter调整脚本</h2>
+
+
+
+<p>我们快到了。</p>
+
+
+
+<p>你现在需要做的就是使用这个<code>train_evaluate</code>函数作为你选择的黑盒优化库的目标。</p>
+
+
+
+<p>我将使用<a href="https://web.archive.org/web/20221007001227/https://scikit-optimize.github.io/" target="_blank" rel="noreferrer noopener nofollow"> Scikit Optimize </a>，我已经在<a href="/web/20221007001227/https://neptune.ai/blog/scikit-optimize" target="_blank" rel="noreferrer noopener">的另一篇文章</a>中详细描述了它，但是你可以使用任何超参数优化库。</p>
+
+
+
+<div id="blog-cta-intext-block_6172a0fa67482" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">了解更多信息</h3>
+  <div class="blog-cta-intext__content"><p>💡使用<a href="https://web.archive.org/web/20221007001227/https://docs.neptune.ai/integrations-and-supported-tools/hyperparameter-optimization/scikit-optimize" target="_blank" rel="noreferrer noopener"> Scikit-Optimize + Neptune集成，检查如何在运行时可视化运行，记录每次运行时尝试的参数，等等。</a></p>
+</div>
+  </div>
+
+
+<p>简单地说，我</p>
+
+
+<div class="custom-point-list">
+<ul><li>定义搜索<strong> <em>空间</em> </strong>，</li><li>创建将被最小化的<code>objective</code>函数，</li><li>通过<code>skopt.forest_minimize</code>功能运行优化。</li></ul>
+</div>
+
+
+<p>在这个例子中，我将从<strong> 10 </strong>随机选择的参数集开始，尝试<strong> 100 </strong>种不同的配置。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> skopt
+
+<span class="hljs-keyword">from</span> script_step2 <span class="hljs-keyword">import</span> train_evaluate
+
+SPACE = [
+    skopt.space.Real(<span class="hljs-number">0.01</span>, <span class="hljs-number">0.5</span>, name=<span class="hljs-string">'learning_rate'</span>, prior=<span class="hljs-string">'log-uniform'</span>),
+    skopt.space.Integer(<span class="hljs-number">1</span>, <span class="hljs-number">30</span>, name=<span class="hljs-string">'max_depth'</span>),
+    skopt.space.Integer(<span class="hljs-number">2</span>, <span class="hljs-number">100</span>, name=<span class="hljs-string">'num_leaves'</span>),
+    skopt.space.Real(<span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>, name=<span class="hljs-string">'feature_fraction'</span>, prior=<span class="hljs-string">'uniform'</span>),
+    skopt.space.Real(<span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>, name=<span class="hljs-string">'subsample'</span>, prior=<span class="hljs-string">'uniform'</span>)]
+
+
+<span class="hljs-meta">@skopt.utils.use_named_args(SPACE)</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(**params)</span>:</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">-1.0</span> * train_evaluate(params)
+
+
+results = skopt.forest_minimize(objective, SPACE, n_calls=<span class="hljs-number">30</span>, n_random_starts=<span class="hljs-number">10</span>)
+best_auc = <span class="hljs-number">-1.0</span> * results.fun
+best_params = results.x
+
+print(<span class="hljs-string">'best result: '</span>, best_auc)
+print(<span class="hljs-string">'best parameters: '</span>, best_params)</pre>
+
+
+
+<p>这就是了。</p>
+
+
+
+<p><em> <strong>结果</strong> </em>对象包含关于产生它的<strong>最佳分数</strong> <strong>和参数</strong>的信息。</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-background">请注意，由于最近的<a href="/web/20221007001227/https://neptune.ai/blog/neptune-new" target="_blank" rel="noreferrer noopener"> API更新</a>，这篇文章也需要一些改变——我们正在努力！与此同时，请检查<a href="https://web.archive.org/web/20221007001227/https://docs.neptune.ai/" target="_blank" rel="noreferrer noopener">海王星文档</a>，那里的一切都是最新的！🥳</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+<div class="note">
+    <h3>注意:</h3>
+    <div class="content">
+                    <div class="wysiwyg_editor">
+                                    <p>如果您想<strong>可视化您的训练并在训练结束后保存诊断图表</strong>，您可以添加一个回调和一个函数调用来<strong>将每个超参数搜索</strong>记录到Neptune。只需使用neptune-contrib 库中的这个<a href="https://web.archive.org/web/20221007001227/https://neptune-contrib.readthedocs.io/_modules/neptunecontrib/monitoring/skopt.html#NeptuneMonitor" target="_blank" rel="noopener">助手函数。</a></p>
+                            </div>
+                    <div class="html_code">
+                                <pre class="hljs"><span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">import</span> neptunecontrib.monitoring.skopt <span class="hljs-keyword">as</span> sk_utils
+<span class="hljs-keyword">import</span> skopt
+
+<span class="hljs-keyword">from</span> script_step2 <span class="hljs-keyword">import</span> train_evaluate
+
+neptune.init(<span class="hljs-string">'jakub-czakon/blog-hpo'</span>)
+neptune.create_experiment(<span class="hljs-string">'hpo-on-any-script'</span>, upload_source_files=[<span class="hljs-string">'*.py'</span>])
+
+SPACE = [
+    skopt.space.Real(<span class="hljs-number">0.01</span>, <span class="hljs-number">0.5</span>, name=<span class="hljs-string">'learning_rate'</span>, prior=<span class="hljs-string">'log-uniform'</span>),
+    skopt.space.Integer(<span class="hljs-number">1</span>, <span class="hljs-number">30</span>, name=<span class="hljs-string">'max_depth'</span>),
+    skopt.space.Integer(<span class="hljs-number">2</span>, <span class="hljs-number">100</span>, name=<span class="hljs-string">'num_leaves'</span>),
+    skopt.space.Real(<span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>, name=<span class="hljs-string">'feature_fraction'</span>, prior=<span class="hljs-string">'uniform'</span>),
+    skopt.space.Real(<span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>, name=<span class="hljs-string">'subsample'</span>, prior=<span class="hljs-string">'uniform'</span>)]
+
+
+<span class="hljs-meta">@skopt.utils.use_named_args(SPACE)</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(**params)</span>:</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">-1.0</span> * train_evaluate(params)
+
+
+monitor = sk_utils.NeptuneMonitor()
+results = skopt.forest_minimize(objective, SPACE, n_calls=<span class="hljs-number">100</span>, n_random_starts=<span class="hljs-number">10</span>, callback=[monitor])
+sk_utils.log_results(results)
+
+neptune.stop()</pre>                            </div>
+                    <div class="text">
+                                    <p>现在，当您运行参数扫描时，您将看到以下内容:</p>
+                            </div>
+                    
+                    
+            </div>
+</div>
+
+
+
+
+
+
+<h2>最后的想法</h2>
+
+
+
+<div class="wp-container-3 wp-block-columns are-vertically-aligned-center">
+<div class="wp-container-1 wp-block-column is-vertically-aligned-center">
+<p>在本文中，您已经学习了如何通过3个步骤优化几乎所有Python脚本的超参数。</p>
+
+
+
+<p>希望有了这些知识，你会用更少的努力建立更好的机器学习模型。</p>
+
+
+
+<p>快乐训练！</p>
+</div>
+
+
+
+
+</div>
+
+
+
+
+<div id="author-box-new-format-block_605d8dd517661" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">雅各布·查孔</h3>
+    
+          <p class="article__authorContent-text">大部分是ML的人。构建MLOps工具，编写技术资料，在Neptune进行想法实验。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-4 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>如何跟踪机器学习模型的超参数？</h2>
+
+
+
+<p class="has-small-font-size">卡米尔·卡什马雷克|发布于2020年7月1日</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p><strong>机器学习算法可通过称为超参数</strong>的多个量规进行调整。最近的深度学习模型可以通过数十个超参数进行调整，这些超参数与数据扩充参数和训练程序参数一起创建了非常复杂的空间。在强化学习领域，您还应该计算环境参数。</p>
+
+
+
+<p>数据科学家要<strong>控制好</strong> <strong>超参数</strong> <strong>空间</strong>，才能<strong>使</strong> <strong>进步</strong>。</p>
+
+
+
+<p>在这里，我们将向您展示<strong>最近的</strong> <strong>实践</strong>，<strong>提示&amp;技巧，</strong>和<strong>工具</strong>以最小的开销高效地跟踪超参数。你会发现自己掌控了最复杂的深度学习实验！</p>
+
+
+
+<h2>为什么我应该跟踪我的超参数？也就是为什么这很重要？</h2>
+
+
+
+<p>几乎每一个深度学习实验指南，像<a href="https://web.archive.org/web/20221007001227/https://www.deeplearningbook.org/contents/guidelines.html" target="_blank" rel="noreferrer noopener">这本深度学习书籍</a>，都建议你如何调整超参数，使模型按预期工作。在<strong>实验-分析-学习循环</strong>中，数据科学家必须控制正在进行的更改，以便循环的“学习”部分正常工作。</p>
+
+
+
+<p>哦，忘了说<strong>随机种子也是一个超参数</strong>(特别是在RL领域:例如检查<a href="https://web.archive.org/web/20221007001227/https://www.reddit.com/r/MachineLearning/comments/76th74/d_why_random_seeds_sometimes_have_quite_large/" target="_blank" rel="noreferrer noopener">这个Reddit </a>)。</p>
+
+
+
+<h2>超参数跟踪的当前实践是什么？</h2>
+
+
+
+<p>让我们逐一回顾一下管理超参数的常见做法。我们关注于如何构建、保存和传递超参数给你的ML脚本。</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221007001227/https://neptune.ai/blog/how-to-track-hyperparameters" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

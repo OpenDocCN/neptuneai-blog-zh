@@ -1,0 +1,743 @@
+<html>
+<head>
+<title>A Complete Guide to Monitoring ML Experiments Live in Neptune </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>海王星现场监测ML实验完全指南</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/monitoring-machine-learning-experiments-guide#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/monitoring-machine-learning-experiments-guide#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>训练机器学习或深度学习模型可能需要很长时间。</p>
+
+
+
+<p>如果你和我一样，你想知道那段时间发生了什么，你可能会感兴趣:</p>
+
+
+
+<ul>
+<li>监控您的培训和验证损失，</li>
+
+
+
+<li>再看GPU消耗，</li>
+
+
+
+<li>每隔一个时期查看图像预测</li>
+
+
+
+<li>还有一堆其他的东西。</li>
+</ul>
+
+
+
+<p>海王星让你做到这一切，在这篇文章中，我会告诉你如何做到这一点。循序渐进。</p>
+
+
+
+<p>看看这个<a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/shared/step-by-step-monitoring-experiments-live/e/STEP-22/charts" target="_blank" rel="noreferrer noopener nofollow">例子，运行</a>，看看它在Neptune应用程序中会是什么样子。</p>
+
+
+
+<div class="is-layout-flow wp-block-group"><div class="wp-block-group__inner-container">
+<section id="note-block_37b41d3fdf11a45c455b296eb83cdc96" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--wysiwyg_editor">
+
+                <img alt="" class="c-item__arrow lazyload" src="../Images/a219aca29d3936c27dd369da8bcf5e01.png" data-src="https://web.archive.org/web/20221206002423/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206002423/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>如果你想在没有注册的情况下尝试Neptune monitoring，只需跳转到<code>Initialize Neptune</code>部分，作为一个匿名用户从那里开始。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+</div></div>
+
+
+
+<h2 id="h-set-up-your-neptune-account">设置您的Neptune帐户</h2>
+
+
+
+<p>建立一个项目并将你的脚本连接到Neptune是非常简单的，但是你仍然需要这样做🙂</p>
+
+
+
+<p>让我们尽快解决这个问题。</p>
+
+
+
+<h3>1.<strong>创建一个项目</strong></h3>
+
+
+
+<p>让我们先<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/setup/creating_project/" target="_blank" rel="noreferrer noopener">创建一个项目</a>。</p>
+
+
+
+<p>为此:</p>
+
+
+
+<ul>
+<li>进入<a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/" target="_blank" rel="noreferrer noopener nofollow">海王星app </a>，</li>
+
+
+
+<li>点击左边的<code>New project</code>按钮，</li>
+
+
+
+<li>给它一个名字，</li>
+
+
+
+<li>决定它是公开的还是私人的，</li>
+
+
+
+<li>完成了。</li>
+</ul>
+
+
+
+<h3>2.<strong>获取您的API令牌</strong></h3>
+
+
+
+<p>您将需要一个<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/setup/setting_api_token/" target="_blank" rel="noreferrer noopener"> Neptune API令牌</a>(您的个人密钥)来连接您用Neptune运行的脚本。</p>
+
+
+
+<p>为此:</p>
+
+
+
+<ul>
+<li>点击右边的用户标志</li>
+
+
+
+<li>点击<code>Get Your API token</code></li>
+
+
+
+<li>复制您的API令牌</li>
+
+
+
+<li>将它粘贴到环境变量、配置文件中，或者直接粘贴到您的脚本中(如果您真的喜欢冒险的话)🙂</li>
+</ul>
+
+
+
+<p>令牌就像密码一样，所以我尽量保护它的安全。</p>
+
+
+
+<p>因为我是Linux爱好者，所以我把它放在了我的环境文件<code>~/.bashrc</code>中。如果您使用不同的系统，请查看文档中的<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/setup/setting_api_token/" target="_blank" rel="noreferrer noopener"> API令牌部分。</a></p>
+
+
+
+<p>有了它，无论你何时运行我的训练脚本，Neptune都会知道你是谁，并适当地记录事情。</p>
+
+
+
+<h3>3.<strong>安装客户端库</strong></h3>
+
+
+
+<p>要使用Neptune，您需要一个客户端库来记录您所关心的一切。</p>
+
+
+
+<p>因为我正在使用Python，所以我将使用Python客户端，但是您也可以通过R语言使用Neptune。</p>
+
+
+
+<p>您可以用pip安装它:</p>
+
+
+
+<pre class="hljs">pip install neptune-client
+</pre>
+
+
+
+<h3>4.初始化海王星</h3>
+
+
+
+<p>现在您已经设置好了一切，您可以开始监控了！</p>
+
+
+
+<p>首先，通过在脚本顶部添加以下内容，将脚本连接到Neptune:</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>import neptune.new as neptune
+
+run = neptune.init_run(
+    project="workspace-name/project-name",
+    api_token="Your Neptune API token",
+)</code></pre>
+</div>
+
+
+
+
+
+<h3>5.创建跑步</h3>
+
+
+
+<p>使用<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/api/neptune/#init_run" target="_blank" rel="noreferrer noopener"> init_run() </a>方法创建一个新的运行。当我们执行上面的neptune.init_run()时，我们开始了一次运行。</p>
+
+
+
+<p>然后，开始的运行在后台跟踪一些系统指标，以及您在代码中记录的任何元数据。默认情况下，Neptune会定期在后台与服务器同步数据。检查【Neptune到底自动记录了什么。</p>
+
+
+
+<p>到Neptune的连接保持打开，直到运行停止或者脚本执行完毕。您可以通过调用run.stop()来显式停止运行。</p>
+
+
+
+<h4>但是什么是跑步呢？</h4>
+
+
+
+<p>一个'<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/api/neptune/#init_run" target="_blank" rel="noreferrer noopener"> run </a>'是项目中的一个名称空间，您可以在其中记录模型构建元数据。</p>
+
+
+
+<p>通常，每次执行进行模型训练、重新训练或推理的脚本时，都会创建一个运行。可以将运行视为您在代码中定义的类似字典的结构。</p>
+
+
+
+<p>他们有:</p>
+
+
+
+<ul>
+<li><em>字段</em>，您可以在其中记录您的ML元数据</li>
+
+
+
+<li><em>名称空间</em>，它组织你的字段</li>
+</ul>
+
+
+
+<p>无论您创建什么层次元数据结构，Neptune都会在UI中反映出来。</p>
+
+
+
+<p>要创建结构化名称空间，请使用正斜杠/</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>run["metrics/f1_score"] = 0.67
+run["metrics/test/roc"] = 0.82
+</code></pre>
+</div>
+
+
+
+
+
+<p>上面的片段:</p>
+
+
+
+<ul>
+<li>创建两个名称空间:metrics和metrics/test。</li>
+
+
+
+<li>为字段f1_score和roc赋值。</li>
+</ul>
+
+
+
+<p>关于run参数的完整列表，可以参考<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/api/neptune/#init_run" target="_blank" rel="noreferrer noopener"> Neptune的API文档。</a></p>
+
+
+
+<h2 id="h-monitoring-experiments-in-neptune-methods">海王星上的监测实验:方法</h2>
+
+
+
+<h3>记录基本的东西</h3>
+
+
+
+<p>简而言之，登录Neptune非常简单:</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>run["WHAT_YOU_WANT_TO_LOG"] = ITS_VALUE</code></pre>
+</div>
+
+
+
+
+
+<p>让我们来看看一些不同的方式，你可以记录重要的事情到海王星。</p>
+
+
+
+<p>您可以记录:</p>
+
+
+
+<ul>
+<li>度量和损失-&gt; <code>run["accuracy"]=0.90</code></li>
+
+
+
+<li>图像和图表-&gt;<code>run["images"].upload("bboxes.png")</code>；</li>
+
+
+
+<li>模型文件之类的工件-&gt; <code>run["model_checkpoints"].upload("my_model.pt")</code></li>
+
+
+
+<li>和许多其他事情。</li>
+</ul>
+
+
+
+<p>有时你可能只是想在训练前后记录一些东西。</p>
+
+
+
+<p>在这种情况下，只要做:</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>params = {
+    "activation": "sigmoid",
+    "dropout": 0.25,
+    "learning_rate": 0.1,
+    "n_epochs": 100,
+}
+</code></pre>
+</div>
+
+
+
+
+
+<p>在其他场景中，有一个训练循环，您可能希望在其中记录一系列值。为此，我们使用。log()函数。</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>for epoch in range(params["n_epochs"]):
+    # this would normally be your training loop
+    run["train/loss"].log(0.99**epoch)
+    run["train/acc"].log(1.01**epoch)
+    run["eval/loss"].log(0.98**epoch)
+    run["eval/acc"].log(1.02**epoch)
+</code></pre>
+</div>
+
+
+
+
+
+<p>这将创建名称空间“train”和“eval”，每个名称空间都有一个<code>loss</code>和<code>acc</code>字段。</p>
+
+
+
+<p>稍后你可以在应用程序中看到这些可视化的图表。</p>
+
+
+
+<h3>集成日志记录</h3>
+
+
+
+<p>为了使日志更容易，我们为大多数Python ML库创建了集成，包括PyTorch、TensorFlow、Keras、scikit-learn等等。你可以在这里看到所有海王星的整合。这些集成为您提供了现成的实用程序，可以记录您通常会在这些ML库中记录的大多数ML元数据。我们来看几个例子。</p>
+
+
+
+<h4>Monitor TensorFlow/Keras models</h4>
+
+
+
+<p>Neptune–Keras集成会自动记录以下元数据:</p>
+
+
+
+<ul>
+<li>模型摘要</li>
+
+
+
+<li>用于定型模型的优化程序的参数</li>
+
+
+
+<li>训练期间传递给model.fit的参数</li>
+
+
+
+<li>每个时期的当前学习率</li>
+
+
+
+<li>训练期间的硬件消耗和stdout/stderr输出</li>
+
+
+
+<li>培训代码和Git信息</li>
+</ul>
+
+
+
+<p>要在使用Keras训练模型时记录元数据，可以按以下方式使用NeptuneCallback。</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>from neptune.new.integrations.tensorflow_keras import NeptuneCallback
+
+run = neptune.init_run()
+neptune_cbk = NeptuneCallback(run=run)
+
+model.fit(
+    x_train,
+    y_train,
+    epochs=5,
+    batch_size=64,
+    callbacks=[neptune_cbk],
+)</code></pre>
+</div>
+
+
+
+
+
+<p>您的训练指标将自动记录到Neptune:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" loading="lazy" src="../Images/142384785f739dab58dd3f4d0d433f00.png" alt="Monitor experiments Neptune Keras" class="wp-image-13628" srcset="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?w=1652&amp;ssl=1 1652w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=768%2C416&amp;ssl=1 768w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=200%2C108&amp;ssl=1 200w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=1536%2C832&amp;ssl=1 1536w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=220%2C119&amp;ssl=1 220w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=120%2C65&amp;ssl=1 120w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=160%2C87&amp;ssl=1 160w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=300%2C163&amp;ssl=1 300w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=480%2C260&amp;ssl=1 480w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=1020%2C553&amp;ssl=1 1020w" sizes="(max-width: 1000px) 100vw, 1000px" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Keras.jpg?resize=1652%2C895&amp;ssl=1"/><figcaption class="wp-element-caption"><a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/common/tf-keras-integration/e/TFK-39154/charts" target="_blank" rel="noreferrer noopener nofollow">See this example in the Neptune app</a></figcaption></figure>
+
+
+
+<p>查看文档，了解更多关于如何使用<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/integrations/keras/" target="_blank" rel="noreferrer noopener"> Neptune-Keras集成</a>的信息。</p>
+
+
+
+<h4>监控时间序列先知模型</h4>
+
+
+
+<p>Prophet是一个流行的时间序列预测库。通过Neptune-Prophet集成，您可以在使用Prophet训练模型时跟踪参数、预测数据框、残差诊断图表、交叉验证折叠和其他元数据。</p>
+
+
+
+<p>这里有一个如何一次性记录关于你的先知模型的相关元数据的例子。</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>import pandas as pd
+from prophet import Prophet
+import neptune.new as neptune
+import neptune.new.integrations.prophet as npt_utils
+
+run = neptune.init_run()
+
+dataset = pd.read_csv(
+    "https://raw.githubusercontent.com/facebook/prophet/main/examples/example_wp_log_peyton_manning.csv"
+)
+model = Prophet()
+model.fit(dataset)
+
+run["prophet_summary"] = npt_utils.create_summary(
+    model, dataset, log_interactive=True
+)
+</code></pre>
+</div>
+
+
+
+
+
+<figure class="wp-block-image size-full is-resized"><img decoding="async" loading="lazy" src="../Images/c443498a62cfa647cdbfd3710f114822.png" alt="Monitor experiments Neptune Prophet" class="wp-image-13631" srcset="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?w=1395&amp;ssl=1 1395w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=768%2C527&amp;ssl=1 768w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=200%2C137&amp;ssl=1 200w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=220%2C151&amp;ssl=1 220w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=120%2C82&amp;ssl=1 120w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=160%2C110&amp;ssl=1 160w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=300%2C206&amp;ssl=1 300w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=480%2C329&amp;ssl=1 480w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=1020%2C700&amp;ssl=1 1020w" sizes="(max-width: 810px) 100vw, 810px" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Prophet.jpg?resize=810%2C555&amp;ssl=1"/><figcaption class="wp-element-caption"><a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/common/fbprophet-integration/e/FBPROP-249/dashboard/Diagnostic-charts-5855c208-c4b8-4171-b065-d0e8802b1b60" target="_blank" rel="noreferrer noopener nofollow">See this example in the Neptune app</a></figcaption></figure>
+
+
+
+<p>查看文档以了解更多关于<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/integrations/prophet/" target="_blank" rel="noreferrer noopener nofollow"> Neptune-Prophet整合</a>的信息。</p>
+
+
+
+<h4>监控Optuna超参数优化</h4>
+
+
+
+<p>参数调整框架<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/integrations/optuna/" target="_blank" rel="noreferrer noopener"> Optuna也有一个回调系统，您可以很好地将Neptune </a>插入其中。每次参数搜索迭代后，所有结果都会被记录和更新。</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>import neptune.new.integrations.optuna as optuna_utils
+
+run = neptune.init_run()
+neptune_callback = optuna_utils.NeptuneCallback(run)
+
+study = optuna.create_study(direction="maximize")
+study.optimize(objective, n_trials=20, callbacks=[neptune_callback])
+</code></pre>
+</div>
+
+
+
+
+
+<figure class="wp-block-image size-full is-resized"><img decoding="async" loading="lazy" src="../Images/f4fdf67f786202f25e99976ec2555745.png" alt="Monitor experiments Neptune Optuna" class="wp-image-13634" srcset="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?w=1611&amp;ssl=1 1611w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=768%2C335&amp;ssl=1 768w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=200%2C87&amp;ssl=1 200w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=1536%2C669&amp;ssl=1 1536w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=220%2C96&amp;ssl=1 220w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=120%2C52&amp;ssl=1 120w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=160%2C70&amp;ssl=1 160w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=300%2C131&amp;ssl=1 300w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=480%2C209&amp;ssl=1 480w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=1020%2C444&amp;ssl=1 1020w" sizes="(max-width: 810px) 100vw, 810px" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-experiments-Neptune-Optuna.jpg?resize=810%2C352&amp;ssl=1"/><figcaption class="wp-element-caption"><a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/common/optuna-integration/e/NEP1-370/dashboard/Vizualizations-5ea92658-6a56-4656-b225-e81c6fbfc8ab" target="_blank" rel="noreferrer noopener nofollow">See this example in the Neptune app</a></figcaption></figure>
+
+
+
+<p>访问文档以了解更多关于Neptune-Optuna整合的信息。</p>
+
+
+
+<p>大多数ML框架都有回调系统。它们略有不同，但想法是一样的。你可以看看Neptune支持的工具的完整列表<a href="https://web.archive.org/web/20221206002423/https://docs.neptune.ai/integrations/">。如果您无法在这个列表中找到您的框架，您总是可以求助于通过Neptune客户端登录的老方法，正如上面已经讨论过的。</a></p>
+
+
+
+<h2 id="h-what-can-you-monitor-in-neptune">在海王星能监测到什么？</h2>
+
+
+
+<p>您可以登录Neptune并实时监控许多不同的事情。</p>
+
+
+
+<p>可以记录每个实验的指标和学习曲线、硬件消耗、模型预测、ROC曲线、控制台日志等，并进行实时探索。</p>
+
+
+
+<p>让我们一个接一个地检查其中的几个。</p>
+
+
+
+<h3><strong>监控ML指标和损失</strong></h3>
+
+
+
+<p>您可以使用= assignment将分数和度量记录为单个值，或者使用log()方法将分数和度量记录为一系列值。</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code># Log scores (single value)
+run["score"] = 0.97
+run["test/acc"] = 0.97
+
+# Log metrics (series of values)
+for epoch in range(100):
+    # your training loop
+    acc = ...
+    loss = ...
+    metric = ...
+
+    run["train/accuracy"].log(acc)
+    run["train/loss"].log(loss)
+    run["metric"].log(metric)
+</code></pre>
+</div>
+
+
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" loading="lazy" src="../Images/b1ed8cec959c8b4f72b3ee7e973cf7e5.png" alt="Monitor metrics Neptune" class="wp-image-13650" srcset="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?w=1920&amp;ssl=1 1920w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=768%2C388&amp;ssl=1 768w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=200%2C101&amp;ssl=1 200w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=1536%2C776&amp;ssl=1 1536w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=220%2C111&amp;ssl=1 220w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=120%2C61&amp;ssl=1 120w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=160%2C81&amp;ssl=1 160w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=300%2C152&amp;ssl=1 300w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=480%2C243&amp;ssl=1 480w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=1020%2C515&amp;ssl=1 1020w" sizes="(max-width: 1000px) 100vw, 1000px" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-metrics-Neptune.jpg?resize=1920%2C970&amp;ssl=1"/><figcaption class="wp-element-caption"><a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/common/colab-test-run/e/COL-217/charts" target="_blank" rel="noreferrer noopener nofollow">See this example in the Neptune app</a></figcaption></figure>
+
+
+
+<h3><strong>监控硬件资源</strong>和控制台日志</h3>
+
+
+
+<p>这些实际上是自动记录到Neptune的:</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>run = neptune.init_run(capture_hardware_metrics=True)</code></pre>
+</div>
+
+
+
+
+
+<p>直接去<code>Monitoring</code>版块看就知道了:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" loading="lazy" src="../Images/40ce0c77c2db2e7e4c8278a801b39f8e.png" alt="Monitor hardware metrics Neptune" class="wp-image-13647" srcset="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?w=1915&amp;ssl=1 1915w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=768%2C385&amp;ssl=1 768w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=200%2C100&amp;ssl=1 200w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=1536%2C771&amp;ssl=1 1536w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=220%2C110&amp;ssl=1 220w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=120%2C60&amp;ssl=1 120w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=160%2C80&amp;ssl=1 160w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=300%2C151&amp;ssl=1 300w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=480%2C241&amp;ssl=1 480w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=1020%2C512&amp;ssl=1 1020w" sizes="(max-width: 1000px) 100vw, 1000px" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Monitor-hardware-metrics-Neptune.jpg?resize=1915%2C961&amp;ssl=1"/><figcaption class="wp-element-caption"><a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/common/showroom/e/SHOW-14/monitoring" target="_blank" rel="noreferrer noopener nofollow">See this example in the app</a></figcaption></figure>
+
+
+
+<h3><strong>监控图像预测</strong></h3>
+
+
+
+<p>您可以记录单个图像或一系列图像(如下例所示)。</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code>from neptune.new.types import File
+
+for name in misclassified_images_names:
+    y_pred = ...
+    y_true = ...
+    run["misclassified_imgs"].log(File("misclassified_image.png"))
+</code></pre>
+</div>
+
+
+
+
+
+<p>它们将出现在应用程序的图库中:</p>
+
+
+
+<figure class="wp-block-image size-full is-resized"><img decoding="async" loading="lazy" src="../Images/09348b36e958d89c17069d8706f23ff8.png" alt="Neptune example_gallery" class="wp-image-13645" srcset="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?w=1259&amp;ssl=1 1259w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=768%2C390&amp;ssl=1 768w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=200%2C102&amp;ssl=1 200w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=220%2C112&amp;ssl=1 220w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=120%2C61&amp;ssl=1 120w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=160%2C81&amp;ssl=1 160w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=300%2C153&amp;ssl=1 300w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=480%2C244&amp;ssl=1 480w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=1020%2C519&amp;ssl=1 1020w" sizes="(max-width: 810px) 100vw, 810px" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-example_gallery.png?resize=810%2C411&amp;ssl=1"/><figcaption class="wp-element-caption"><a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/common/pytorch-lightning-integration/e/PTL-15/images" target="_blank" rel="noreferrer noopener nofollow">See this example in the app</a></figcaption></figure>
+
+
+
+<h3><strong>监控文件更新</strong></h3>
+
+
+
+<p>你可以通过使用<code>upload()</code>方法从任何深度学习框架中保存模型权重。在下面的例子中，它们被记录在名称空间<code>model_checkpoints</code>中名为<code>my_model</code>的字段下。</p>
+
+
+
+<div class="block-code-snippet  l-padding__top--0 l-padding__bottom--0 block-code-snippet--regular language-py line-numbers">
+    <pre><code># Log PyTorch model weights
+my_model = ...
+torch.save(my_model, "my_model.pt")
+run["model_checkpoints/my_model"].upload("model_checkpoints/my_model.pt")
+</code></pre>
+</div>
+
+
+
+
+
+<p>模型检查点出现在<strong>所有元数据</strong>部分。</p>
+
+
+
+<figure class="wp-block-image size-full is-resized"><img decoding="async" loading="lazy" src="../Images/6ec820c2e7f1795cd9fdf389d4429573.png" alt="" class="wp-image-13644" srcset="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?w=918&amp;ssl=1 918w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?resize=768%2C289&amp;ssl=1 768w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?resize=200%2C75&amp;ssl=1 200w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?resize=220%2C83&amp;ssl=1 220w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?resize=120%2C45&amp;ssl=1 120w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?resize=160%2C60&amp;ssl=1 160w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?resize=300%2C113&amp;ssl=1 300w, https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?resize=480%2C180&amp;ssl=1 480w" sizes="(max-width: 810px) 100vw, 810px" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206002423im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/12/Neptune-run_view_model_checkpoints.png?resize=810%2C304&amp;ssl=1"/><figcaption class="wp-element-caption"><a href="https://web.archive.org/web/20221206002423/https://app.neptune.ai/o/common/org/showroom/e/SHOW-14/all?path=model_checkpoints" target="_blank" rel="noreferrer noopener nofollow">See this example in the Neptune app</a></figcaption></figure>
+
+
+
+<h2 id="h-compare-running-experiments-with-previous-ones">将正在进行的实验与以前的实验进行比较</h2>
+
+
+
+<p>在海王星监测ML实验很酷的一点是，你可以将正在运行的实验与你之前的实验进行比较。</p>
+
+
+
+<p>这使得确定正在训练的模型是否显示出改进的希望变得容易。如果没有，你甚至可以从用户界面中止实验。</p>
+
+
+
+<p>为此:</p>
+
+
+
+<ul>
+<li>转到实验仪表板</li>
+
+
+
+<li>选择几个实验</li>
+
+
+
+<li>单击比较以覆盖学习曲线，并显示参数和指标的差异</li>
+
+
+
+<li>如果你看不到训练的重点，点击中止正在进行的训练</li>
+</ul>
+
+
+
+<h2 id="h-share-running-experiments-with-others-with-a-link">通过链接与其他人分享跑步实验</h2>
+
+
+
+<p>您可以通过复制实验的链接并将其发送给某人来分享您正在进行的实验。</p>
+
+
+
+<p>就像我在这里和你分享这个实验一样:</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206002423/https://ui.neptune.ai/o/shared/org/step-by-step-monitoring-experiments-live/e/STEP-22" target="_blank" rel="noreferrer noopener">https://ui . Neptune . ai/o/shared/org/STEP-by-STEP-monitoring-experiments-live/e/STEP-22</a></p>
+
+
+
+<p>最酷的是，你可以让人们直接进入你实验中有趣的部分，比如代码、硬件消耗图表或学习曲线。你也可以通过链接分享实验对比。</p>
+
+
+
+
+
+<p class="has-text-align-center"><a href="https://web.archive.org/web/20221206002423/https://ui.neptune.ai/o/shared/org/step-by-step-monitoring-experiments-live/e/STEP-22/artifacts?path=charts%2F" target="_blank" rel="noreferrer noopener">在海王星看到的</a></p>
+
+
+
+<h2 id="h-final-thoughts">最后的想法</h2>
+
+
+
+<p>有了这些信息，你应该能够监控你所关心的机器学习实验的每一部分。</p>
+
+
+
+<p>如需更多信息，您可以:</p>
+
+
+
+
+
+
+
+<p>实验监控快乐！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

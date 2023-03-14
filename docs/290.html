@@ -1,0 +1,887 @@
+<html>
+<head>
+<title>Cross-Validation in Machine Learning: How to Do It Right </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>机器学习中的交叉验证:如何正确进行</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/cross-validation-in-machine-learning-how-to-do-it-right#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/cross-validation-in-machine-learning-how-to-do-it-right#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>在机器学习(ML)中，泛化通常指的是算法在各种输入中有效的能力。这意味着<a href="https://web.archive.org/web/20221225163138/https://towardsdatascience.com/all-machine-learning-models-explained-in-6-minutes-9fe30ff6776a" target="_blank" rel="noreferrer noopener nofollow"> <strong> ML </strong>模型</a>不会遇到来自相同训练数据分布的新输入的性能下降。</p>
+
+
+
+<p>对人类来说，概括是最自然不过的事情了。我们可以即时分类。例如，我们肯定会认出一只狗，即使我们以前没有见过这个品种。然而，对于ML模型来说，这可能是一个相当大的挑战。这就是为什么在构建模型时，检查算法的泛化能力是一项需要大量注意力的重要任务。</p>
+
+
+
+<p>为此，我们使用<a href="https://web.archive.org/web/20221225163138/https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noreferrer noopener nofollow"> <strong>交叉验证</strong> </a> ( <strong> CV </strong>)。</p>
+
+
+
+<p>在本文中，我们将涵盖:</p>
+
+
+
+<ul>
+<li>什么是交叉验证:定义、使用目的和技术</li>
+
+
+
+<li>不同的CV技术:保持、k折叠、留一、留p、分层k折叠、重复k折叠、嵌套k折叠、时间序列CV</li>
+
+
+
+<li>如何使用这些技术:sklearn</li>
+
+
+
+<li>机器学习中的交叉验证:sklearn，CatBoost</li>
+
+
+
+<li>深度学习中的交叉验证:Keras，PyTorch，MxNet</li>
+
+
+
+<li>最佳实践和提示:时间序列、医疗和财务数据、图像</li>
+</ul>
+
+
+
+
+
+
+
+<h2 id="what-is-cross-validation">什么是交叉验证？</h2>
+
+
+
+<p><strong>交叉验证</strong>是一种评估机器学习模型并测试其性能的技术。CV常用于应用型ML任务。它有助于为特定的预测建模问题比较和选择合适的模型。</p>
+
+
+
+<p>CV易于理解，易于实施，并且与用于计算模型效率得分的其他方法相比，它倾向于具有较低的偏差。所有这些使得交叉验证成为为特定任务选择最佳模型的有力工具。</p>
+
+
+
+<p>有很多不同的技术可以用来<strong>交叉验证</strong>模型。尽管如此，它们都有一个相似的算法:</p>
+
+
+
+<ol>
+<li>将数据集分成两部分:一部分用于训练，另一部分用于测试</li>
+
+
+
+<li>在训练集上训练模型</li>
+
+
+
+<li>在测试集上验证模型</li>
+
+
+
+<li>重复1-3步几次。该数字取决于您正在使用的<strong> </strong> CV方法</li>
+</ol>
+
+
+
+<p>你可能知道，有很多简历技巧。有些是常用的，有些只是理论上的。让我们来看看本文将涉及的交叉验证方法。</p>
+
+
+
+<ul>
+<li>坚持</li>
+
+
+
+<li>k倍</li>
+
+
+
+<li>留一个出来</li>
+
+
+
+<li>漏接</li>
+
+
+
+<li>分层K折叠</li>
+
+
+
+<li>重复K倍</li>
+
+
+
+<li>嵌套K折叠</li>
+
+
+
+<li>时间序列CV</li>
+</ul>
+
+
+
+<h2 id="hold-out-cross-validation">保留交叉验证</h2>
+
+
+
+<p><strong>保留交叉验证</strong>是最简单和最常见的技术。你可能不知道这是一种<strong>坚持</strong>的方法，但你肯定每天都在用。</p>
+
+
+
+<p>保持技术的算法；</p>
+
+
+
+<ol>
+<li>将数据集分为两部分:训练集和测试集。通常，数据集的80%用于训练集，20%用于测试集，但是您可以选择更适合您的任何拆分</li>
+
+
+
+<li>在训练集上训练模型</li>
+
+
+
+<li>在测试集上验证</li>
+
+
+
+<li>保存验证的结果</li>
+</ol>
+
+
+
+
+
+<p>就是这样。</p>
+
+
+
+<p>我们通常在大型数据集上使用hold-out方法，因为它只需要训练模型一次。</p>
+
+
+
+<p>实施hold-out真的很容易。例如，您可以使用sk learn . model _ selection . train _ test _ split来完成。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+X, y = np.arange(<span class="hljs-number">10</span>).reshape((<span class="hljs-number">5</span>, <span class="hljs-number">2</span>)), range(<span class="hljs-number">5</span>)
+X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                    test_size=<span class="hljs-number">0.2</span>,
+                                                    random_state=<span class="hljs-number">111</span>)</pre>
+
+
+
+<p>尽管如此，拒绝合作还是有一个很大的缺点。</p>
+
+
+
+<p>例如，分布不完全均匀的数据集。如果是这样的话，我们可能会在分拆后陷入困境。例如，训练集不会代表测试集。训练集和测试集可能差别很大，其中一个可能更容易或更难。</p>
+
+
+
+<p>此外，我们只测试我们的模型一次的事实可能是这种方法的瓶颈。由于前面提到的原因，通过保持技术获得的结果可能被认为是不准确的。</p>
+
+
+
+<h2 id="k-fold-cross-validation">k倍交叉验证</h2>
+
+
+
+<p><strong> k倍交叉验证</strong>是一种最大限度减少拒绝法缺点的技术。k-Fold引入了一种分割数据集的新方法，有助于克服“只测试一次的瓶颈”。</p>
+
+
+
+<p>k倍技术的算法:</p>
+
+
+
+<ol>
+<li>选择折叠数–k。通常，k为5或10，但您可以选择小于数据集长度的任何数字。</li>
+
+
+
+<li>将数据集分成k个相等(如果可能)的部分(它们被称为折叠)</li>
+
+
+
+<li>选择k–1折叠作为训练集。剩余的折叠将是测试集</li>
+
+
+
+<li>在训练集上训练模型。在交叉验证的每次迭代中，您必须独立于前一次迭代中训练的模型来训练新的模型</li>
+
+
+
+<li>在测试集上验证</li>
+
+
+
+<li>保存验证的结果</li>
+
+
+
+<li>重复步骤3-6k次。每次使用剩余的折叠作为测试集。最后，你应该在你的每一次折叠中验证这个模型。</li>
+
+
+
+<li>要获得最终分数，请对第6步中得到的结果进行平均。</li>
+</ol>
+
+
+
+
+
+<p>要执行k-Fold交叉验证，可以使用sklearn.model_selection.KFold。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> KFold
+
+X = np.array([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>]])
+y = np.array([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>])
+kf = KFold(n_splits=<span class="hljs-number">2</span>)
+
+<span class="hljs-keyword">for</span> train_index, test_index <span class="hljs-keyword">in</span> kf.split(X):
+    print(<span class="hljs-string">"TRAIN:"</span>, train_index, <span class="hljs-string">"TEST:"</span>, test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+</pre>
+
+
+
+<p>总的来说，使用k折技术总比持有要好。在面对面的情况下，比较k倍给出了更稳定和可信的结果，因为训练和测试是在数据集的几个不同部分上执行的。如果我们增加折叠次数，在许多不同的子数据集上测试模型，我们可以使总得分更加稳健。</p>
+
+
+
+<p>尽管如此，k-Fold方法有一个缺点。增加k导致训练更多的模型，并且训练过程可能非常昂贵和耗时。</p>
+
+
+
+<h2 id="leave-one-out-cross-validation">留一交叉验证</h2>
+
+
+
+<p><strong>留一法сRoss-validation</strong>(<strong>LOOCV</strong>)是<strong> k倍CV </strong>的极端案例。想象一下如果<strong> k </strong>等于<strong> n </strong>其中n是数据集中样本的数量。这种<strong> k折</strong>情况相当于<strong>留一法</strong>技术。</p>
+
+
+
+<p><br/>LOOCV技术的算法:</p>
+
+
+
+<ol>
+<li>从数据集中选择一个样本作为测试集</li>
+
+
+
+<li>剩余的n-1个样本将成为训练集</li>
+
+
+
+<li>在训练集上训练模型。在每次迭代中，必须训练一个新的模型</li>
+
+
+
+<li>在测试集上验证</li>
+
+
+
+<li>保存验证的结果</li>
+
+
+
+<li>重复步骤1-5n次，因为对于n个样本，我们有n个不同的训练和测试集</li>
+
+
+
+<li>要获得最终分数，请对第5步中得到的结果进行平均。</li>
+</ol>
+
+
+
+
+
+<p>对于LOOCV，sklearn也有一个内置的方法。可以在model_selection库–sk learn . model _ selection . leave one out中找到。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> LeaveOneOut
+
+X = np.array([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>]])
+y = np.array([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>])
+loo = LeaveOneOut()
+
+<span class="hljs-keyword">for</span> train_index, test_index <span class="hljs-keyword">in</span> loo.split(X):
+    print(<span class="hljs-string">"TRAIN:"</span>, train_index, <span class="hljs-string">"TEST:"</span>, test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]</pre>
+
+
+
+<p>留一交叉验证的最大优点是不会浪费太多数据。我们只使用整个数据集中的一个样本作为测试集，而其余的是训练集。但与k-Fold CV相比，LOOCV需要建立n个模型而不是k个模型，因为我们知道代表数据集中样本数量的n比k大得多。这意味着LOOCV比k-Fold的计算成本更高，使用LOOCV交叉验证模型可能需要大量时间。</p>
+
+
+
+<p>因此，数据科学界有一个基于经验证据和不同研究的一般规则，这表明5倍或10倍交叉验证应优于LOOCV。</p>
+
+
+
+<h2 id="leave-p-out-cross-validation">遗漏交叉验证</h2>
+
+
+
+<p><em> <strong>留一法交叉验证</strong> ( <strong> LpOC </strong>)类似于<strong>留一法CV </strong>，它通过使用<strong> p </strong>样本作为测试集来创建所有可能的训练和测试集。所有提到的关于<strong> LOOCV </strong>的都是真的，对于<strong> LpOC </strong>。</em></p>
+
+
+
+<p>不过，值得一提的是，与LOOCV不同，如果p大于1，LpOC的k倍测试集将重叠。</p>
+
+
+
+<p>LpOC技术的算法；</p>
+
+
+
+<ol>
+<li>从将成为测试集的数据集中选择p个样本</li>
+
+
+
+<li>剩余的n–p个样本将成为训练集</li>
+
+
+
+<li>在训练集上训练模型。在每次迭代中，必须训练一个新的模型</li>
+
+
+
+<li>在测试集上验证</li>
+
+
+
+<li>保存验证的结果</li>
+
+
+
+<li>重复步骤2–5c<sub>p</sub>T2】n次</li>
+
+
+
+<li>要获得最终分数，请对第5步中得到的结果进行平均</li>
+</ol>
+
+
+
+<p>您可以使用sk learn–sk learn . model _ selection . Leave pout执行Leave-p-out CV。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> LeavePOut
+
+X = np.array([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">6</span>], [<span class="hljs-number">7</span>, <span class="hljs-number">8</span>]])
+y = np.array([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>])
+lpo = LeavePOut(<span class="hljs-number">2</span>)
+
+<span class="hljs-keyword">for</span> train_index, test_index <span class="hljs-keyword">in</span> lpo.split(X):
+    print(<span class="hljs-string">"TRAIN:"</span>, train_index, <span class="hljs-string">"TEST:"</span>, test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+</pre>
+
+
+
+<p>LpOC具有LOOCV的所有缺点，但无论如何，它和LOOCV一样强大。</p>
+
+
+
+<h2 id="stratified-k-fold-cross-validation">分层k倍交叉验证</h2>
+
+
+
+<p>有时，我们可能会面临数据集中目标值的巨大不平衡。例如，在关于手表价格的数据集中，可能有大量价格高的手表。在分类的情况下，在猫和狗的数据集中，可能有很大的向狗类的转移。</p>
+
+
+
+<p><strong>分层k-Fold </strong>是标准<strong> k-Fold CV </strong>技术的一种变体，该技术被设计成在目标不平衡的情况下有效。</p>
+
+
+
+<p>它的工作原理如下。分层k折叠将数据集分成k个折叠，使得每个折叠包含与完整集大致相同百分比的每个目标类的样本。在回归的情况下，分层k-Fold确保平均目标值在所有Fold中大致相等。</p>
+
+
+
+<p>分层k折叠技术的算法；</p>
+
+
+
+<ol>
+<li>选择一些折叠–k</li>
+
+
+
+<li>将数据集分割成k个折叠。每个文件夹必须包含与完整集大致相同百分比的每个目标类别的样本</li>
+
+
+
+<li>选择k–1个折叠作为训练集。剩余的折叠将是测试集</li>
+
+
+
+<li>在训练集上训练模型。在每次迭代中，必须训练一个新的模型</li>
+
+
+
+<li>在测试集上验证</li>
+
+
+
+<li>保存验证的结果</li>
+
+
+
+<li>重复步骤3-6k次。每次使用剩余的折叠作为测试集。最后，你应该在你的每一次折叠中验证这个模型。</li>
+
+
+
+<li>要获得最终分数，请对第6步中得到的结果进行平均。</li>
+</ol>
+
+
+
+
+
+<p>您可能已经注意到，分层k折叠技术的算法类似于标准k折叠。您不需要额外编写代码，因为该方法会为您做所有必要的事情。</p>
+
+
+
+<p>分层k-Fold在sklearn中也有一个内置的方法——sk learn . model _ selection . stratifiedkfold。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> StratifiedKFold
+
+X = np.array([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>]])
+y = np.array([<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>])
+skf = StratifiedKFold(n_splits=<span class="hljs-number">2</span>)
+
+<span class="hljs-keyword">for</span> train_index, test_index <span class="hljs-keyword">in</span> skf.split(X, y):
+    print(<span class="hljs-string">"TRAIN:"</span>, train_index, <span class="hljs-string">"TEST:"</span>, test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+</pre>
+
+
+
+<p>上面提到的所有关于k-Fold CV对于分层k-Fold技术都是正确的。在选择不同的CV方法时，请确保您使用的是正确的方法。例如，您可能会认为您的模型性能很差，仅仅是因为您使用k-Fold CV来验证在具有<a href="/web/20221225163138/https://neptune.ai/blog/how-to-deal-with-imbalanced-classification-and-regression-data" target="_blank" rel="noreferrer noopener">类不平衡</a>的数据集上训练的模型。为了避免这种情况，您应该始终对您的数据进行适当的探索性数据分析。</p>
+
+
+
+<h2 id="repeated-k-fold-cross-validation">重复k倍交叉验证</h2>
+
+
+
+<p><strong>重复k倍交叉验证</strong>或<strong>重复随机子抽样CV </strong>可能是本文所有<strong> CV </strong>技术中最稳健的。它是<strong> k-Fold </strong>的变体，但是在<strong>重复k-Fold</strong><strong>的情况下，k </strong>不是折叠的次数。这是我们训练模型的次数。</p>
+
+
+
+<p>总的想法是，在每次迭代中，我们将在整个数据集中随机选择样本作为我们的测试集。例如，如果我们决定数据集的20%将成为我们的测试集，那么将随机选择20%的样本，剩下的80%将成为训练集。</p>
+
+
+
+<p>重复k倍技术的算法；</p>
+
+
+
+<ol>
+<li>选择k–模型将被训练的次数</li>
+
+
+
+<li>挑选一些样本作为测试集</li>
+
+
+
+<li>分割数据集</li>
+
+
+
+<li>在训练器械上进行训练。在交叉验证的每次迭代中，必须训练一个新的模型</li>
+
+
+
+<li>在测试集上验证</li>
+
+
+
+<li>保存验证的结果</li>
+
+
+
+<li>重复步骤3-6 k次</li>
+
+
+
+<li>要获得最终分数，请对第6步中得到的结果进行平均。</li>
+</ol>
+
+
+
+
+
+<p>重复k倍比标准k倍CV有明显的优势。首先，训练/测试分割的比例不依赖于迭代的次数。其次，我们甚至可以为每次迭代设置唯一的比例。第三，从数据集中随机选择样本使得重复k-Fold对选择偏差更加鲁棒。</p>
+
+
+
+<p>尽管如此，还是有一些缺点。k-Fold CV保证模型将在所有样本上进行测试，而重复k-Fold基于随机化，这意味着一些样本可能永远不会被选入测试集。同时，一些样本可能被选择多次。因此对于不平衡的数据集来说，这是一个糟糕的选择。</p>
+
+
+
+<p>Sklearn会帮你实现一个重复的k倍CV。只需使用sklearn . model _ selection . repeated kfold。在sk learn实现该技术时，您必须设置想要的折叠次数(n_splits)和将要执行的分割次数(n_repeats)。它保证您在每次迭代中都有不同的折叠。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> RepeatedKFold
+
+X = np.array([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>]])
+y = np.array([<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>])
+rkf = RepeatedKFold(n_splits=<span class="hljs-number">2</span>, n_repeats=<span class="hljs-number">2</span>, random_state=<span class="hljs-number">42</span>)
+
+<span class="hljs-keyword">for</span> train_index, test_index <span class="hljs-keyword">in</span> rkf.split(X):
+    print(<span class="hljs-string">"TRAIN:"</span>, train_index, <span class="hljs-string">"TEST:"</span>, test_index)
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+</pre>
+
+
+
+<h2 id="nested-k-fold">嵌套k折叠</h2>
+
+
+
+<p>与旨在评估算法质量的其他CV技术不同，<strong>嵌套k重CV </strong>用于训练模型，其中超参数也需要优化。它估计基础模型及其(超)参数搜索的泛化误差。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/ff7b2c5f405752272981a059822aeebe.png" alt="Nested k-Fold " class="wp-image-61631" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221225163138im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Nested-k-fold-CV-1.png?ssl=1"/><figcaption class="wp-element-caption"><em>Nested k-Fold cross-validation resampling | <a href="https://web.archive.org/web/20221225163138/https://stats.stackexchange.com/questions/292179/whats-the-meaning-of-nested-resampling" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>嵌套k折叠技术的算法；</p>
+
+
+
+<ol>
+<li>为当前模型定义一组超参数组合C。如果模型没有超参数，C就是空集。</li>
+
+
+
+<li>将数据分成K份，病例和对照的分布大致相等。</li>
+
+
+
+<li>(外循环)对于折叠K，在K折叠中:<ol>
+<li>将折叠k设置为测试集。</li>
+
+
+
+<li>对剩余的K-1个折叠执行自动特征选择。</li>
+
+
+
+<li>对于C中的参数组合C:<ol>
+<li>(内部循环)对于折叠K，在剩余的K-1个折叠中:<ol>
+<li>将折叠k设置为验证集。</li>
+
+
+
+<li>剩余K-2褶皱上的火车模型。</li>
+
+
+
+<li>在折叠k上评估模型性能</li>
+</ol>
+</li>
+
+
+
+<li>计算参数组合c的K-2倍平均性能。</li>
+</ol>
+</li>
+
+
+
+<li>使用超参数组合在K-1个折叠上训练模型，该超参数组合在内部循环的所有步骤上产生最佳平均性能。</li>
+
+
+
+<li>在折叠k上评估模型性能</li>
+</ol>
+</li>
+
+
+
+<li>计算K倍的平均性能。</li>
+</ol>
+
+
+
+<p id="the-inner-loop-performs-cross-validation-to-identify-the-best-features-and-model-hyper-parameters-using-the-k-1-data-folds-available-at-each-iteration-of-the-outer-loop-the-model-is-trained-once-for-each-outer-loop-step-and-evaluated-on-the-held-out-data-fold-this-process-yields-k-evaluations-of-the-model-performance-one-for-each-data-fold-and-allows-the-model-to-be-tested-on-every-sample">内部循环执行交叉验证，以使用外部循环的每次迭代中可用的k-1个数据折叠来识别最佳特征和模型超参数。该模型为每个外部循环步骤训练一次，并在保留的数据折叠上进行评估。这个过程产生模型性能的k个评估，每个数据折叠一个，并允许在每个样本上测试模型。</p>
+
+
+
+<p>要注意的是，这种技术在计算上是昂贵的，因为大量的模型被训练和评估。不幸的是，sklearn中没有内置的方法可以为您执行嵌套的k-Fold CV。</p>
+
+
+
+<p>可以自己实现，也可以参考这里的实现<a href="https://web.archive.org/web/20221225163138/https://machinelearningmastery.com/nested-cross-validation-for-machine-learning-with-python/" target="_blank" rel="noreferrer noopener nofollow">。</a></p>
+
+
+
+<h2 id="time-series-cross-validation">时间序列交叉验证</h2>
+
+
+
+<p>传统的交叉验证技术不适用于时序数据，因为我们不能选择随机数据点并将它们分配给测试集或训练集，因为使用未来的值来预测过去的值是没有意义的。这主要有两种方法:</p>
+
+
+
+<ol>
+<li><strong>滚动交叉验证</strong></li>
+</ol>
+
+
+
+<p>交叉验证是在滚动的基础上进行的，即从用于训练目的的一小部分数据开始，预测未来值，然后检查预测数据点的准确性。下图可以帮助你获得这种方法背后的直觉。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/9a7104d0e5d8d31fbad3dc952a1c9e00.png" alt="Time-Series Cross-Validation" class="wp-image-61633" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221225163138im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Time-Series-Cross-Validation-1.png?ssl=1"/><figcaption class="wp-element-caption"><em>Rolling cross-validation | <a href="https://web.archive.org/web/20221225163138/https://goldinlocks.github.io/Time-Series-Cross-Validation/#:~:text=Blocked%20and%20Time%20Series%20Split,and%20another%20as%20a%20response." target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<ol start="2">
+<li><strong>交叉验证受阻</strong></li>
+</ol>
+
+
+
+<p>第一种技术可能会将未来数据泄漏到模型中。该模型将观察未来的模式进行预测，并试图记住它们。这就是引入阻塞交叉验证的原因。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/3e6f30151071cba62737fd67fefba9fd.png" alt="Time-Series Cross-Validation" class="wp-image-61634" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221225163138im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Time-Series-Cross-Validation-2.png?ssl=1"/><figcaption class="wp-element-caption"><em>Blocked cross-validation | <a href="https://web.archive.org/web/20221225163138/https://goldinlocks.github.io/Time-Series-Cross-Validation/#:~:text=Blocked%20and%20Time%20Series%20Split,and%20another%20as%20a%20response." target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>它的工作原理是在两个位置增加边距。第一个是在训练和验证折叠之间，以防止模型观察到两次使用的滞后值，一次作为回归变量，另一次作为响应。第二个是在每次迭代中使用的折叠之间，以防止模型从一次迭代到下一次迭代记住模式。</p>
+
+
+
+<h2 id="cross-validation-in-machine-learning">机器学习中的交叉验证</h2>
+
+
+
+<p id="cross-validation-in-machine-learning">什么时候交叉验证是正确的选择？</p>
+
+
+
+<p>尽管对你训练过的模型进行交叉验证从来都不是一个坏的选择，<strong>在某些情况下，交叉验证是绝对必要的:</strong></p>
+
+
+
+<ol>
+<li><strong>有限数据集</strong></li>
+</ol>
+
+
+
+<p>假设我们有100个数据点，我们正在处理一个有10个类的多类分类问题，平均每个类有10个例子。在80-20的训练测试划分中，这个数字甚至会进一步下降到每类8个样本用于训练。这里明智的做法是使用交叉验证，并利用我们的整个数据集进行训练和测试。</p>
+
+
+
+
+
+
+
+<ol start="2">
+<li><strong>相关数据点</strong></li>
+</ol>
+
+
+
+<p>当我们对数据进行随机训练测试分割时，我们假设我们的例子是独立的。这意味着知道一些实例不会帮助我们理解其他实例。然而，情况并不总是这样，在这种情况下，我们的模型熟悉整个数据集是很重要的，这可以进行交叉验证。</p>
+
+
+
+<ol start="3">
+<li><strong>单一指标的缺点</strong></li>
+</ol>
+
+
+
+<p>在没有交叉验证的情况下，我们只能得到一个单一的准确度或精确度值，或者回忆，这可能是一个偶然的结果。当我们训练多个模型时，我们消除了这种可能性，并获得了每个模型的指标，从而产生了强大的洞察力。</p>
+
+
+
+<ol start="4">
+<li><strong>超参数调谐</strong></li>
+</ol>
+
+
+
+<p>虽然有很多<a href="/web/20221225163138/https://neptune.ai/blog/hyperparameter-tuning-in-python-complete-guide" target="_blank" rel="noreferrer noopener">方法可以调优你的模型的超参数</a>比如网格搜索，贝叶斯优化等等。这个练习不能在训练集或测试集上完成，因此需要一个验证集。因此，我们退回到上面讨论过的同样的分裂问题，交叉验证可以帮助我们解决这个问题。</p>
+
+
+
+
+
+
+
+<h2 id="cross-validation-in-deep-learning">深度学习中的交叉验证</h2>
+
+
+
+<p>深度学习(DL)中的交叉验证可能有点棘手，因为大多数CV技术需要至少训练模型几次。</p>
+
+
+
+<p>在深度学习中，你通常会试图避免CV，因为与训练k个不同模型相关联的成本。你可以使用训练数据的随机子集作为验证的依据，而不是使用k-Fold或其他CV技术。</p>
+
+
+
+<p>例如，<a href="https://web.archive.org/web/20221225163138/http://keras.io/models/" target="_blank" rel="noreferrer noopener nofollow"> <strong> Keras </strong> </a>深度学习库允许你为执行训练的fit函数传递两个参数中的一个。</p>
+
+
+
+<ol>
+<li><strong> validation_split </strong>:应该等待验证的数据的百分比</li>
+
+
+
+<li><strong> validation_data </strong>:应该用于验证的(X，y)元组。该参数覆盖validation_split参数，这意味着您一次只能使用其中一个参数。</li>
+</ol>
+
+
+
+<p>在PyTorch和MxNet等其他DL框架的官方教程中也使用了同样的方法。他们还建议将数据集分成三部分:训练、验证和测试。</p>
+
+
+
+<ol>
+<li>训练–数据集的一部分，用于训练</li>
+
+
+
+<li>验证–训练时要验证的数据集的一部分</li>
+
+
+
+<li>测试–模型最终验证数据集的一部分</li>
+</ol>
+
+
+
+<p>不过，如果数据集很小(包含数百个样本)，您可以在DL任务中使用交叉验证。在这种情况下，学习一个复杂的模型可能是一个不相关的任务，所以请确保不要使任务进一步复杂化。</p>
+
+
+
+<h2 id="best-practices-and-tips">最佳实践和技巧</h2>
+
+
+
+<p>值得一提的是，有时执行交叉验证可能有点棘手。</p>
+
+
+
+<p>例如，分割数据集时很容易犯逻辑错误，这可能导致不可信的CV结果。</p>
+
+
+
+<p>在交叉验证以下模型时，您可能会发现一些需要牢记的提示:</p>
+
+
+
+<ol>
+<li>拆分数据时要合乎逻辑(拆分方法有意义吗)</li>
+
+
+
+<li>使用适当的CV方法(这种方法对我的用例可行吗)</li>
+
+
+
+<li>当处理时间序列时，不要验证过去(见第一个提示)</li>
+
+
+
+<li>当处理医疗或财务数据时，记得按人进行分类。避免一个人的数据同时出现在训练集和测试集中，因为这可能会被认为是数据泄漏</li>
+
+
+
+<li>当从较大的图像中裁剪补丁时，记得按较大的图像Id进行分割</li>
+</ol>
+
+
+
+<p>当然，提示因任务而异，几乎不可能涵盖所有的提示。这就是为什么在开始交叉验证模型之前执行<strong>可靠的探索性数据分析</strong>总是最佳实践。</p>
+
+
+
+<h2 id="final-thoughts">最后的想法</h2>
+
+
+
+<p>交叉验证是一个强大的工具。每个数据科学家都应该熟悉它。在现实生活中，如果不交叉验证一个模型，你就无法完成这个项目。</p>
+
+
+
+<p>在我看来，最好的<strong> CV </strong>技术是<strong>嵌套k折</strong>和标准<strong> k折</strong>。就我个人而言，我在欺诈检测任务中使用了它们。<strong>嵌套的k-Fold，as </strong>以及<strong> GridSeachCV </strong>，帮助我调整我的模型的参数。<strong>另一方面，k倍</strong>用于评估我的模型的性能。</p>
+
+
+
+<p>在本文中，我们已经弄清楚了什么是交叉验证，在野外有哪些CV技术，以及如何实现它们。在未来，最大似然算法的表现肯定会比现在更好。尽管如此，交叉验证总是需要的，以支持你的结果。</p>
+
+
+
+<p>希望有了这些信息，你在为下一个机器学习项目设置简历时不会有任何问题！</p>
+
+
+
+<h2 id="resources">资源</h2>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20221225163138/https://www.geeksforgeeks.org/cross-validation-machine-learning/" target="_blank" rel="noreferrer noopener nofollow">https://www . geeks forgeeks . org/cross-validation-machine-learning/</a></li>
+
+
+
+<li><a href="https://web.archive.org/web/20221225163138/https://machinelearningmastery.com/k-fold-cross-validation/" target="_blank" rel="noreferrer noopener nofollow">https://machinelearningmastery.com/k-fold-cross-validation/</a></li>
+
+
+
+<li><a href="https://web.archive.org/web/20221225163138/https://towardsdatascience.com/cross-validation-in-machine-learning-72924a69872f" target="_blank" rel="noreferrer noopener nofollow">https://towards data science . com/cross-validation-in-machine-learning-72924 a 69872 f</a></li>
+
+
+
+<li><a href="https://web.archive.org/web/20221225163138/https://towardsdatascience.com/why-and-how-to-do-cross-validation-for-machine-learning-d5bd7e60c189" target="_blank" rel="noreferrer noopener nofollow">https://towards data science . com/why-and-how-do-cross-validation-for-machine-learning-D5 BD 7 e 60 c 189</a></li>
+
+
+
+<li><a href="https://web.archive.org/web/20221225163138/https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noreferrer noopener nofollow">https://sci kit-learn . org/stable/modules/cross _ validation . html</a></li>
+</ol>
+        </div>
+        
+    </div>    
+</body>
+</html>

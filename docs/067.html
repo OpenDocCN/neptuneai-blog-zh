@@ -1,0 +1,751 @@
+<html>
+<head>
+<title>GANs Failure Modes: How to Identify and Monitor Them </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>天然气水合物抑制剂失效模式:如何识别和监控</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/gan-failure-modes#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/gan-failure-modes#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>一个<a href="/web/20220926102431/https://neptune.ai/blog/generative-adversarial-networks-gan-applications" target="_blank" rel="noreferrer noopener">生成对抗网络</a>是两个子网络的组合，它们在训练时相互竞争，以便生成真实的数据。发生器网络产生看起来真实的人造数据，而鉴别器网络识别数据是人造的还是真实的。</p>
+
+
+
+<p>虽然甘是强大的模型，但他们可能很难训练。我们同时训练发生器和鉴别器，彼此牺牲。这是一个动态系统，只要一个模型的参数被更新，优化问题的性质就会改变，因此，达到收敛可能是困难的。</p>
+
+
+
+<p>训练还会导致GANs 的<strong>失败，无法模拟完整的分布，这也被称为<strong>模式崩溃</strong>。</strong></p>
+
+
+
+<p>在本文中:</p>
+
+
+<div class="custom-point-list">
+<ul><li>我们将看到如何训练一个稳定的GAN模型</li><li>然后将试验训练过程以理解模式失败的可能原因。</li></ul>
+</div>
+
+
+<p>过去几年我一直在训练GANs，我观察到，GANs中常见的故障模式是<strong>模式崩溃</strong>和<strong>收敛故障</strong>，我们将在本文中讨论。</p>
+
+
+<p id="block_6230584a0a19c" class="separator separator-25">训练稳定的GAN网络</p>
+
+
+
+
+
+<h2>为了理解失败(在训练GAN中)是如何发生的，让我们首先训练一个稳定的GAN网络。我们将使用<a href="https://web.archive.org/web/20220926102431/http://yann.lecun.com/exdb/mnist/" target="_blank" rel="noreferrer noopener nofollow"> MNIST数据集</a>，我们的目标是使用生成器网络从随机噪声中生成人工手写数字。</h2>
+
+
+
+<p>生成器将随机噪声作为输入，输出为28×28大小的假手写数字。鉴别器将从生成器和地面实况中获取输入的28×28图像，并尝试对它们进行正确分类。</p>
+
+
+
+<p>我把学习率0.0002，adam optimizer，和0.5作为adam optimizer的动量。</p>
+
+
+
+<p>先来看看我们稳定的GAN网络的代码。首先，让我们进行所需的导入。</p>
+
+
+
+<p>注意，在这个练习中，我们将使用PyTorch来训练我们的模型，使用neptune.ai的仪表板来进行实验跟踪。这里是我所有实验的链接。我在colab和Neptune中运行脚本，使得跟踪所有实验变得非常容易。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn
+<span class="hljs-keyword">import</span> torchvision.transforms <span class="hljs-keyword">as</span> transforms
+<span class="hljs-keyword">import</span> torch.optim <span class="hljs-keyword">as</span> optim
+<span class="hljs-keyword">import</span> torchvision.datasets <span class="hljs-keyword">as</span> datasets
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> torchvision.utils <span class="hljs-keyword">import</span> make_grid
+<span class="hljs-keyword">from</span> torch.utils.data <span class="hljs-keyword">import</span> DataLoader
+<span class="hljs-keyword">from</span> tqdm <span class="hljs-keyword">import</span> tqdm
+
+<span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+<span class="hljs-keyword">from</span> neptune.new.types <span class="hljs-keyword">import</span> File</pre>
+
+
+
+<p>在这种情况下，适当的实验跟踪非常重要，因为损失图和中间图像可以很好地帮助识别是否存在故障模式。或者可以使用matplotlib、<a href="https://web.archive.org/web/20220926102431/https://github.com/IDSIA/sacred" target="_blank" rel="noreferrer noopener nofollow">神圣</a>、<a href="https://web.archive.org/web/20220926102431/https://www.tensorflow.org/tensorboard" target="_blank" rel="noreferrer noopener nofollow"> TensorBoard </a>等。也取决于您的使用情况和舒适度。</p>
+
+
+
+
+
+
+
+<p>我们首先初始化Neptune的运行，一旦您在Neptune仪表板上创建了一个项目，您就可以<a href="https://web.archive.org/web/20220926102431/https://docs.neptune.ai/getting-started/installation#authentication-neptune-api-token" target="_blank" rel="noreferrer noopener">获得项目路径和API令牌</a>。</p>
+
+
+
+<p>我们将批次大小保持为1024，我们将运行100个时期。潜在维度被初始化以生成用于生成器输入的随机数据。和样本大小将用于推断每个时期的64个图像，因此我们可以在每个时期之后可视化图像的质量。k是我们打算运行discriminator的步骤数。</p>
+
+
+
+<pre class="hljs">run = neptune.init(
+   project=<span class="hljs-string">"project name"</span>,
+   api_token=<span class="hljs-string">"You API token"</span>,
+)</pre>
+
+
+
+<p>现在，我们下载MNIST数据并创建Dataloader对象。</p>
+
+
+
+<pre class="hljs">batch_size = <span class="hljs-number">1024</span>
+epochs = <span class="hljs-number">100</span>
+sample_size = <span class="hljs-number">64</span>
+latent_dim = <span class="hljs-number">128</span>
+k = <span class="hljs-number">1</span>
+device = torch.device(<span class="hljs-string">'cuda'</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> <span class="hljs-string">'cpu'</span>)
+
+transform = transforms.Compose([
+                               transforms.ToTensor(),
+                               transforms.Normalize((<span class="hljs-number">0.5</span>,), (<span class="hljs-number">0.5</span>,)),
+           ])
+</pre>
+
+
+
+<p>最后，我们定义了一些用于训练的超参数，并使用run object将它们传递给Neptune仪表板。</p>
+
+
+
+<pre class="hljs">train_data = datasets.MNIST(
+   root=<span class="hljs-string">'../input/data'</span>,
+   train=<span class="hljs-keyword">True</span>,
+   download=<span class="hljs-keyword">True</span>,
+   transform=transform
+)
+train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<p>这是我们定义发生器和鉴别器网络的地方。</p>
+
+
+
+<pre class="hljs">params = {<span class="hljs-string">"learning_rate"</span>: <span class="hljs-number">0.0002</span>,
+         <span class="hljs-string">"optimizer"</span>: <span class="hljs-string">"Adam"</span>,
+         <span class="hljs-string">"optimizer_betas"</span>: (<span class="hljs-number">0.5</span>, <span class="hljs-number">0.999</span>),
+         <span class="hljs-string">"latent_dim"</span>: latent_dim}
+
+run[<span class="hljs-string">"parameters"</span>] = params</pre>
+
+
+
+<p>发电机网络</p>
+
+
+
+<h3>发电机模型以潜在空间作为输入，这是一个随机噪声。</h3>
+
+
+<div class="custom-point-list">
+<ul><li>在第一层中，我们将潜在空间(维数为128)转换为128个通道的特征空间，每个通道的高度和宽度为7×7。</li><li>在两个反卷积层之后，增加特征空间的高度和宽度。</li><li>随后是具有tanh激活的卷积层，以生成具有一个通道和28×28高度和宽度的图像。</li><li>鉴别器网络</li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Generator</span><span class="hljs-params">(nn.Module)</span>:</span>
+   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, latent_space)</span>:</span>
+       super(Generator, self).__init__()
+       self.latent_space = latent_space
+       self.fcn = nn.Sequential(
+           nn.Linear(in_features=self.latent_space, out_features=<span class="hljs-number">128</span>*<span class="hljs-number">7</span>*<span class="hljs-number">7</span>),
+           nn.LeakyReLU(<span class="hljs-number">0.2</span>),
+       )
+
+       self.deconv = nn.Sequential(
+           nn.ConvTranspose2d(in_channels=<span class="hljs-number">128</span>, out_channels=<span class="hljs-number">128</span>, kernel_size=(<span class="hljs-number">4</span>, <span class="hljs-number">4</span>), stride=(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>), padding=(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)),
+           nn.LeakyReLU(<span class="hljs-number">0.2</span>),
+
+           nn.ConvTranspose2d(in_channels=<span class="hljs-number">128</span>, out_channels=<span class="hljs-number">128</span>, kernel_size=(<span class="hljs-number">4</span>, <span class="hljs-number">4</span>), stride=(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>), padding=(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)),
+           nn.LeakyReLU(<span class="hljs-number">0.2</span>),
+
+           nn.Conv2d(in_channels=<span class="hljs-number">128</span>, out_channels=<span class="hljs-number">1</span>, kernel_size=(<span class="hljs-number">3</span>, <span class="hljs-number">3</span>), padding=(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)),
+           nn.Tanh()
+       )
+
+   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, x)</span>:</span>
+       x = self.fcn(x)
+       x = x.view(<span class="hljs-number">-1</span>, <span class="hljs-number">128</span>, <span class="hljs-number">7</span>, <span class="hljs-number">7</span>)
+       x = self.deconv(x)
+       <span class="hljs-keyword">return</span> x</pre>
+
+
+
+
+
+
+<h3>我们的鉴别器网络由两个卷积层组成，用于从来自生成器的图像和真实图像中生成特征。</h3>
+
+
+<div class="custom-point-list">
+<ul><li>后面是分类器层，通过鉴别器对图像预测是真的还是假的进行分类。</li><li>现在我们初始化发生器和鉴别器网络，以及优化器和损失函数。</li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Discriminator</span><span class="hljs-params">(nn.Module)</span>:</span>
+   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+       super(Discriminator, self).__init__()
+       self.conv = nn.Sequential(
+           nn.Conv2d(in_channels=<span class="hljs-number">1</span>, out_channels=<span class="hljs-number">64</span>, kernel_size=(<span class="hljs-number">4</span>, <span class="hljs-number">4</span>), stride=(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>), padding=(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)),
+           nn.LeakyReLU(<span class="hljs-number">0.2</span>),
+
+           nn.Conv2d(in_channels=<span class="hljs-number">64</span>, out_channels=<span class="hljs-number">64</span>, kernel_size=(<span class="hljs-number">4</span>, <span class="hljs-number">4</span>), stride=(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>), padding=(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)),
+           nn.LeakyReLU(<span class="hljs-number">0.2</span>)
+       )
+       self.classifier = nn.Sequential(
+           nn.Linear(in_features=<span class="hljs-number">3136</span>, out_features=<span class="hljs-number">1</span>),
+           nn.Sigmoid()
+       )
+
+   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, x)</span>:</span>
+       x = self.conv(x)
+       x = x.view(x.size(<span class="hljs-number">0</span>), <span class="hljs-number">-1</span>)
+       x = self.classifier(x)
+       <span class="hljs-keyword">return</span> x</pre>
+
+
+
+<p>我们有一些辅助函数，为假图像和真图像创建标签(其中size是批量大小),还有create_noise函数用于生成器输入。</p>
+
+
+
+<p>发电机培训功能</p>
+
+
+
+<pre class="hljs">generator = Generator(latent_dim).to(device)
+discriminator = Discriminator().to(device)
+
+optim_g = optim.Adam(generator.parameters(), lr=<span class="hljs-number">0.0002</span>, betas=(<span class="hljs-number">0.5</span>, <span class="hljs-number">0.999</span>))
+optim_d = optim.Adam(discriminator.parameters(), lr=<span class="hljs-number">0.0002</span>, betas=(<span class="hljs-number">0.5</span>, <span class="hljs-number">0.999</span>))
+
+criterion = nn.BCELoss()
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">label_real</span><span class="hljs-params">(size)</span>:</span>
+   labels = torch.ones(size, <span class="hljs-number">1</span>)
+   <span class="hljs-keyword">return</span> labels.to(device)
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">label_fake</span><span class="hljs-params">(size)</span>:</span>
+   labels = torch.zeros(size, <span class="hljs-number">1</span>)
+   <span class="hljs-keyword">return</span> labels.to(device)
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_noise</span><span class="hljs-params">(sample_size, latent_dim)</span>:</span>
+   <span class="hljs-keyword">return</span> torch.randn(sample_size, latent_dim).to(device)</pre>
+
+
+
+<h3>现在我们将训练发电机:</h3>
+
+
+
+<p>生成器接收随机噪声并给出假图像。</p>
+
+
+<div class="custom-point-list">
+<ul><li>这些伪图像然后被发送到鉴别器，现在我们最小化真实标签和鉴别器预测的伪图像之间的损失。</li><li>从这个函数中，我们将观察发电机损耗。</li><li>鉴别器训练功能</li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train_generator</span><span class="hljs-params">(optimizer, data_fake)</span>:</span>
+   b_size = data_fake.size(<span class="hljs-number">0</span>)
+   real_label = label_real(b_size)
+   optimizer.zero_grad()
+   output = discriminator(data_fake)
+   loss = criterion(output, real_label)
+   loss.backward()
+   optimizer.step()
+   <span class="hljs-keyword">return</span> loss</pre>
+
+
+
+<h3>我们创建一个函数train_discriminator:</h3>
+
+
+
+<p>我们知道，这个网络在训练时从地面真实图像(即真实图像)和生成器网络(即虚假图像)获取输入。</p>
+
+
+<div class="custom-point-list">
+<ul><li>一个接一个，我们通过假的和真的图像，计算损失和反馈。我们将观察到两个鉴别器损耗；实像损失(loss_real)和伪像损失(loss_fake)。</li><li>甘模特培训</li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train_discriminator</span><span class="hljs-params">(optimizer, data_real, data_fake)</span>:</span>
+   b_size = data_real.size(<span class="hljs-number">0</span>)
+   real_label = label_real(b_size)
+   fake_label = label_fake(b_size)
+   optimizer.zero_grad()
+   output_real = discriminator(data_real)
+   loss_real = criterion(output_real, real_label)
+   output_fake = discriminator(data_fake)
+   loss_fake = criterion(output_fake, fake_label)
+   loss_real.backward()
+   loss_fake.backward()
+   optimizer.step()
+   <span class="hljs-keyword">return</span> loss_real, loss_fake</pre>
+
+
+
+<h3>现在我们有了所有的函数，让我们来训练我们的模型，并查看观察结果，以确定训练是否稳定。</h3>
+
+
+
+<p>第一行中的噪声将用于推断每个时期之后的中间图像。我们保持噪声不变，这样我们就可以比较不同时期的图像。</p>
+
+
+<div class="custom-point-list">
+<ul><li>现在，对于每个时期，我们训练鉴别器k次(在这种情况下一次为k=1)，每次训练发生器。</li><li>所有的损失都被记录下来并发送到Neptune dashboard进行绘图。我们不需要将它们添加到列表中，使用Neptune dashboard我们可以即时绘制损失图。它还将在. csv文件中记录每一步的损失。</li><li>我已经使用[点]上传功能在Neptune元数据中保存了每个纪元后生成的图像。</li><li>让我们看看中间的图像。</li></ul>
+</div>
+
+
+<pre class="hljs">noise = create_noise(sample_size, latent_dim)
+generator.train()
+discriminator.train()
+
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(epochs):
+   loss_g = <span class="hljs-number">0.0</span>
+   loss_d_real = <span class="hljs-number">0.0</span>
+   loss_d_fake = <span class="hljs-number">0.0</span>
+
+   
+   <span class="hljs-keyword">for</span> bi, data <span class="hljs-keyword">in</span> tqdm(enumerate(train_loader), total=int(len(train_data) / train_loader.batch_size)):
+       image, _ = data
+       image = image.to(device)
+       b_size = len(image)
+       <span class="hljs-keyword">for</span> step <span class="hljs-keyword">in</span> range(k):
+           data_fake = generator(create_noise(b_size, latent_dim)).detach()
+           data_real = image
+           loss_d_fake_real = train_discriminator(optim_d, data_real, data_fake)
+           loss_d_real += loss_d_fake_real[<span class="hljs-number">0</span>]
+           loss_d_fake += loss_d_fake_real[<span class="hljs-number">1</span>]
+       data_fake = generator(create_noise(b_size, latent_dim))
+       loss_g += train_generator(optim_g, data_fake)
+
+   
+   generated_img = generator(noise).cpu().detach()
+   generated_img = make_grid(generated_img)
+   generated_img = np.moveaxis(generated_img.numpy(), <span class="hljs-number">0</span>, <span class="hljs-number">-1</span>)
+   run[f<span class="hljs-string">'generated_img/{epoch}'</span>].upload(File.as_image(generated_img))
+   epoch_loss_g = loss_g / bi
+   epoch_loss_d_real = loss_d_real/bi
+   epoch_loss_d_fake = loss_d_fake/bi
+   run[<span class="hljs-string">"train/loss_generator"</span>].log(epoch_loss_g)
+   run[<span class="hljs-string">"train/loss_discriminator_real"</span>].log(epoch_loss_d_real)
+   run[<span class="hljs-string">"train/loss_discriminator_fake"</span>].log(epoch_loss_d_fake)
+
+   print(f<span class="hljs-string">"Epoch {epoch} of {epochs}"</span>)
+   print(f<span class="hljs-string">"Generator loss: {epoch_loss_g:.8f}, Discriminator loss fake: {epoch_loss_d_fake:.8f}, Discriminator loss real: {epoch_loss_d_real:.8f}"</span>)</pre>
+
+
+
+<p>时代10</p>
+
+
+
+<h4>这些是在时期10产生的64位数字。</h4>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="62354" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_3" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?fit=742%2C740&amp;ssl=1" data-orig-size="742,740" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?fit=742%2C740&amp;ssl=1" src="../Images/52dfcfafd8e8ff6d5b6781c57634e525.png" alt="Digits generated from a Stable GAN at 10th Epoch" class="wp-image-62354 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?resize=563%2C562&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?resize=563%2C562&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62354" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_3" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?fit=742%2C740&amp;ssl=1" data-orig-size="742,740" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?fit=742%2C740&amp;ssl=1" src="../Images/52dfcfafd8e8ff6d5b6781c57634e525.png" alt="Digits generated from a Stable GAN at 10th Epoch" class="wp-image-62354" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_3.png?resize=563%2C562&amp;ssl=1"/></noscript><figcaption><em>Fig. 1 – Digits generated from a stable GAN at 10th epoch | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>纪元100年</p>
+
+
+
+<h4>这些是在时段100使用相同的噪声生成的。这些看起来比epoch 10的图像好得多，在这里我们实际上可以识别不同的数字。我们可以训练更多的时期或调整超参数以获得更好的图像质量。</h4>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="62339" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_13" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?fit=740%2C739&amp;ssl=1" data-orig-size="740,739" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_13" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?fit=740%2C739&amp;ssl=1" src="../Images/cf3fb4e71604dffb7138cdf71b524b1b.png" alt="Digits generated from a stable GAN at the 100th epoch" class="wp-image-62339 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?resize=544%2C543&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?resize=544%2C543&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62339" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_13" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?fit=740%2C739&amp;ssl=1" data-orig-size="740,739" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_13" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?fit=740%2C739&amp;ssl=1" src="../Images/cf3fb4e71604dffb7138cdf71b524b1b.png" alt="Digits generated from a stable GAN at the 100th epoch" class="wp-image-62339" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_13.png?resize=544%2C543&amp;ssl=1"/></noscript><figcaption><em> <em>Fig. 2 – </em></em> <em>Digits generated from a stable GAN at the 100th epoch | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>损失图</p>
+
+
+
+<h3>你可以很容易地进入Neptune dashboard中的“Add New Dashboard ”,将不同的亏损图表合并成一个图表。</h3>
+
+
+
+<p>在图3中，您可以观察到在40时段后损失趋于稳定。真实和虚假图像的鉴别器损耗保持在0.6左右，而发生器的鉴别器损耗在0.8左右。上图是稳定训练的预期图。我们可以将此视为基线，并尝试改变k(鉴别器的训练步骤)、增加历元数等。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?ssl=1" data-lbwps-width="1626" data-lbwps-height="596" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png"><img data-attachment-id="62415" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig3_loss_stable_gans" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig3_loss_stable_gans" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?fit=1024%2C375&amp;ssl=1" src="../Images/336a2dbe806901ad936391da218d21f0.png" alt="loss_stable_gans" class="wp-image-62415 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?resize=1024%2C375&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?resize=1024%2C375&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62415" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig3_loss_stable_gans" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig3_loss_stable_gans" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?fit=1024%2C375&amp;ssl=1" src="../Images/336a2dbe806901ad936391da218d21f0.png" alt="loss_stable_gans" class="wp-image-62415" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig3_loss_stable_gans.png?resize=1024%2C375&amp;ssl=1"/></noscript></a><figcaption><em><em>Fig. 3 – </em>Loss graph, the three lines indicate a loss for generator, fake images on discriminator, and real images on discriminator | <a href="https://web.archive.org/web/20220926102431/https://app.neptune.ai/tanayag/Gan-Mode-Failure/e/GAN-30/dashboard/Loss-Graphs-95b0d2fd-e285-47e7-b998-90e98174db46">Source</a></em></figcaption></figure></div>
+
+
+
+<p>现在我们已经建立了一个稳定的GAN模型，让我们看看故障模式。</p>
+
+
+
+<p>GAN故障模式</p>
+
+
+
+
+
+
+<h2 id="gan-failure-modes">在过去的几年中，我们已经看到GAN应用的快速增长，无论是提高图像分辨率、条件生成还是生成真实的合成数据。</h2>
+
+
+
+<p>训练失败是这类应用的一个难题。</p>
+
+
+
+<p><strong>如何识别GAN失效模式？我们如何知道是否有故障模式:</strong></p>
+
+
+
+<p>生成器应该理想地产生各种数据。如果它产生一种或一组相似的输出，就会有一个<strong>模式崩溃</strong>。</p>
+
+
+<div class="custom-point-list">
+<ul><li>当生成一组视觉上很差的数据时，这可能是<strong>收敛失败</strong>的情况。</li><li><strong>GAN中模式崩塌的原因是什么？故障模式原因:</strong></li></ul>
+</div>
+
+
+<p>无法找到网络的收敛。</p>
+
+
+<div class="custom-point-list">
+<ul><li>生成器可以找到某种类型的数据，很容易骗过鉴别器。在假设目标已经实现的情况下，它会一次又一次地生成相同的数据。整个系统可能对单一类型输出进行过度优化。</li><li>识别模式崩溃和其他故障模式的问题是，我们不能依赖定性分析(如手动查看数据)。如果有大量数据或者问题非常复杂(我们不会总是生成数字)，这种方法可能会失败。</li></ul>
+</div>
+
+
+<p>评估故障模式</p>
+
+
+
+<h2>在本节中，我们将尝试理解如何识别是否存在模式崩溃或收敛失败。我们会看到三种评估方法。其中一个我们已经在前一节讨论过了。</h2>
+
+
+
+<p>看中间的图像</p>
+
+
+
+<h3>让我们看一些例子，在那里，从中间图像可以评估模式崩溃和收敛。在图4中，我们看到质量非常差的图像，而在图5中，我们可以看到生成了相同的一组图像。</h3>
+
+
+
+<p>虽然图4是收敛失败的例子，但是图5显示了模式崩溃。通过手动查看图像，您可以了解模型的运行情况。但是，当问题的复杂性很高或者训练数据太大时，您可能无法识别模式崩溃。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="62344" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_11" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?fit=655%2C664&amp;ssl=1" data-orig-size="655,664" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_11" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?fit=296%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?fit=655%2C664&amp;ssl=1" src="../Images/2c520206eb1f9965cc3ab43aa4953a37.png" alt="Output from one of the unstable training" class="wp-image-62344 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?resize=567%2C574&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?resize=567%2C574&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62344" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_11" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?fit=655%2C664&amp;ssl=1" data-orig-size="655,664" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_11" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?fit=296%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?fit=655%2C664&amp;ssl=1" src="../Images/2c520206eb1f9965cc3ab43aa4953a37.png" alt="Output from one of the unstable training" class="wp-image-62344" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_11.png?resize=567%2C574&amp;ssl=1"/></noscript><figcaption><em>Fig. 4 – These are the output from one of the unstable training. This is on the same training code as above and slightly tweaked hyperparameters, but even after 300 epochs, you can see how bad our images are – an example of convergence failure | Source: Author</em></figcaption></figure></div>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="62346" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_9" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?fit=852%2C847&amp;ssl=1" data-orig-size="852,847" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_9" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?fit=300%2C298&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?fit=852%2C847&amp;ssl=1" src="../Images/1a022bf4279676c936e3de896ca5140f.png" alt="This is another example, you can see the same kind of images generated indicating Mode Collapse" class="wp-image-62346 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?resize=559%2C555&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?resize=559%2C555&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62346" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_9" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?fit=852%2C847&amp;ssl=1" data-orig-size="852,847" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_9" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?fit=300%2C298&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?fit=852%2C847&amp;ssl=1" src="../Images/1a022bf4279676c936e3de896ca5140f.png" alt="This is another example, you can see the same kind of images generated indicating Mode Collapse" class="wp-image-62346" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_9.png?resize=559%2C555&amp;ssl=1"/></noscript><figcaption><em>Fig. 5 – This is another example, you can see the same kind of images generated indicating Mode Collapse | <a href="https://web.archive.org/web/20220926102431/https://towardsdatascience.com/10-lessons-i-learned-training-generative-adversarial-networks-gans-for-a-year-c9071159628" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>我们来看看一些更好的方法。</p>
+
+
+
+<p>通过观察损失图</p>
+
+
+
+<h3>通过查看损失图，我们可以了解更多情况。例如，在图3中，您可以注意到在某个点之后损耗饱和，显示了预期的行为。现在让我们看看图6中的损失图，我已经减少了潜在维度，所以行为是不稳定的。</h3>
+
+
+
+<p>我们可以在图6中看到，发电机损耗在1和1.2附近振荡。虽然伪图像和真实图像的鉴别器损失也在0.6左右，但损失比我们在稳定版本中注意到的要多一些。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?ssl=1" data-lbwps-width="1626" data-lbwps-height="596" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png"><img data-attachment-id="62417" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig6_loss_latentspace2" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig6_loss_latentSpace2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?fit=1024%2C375&amp;ssl=1" src="../Images/62d6b0ce5cbe09b9b225f1efb5302114.png" alt="gan_loss_latentSpace2" class="wp-image-62417 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?resize=1024%2C375&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?resize=1024%2C375&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62417" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig6_loss_latentspace2" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig6_loss_latentSpace2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?fit=1024%2C375&amp;ssl=1" src="../Images/62d6b0ce5cbe09b9b225f1efb5302114.png" alt="gan_loss_latentSpace2" class="wp-image-62417" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig6_loss_latentSpace2.png?resize=1024%2C375&amp;ssl=1"/></noscript></a><figcaption><em>Fig. 6 – Loss graph when the latent dimension is reduced | <a href="https://web.archive.org/web/20220926102431/http://neptune.ai/" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+<p>我建议，即使图表有很高的方差，也没关系。您可以增加历元的数量，并等待更多的时间让它变得稳定，最重要的是继续检查生成的中间图像。</p>
+
+
+
+<p>如果发生器和鉴别器的损耗图在初始时期都下降到零，那么这也是一个问题。这意味着生成器发现了一组很容易被鉴别者识别的假图像。</p>
+
+
+
+<p>统计上不同的箱数(NDB分数)</p>
+
+
+
+<h3>与上述两种定性方法不同，NDB评分是一种定量方法。因此，NDB分数可以识别是否有模式崩溃，而不是查看图像和损失图，遗漏一些东西或没有做出正确的解释。</h3>
+
+
+
+<p>让我们了解一下NDB评分的工作原理:</p>
+
+
+
+<p>我们有两个集合，一个训练集(在其上训练模型)和一个测试集(训练完成后由生成器在随机噪声上生成的假图像)。</p>
+
+
+<div class="custom-point-list">
+<ul><li>现在使用K均值聚类将训练集分成K个聚类。这将是我们的K个不同的箱子。</li><li>现在，基于测试数据点和K个簇的质心之间的欧几里德距离，将测试数据分配到这K个箱中。</li><li>现在，在每个箱的训练样本和测试样本之间进行双样本测试，并计算Z值。如果Z分数小于阈值(本文中使用0.05)，则将该条柱标记为统计差异。</li><li>计算统计上不同的箱数，并除以k。</li><li>收到的值将介于0和1之间。</li><li>高数量的统计上不同的箱意味着，即，值更接近1，意味着高模式崩溃，意味着坏的模型。然而，NDB分数接近0意味着较少或没有模式崩溃。</li></ul>
+</div>
+
+
+<p>NDB评估方法来自关于GANs和GMMs的论文<a href="https://web.archive.org/web/20220926102431/https://arxiv.org/pdf/1805.12462.pdf" target="_blank" rel="noreferrer noopener nofollow">。</a></p>
+
+
+
+<p>计算NDB的一个非常好实现的代码可以在<a href="https://web.archive.org/web/20220926102431/https://twitter.com/kevinkwshen" target="_blank" rel="noreferrer noopener nofollow">沈世爱</a>的这个<a href="https://web.archive.org/web/20220926102431/https://colab.research.google.com/drive/1fGrFl5UzYc3upShr25Hv8VfqyzhZOPTM?usp=sharing" target="_blank" rel="noreferrer noopener nofollow"> colab笔记本</a>中找到。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="62335" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_16" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?fit=1073%2C448&amp;ssl=1" data-orig-size="1073,448" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_16" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?fit=300%2C125&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?fit=1024%2C428&amp;ssl=1" src="../Images/3379144c09a54c5af158fbe07b052763.png" alt="(a)Top Left - Image from Training dataset (b)Bottom Left - Image from Test dataset and the overlap is shown (c)Bar Graph showing bins for train and test set" class="wp-image-62335 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?resize=833%2C348&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?resize=833%2C348&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62335" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_16" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?fit=1073%2C448&amp;ssl=1" data-orig-size="1073,448" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_16" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?fit=300%2C125&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?fit=1024%2C428&amp;ssl=1" src="../Images/3379144c09a54c5af158fbe07b052763.png" alt="(a)Top Left - Image from Training dataset (b)Bottom Left - Image from Test dataset and the overlap is shown (c)Bar Graph showing bins for train and test set" class="wp-image-62335" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_16.png?resize=833%2C348&amp;ssl=1"/></noscript><figcaption><em>Fig. 7 – (a) Top Left – Image from Training dataset (b) Bottom Left – Image from Test dataset and the overlap is shown (c) Bar Graph showing bins for train and test set | <a href="https://web.archive.org/web/20220926102431/https://arxiv.org/abs/1805.12462" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>解决故障模式</p>
+
+
+
+<h2>现在我们已经了解了如何识别GANs培训中的问题，我们将研究一些解决方案和经验法则来解决这些问题。其中一些将是基本的超参数调整。如果你想更进一步稳定你的GANs，我们将讨论一些算法。</h2>
+
+
+
+<p>成本函数</p>
+
+
+
+<h3>有论文说无损失函数优越。我建议你从更简单的损失函数开始，就像我们使用的二进制交叉熵，然后从那里开始。</h3>
+
+
+
+<p>现在，在某些GAN架构中使用某些损失函数并不是一种强制要求。但是很多研究投入到这些论文的写作中，很多研究仍然在进行中。因此，使用图8中的这些损失函数将是一个很好的做法，这可能有助于防止模式崩溃和收敛。</p>
+
+
+
+<p>对不同的损失函数进行实验，注意您的损失函数可能会因为超参数的错误调整而失败，比如使优化器过于激进，或者学习率过大。这些问题我们以后再讲。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full"><img data-attachment-id="62342" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_12" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?fit=646%2C966&amp;ssl=1" data-orig-size="646,966" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_12" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?fit=201%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?fit=646%2C966&amp;ssl=1" src="../Images/2e9714cd11fd590ed3a5bda0182edfe8.png" alt="Architecture of GANs and corresponding loss functions used in papers" class="wp-image-62342 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?resize=646%2C966&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?resize=646%2C966&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62342" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_12" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?fit=646%2C966&amp;ssl=1" data-orig-size="646,966" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_12" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?fit=201%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?fit=646%2C966&amp;ssl=1" src="../Images/2e9714cd11fd590ed3a5bda0182edfe8.png" alt="Architecture of GANs and corresponding loss functions used in papers" class="wp-image-62342" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_12.png?resize=646%2C966&amp;ssl=1"/></noscript><figcaption><em>Fig. 8 – Architecture of GANs and corresponding loss functions used in papers | <a href="https://web.archive.org/web/20220926102431/https://github.com/hwalsuklee/tensorflow-generative-model-collections" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>潜在空间</p>
+
+
+
+<h3>潜在空间是对发生器的输入(随机噪声)进行采样的地方。现在，如果你限制潜在空间，它将产生更多相同类型的输出，如图9所示。您也可以查看图6中相应的损耗图。</h3>
+
+
+
+<p>在图9中，你能看到这么多相似的8和7吗？因此模式崩溃。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="62351" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_6" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?fit=738%2C738&amp;ssl=1" data-orig-size="738,738" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_6" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?fit=738%2C738&amp;ssl=1" src="../Images/0b27bb9e75ff56a77514eed3801aeb0c.png" alt="Subplot at 100th epoch, when latent space is 2" class="wp-image-62351 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?resize=560%2C560&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?resize=560%2C560&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62351" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_6" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?fit=738%2C738&amp;ssl=1" data-orig-size="738,738" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_6" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?fit=738%2C738&amp;ssl=1" src="../Images/0b27bb9e75ff56a77514eed3801aeb0c.png" alt="Subplot at 100th epoch, when latent space is 2" class="wp-image-62351" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_6.png?resize=560%2C560&amp;ssl=1"/></noscript><figcaption><em>Fig. 9 – Subplot at 100th epoch, when latent space is 2 | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>请注意，在训练GAN网络时，提供足够的潜在空间是至关重要的，因此生成器可以创建各种功能。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?ssl=1" data-lbwps-width="1626" data-lbwps-height="596" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png"><img data-attachment-id="62418" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig10_loss_latentspace1" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig10_loss_latentSpace1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?fit=1024%2C375&amp;ssl=1" src="../Images/1cf54f5dd9c45e0594d35acf9c5d481e.png" alt="gan_loss_latentSpace1" class="wp-image-62418 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?resize=1024%2C375&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?resize=1024%2C375&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62418" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig10_loss_latentspace1" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig10_loss_latentSpace1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?fit=1024%2C375&amp;ssl=1" src="../Images/1cf54f5dd9c45e0594d35acf9c5d481e.png" alt="gan_loss_latentSpace1" class="wp-image-62418" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig10_loss_latentSpace1.png?resize=1024%2C375&amp;ssl=1"/></noscript></a><figcaption><em>Fig. 10 – Here I gave the latent space as 1, ran for 200 epochs. </em><br/><em>We can see the generator loss constantly increasing and oscillation in all the losses | <a href="https://web.archive.org/web/20220926102431/http://neptune.ai/" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="62350" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_7" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?fit=738%2C736&amp;ssl=1" data-orig-size="738,736" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_7" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?fit=738%2C736&amp;ssl=1" src="../Images/9490e967233c1741e349c75180de6214.png" alt="Subplot corresponding Fig. 10, where the latent space is 1. These digits are generated on the 200th epoch." class="wp-image-62350 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?resize=556%2C554&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?resize=556%2C554&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62350" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_7" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?fit=738%2C736&amp;ssl=1" data-orig-size="738,736" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_7" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?fit=738%2C736&amp;ssl=1" src="../Images/9490e967233c1741e349c75180de6214.png" alt="Subplot corresponding Fig. 10, where the latent space is 1. These digits are generated on the 200th epoch." class="wp-image-62350" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_7.png?resize=556%2C554&amp;ssl=1"/></noscript><figcaption><em>Fig. 11 – Subplot corresponding fig. 10, where the latent space is 1. </em><br/><em>These digits are generated on the 200th epoch | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>学习率</p>
+
+
+
+<h3>我在训练gan时观察到的一个最常见的问题是高学习率。它会导致模式崩溃或不收敛。你保持低学习率真的很重要，低到0.0002甚至更低。</h3>
+
+
+
+<p>我们可以从图12中的损失图清楚地看到，鉴别器将所有图像识别为真实的。这就是为什么假图像的损失很高，而真实图像的损失为零。现在，生成器假设它生成的所有图像都在欺骗鉴别器。这里的问题是，由于如此高的学习率，鉴别者甚至没有得到一点培训。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?ssl=1" data-lbwps-width="1626" data-lbwps-height="596" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png"><img data-attachment-id="62419" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig12_loss_lr_0-2" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig12_loss_lr_0.2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?fit=1024%2C375&amp;ssl=1" src="../Images/e2e97f93222d0972918d75277f6333b2.png" alt="gan_loss_lr_0.2" class="wp-image-62419 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?resize=1024%2C375&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?resize=1024%2C375&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62419" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig12_loss_lr_0-2" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig12_loss_lr_0.2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?fit=1024%2C375&amp;ssl=1" src="../Images/e2e97f93222d0972918d75277f6333b2.png" alt="gan_loss_lr_0.2" class="wp-image-62419" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig12_loss_lr_0.2.png?resize=1024%2C375&amp;ssl=1"/></noscript></a><figcaption><em>Fig. 12 – Loss values when the learning rate is 0.2 | <a href="https://web.archive.org/web/20220926102431/http://neptune.ai/" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="62355" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_2" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?fit=736%2C734&amp;ssl=1" data-orig-size="736,734" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?fit=736%2C734&amp;ssl=1" src="../Images/2284c5db8f74a9f0f1033b497c83494d.png" alt="Generated Images on 100th epoch, with a learning rate of 0.2" class="wp-image-62355 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?resize=543%2C543&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?resize=543%2C543&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62355" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_2" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?fit=736%2C734&amp;ssl=1" data-orig-size="736,734" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?fit=300%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?fit=736%2C734&amp;ssl=1" src="../Images/2284c5db8f74a9f0f1033b497c83494d.png" alt="Generated Images on 100th epoch, with a learning rate of 0.2" class="wp-image-62355" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_2.png?resize=543%2C543&amp;ssl=1"/></noscript><figcaption><em>Fig. 13 – Generated Images on 100th epoch, with a learning rate of 0.2 | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>批量越大，学习率的值就越高，但是要尽量安全。</p>
+
+
+
+<p>【计算机】优化程序</p>
+
+
+
+<h3>一个侵略性的修改器对训练GANs来说是个坏消息。它导致无法找到发电机损耗和鉴别器损耗之间的平衡，从而导致收敛失败。</h3>
+
+
+
+<p>在Adam Optimizer中，betas是用于计算梯度及其平方的移动平均值的超参数。我们最初(在稳定训练中)对β1使用值0.5。将其更改为0.9(默认值)会增加优化器的积极性。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?ssl=1" data-lbwps-width="1626" data-lbwps-height="596" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png"><img data-attachment-id="62420" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig14_loss_adam_betas_0-9_0-999" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig14_loss_adam_betas_0.9_0.999" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?fit=1024%2C375&amp;ssl=1" src="../Images/2fd322684de9915108e6de0d5e9af653.png" alt="gan_loss_adam_betas_0.9_0.999" class="wp-image-62420 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?resize=1024%2C375&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?resize=1024%2C375&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62420" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes/attachment/fig14_loss_adam_betas_0-9_0-999" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?fit=1626%2C596&amp;ssl=1" data-orig-size="1626,596" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Fig14_loss_adam_betas_0.9_0.999" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?fit=300%2C110&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?fit=1024%2C375&amp;ssl=1" src="../Images/2fd322684de9915108e6de0d5e9af653.png" alt="gan_loss_adam_betas_0.9_0.999" class="wp-image-62420" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Fig14_loss_adam_betas_0.9_0.999.png?resize=1024%2C375&amp;ssl=1"/></noscript></a><figcaption><em>Fig. 14 – Loss graph with default values of Adam Optimizer (betas are 0.9 and 0.999) | <a href="https://web.archive.org/web/20220926102431/http://neptune.ai/" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+<p>在图14中，鉴别器表现良好。由于发电机损耗不断增加，我们可以看出它正在产生如此糟糕的图像，以至于鉴别器很容易将其归类为假图像。损失图没有达到平衡。</p>
+
+
+
+<p>特征匹配</p>
+
+
+
+<h3>特征匹配提出了一种新的目标函数，其中我们不直接使用鉴别器输出。训练发生器，使得发生器输出预期与鉴别器中间特征上的实像值相匹配。</h3>
+
+
+
+<p>对于真实图像和虚假图像，在中间层上以小批量计算特征向量(图15中的f(x )),并且测量这些特征向量的平均L2距离。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?ssl=1" data-lbwps-width="1400" data-lbwps-height="541" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png"><img data-attachment-id="62356" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_1" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?fit=1400%2C541&amp;ssl=1" data-orig-size="1400,541" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?fit=300%2C116&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?fit=1024%2C396&amp;ssl=1" src="../Images/b5d29b479fc87a1cdeab9a99b1e49add.png" alt="f(x) is the feature vector extracted at the intermediate layer of the discriminator" class="wp-image-62356 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?resize=1024%2C396&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?resize=1024%2C396&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="62356" data-permalink="https://web.archive.org/web/20220926102431/https://neptune.ai/gans-failure-modes-how-to-identify-and-monitor-them_1" data-orig-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?fit=1400%2C541&amp;ssl=1" data-orig-size="1400,541" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs Failure Modes – How to Identify and Monitor Them_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?fit=300%2C116&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926102431/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?fit=1024%2C396&amp;ssl=1" src="../Images/b5d29b479fc87a1cdeab9a99b1e49add.png" alt="f(x) is the feature vector extracted at the intermediate layer of the discriminator" class="wp-image-62356" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926102431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-Failure-Modes-How-to-Identify-and-Monitor-Them_1.png?resize=1024%2C396&amp;ssl=1"/></noscript></a><figcaption><em>Fig. 15 – f(x) is the feature vector extracted at the intermediate layer of the discriminator | <a href="https://web.archive.org/web/20220926102431/https://towardsdatascience.com/gan-ways-to-improve-gan-performance-acf37f9f59b" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>将生成的数据与真实数据的统计数据进行匹配更有意义。如果优化器在搜索最佳数据生成时变得过于贪婪，并且从未达到收敛，那么特征匹配可能会有所帮助。</p>
+
+
+
+<p>历史平均</p>
+
+
+
+<h3>我们保持前t个模型的参数(θ)的移动平均值。现在，我们惩罚模型，使用先前的参数将L2成本添加到成本函数中。</h3>
+
+
+
+<p>这里，θ[i]是第I次<sup>运行时的参数值。</sup></p>
+
+
+
+
+
+
+
+<p>在处理非凸目标函数时，历史平均可以帮助收敛模型。</p>
+
+
+
+<p>结论</p>
+
+
+
+<h2>我们现在明白了在训练GANs时实验跟踪的重要性。</h2>
+
+
+<div class="custom-point-list">
+<ul><li>理解损耗图并仔细观察生成的中间数据非常重要。</li><li>超参数，如学习率、优化器参数、潜在空间等。如果调整不当，可能会破坏您的模型。</li><li>随着过去几年GAN模型的增加，越来越多的研究进入到稳定GAN的训练中。对于特定的用例，有更多的技术是有益的。</li><li>进一步阅读</li></ul>
+</div>
+
+
+<h3>塔奈·阿格拉瓦尔</h3>
+
+
+
+
+
+
+<div id="author-box-new-format-block_6065e02db269e" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">Curl Analytics的深度学习工程师</h3>
+    
+          <p class="article__authorContent-text"><strong>阅读下一篇</strong></p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">机器学习中模型评估和选择的最终指南</p>
+
+
+
+<h2>10分钟阅读|作者Samadrita Ghosh |年7月16日更新</h2>
+
+
+
+<p class="has-small-font-size">10 mins read | Author Samadrita Ghosh | Updated July 16th, 2021</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10">在高层次上，机器学习是统计和计算的结合。机器学习的关键围绕着算法或模型的概念，这些概念实际上是类固醇的统计估计。</p>
+
+
+
+<p>然而，根据数据分布的不同，任何给定的模型都有一些限制。它们中没有一个是完全准确的，因为它们只是<strong> <em>(即使使用类固醇)</em> </strong>。这些限制俗称<strong> <em>偏差</em> </strong>和<strong> <em>方差</em> </strong>。</p>
+
+
+
+<p>具有高偏差的<strong>模型会因为不太注意训练点而过于简化(例如:在线性回归中，不管数据分布如何，模型将总是假设线性关系)。</strong></p>
+
+
+
+<p>具有高方差的<strong>模型将通过不对其之前未见过的测试点进行概括来将其自身限制于训练数据(例如:max_depth = None的随机森林)。</strong></p>
+
+
+
+<p>当限制很微妙时，问题就出现了，比如当我们必须在随机森林算法和梯度推进算法之间进行选择，或者在同一决策树算法的两个变体之间进行选择。两者都趋向于具有高方差和低偏差。</p>
+
+
+
+<p>这就是模型选择和模型评估发挥作用的地方！</p>
+
+
+
+<p>在本文中，我们将讨论:</p>
+
+
+
+<p>什么是模型选择和模型评估？</p>
+
+
+<div class="custom-point-list">
+<ul><li>有效的模型选择方法(重采样和概率方法)</li><li>流行的模型评估方法</li><li>重要的机器学习模型权衡</li><li>Important Machine Learning model trade-offs</li></ul>
+</div>
+
+<a class="button continous-post blue-filled" href="/web/20220926102431/https://neptune.ai/blog/the-ultimate-guide-to-evaluation-and-selection-of-models-in-machine-learning" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

@@ -1,0 +1,576 @@
+<html>
+<head>
+<title>Apache Spark Tutorial: Get Started With Serving ML Models With Spark </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>Apache Spark教程:开始使用Spark服务ML模型</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/apache-spark-tutorial#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/apache-spark-tutorial#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>到2025年，预计每天将产生463艾字节的数据。数据科学家需要理解这些数据。显然，你不能在任何一台计算机上处理或存储大数据。大数据需要存储在计算机集群中。</p>
+
+
+
+<p>这使得机器学习过程更加复杂。幸运的是，有专门为处理大数据而构建的工具。Apache Spark就是这些工具之一。</p>
+
+
+
+<p>让我们看看如何使用Apache Spark来处理大数据。</p>
+
+
+
+<h2 id="h-what-is-apache-spark">什么是阿帕奇火花？</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20221206001716/https://spark.apache.org/" target="_blank" rel="noreferrer noopener nofollow"> Apache Spark </a>是一个分析和处理大数据的开源引擎。Spark应用程序有一个驱动程序，运行用户的主要功能。它还负责在集群中执行并行操作。</p>
+
+
+
+<p>这个上下文中的集群指的是一组节点。每个节点都是一台机器或服务器。发送给执行器的一个工作单元称为一个任务，涉及多个任务的并行计算称为一个作业。</p>
+
+
+
+
+
+
+
+<h3>火花语境</h3>
+
+
+
+<p>Spark中的应用程序由SparkContext控制。它连接到集群管理器，如上图所示。有几个集群管理器，即:</p>
+
+
+
+<ul><li>Spark自己的独立集群管理器</li><li>梅索斯</li><li>故事</li></ul>
+
+
+
+<p>集群管理器为Spark应用程序分配资源。</p>
+
+
+
+<h3>火花执行者</h3>
+
+
+
+<p>执行器位于worker节点上，它们运行计算并存储应用程序的数据。工作节点负责在集群中运行应用程序代码。</p>
+
+
+
+<p>Spark中的每个应用都会有自己的<a href="https://web.archive.org/web/20221206001716/https://spark.apache.org/docs/latest/cluster-overview.html" target="_blank" rel="noreferrer noopener nofollow">执行程序</a>。SparkContext向执行者发送任务。应用程序是相互隔离的，因为每个应用程序都有自己的执行程序。</p>
+
+
+
+<h3>为什么使用Apache Spark</h3>
+
+
+
+<p>还有其他工具，如<a href="https://web.archive.org/web/20221206001716/https://hadoop.apache.org/" target="_blank" rel="noreferrer noopener nofollow"> Hadoop </a>，可以用于分布式计算。你为什么要用Apache Spark？</p>
+
+
+
+<ul><li>由于内存计算，它比Hadoop快100倍</li><li>Apache Spark可以用在Java、<a href="https://web.archive.org/web/20221206001716/https://spark.apache.org/docs/latest/" target="_blank" rel="noreferrer noopener nofollow"> Scala </a>、<a href="https://web.archive.org/web/20221206001716/https://spark.apache.org/docs/0.9.2/python-programming-guide.html" target="_blank" rel="noreferrer noopener nofollow"> Python </a>、R或者SQL中</li><li>您可以在Hadoop、Apache Mesos、Kubernetes或云中运行Apache Spark</li></ul>
+
+
+
+<h2 id="h-apache-spark-installation">阿帕奇火花装置</h2>
+
+
+
+<p>预计您将在一个计算机集群中运行Spark，例如一个云环境。然而，如果你是Spark的初学者，有更快的方法可以开始。让我们来看看其中的一些。</p>
+
+
+
+<h3>在Google Colab上设置Spark</h3>
+
+
+
+<p>要在Google Colab 上运行Spark，你需要两样东西:openjdk和findspark。</p>
+
+
+
+<p>“findspark”是使spark可以在Google Colab上导入的包。您还需要下载Spark并提取它。</p>
+
+
+
+<pre class="hljs">!apt-get install openjdk<span class="hljs-number">-8</span>-jdk-headless -qq &gt; /dev/null
+!wget -q https://www-us.apache.org/dist/spark/spark<span class="hljs-number">-3.0</span><span class="hljs-number">.1</span>/spark<span class="hljs-number">-3.0</span><span class="hljs-number">.1</span>-bin-hadoop2<span class="hljs-number">.7</span>.tgz
+!tar xf spark<span class="hljs-number">-3.0</span><span class="hljs-number">.1</span>-bin-hadoop2<span class="hljs-number">.7</span>.tgz
+!pip install findspark</pre>
+
+
+
+<p>下一步，根据Spark和Java的安装位置设置一些环境变量。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> os
+os.environ[<span class="hljs-string">"JAVA_HOME"</span>] = <span class="hljs-string">"/usr/lib/jvm/java-8-openjdk-amd64"</span>
+os.environ[<span class="hljs-string">"SPARK_HOME"</span>] = <span class="hljs-string">"/content/spark-3.0.1-bin-hadoop2.7"</span></pre>
+
+
+
+<p>接下来，使用“findspark”使spark可导入。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> findspark
+findspark.init()</pre>
+
+
+
+<p>任何时候你想使用Spark，你都需要创建SparkContext。创建一个“SparkContext”实例，以确认Spark安装成功。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pyspark
+sc = pyspark.SparkContext()</pre>
+
+
+
+<h3>在本地机器上安装Apache Spark</h3>
+
+
+
+<p>如何在本地机器上安装Spark？这个过程会变得非常复杂，非常迅速。这可能不值得，因为您实际上不会在本地机器上运行类似生产的集群。</p>
+
+
+
+<p>使用容器在本地机器上运行Spark的安装会更加容易和快捷。您需要安装<a href="https://web.archive.org/web/20221206001716/https://docs.docker.com/engine/install/" target="_blank" rel="noreferrer noopener nofollow"> Docker </a>以便使用容器安装Spark。</p>
+
+
+
+<p>下一步是从Docker Hub中提取Spark图像。完成后，您将能够访问本地主机:8888上的现成笔记本。</p>
+
+
+
+<pre class="hljs">$ docker run -p <span class="hljs-number">8888</span>:<span class="hljs-number">8888</span> jupyter/pyspark-notebook</pre>
+
+
+
+<p>当您导航到该笔记本时，您可以启动一个新的SparkContext来确认安装。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pyspark
+sc = pyspark.SparkContext()</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/901fc4bd031ea23124cfdddf96479460.png" alt="Apache spark context" class="wp-image-41040" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-spark-context.png?ssl=1"/></figure>
+
+
+
+<h3>在数据块上运行Apache Spark</h3>
+
+
+
+<p>最省事的选择是使用Databricks社区版。你唯一需要做的就是建立一个免费账户。本文将假设您在Databricks上运行Spark。然而，我们提到的所有其他替代方案都足够了。</p>
+
+
+
+
+
+
+
+<h2 id="h-apache-spark-basics">Apache Spark基础知识</h2>
+
+
+
+<p>在Apache Spark中需要理解的最基本的事情是它如何表示数据。主要表现在:</p>
+
+
+
+<ul><li>弹性分布式数据集</li><li>Dataframes</li></ul>
+
+
+
+<h3>弹性分布式数据集</h3>
+
+
+
+<p>一个<a href="https://web.archive.org/web/20221206001716/https://databricks.com/glossary/what-is-rdd" target="_blank" rel="noreferrer noopener nofollow">弹性分布式数据集(RDD) </a>是一个可以并行操作的容错元素集合。rdd自动从故障中恢复。在以下情况下，这种格式是很好的选择:</p>
+
+
+
+<ul><li>您正在处理非结构化数据，如媒体或文本流</li><li>您需要对数据集执行低级转换</li></ul>
+
+
+
+<h4>RDD创作</h4>
+
+
+
+<p>您可以通过并行化驱动程序中的集合或使用文件系统中的数据集来创建RDD。Spark将决定分割数据集的最佳分区数量。但是，您可以将它作为第二个参数传递给“并行化”函数:</p>
+
+
+
+<pre class="hljs">my_list = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>,<span class="hljs-number">6</span>]
+my_list_distributed = sc.parallelize(my_list,<span class="hljs-number">3</span>)</pre>
+
+
+
+<h4>RDD行动</h4>
+
+
+
+<p>在Spark中，有两种主要操作类型:</p>
+
+
+
+
+
+
+
+<h4>火花变换</h4>
+
+
+
+<p>转换将从现有的数据集创建新的数据集。这种操作的一个例子是“映射”。转换是懒惰的，这意味着它们不会立即返回计算结果。只有当动作请求结果时，计算才会发生。</p>
+
+
+
+<pre class="hljs">my_list = [<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>]
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">power_two</span><span class="hljs-params">(x)</span>:</span>
+  <span class="hljs-keyword">return</span> x**<span class="hljs-number">2</span>
+list(map(power_two,my_list))</pre>
+
+
+
+<h4><img decoding="async" loading="lazy" src="../Images/758ff4a6a9c7763c32825282f90ce6bc.png" data-original-src="https://web.archive.org/web/20221206001716im_/https://lh5.googleusercontent.com/ArClzC1-Mck4RRZyoy-32ZWuyOIGFkF37umprD6fjsduuFVoOlsWhK1bX-sUFshq2aGuGjEkXZz7m7W7hjutEnmbcV4xPJXCJhY3j2xfa73-AHzB1ACuHt2d70uzo6WGvU3I8ZFs"/></h4>
+
+
+
+<p>Spark中的其他转换包括:</p>
+
+
+
+<ul><li>` filter`–在选择在特定条件下返回true的项目后返回数据集</li><li>` union`–返回两个数据集的并集</li></ul>
+
+
+
+<h4>火花动作</h4>
+
+
+
+<p>在对数据集进行特定计算后，操作将返回值。例如,“减少”功能。</p>
+
+
+
+<pre class="hljs">results = map(power_two,my_list)
+<span class="hljs-keyword">for</span> result <span class="hljs-keyword">in</span> results:
+  print(result)</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/2c5e95cd5c89c298616f23e6624b9ed9.png" alt="Apache guide code 1" class="wp-image-41042" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-1.png?ssl=1"/></figure>
+
+
+
+<p>使用Spark还可以执行一些其他操作:</p>
+
+
+
+<ul><li>` collect '以数组形式返回数据集</li><li>` count '返回数据集中的项目数</li><li>` take(n )'返回数据集的前n个元素</li><li>` first '返回数据集中的第一个元素</li></ul>
+
+
+
+<h4>RDD持久性</h4>
+
+
+
+<p>Spark允许您通过缓存数据集来提高应用程序的性能。计算结果可以保存在内存中，下次需要时可以从缓存中检索。Spark中的缓存是容错的，因此任何丢失的分区都将使用创建它们的转换重新计算。</p>
+
+
+
+<pre class="hljs">df.cache()</pre>
+
+
+
+<h3>Dataframes</h3>
+
+
+
+<p>Spark数据帧是不可变的，非常类似于<a href="https://web.archive.org/web/20221206001716/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html" target="_blank" rel="noreferrer noopener nofollow">熊猫数据帧</a>。稍后您将会看到，Spark数据帧可以使用SQL进行查询。通过下面的机器学习示例，您将看到Spark中数据帧和SQL的用法。</p>
+
+
+
+
+
+
+
+<h2 id="h-machine-learning-in-spark">Spark中的机器学习</h2>
+
+
+
+<p>你可以使用' pyspark.ml '在spark中进行机器学习，这个模块是Spark自带的，所以你不需要去寻找或者安装它。登录到您的<a href="https://web.archive.org/web/20221206001716/https://community.cloud.databricks.com/" target="_blank" rel="noreferrer noopener nofollow"> Databricks </a>帐户后，创建一个集群。本练习所需的笔记本电脑将在该集群中运行。</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/529c4f5707553c4e67c000e307125103.png" alt="Apache guide - new cluster" class="wp-image-41043" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-new-cluster.png?ssl=1"/></figure>
+
+
+
+<p>当集群准备就绪时，创建一个笔记本。接下来，您需要定义数据的来源。Databricks允许您从其合作伙伴提供商上传数据或链接。上传数据时，需要小于2GB。</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/3d2a97cff1141e3b4762f24d19cb29b4.png" alt="Apache guide - new table" class="wp-image-41044" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-new-table.png?ssl=1"/></figure>
+
+
+
+<p>为了便于说明，让我们使用来自UCI机器学习的心脏病数据集。</p>
+
+
+
+<h3>使用Spark进行数据探索</h3>
+
+
+
+<p>将数据集上传到Databricks后，请记下数据集的路径，以便可以使用它来加载数据。此外，请确保您的笔记本电脑已连接到集群。</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/d2c401843502da5e62f36673be4b08a8.png" alt="Apache guide code " class="wp-image-41045" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-2.png?ssl=1"/></figure>
+
+
+
+<pre class="hljs">df = spark.read.csv(<span class="hljs-string">'/FileStore/tables/heart.csv'</span>,sep=<span class="hljs-string">','</span>,inferSchema=<span class="hljs-string">'true'</span>,header=<span class="hljs-string">'true'</span>)</pre>
+
+
+
+<p>请注意，您不必创建SparkContext。这是因为Databricks在默认情况下会为您做这件事。您可以在单元格中键入“sc”来确认这一点。</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/b586af26aa2a539fa0a7e022d175900e.png" alt="Apache guide code " class="wp-image-41046" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-3.png?ssl=1"/></figure>
+
+
+
+<p>您还可以单击Spark UI的链接来查看关于您的集群的更多信息。</p>
+
+
+
+
+
+
+
+<p>在数据块上运行数据探索的最快方法是使用“显示(df)”功能。这个函数是Databricks独有的，所以如果你在Google Colab或你的本地机器上，它将不起作用。在这些平台上，您可以使用:</p>
+
+
+
+<pre class="hljs">df.display()</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/f8f2aa715e7af066f4e636f207022f2b.png" alt="Apache guide plot" class="wp-image-41048" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-plot.png?ssl=1"/></figure>
+
+
+
+<p>点击绘图选项按钮会给你更多的图表和选项，你可以尝试。你也可以下载这些图。</p>
+
+
+
+<p>如前所述，您可以运行过滤操作。</p>
+
+
+
+<pre class="hljs">df.filter((df.age&gt;<span class="hljs-number">20</span>) &amp; (df.target==<span class="hljs-string">'1'</span>)).show()</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/bf918e9b81ee7a8f0645fcf7c184bd88.png" alt="Apache guide code " class="wp-image-41049" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-4.png?ssl=1"/></figure>
+
+
+
+<p>Spark还可以让你运行“分组”操作，就像你在熊猫身上做的那样。让我们看看如何做到这一点。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pyspark.sql <span class="hljs-keyword">import</span> functions <span class="hljs-keyword">as</span> F
+df.groupBy([<span class="hljs-string">"sex"</span>]).agg(
+    F.mean(<span class="hljs-string">"age"</span>).alias(<span class="hljs-string">"Mean Age"</span>)
+    ).show()</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/004794fef36e09bf8ec931c17f186db9.png" alt="Apache guide code " class="wp-image-41050" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-5.png?ssl=1"/></figure>
+
+
+
+<p>如果您来自SQL世界，您可能会对查询数据框感兴趣，就像查询SQL表一样。您可以通过使用“SQLContext”注册一个临时SQL表来实现这一点。之后，就可以正常运行SQL查询了。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pyspark.sql <span class="hljs-keyword">import</span> SQLContext
+sqlContext = SQLContext(sc)
+df.registerTempTable(<span class="hljs-string">'df_table'</span>)
+df_sql = sqlContext.sql(<span class="hljs-string">'select age,target,sex,slope,cp from df_table where age&gt;30 ORDER BY age DESC'</span>)
+df_sql.show()</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/498a44be0ea9974524e73058951a0c4a.png" alt="Apache guide code" class="wp-image-41051" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-6.png?ssl=1"/></figure>
+
+
+
+<h3>用Spark进行数据预处理</h3>
+
+
+
+<p>一旦完成了数据探索，下一步就是将数据转换成Spark的MLlib可以接受的格式。在这种情况下，需要将特征转换为单个向量，该向量将被传递给机器学习模型。</p>
+
+
+
+<p>这可以使用“VectorAssembler”来完成。让我们导入它，并使用数据集中的功能实例化它。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pyspark.ml.feature <span class="hljs-keyword">import</span> VectorAssembler
+feat_cols = [<span class="hljs-string">'age'</span>,
+ <span class="hljs-string">'sex'</span>,
+ <span class="hljs-string">'cp'</span>,
+ <span class="hljs-string">'trestbps'</span>,
+ <span class="hljs-string">'chol'</span>,
+ <span class="hljs-string">'fbs'</span>,
+ <span class="hljs-string">'restecg'</span>,
+ <span class="hljs-string">'thalach'</span>,
+ <span class="hljs-string">'exang'</span>,
+ <span class="hljs-string">'oldpeak'</span>,
+ <span class="hljs-string">'slope'</span>,
+ <span class="hljs-string">'ca'</span>,
+ <span class="hljs-string">'thal'</span>]
+vec_assember = VectorAssembler(inputCols = feat_cols, outputCol=<span class="hljs-string">'features'</span> )</pre>
+
+
+
+<p>下一步是用它来转换数据框。</p>
+
+
+
+<pre class="hljs">final_data = vec_assember.transform(df)</pre>
+
+
+
+<p>“take”功能可用于查看数据集的一部分。你会注意到一个叫做“特征”的向量，它包含了所有的特征。</p>
+
+
+
+<pre class="hljs">final_data.take(<span class="hljs-number">2</span>)</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/44768cff99dc5a0b30f4f7ae24f33b66.png" alt="Apache guide code" class="wp-image-41052" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-7.png?ssl=1"/></figure>
+
+
+
+<p>接下来，将数据集分成训练集和测试集。</p>
+
+
+
+<pre class="hljs">training,testing = final_data.randomSplit([<span class="hljs-number">0.7</span>,<span class="hljs-number">0.3</span>],seed=<span class="hljs-number">42</span>)</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/d2a627f37e96da9b5f66c543dc0c0c5b.png" alt="Apache guide code" class="wp-image-41053" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-8.png?ssl=1"/></figure>
+
+
+
+<h3>用PySpark MLlib构建机器学习模型</h3>
+
+
+
+<p>下一步是使这个数据集适合算法。这里我们用逻辑回归。<br/>从导入开始。你可以在这里访问更多的<a href="https://web.archive.org/web/20221206001716/https://spark.apache.org/docs/latest/ml-guide.html" target="_blank" rel="noreferrer noopener nofollow">算法。</a></p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pyspark.ml.classification <span class="hljs-keyword">import</span> LogisticRegression</pre>
+
+
+
+<p>让我们创建一个算法实例，同时传递标签列名和特性名。</p>
+
+
+
+<pre class="hljs">lr = LogisticRegression(labelCol=<span class="hljs-string">'target'</span>,featuresCol=<span class="hljs-string">'features'</span>)</pre>
+
+
+
+<p>现在让模型适应训练集。</p>
+
+
+
+<pre class="hljs">lrModel = lr.fit(training)</pre>
+
+
+
+<h3>评估模型</h3>
+
+
+
+<p>在评估模型之前，您必须运行预测。使用“转换”功能。</p>
+
+
+
+<pre class="hljs">predictions = lrModel.transform(testing)</pre>
+
+
+
+<p>您可以通过选择一些列来查看这些预测。</p>
+
+
+
+<pre class="hljs">predictions.select(<span class="hljs-string">'target'</span>,<span class="hljs-string">'prediction'</span>,<span class="hljs-string">'probability'</span>,<span class="hljs-string">'age'</span>,<span class="hljs-string">'sex'</span>).show()</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/4d987f6c316936bba4d4e542f09c0a97.png" alt="Apache guide code" class="wp-image-41054" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-9.png?ssl=1"/></figure>
+
+
+
+<p>由于这是二元分类，因此可以使用“BinaryClassificationEvaluator”函数来评估模型。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pyspark.ml.evaluation <span class="hljs-keyword">import</span> BinaryClassificationEvaluator
+evaluator.evaluate(predictions)</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/4f67625e2c8bc0b41592a826225dbf13.png" alt="Apache guide code" class="wp-image-41055" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001716im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Apache-guide-code-10.png?ssl=1"/></figure>
+
+
+
+<h3>服务于Apache Spark机器学习模型</h3>
+
+
+
+<p>Databricks让你用MLflow服务你的机器学习模型。然而，为您的模型提供服务的最简单的方法是将其发送到像Neptune这样的模型注册中心。</p>
+
+
+
+<pre class="hljs">lrModel.save(<span class="hljs-string">"model.pkl"</span>)
+neptune.log_artifact(“model.pkl”)</pre>
+
+
+
+<h2 id="h-final-thoughts">最后的想法</h2>
+
+
+
+<p>在本文中，您已经看到Apache Spark可用于分析和构建处理大数据的机器学习模型。我们还讨论了使用Apache Spark的核心概念:</p>
+
+
+
+<ul><li>什么是阿帕奇火花</li><li>Apache Spark中的数据表示</li><li>安装Apache Spark的各种方法</li><li>在本地机器Databricks和Google Colab上运行Spark</li><li>使用Apache Spark构建和保存机器学习模型</li></ul>
+
+
+
+<p>现在，您已经掌握了使用大数据探索和构建机器学习模型所需的技能。感谢阅读！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

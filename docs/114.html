@@ -1,0 +1,1893 @@
+<html>
+<head>
+<title>MLOps Tools for NLP Projects </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>NLP项目的MLOps工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/mlops-tools-for-nlp-projects#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/mlops-tools-for-nlp-projects#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>聊天机器人、总结应用、Siri、Alexa——这些只是一些已经被大规模采用的很酷的自然语言处理(T2)项目。你有没有想过它们是如何管理、持续改进和维护的？这正是我们在本文中要回答的问题。</p>
+
+
+
+<p>例如，<a href="https://web.archive.org/web/20221206052610/https://cloud.google.com/blog/products/g-suite/everyday-ai-beyond-spell-check-how-google-docs-is-smart-enough-to-correct-grammar" target="_blank" rel="noreferrer noopener nofollow">谷歌的自动更正</a>每次都变得更好，但不是因为他们想出了一个不需要任何维护的超级好的模型。每次都变得更好，因为有一个管道，在早期通过在获得新数据时反复执行所有ML任务来自动化和改进模型。这是MLOps最好的例子。</p>
+
+
+
+<p>在本文中，我将告诉您可以用于NLP项目的各种<a href="/web/20221206052610/https://neptune.ai/blog/mlops-what-it-is-why-it-matters-and-how-to-implement-it-from-a-data-scientist-perspective" target="_blank" rel="noreferrer noopener"> MLOps </a>工具。这包括很酷的开源平台，以及一些帮助您入门的代码。我还将对所有工具进行比较，以帮助您导航并为您想要使用的任何框架选择最佳工具。</p>
+
+
+
+<p>以下是我们将要讨论的内容:</p>
+
+
+
+
+
+
+
+<p>以下是我写这篇文章时所做的假设，只是为了让我们达成共识:</p>
+
+
+
+<ul><li>你知道什么是NLP。你不需要知道很多，只要知道一点基本的和一些流程就够了。</li><li>您熟悉构建机器学习项目的过程。还是那句话，不需要知道太多。你之前至少应该建立一个机器学习项目，这样你就知道我将使用的术语。</li><li>你思想开放，乐于学习！</li></ul>
+
+
+
+<p>如果您是MLOps专家，您可以跳过介绍，直接使用工具。</p>
+
+
+
+<h2 id="mlops">什么是MLOps？</h2>
+
+
+
+<p>数据会随着时间的推移而变化，这使得机器学习模型变得陈旧。ML模型学习数据中的模式，但是这些模式随着趋势和行为的改变而改变。</p>
+
+
+
+<p>我们不能阻止数据总是变化，但是我们可以让我们的模型随着新的趋势和变化而更新。为此，我们需要一个自动化的管道。这个自动化过程被称为<strong> MLOps </strong>。</p>
+
+
+
+<p>MLOps是数据科学家和运营专业人员之间进行协作和沟通的一套实践。</p>
+
+
+
+<p>请注意<em> MLOps还没有完全自动化，至少</em>还没有。你还是要手动做一些事情，但是比起完全没有工作流来说，要轻松无比。</p>
+
+
+
+<h3>MLOps是如何工作的？</h3>
+
+
+
+<p><strong> MLOps，</strong>即机器学习运算，与DevOps不同。</p>
+
+
+
+<p>DevOps是开发和操作大型软件系统的一种流行实践。它在软件系统开发中有两个概念:</p>
+
+
+
+
+
+
+
+<p>典型的DevOps周期是:</p>
+
+
+
+<ul><li>代码，</li><li>测试，</li><li>部署，</li><li>监视器。</li></ul>
+
+
+
+<p>在ML项目中，有许多其他过程，如数据收集和处理、特征工程、培训和评估ML模型，DevOps无法处理所有这些。</p>
+
+
+
+
+
+
+
+<p>在MLOps中，您有:</p>
+
+
+
+<ul><li>进入系统的数据通常是条目，</li><li>预处理数据和选择有用特征的代码，</li><li>训练模型和评估模型的代码，</li><li>测试和验证它的代码，</li><li>要部署的代码，</li><li>诸如此类。</li></ul>
+
+
+
+<p>要将您的模型部署到生产中，您需要通过CI/CD管道来推动它。</p>
+
+
+
+<p>一旦投入生产:</p>
+
+
+
+<ul><li>你需要经常检查性能，确保它是可靠的，</li><li>您需要一个自动警报或触发系统来通知您问题，并确保这些更改解决了出现的问题。</li></ul>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206052610/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/MLOps-automated-pipeline.jpg?ssl=1"><img decoding="async" loading="lazy" src="../Images/48b85a422ed1e025131d1ca02a960d9c.png" alt="MLOps automated pipeline" class="wp-image-50283" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206052610im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/MLOps-automated-pipeline.jpg?resize=768%2C575&amp;ssl=1"/></a><figcaption><em>MLOps automated pipeline | <a href="https://web.archive.org/web/20221206052610/https://ml-ops.org/content/mlops-principles" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<h2 id="why-mlops">我们为什么需要MLOps？</h2>
+
+
+
+<p>无论您尝试部署哪种解决方案，MLOps都是项目成功的基础。</p>
+
+
+
+<p>MLOps不仅有助于协作和将ML集成到技术中，它还帮助数据科学家做他们最擅长的事情，开发模型。MLOps自动执行由数据科学家手动完成的再培训、测试和部署。</p>
+
+
+
+<p>机器学习有助于部署解决方案，通过创建更高效的工作流、利用数据分析进行决策和改善客户体验来释放以前未开发的收入来源、节省时间和降低成本。如果没有像MLOps这样的坚实框架，这些目标很难实现。</p>
+
+
+
+
+
+
+
+<p>为您的NLP项目选择合适的MLOps工具取决于您的解决方案的工具。</p>
+
+
+
+<p>您的选择取决于您的项目需求、成熟度和部署规模。你的项目必须结构合理(<a href="https://web.archive.org/web/20221206052610/https://drivendata.github.io/cookiecutter-data-science/" target="_blank" rel="noreferrer noopener nofollow"> Cookie Cutter </a>是一个很好的项目结构工具，可以帮助你做到这一点)。</p>
+
+
+
+<p>Verta的创始人兼首席执行官Manasi Vartak，<a href="https://web.archive.org/web/20221206052610/https://blog.verta.ai/blog/ml-infrastructure-build-vs-buy-vs-open-source" target="_blank" rel="noreferrer noopener nofollow">指出了您在选择任何MLOps工具之前应该问自己的一些问题</a>:</p>
+
+
+
+<ul><li>它应该对数据科学家友好，而不是限制您的数据科学团队使用特定的工具和框架。</li><li>它应该易于安装，易于设置，易于定制。</li><li>它应该可以与您现有的平台自由集成。</li><li>它应该能够重现结果；无论您是与团队成员合作，调试产品故障，还是迭代现有模型，再现性都是至关重要的。</li><li>它应该具有良好的伸缩性；选择一个能够满足您当前需求的平台，该平台可以针对实时和批处理工作负载进行扩展以满足未来需求，支持高吞吐量场景，随着流量的增加而自动扩展，并具有简单的成本管理和安全的部署和发布实践。</li></ul>
+
+
+
+<h2 id="open-source">NLP项目的最佳开源MLOps工具</h2>
+
+
+
+<p>每个MLOps工具都有自己的工具。下面列出的开源平台是特定于NLP项目的，并根据它们拥有的Github星级数进行评级。一些商业化的平台专门用于NLP项目，但是其他的通常可以用于任何ML项目。</p>
+
+
+
+<h3><a href="https://web.archive.org/web/20221206052610/https://novetta.github.io/adaptnlp/#AdaptNLP-Install" target="_blank" rel="noreferrer noopener nofollow">适配NLP </a> (329 Github stars)</h3>
+
+
+
+<p>它是一个高级框架和库，用于运行、培训和部署最先进的自然语言处理(NLP)模型，以执行端到端任务。它建立在Zalando Research的天赋和拥抱脸的变形金刚库之上。</p>
+
+
+
+<p>AdaptNLP为机器学习研究人员和科学家提供了一种模块化和<strong>自适应</strong>的方法来完成各种NLP任务，并提供了一种<strong>简单</strong> API来训练、推理和部署基于NLP的微服务。您可以使用Fast-api在本地或使用docker部署Adapt-NLP模型。</p>
+
+
+
+<p><strong> AdaptNLP特性:</strong></p>
+
+
+
+<ul><li>该API针对具有SOTA预训练模型的NLP任务进行了统一。您可以将它与Flair和Transformer模型一起使用。</li><li>提供用于训练和微调模型的界面。</li><li>使用FastAPI框架轻松即时地部署您的NLP模型。</li><li>您可以使用Docker在GPU上轻松构建和运行AdaptNLP容器。</li></ul>
+
+
+
+<p><strong>Linux/Mac的安装要求:</strong></p>
+
+
+
+<p>我建议您将它安装在新的虚拟环境中，以防止依赖性集群问题。如果您安装了Python 3.7版，您需要安装Pytorch的最新稳定版本(1.7版)，如果您安装了Python 3.6版，您需要将Pytorch降级到&lt; =1.6版。</p>
+
+
+
+<p>【Windows的安装要求:</p>
+
+
+
+<p>如果你还没有安装Pytorch，你必须从Pytorch手动安装。</p>
+
+
+
+<p><strong>使用画中画</strong>，</p>
+
+
+
+<pre class="hljs">pip install adaptnlp</pre>
+
+
+
+<p>或者如果你想为发展做贡献，</p>
+
+
+
+<pre class="hljs">pip install adaptnlp[dev]</pre>
+
+
+
+<p><a href="https://web.archive.org/web/20221206052610/https://novetta.github.io/adaptnlp/tutorial-intro" target="_blank" rel="noreferrer noopener nofollow">T1】教程T3】:</a></p>
+
+
+
+
+
+
+
+<h3><a href="https://web.archive.org/web/20221206052610/https://github.com/awslabs/autogluon" target="_blank" rel="noreferrer noopener nofollow">auto gulon</a>(3.5k Github stars)</h3>
+
+
+
+<p>自动登录是简单的文本，图像和表格数据的自动标记。它使您能够轻松地将AutoML扩展到深度学习、堆栈组装和其他现实世界的应用程序等领域。它自动执行机器学习任务，并在您的应用中为您的模型提供强大的预测性能。</p>
+
+
+
+<p>只需几行代码，就可以在文本、图像和表格数据上训练和部署高精度的机器学习和深度学习模型。目前，它只为Linux和MacOS用户提供支持。</p>
+
+
+
+<p><strong>自动登录功能:</strong></p>
+
+
+
+<ul><li>只需几行代码，就可以创建深度学习和ML解决方案的快速原型。</li><li>无需专业知识，自动使用最先进的技术。</li><li>您可以自动执行数据预处理、工具搜索、模型选择/集成和超参数调整。</li><li>AutoGulon完全可以根据您的使用情况进行定制。</li></ul>
+
+
+
+<p><strong>安装:</strong></p>
+
+
+
+<p>它要求您拥有Python 3.6、3.7或3.8。目前只支持Linux和MacOS。根据您的系统，您可以下载CPU版本或GPU版本。</p>
+
+
+
+<p><strong>使用画中画</strong>:</p>
+
+
+
+<p><strong>对于MacOS </strong>:</p>
+
+
+
+
+
+
+
+<pre class="hljs">python3 -m pip install -U pip
+python3 -m pip install -U setuptools wheel
+python3 -m pip install -U <span class="hljs-string">"mxnet&lt;2.0.0"</span>
+python3 -m pip install autogluon
+</pre>
+
+
+
+
+
+
+
+<p>目前不可用</p>
+
+
+
+<p><strong>对于Linux </strong>:</p>
+
+
+
+
+
+
+
+<pre class="hljs">python3 -m pip install -U pip
+python3 -m pip install -U setuptools wheel
+python3 -m pip install -U <span class="hljs-string">"mxnet&lt;2.0.0"</span>
+python3 -m pip install autogluon
+</pre>
+
+
+
+
+
+
+
+<pre class="hljs">python3 -m pip install -U pip
+python3 -m pip install -U setuptools wheel
+
+
+
+python3 -m pip install -U <span class="hljs-string">"mxnet_cu101&lt;2.0.0"</span>
+python3 -m pip install autogluon
+</pre>
+
+
+
+<p>教程:</p>
+
+
+
+
+
+
+
+<h3><a href="https://web.archive.org/web/20221206052610/https://github.com/dmlc/gluon-nlp" target="_blank" rel="noreferrer noopener nofollow">gluonlp</a>(2.3k github stars)</h3>
+
+
+
+<p>它是一个支持NLP过程的框架，比如加载文本数据、预处理文本数据和训练NLP模型。Linux和MACOS上都有。您也可以将其他形式的NLP模型转换成GulonNLP。您可以转换的此类模型的几个<a href="https://web.archive.org/web/20221206052610/https://nlp.gluon.ai/master/model_zoo/conversion_toolkits/index.html" target="_blank" rel="noreferrer noopener nofollow">示例</a>包括BERT、ALBERT、ELECTRA、MobileBERT、RoBERTa、XLM-R、BART、GPT-2和T5。</p>
+
+
+
+<p><strong> GulonNLP特性:</strong></p>
+
+
+
+<ul><li>易于使用的文本处理工具和模块化API</li><li>预训练模型动物园</li><li>用Numpy之类的API编写模型</li><li>通过<a href="https://web.archive.org/web/20221206052610/https://tvm.apache.org/" target="_blank" rel="noreferrer noopener nofollow"> Apache TVM </a>进行快速推理(孵化)(实验)</li><li>AWS与<a href="https://web.archive.org/web/20221206052610/https://aws.amazon.com/sagemaker/" target="_blank" rel="noreferrer noopener nofollow"> SageMaker </a>的集成</li></ul>
+
+
+
+<p><a href="https://web.archive.org/web/20221206052610/https://nlp.gluon.ai/master/index.html" target="_blank" rel="noreferrer noopener nofollow"> <strong>安装</strong> </a>:</p>
+
+
+
+<p>在开始安装之前，请确保您的系统上有MXNet 2版本。以防万一，你可以从你的终端安装它。从以下选项中选择一个:</p>
+
+
+
+<pre class="hljs">
+python3 -m pip install -U --pre <span class="hljs-string">"mxnet-cu102&gt;=2.0.0a"</span>
+
+
+python3 -m pip install -U --pre <span class="hljs-string">"mxnet-cu110&gt;=2.0.0a"</span>
+
+
+python3 -m pip install -U --pre <span class="hljs-string">"mxnet&gt;=2.0.0a"</span>
+</pre>
+
+
+
+<p>现在，您可以继续安装GulonNLP了。打开您的终端并键入:</p>
+
+
+
+<pre class="hljs">python3 -m pip install -U -e</pre>
+
+
+
+<p>您也可以通过键入以下命令来安装所有额外的要求:</p>
+
+
+
+<pre class="hljs">python3 -m pip install -U -e .<span class="hljs-string">"[extras]"</span></pre>
+
+
+
+<p>如果您在安装过程中遇到任何与用户权限相关的问题，请参考本<a href="https://web.archive.org/web/20221206052610/https://github.com/dmlc/gluon-nlp">指南</a>。</p>
+
+
+
+<p>教程:</p>
+
+
+
+
+
+
+
+<h3><a href="https://web.archive.org/web/20221206052610/https://github.com/BrikerMan/Kashgari" target="_blank" rel="noreferrer noopener nofollow">喀什噶尔</a> (2.1k github星星)</h3>
+
+
+
+<p>强大的NLP迁移学习框架，可用于在5分钟内为命名实体识别(NER)、词性标注(POS)和模型分类构建最先进的模型。初学者、学者和研究人员都可以使用它。</p>
+
+
+
+<p><strong>喀什特点:</strong></p>
+
+
+
+<ul><li>易于定制、有据可查且简单明了。</li><li>Kashgari允许您在自然语言处理项目中使用最先进的模型。</li><li>它允许您构建多标签分类模型，创建定制模型，等等。点击了解更多<a href="https://web.archive.org/web/20221206052610/https://kashgari.readthedocs.io/en/v2.0.1/tutorial/text-classification/"/></li><li>允许你调整你的模型的超参数，使用定制的优化器和回调，创建定制的模型，和<a href="https://web.archive.org/web/20221206052610/https://kashgari.readthedocs.io/en/v2.0.1/tutorial/text-labeling/">其他的</a>。</li><li>Kashgari有内置的预训练模型，这使得迁移学习非常容易。</li><li>Kashagri简单、快速且可扩展</li><li>您可以导出您的模型，并使用tensorflow服务将它们直接部署到云中。</li></ul>
+
+
+
+<p><strong>安装</strong></p>
+
+
+
+<p>Kashgari要求您在系统上安装Python 3.6+版本。</p>
+
+
+
+<p><strong>使用画中画</strong></p>
+
+
+
+
+
+
+
+<pre class="hljs">pip install <span class="hljs-string">'kashgari&gt;=2.0.0</span></pre>
+
+
+
+
+
+
+
+<pre class="hljs">pip install <span class="hljs-string">'kashgari&gt;=2.0.0</span></pre>
+
+
+
+
+
+
+
+<pre class="hljs">pip install <span class="hljs-string">'kashgari&lt;1.0.0</span></pre>
+
+
+
+<p><strong>教程:</strong></p>
+
+
+
+
+
+
+
+<h3><a href="https://web.archive.org/web/20221206052610/https://awesomeopensource.com/project/LexPredict/lexpredict-lexnlp" target="_blank" rel="noreferrer noopener nofollow"> LexNLP </a> (460颗Github星星)</h3>
+
+
+
+<p>由LexPredict开发的LexNLP是一个Python库，用于处理真实的非结构化法律文本，包括合同、政策、程序和其他类型的材料、分类器和条款类型、用于构建新的聚类和分类方法的工具、真实法律文档的数百个单元测试。</p>
+
+
+
+<p><strong>特性:</strong></p>
+
+
+
+<ul><li>它提供了预训练的模型，用于分段、单词嵌入和主题模型，以及用于文档和子句类型的分类器。</li><li>事实提取。</li><li>构建新的聚类和分类方法的工具。</li></ul>
+
+
+
+<p><strong>安装:</strong></p>
+
+
+
+<p>要求您已经安装了Python 3.6</p>
+
+
+
+<pre class="hljs">pip install lexnlp
+</pre>
+
+
+
+<p><strong>教程:</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+<p>TensorFlow Text提供了一组与文本相关的类和操作，可用于TensorFlow 2.0。该库可以执行基于文本的模型所需的常规预处理，并包括core TensorFlow未提供的对序列建模有用的其他功能。</p>
+
+
+
+<p>在文本预处理中使用这些操作的好处是它们是在张量流图中完成的。您不需要担心训练中的标记化与推理中的标记化不同，或者管理预处理脚本。</p>
+
+
+
+<p><strong> Tensorflow文本特征:</strong></p>
+
+
+
+<ul><li>为处理文本提供了一个大型工具包</li><li>允许与大量Tensorflow工具集成，以支持从问题定义到培训、评估和启动的项目</li><li>降低服务时间的复杂性并防止培训-服务偏差</li></ul>
+
+
+
+<p><strong>安装:</strong></p>
+
+
+
+<p><strong>使用画中画</strong></p>
+
+
+
+<p>请注意:<em>使用pip install安装TF Text时，请注意您正在运行的TensorFlow的版本，因为您应该指定TF Text的相应次要版本(例如，对于tensorflow==2.3.x，请使用tensorflow_text==2.3.x) </em>。</p>
+
+
+
+<pre class="hljs">pip install -U tensorflow-text==&lt;version&gt;
+</pre>
+
+
+
+<p><strong>从源安装</strong></p>
+
+
+
+<p>请注意<em> TF Text需要在与TensorFlow相同的环境下构建。因此，如果您手工构建TF文本，强烈建议您也构建TensorFlow </em>。</p>
+
+
+
+<p>如果在MacOS上构建，<em>您必须安装coreutils </em>。自制可能是最容易做到的。</p>
+
+
+
+<p>构建并安装TensorFlow。</p>
+
+
+
+<ul><li>克隆TF文本repo: git克隆<a href="https://web.archive.org/web/20221206052610/https://github.com/tensorflow/text.git" rel="nofollow">https://github.com/tensorflow/text.git</a></li><li>运行构建脚本来创建pip包:。/oss_scripts/run_build.sh这一步之后，应该会有一个*。当前目录中的whl文件。文件名类似tensor flow _ text-2 . 5 . 0 rc0-cp38-cp38-Linux _ x86 _ 64 . whl。</li><li>将软件包安装到环境:pip install。/tensor flow _ text-*-*-*-OS _ platform . whl</li></ul>
+
+
+
+<p><strong>教程:</strong></p>
+
+
+
+<p>文本预处理</p>
+
+
+
+
+
+
+
+<p>文本分类</p>
+
+
+
+
+
+
+
+<p>文本生成</p>
+
+
+
+
+
+
+
+<h3><a href="https://web.archive.org/web/20221206052610/https://snorkel.readthedocs.io/en/v0.9.7/" target="_blank" rel="noreferrer noopener nofollow">通气管</a> (4.7k GitHub stars)</h3>
+
+
+
+<p>数据标记工具，您可以以编程方式标记、构建和管理培训数据。通气管管道的第一组件包括标记函数，其被设计为弱启发式函数，在给定未标记数据的情况下预测标记。</p>
+
+
+
+<p>特点:</p>
+
+
+
+<ul><li>它支持Tensorflow/Keras、Pytorch、Spark、Dask和Scikit-Learn。</li><li>它提供了用于标记、分析、预处理、切片、映射、实用程序和分类的API。</li></ul>
+
+
+
+<p><strong>安装:</strong></p>
+
+
+
+<p>通气管需要Python 3.6或更高版本。</p>
+
+
+
+<p><strong>使用画中画(推荐)</strong></p>
+
+
+
+<pre class="hljs">pip install snorkel
+</pre>
+
+
+
+<p><strong>使用康达</strong></p>
+
+
+
+<pre class="hljs">conda install snorkel -c conda-forge
+</pre>
+
+
+
+<p>请注意:如果你使用的是Windows，强烈推荐使用Docker ( <a href="https://web.archive.org/web/20221206052610/https://github.com/snorkel-team/snorkel-tutorials/blob/master/Dockerfile" target="_blank" rel="noreferrer noopener nofollow">教程示例</a>)或<a href="https://web.archive.org/web/20221206052610/https://docs.microsoft.com/en-us/windows/wsl/faq" target="_blank" rel="noreferrer noopener nofollow"> Linux子系统</a>。</p>
+
+
+
+<p><strong>教程:</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+<p>Lingvo是一个在Tensorflow中构建神经网络的框架，尤其是序列模型。</p>
+
+
+
+<p><strong>tensorlow lingvo特征:</strong></p>
+
+
+
+<ul><li>Lingvo支持自然语言处理(NLP)任务，但它也适用于用于图像分割和点云分类等任务的模型。</li><li>Lingvo可用于训练“生产规模”数据集。</li><li>Lingvo为同步和异步分布式训练提供了额外的支持。</li><li>量化支持已经直接内置到Lingvo框架中。</li></ul>
+
+
+
+<p><strong>安装:</strong></p>
+
+
+
+<p><strong>使用画中画</strong>:</p>
+
+
+
+<pre class="hljs">pip3 install lingvo
+</pre>
+
+
+
+<p><strong>从源安装</strong>:</p>
+
+
+
+<p>检查您是否满足以下先决条件</p>
+
+
+
+<ul><li>系统上安装的TensorFlow 2.5</li><li>C++编译器(官方仅支持g++ 7.3)</li><li>巴泽尔建筑系统。</li></ul>
+
+
+
+<p>参考<a href="https://web.archive.org/web/20221206052610/https://github.com/tensorflow/lingvo/blob/master/docker/dev.dockerfile" target="_blank" rel="noreferrer noopener nofollow"> docker/dev.dockerfile </a>了解一组工作要求。</p>
+
+
+
+<p>现在，git克隆存储库，然后使用bazel直接构建和运行目标。codelab中的python -m模块命令需要映射到bazel run命令上。</p>
+
+
+
+<p><strong>使用docker </strong>:</p>
+
+
+
+<p>Docker配置可用于这两种情况。可以在每个文件顶部的注释中找到说明。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206052610/https://github.com/tensorflow/lingvo/blob/master/docker/lib.dockerfile" target="_blank" rel="noreferrer noopener nofollow"> lib.dockerfile </a>预装了Lingvo pip包。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206052610/https://github.com/tensorflow/lingvo/blob/master/docker/dev.dockerfile" target="_blank" rel="noreferrer noopener nofollow"> dev.dockerfile </a>可用于从源代码构建Lingvo。</p>
+
+
+
+<p><strong>教程:</strong></p>
+
+
+
+
+
+
+
+<h3><a href="https://web.archive.org/web/20221206052610/https://github.com/explosion/spaCy" target="_blank" rel="noreferrer noopener nofollow">空间</a> (21k Github stars)</h3>
+
+
+
+<p>spaCy是Python和Cython中的高级自然语言处理库。它建立在最新的研究基础上，从第一天起就被设计用于真实的产品。</p>
+
+
+
+<p>spaCy带有预训练的管道，目前支持60多种语言的标记化和训练。它具有最先进的速度和神经网络模型，用于标记、解析、命名实体识别、文本分类等，多任务学习，具有像<a href="/web/20221206052610/https://neptune.ai/blog/bert-and-the-transformer-architecture-reshaping-the-ai-landscape" target="_blank" rel="noreferrer noopener"> BERT </a>这样预先训练的转换器，以及生产就绪的培训系统和简单的模型打包、部署和工作流管理。</p>
+
+
+
+<p><strong>特性:</strong></p>
+
+
+
+<ul><li>支持PyTorch、TensorFlow和其他框架中的定制模型。</li><li>支持60多种语言。</li><li>支持预先训练的单词向量和嵌入。</li><li>简单的模型打包、部署和工作流管理。</li><li>语言驱动的标记化。</li></ul>
+
+
+
+<p><strong>安装:</strong></p>
+
+
+
+<p>它支持macOS / OS X、Linux和Windows (Cygwin、MinGW、Visual Studio)。您还需要在系统上安装Python 3.6+版本(仅64位)。</p>
+
+
+
+<p><strong>使用画中画</strong></p>
+
+
+
+<p>在继续安装之前，请确保您的pip、setuptools和wheel是最新的。</p>
+
+
+
+<pre class="hljs">pip install -U pip setuptools wheel
+pip install spacy
+</pre>
+
+
+
+<p><strong>使用康达</strong></p>
+
+
+
+<pre class="hljs">conda install -c conda-forge spacy</pre>
+
+
+
+<p><strong>教程:</strong></p>
+
+
+
+
+
+
+
+<h2 id="h-flair-11k-github-stars"><a href="https://web.archive.org/web/20221206052610/https://github.com/flairNLP/flair" target="_blank" rel="noreferrer noopener nofollow">天赋</a> (11k GitHub明星)</h2>
+
+
+
+<p>Flair是最先进的NLP的简单框架。它允许您使用最先进的模型来完成NLP任务，如命名实体识别(NER)、词性标注(POS)、词义消歧和分类。它为<a href="https://web.archive.org/web/20221206052610/https://github.com/flairNLP/flair/blob/master/resources/docs/HUNFLAIR.md" target="_blank" rel="noreferrer noopener nofollow">生物医学数据</a>提供了特殊的支持，也支持数量迅速增长的语言。</p>
+
+
+
+<p><strong>天赋特性:</strong></p>
+
+
+
+<ul><li>它完全建立在Pytorch上，因此您可以轻松地构建和训练您的天赋模型。</li><li>最先进的自然语言处理模型，可以用于你的文本。</li><li>允许你用简单的接口组合不同的单词和文档嵌入。</li></ul>
+
+
+
+<p><strong>安装:</strong></p>
+
+
+
+<p>它要求你有Pytorch 1.5+，目前支持Python 3.6。<a href="https://web.archive.org/web/20221206052610/https://vsupalov.com/developing-with-python3-6-on-ubuntu-16-04/">下面是如何为Ubuntu 16.04 </a>。</p>
+
+
+
+<pre class="hljs">pip install flair
+</pre>
+
+
+
+<p><strong>教程:</strong></p>
+
+
+
+
+
+
+
+<h3>适用于您的NLP项目的开源MLOps工具–比较</h3>
+
+
+
+<p id="separator-block_61c9c5bcc93d7" class="block-separator block-separator--5"> </p>
+
+
+
+<section id="large-table-block_61c9bde861124" class="block-large-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+                <tr>
+                    <td class="c-item"/>
+
+                                            <td class="c-item">
+                            <p class="c-item__inner">Github stars</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">Windows操作系统</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">Linux操作系统</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">马科斯</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">Tensorflow</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">Pytorcht</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">其他框架</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">数据标记</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">数据预处理</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">模型开发</p>
+                        </td>
+                                            <td class="c-item">
+                            <p class="c-item__inner">模型部署</p>
+                        </td>
+                    
+                </tr>
+            </thead>
+        
+
+        <tbody class="c-table__body">
+
+                            
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 329 </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 11k </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 21k </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 2.3k </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 4.7k </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 770 </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong>第460章</strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 2.1k </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 2.3k </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                                                                        
+                    </tr>
+
+                
+                    <tr class="c-row">
+
+                                                                                                                    
+                                    <td class="c-ceil c-ceil--first">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner"><strong> 3.5k </strong></p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">
+                                        <p class="c-ceil__inner">                                                                                                                                                                                                                                                                           </p>
+                                    </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                    
+                                    <td class="c-ceil">                                                                              </td>
+
+                                                                                                                        
+                    </tr>
+
+                            
+        </tbody>
+
+    </table>
+
+</section>
+
+
+
+<h2 id="service">NLP项目的最佳MLOps即服务工具</h2>
+
+
+
+
+
+
+
+<p>Neuro MLOps platform为您提供成功的大规模ML开发所需的基础设施和流程的完整解决方案和管理。它提供完整的MLOps生命周期，包括数据收集、模型开发、模型培训、<a href="/web/20221206052610/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>、部署和监控。Neu.ro为成功的大规模ML开发提供基础设施和流程的管理。</p>
+
+
+
+<p><strong>设置</strong></p>
+
+
+
+<p>装置</p>
+
+
+
+<p>建议首先创建一个新的虚拟环境。它要求您安装Python 3.7。</p>
+
+
+
+<pre class="hljs">pip install -U neuromation
+</pre>
+
+
+
+<p>或者</p>
+
+
+
+<pre class="hljs">&lt;pre <span class="hljs-class"><span class="hljs-keyword">class</span>="<span class="hljs-title">hljs</span>" <span class="hljs-title">style</span>="<span class="hljs-title">display</span>:</span> block; overflow-x: auto; padding: <span class="hljs-number">0.5</span>em; color: rgb(<span class="hljs-number">51</span>, <span class="hljs-number">51</span>, <span class="hljs-number">51</span>); background: rgb(<span class="hljs-number">248</span>, <span class="hljs-number">248</span>, <span class="hljs-number">248</span>);<span class="hljs-string">"&gt;pip install -U neuromation
+&lt;/pre&gt;</span></pre>
+
+
+
+<p><strong>如何:</strong></p>
+
+
+
+<ul><li>在neu.ro注册</li><li>使用webUI或CLI上传数据</li><li>设置开发环境(允许您使用GPU)</li><li>训练模型或下载预训练模型</li><li>运行笔记本(Jupyter)</li></ul>
+
+
+
+<p>看看这本<a href="https://web.archive.org/web/20221206052610/https://github.com/neuro-inc/cookbook" target="_blank" rel="noreferrer noopener nofollow"> ML食谱</a>来帮助你开始一个NLP项目。</p>
+
+
+
+
+
+
+
+<p>AutoNLP提供了一种自动训练最先进的NLP模型的方法，与拥抱脸生态系统无缝集成，并自动将其部署在可扩展的环境中。这是一种为不同任务训练、评估和部署最先进的NLP模型的自动化方式。它会根据您提供的数据集自动调整部署的工作模型。</p>
+
+
+
+<p><strong>设置</strong></p>
+
+
+
+<p>安装:</p>
+
+
+
+<p>要使用画中画:</p>
+
+
+
+<pre class="hljs">pip install -U autonlp
+</pre>
+
+
+
+<p>请注意:您需要安装git lfs来使用cli</p>
+
+
+
+<p><strong>如何:</strong></p>
+
+
+
+<ul><li>登录您的帐户</li><li>创建新模型</li><li>上传数据集</li><li>训练你的自动模型</li><li>跟踪模型进度</li><li>做预测</li><li>部署您的模型</li></ul>
+
+
+
+<p>查看<a href="https://web.archive.org/web/20221206052610/https://huggingface.co/docs/autonlp/" target="_blank" rel="noreferrer noopener nofollow"> AutoNLP文档</a>了解您的具体使用案例。</p>
+
+
+
+
+
+
+
+<p>Neptune跟踪机器学习实验，存储您的模型的元数据(日志度量、性能图表、视频、音频、文本、记录数据探索)，提供一个模型注册表，您可以在其中版本化、存储并让您随时查询您的模型，并为您的团队提供一种有效的协作方式。Neptune允许您定制UI并管理本地环境或云环境中的用户。</p>
+
+
+
+<p><strong>设置</strong></p>
+
+
+
+<p>装置</p>
+
+
+
+<pre class="hljs">pip install neptune-client</pre>
+
+
+
+<p>如何记录您的项目元数据，</p>
+
+
+
+<ul><li>创建一个海王星账户</li><li>在海王星上创建一个新项目</li></ul>
+
+
+
+<p>在代码编辑器中，</p>
+
+
+
+<ul><li>用您的api令牌初始化一次运行，并记录您想要的模型元数据。</li><li>运行您的代码，您在Neptune上的项目将自动更新！</li></ul>
+
+
+
+<p>查看Neptune <a href="https://web.archive.org/web/20221206052610/https://docs.neptune.ai/" target="_blank" rel="noreferrer noopener nofollow">文档</a>,探索更多内容，无风险运行您的实验！</p>
+
+
+
+
+
+
+
+
+
+
+
+<p>DataRobot现在已经收购了Algorithmia，它是一个平台，可以大规模地自动化构建、部署和维护机器学习(ML)和人工智能(AI)的端到端流程。它是一个无代码的应用构建器，是一个您可以在生产中部署、监控、管理和治理所有模型的平台，无论它们是如何创建的，何时何地部署的。</p>
+
+
+
+<p><strong>设置</strong></p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206052610/https://github.com/datarobot-community/quickstart-guide">安装</a></p>
+
+
+
+<ul><li>它目前支持python 2.7和&gt; =3.4</li></ul>
+
+
+
+<pre class="hljs">pip3 install datarobot
+</pre>
+
+
+
+
+
+
+
+<pre class="hljs">pip3 install requests requests-toolbelt
+</pre>
+
+
+
+<p><strong>如何创建新项目:</strong></p>
+
+
+
+<ul><li>登录您的帐户</li><li>安装依赖项</li><li>加载并分析您的数据</li><li>开始建模</li><li>审查和解释模型</li><li>部署模型</li><li>选择应用程序</li></ul>
+
+
+
+<p>查看此<a href="https://web.archive.org/web/20221206052610/https://community.datarobot.com/t5/knowledge-base/automated-machine-learning-automl-walkthrough/ta-p/4825" target="_blank" rel="noreferrer noopener nofollow">文档</a>了解如何使用这些步骤的正确演练。</p>
+
+
+
+
+
+
+
+
+
+
+
+<p>它有助于您简化和实施生产机器学习模型的工具最佳实践。它是一个可扩展的框架，为AWS ML服务和第三方服务提供管理ML管道的标准接口。解决方案模板允许您上传训练好的模型，配置管道的编排，并监控管道操作。它允许您利用预先配置的ML管道，还可以自动部署带有推理端点的训练模型。</p>
+
+
+
+<p><strong>如何设置新项目:</strong></p>
+
+
+
+<ul><li>登录您的AWS帐户</li><li>创建新的pagemaker工作室</li><li>创建新项目</li><li>选择所需的MLOps架构(开发、评估或部署)。</li><li>将数据添加到AWS S3时段</li><li>创建管道和培训文件。</li></ul>
+
+
+
+<p>查看此<a href="https://web.archive.org/web/20221206052610/https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-projects-walkthrough.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>了解如何建立一个新项目。你也可以看看这篇关于如何创建一个简单项目的<a href="https://web.archive.org/web/20221206052610/https://towardsdatascience.com/a-practical-guide-to-mlops-in-aws-sagemaker-part-i-1d28003f565" target="_blank" rel="noreferrer noopener nofollow">教程</a>。</p>
+
+
+
+
+
+
+
+<p>Azure MLOps允许您通过端到端的沿袭跟踪来试验、开发和将模型部署到生产中。它允许您创建可复制的ML管道，可重用的软件环境，从任何地方部署模型，管理ML生命周期，并密切监视生产中的模型的任何问题。它允许您使用管道自动化端到端的ML生命周期，这允许您更新模型、测试新模型，并持续部署新的ML模型。</p>
+
+
+
+<p><strong>设置</strong></p>
+
+
+
+<p>装置</p>
+
+
+
+<p>你需要安装<a href="https://web.archive.org/web/20221206052610/https://docs.microsoft.com/en-us/cli/azure/install-azure-cli" target="_blank" rel="noreferrer noopener nofollow"> Azure CLI </a></p>
+
+
+
+<p><strong>如何:</strong></p>
+
+
+
+<ul><li>登录到<a href="https://web.archive.org/web/20221206052610/http://dev.azure.com/" target="_blank" rel="noreferrer noopener nofollow"> Azure devops </a></li><li>创建新项目</li><li>导入项目存储库</li><li>设置项目环境</li><li>创建管道</li><li>培训和部署模型</li><li>设置持续集成管道</li></ul>
+
+
+
+<p>查看此<a href="https://web.archive.org/web/20221206052610/https://benalexkeen.com/creating-end-to-end-mlops-pipelines-using-azure-ml-and-azure-pipelines-part-7/" target="_blank" rel="noreferrer noopener nofollow">文档</a>了解如何进行这些流程</p>
+
+
+
+
+
+
+
+<p>Vertex AI是一个机器学习平台，你可以在一个地方访问所有的谷歌云服务，以部署和维护AI模型。它将构建ML的Google云服务整合在一个统一的UI和API下。您可以使用Vertex AI通过AutoML或您的自定义代码轻松训练和比较模型，并将所有模型存储在一个中央模型库中。</p>
+
+
+
+<p><strong>设置</strong></p>
+
+
+
+<p>装置</p>
+
+
+
+<p>你可以使用谷歌云控制台和云外壳，或者在你的系统中安装T2云软件开发工具包。</p>
+
+
+
+<p><strong>如何创建新项目(使用云壳):</strong></p>
+
+
+
+<ul><li>登录您的<a href="https://web.archive.org/web/20221206052610/https://console.cloud.google.com/freetrial" target="_blank" rel="noreferrer noopener nofollow">账户</a></li><li>创建新项目(确保为您的帐户启用了计费)</li><li>激活云壳</li><li>创建一个存储桶</li><li>训练你的模型</li><li>部署到谷歌云</li></ul>
+
+
+
+<p>查看此<a href="https://web.archive.org/web/20221206052610/https://cloud.google.com/vertex-ai/docs/tutorials" target="_blank" rel="noreferrer noopener nofollow">文档</a>以获得如何遵循这些步骤的演练。</p>
+
+
+
+
+
+
+
+<h3>NLP项目的MLOps即服务工具—比较</h3>
+
+
+
+<p id="separator-block_61b20ca221dcc" class="block-separator block-separator--10"> </p>
+
+
+
+<div id="medium-table-block_61b20ca921dcd" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">数据收集和管理</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">数据准备和特征工程</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">模型培训和部署</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">模型监控和实验跟踪</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">ML元数据存储</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">模型注册和管理</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_610be96520098" class="block-separator block-separator--15">结论</p>
+
+
+
+<h2 id="h-conclusion">我已经谈到了为什么您需要MLOps，以及如何为您的项目选择一个好的工具。我还列出了一些NLP MLOps工具，并强调了一些很酷的特性。不确定要试用哪种工具？查看我做的对照表，看看哪个最适合你的项目。我希望你尝试一些列出的工具，并让我知道你的想法。感谢阅读！</h2>
+
+
+
+<p>附加参考</p>
+
+
+
+<h2 id="h-additional-references">Additional references</h2>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

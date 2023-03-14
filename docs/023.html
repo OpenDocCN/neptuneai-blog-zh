@@ -1,0 +1,584 @@
+<html>
+<head>
+<title>4 Ways Machine Learning Teams Use CI/CD in Production </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>机器学习团队在生产中使用CI/CD的4种方式</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/ways-ml-teams-use-ci-cd-in-production#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/ways-ml-teams-use-ci-cd-in-production#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p><a href="https://web.archive.org/web/20220926093601/https://en.wikipedia.org/wiki/DevOps" target="_blank" rel="noreferrer noopener nofollow"> DevOps </a>中的一个核心概念现在正在走向机器学习操作(<a href="/web/20220926093601/https://neptune.ai/blog/mlops" target="_blank" rel="noreferrer noopener"> MLOps </a>)是CI/CD——持续集成和持续交付或持续部署。CI/CD作为核心DevOps实践，包含了通过简化应用程序的构建、测试和生产部署来可靠地交付软件应用程序的工具和方法。让我们在下面定义这些概念:</p>
+
+
+
+
+<div class="custom-point-list">
+<ul><li><a href="https://web.archive.org/web/20220926093601/https://en.wikipedia.org/wiki/Continuous_delivery" target="_blank" rel="noreferrer noopener nofollow">连续交付</a> (CD)是将每个构建部署到类似生产的环境中，并在部署之前执行应用程序的自动化集成和测试的实践。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li><a href="https://web.archive.org/web/20220926093601/https://en.wikipedia.org/wiki/Continuous_deployment" target="_blank" rel="noreferrer noopener nofollow">持续部署</a> (CD)通过将应用程序的配置和部署自动化到生产环境，补充了额外步骤的持续集成。</li></ul>
+</div>
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img data-attachment-id="60701" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/blog/ways-ml-teams-use-ci-cd-in-production/attachment/ci-vs-cd-vs-cd" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?fit=1920%2C1080&amp;ssl=1" data-orig-size="1920,1080" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="CI-vs-CD-vs-CD" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?fit=1024%2C576&amp;ssl=1" src="../Images/825565c3cd2e591d422547646a545f7f.png" alt="Continuous Integration vs Continuous Delivery vs Continuous Deployment" class="wp-image-60701 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?resize=1024%2C576&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?resize=1024%2C576&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60701" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/blog/ways-ml-teams-use-ci-cd-in-production/attachment/ci-vs-cd-vs-cd" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?fit=1920%2C1080&amp;ssl=1" data-orig-size="1920,1080" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="CI-vs-CD-vs-CD" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?fit=1024%2C576&amp;ssl=1" src="../Images/825565c3cd2e591d422547646a545f7f.png" alt="Continuous Integration vs Continuous Delivery vs Continuous Deployment" class="wp-image-60701" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/CI-vs-CD-vs-CD.png?resize=1024%2C576&amp;ssl=1"/></noscript><figcaption><em>Continuous Integration vs Continuous Delivery vs Continuous Deployment | <a href="https://web.archive.org/web/20220926093601/https://www.atlassian.com/continuous-delivery/principles/continuous-integration-vs-delivery-vs-deployment" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>过去几年开发的大多数CI/CD工具都是为传统软件应用程序而专门构建的。您(可能)知道，开发和部署传统软件应用程序与构建和部署机器学习(ML)应用程序在许多方面<a href="https://web.archive.org/web/20220926093601/https://medium.com/@hockchiye.er/conventional-software-vs-machine-learning-application-a-testers-perspective-7bf5a38669d2" target="_blank" rel="noreferrer noopener nofollow"/>有很大不同。这些问题就变成了:</p>
+
+
+<div class="custom-point-list">
+<ul><li>ML团队如何采用现有的CI/CD工具来适应他们的机器学习用例？</li><li>有没有更好的专门为ML应用程序构建的选项？</li></ul>
+</div>
+
+
+<p>在本文中，您将了解4个不同的团队如何使用或已经使用CI/CD概念、工具和技术来构建和部署他们的机器学习应用程序。本文的目的是从这些团队实施的不同解决方案(包括其使用案例)中，为您提供CI/CD使用的广阔视角。</p>
+
+
+
+<h2 id="continuous-integration-and-delivery-ci-cd-for-machine-learning-ml-with-azure-devops">使用Azure DevOps为机器学习(ML)提供持续集成和交付(CI/CD)</h2>
+
+
+
+<p>在本节中，我们将介绍一个团队的工作流程，该团队在<a href="https://web.archive.org/web/20220926093601/https://azure.microsoft.com/en-us/services/devops/" target="_blank" rel="noreferrer noopener nofollow"> Azure DevOps </a>中为其机器学习工作负载编排CI/CD流程。他们的机器学习工作负载大多运行在<a href="https://web.archive.org/web/20220926093601/https://azure.microsoft.com/en-us/" target="_blank" rel="noreferrer noopener nofollow"> Azure Cloud </a>上。</p>
+
+
+
+<p><em>感谢</em><a href="https://web.archive.org/web/20220926093601/https://www.linkedin.com/in/emmanuelraj7/" target="_blank" rel="noreferrer noopener nofollow"><em>Emmanuel Raj</em></a><em>接受我的采访，介绍他的团队如何为他们的ML工作负载进行CI/CD。这一部分利用了采访中Emmanuel的回答和他关于MLOps的非常实用的书；</em> <a href="https://web.archive.org/web/20220926093601/https://www.amazon.com/gp/product/1800562888/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=1800562888&amp;linkCode=as2&amp;tag=aischool-20&amp;linkId=be8ff7bb86db916ab514294d387c3c8c" target="_blank" rel="noreferrer noopener nofollow"> <em>【工程机器学习运算】</em> </a> <em>。</em></p>
+
+
+
+<h3 id="industry">工业</h3>
+
+
+
+<p>零售和消费品。</p>
+
+
+
+<h3 id="use-case">用例</h3>
+
+
+
+<p>这个团队帮助零售客户使用机器学习以自动化的方式解决问题。当用户提出票证或票证由维护问题产生时，机器学习用于将票证分类为不同的类别，帮助更快地解决票证问题。</p>
+
+
+
+
+
+
+
+
+
+<h3 id="overview">概观</h3>
+
+
+
+<p>为了协调他们的CI/CD工作流，团队使用了Azure DevOps <a href="https://web.archive.org/web/20220926093601/https://azure.microsoft.com/en-in/solutions/devops/#products" target="_blank" rel="noreferrer noopener nofollow">产品套件</a>。他们还为ML工作负载配置了开发和生产环境。这些工作流由所有CI/CD流程组成，这些流程发生在将模型部署到生产之前的<strong>和部署</strong>之后的<strong>。</strong></p>
+
+
+
+
+
+<h3 id="ci-cd-workflow-before-deploying-the-model-to-production">将模型部署到生产之前的CI/CD工作流</h3>
+
+
+
+
+<div class="custom-point-list">
+<ol start="2"><li>使用<a href="https://web.archive.org/web/20220926093601/https://docs.microsoft.com/en-in/azure/devops/pipelines/build/triggers?view=azure-devops#classic-release-pipelines" target="_blank" rel="noreferrer noopener nofollow">发布管道</a>将工件部署到基础设施目标。在开发环境中测试之后，发布管道将工件转移到<a href="https://web.archive.org/web/20220926093601/https://medium.com/globant/designing-a-qa-strategy-for-a-machine-learning-application-c3a577926686" target="_blank" rel="noreferrer noopener nofollow">质量保证</a>(或QA)阶段。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="3"><li><strong>模型测试发生在QA阶段</strong>，团队在模型服务上执行<a href="https://web.archive.org/web/20220926093601/https://netflixtechblog.com/what-is-an-a-b-test-b08cc1b57962" target="_blank" rel="noreferrer noopener nofollow"> A/B测试</a>和<a href="https://web.archive.org/web/20220926093601/https://en.wikipedia.org/wiki/Stress_testing_(software)#:~:text=Stress%20testing%20is%20a%20software,for%20all%20types%20of%20software." target="_blank" rel="noreferrer noopener nofollow">压力测试</a>，以确保模型准备好部署到生产环境。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="4"><li>人类验证者，通常是产品所有者，确保模型通过测试，已经被验证，然后批准模型使用发布管道被部署到生产环境中。</li></ol>
+</div>
+
+
+<h3 id="ci-cd-workflow-after-deploying-the-model-to-production">将模型部署到生产后的CI/CD工作流</h3>
+
+
+<div class="custom-point-list">
+<ol><li>在将模型部署到生产中后，团队<strong>设置cron作业</strong>(作为其CI/CD管道的一部分)，每周监控<a href="https://web.archive.org/web/20220926093601/https://docs.evidentlyai.com/reports/data-drift" target="_blank" rel="noreferrer noopener nofollow">数据漂移</a>和<a href="https://web.archive.org/web/20220926093601/https://neptune.ai/blog/concept-drift-best-practices" target="_blank" rel="noreferrer noopener nofollow">概念漂移</a>的模型指标，以便当出现需要重新训练模型的不可接受的漂移时，管道可以被<a href="https://web.archive.org/web/20220926093601/https://docs.microsoft.com/en-in/azure/devops/pipelines/process/scheduled-triggers?view=azure-devops&amp;tabs=yaml" target="_blank" rel="noreferrer noopener nofollow">触发</a>。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="2"><li>他们还通过检查Azure DevOps管道中的管道版本来监控生产中CI/CD管道的性能。检查的目的是确保他们的CI/CD管道处于健康和稳定的状态。他们在检查CI/CD渠道时遵循的指导方针包括:</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ul><li>定期审核系统日志和事件。</li><li>集成自动化验收测试。</li><li>需要拉请求来改变管道。</li><li>在将每个故事或功能添加到管道之前，对它们进行同行代码评审。</li><li>定期报告对团队所有成员可见的指标。</li></ul>
+</div>
+
+
+<p>总而言之，Azure DevOps为团队提供了一套有用的工具，使开发(机器学习；模型构建)和运营团队和谐地工作。</p>
+
+
+
+<h2 id="continuous-integration-and-delivery-ci-cd-for-ml-with-gitops-using-jenkins-and-argo-workflows">使用Jenkins和Argo工作流实现ML与GitOps的持续集成和交付(CI/CD)</h2>
+
+
+
+<p>在本节中，您将了解一个团队如何能够创建一个框架来编排他们的机器学习工作流，并使用<a href="https://web.archive.org/web/20220926093601/https://www.gitops.tech/" target="_blank" rel="noreferrer noopener nofollow"> GitOps </a>运行CI/CD管道。</p>
+
+
+
+<p>感谢格林斯团队前ML工程师<a href="https://web.archive.org/web/20220926093601/https://www.linkedin.com/in/twolodzko/" target="_blank" rel="noreferrer noopener nofollow"><em>Tymoteusz Wolodzko</em></a><em>接受我的采访。本节利用了Tymoteusz在采访中得到的回复以及他在Neptune.ai博客上发表的</em> <a href="/web/20220926093601/https://neptune.ai/blog/mlops-at-greensteam-shipping-machine-learning-case-study" target="_blank" rel="noreferrer noopener"> <em>案例研究博文</em> </a> <em>。</em></p>
+
+
+
+<h3 id="industry">工业</h3>
+
+
+
+<p>计算机软件</p>
+
+
+
+<h3 id="use-case">用例</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20220926093601/https://www.greensteam.com/" target="_blank" rel="noreferrer noopener nofollow">greens team</a>–一家i4 Insight公司为海洋行业提供软件解决方案，帮助减少燃料消耗。过量使用燃料既费钱又对环境有害，T2国际海事组织要求船只经营者更加环保，到2050年减少50%的二氧化碳排放量。</p>
+
+
+
+
+
+
+
+
+
+<h3 id="overview">概观</h3>
+
+
+
+<p>为了实现CI/CD，团队利用Jenkins运行代码质量检查的<a href="https://web.archive.org/web/20220926093601/https://www.gitops.tech/" target="_blank" rel="noreferrer noopener nofollow"> GitOps </a>和在测试环境中使用类似生产运行的冒烟测试。团队有一个模型代码的单一管道，每个拉请求都经过代码审查和自动化的<a href="https://web.archive.org/web/20220926093601/https://en.wikipedia.org/wiki/Unit_testing" target="_blank" rel="noreferrer noopener nofollow">单元测试</a>。</p>
+
+
+
+<p>拉取请求还经过了自动化的<a href="https://web.archive.org/web/20220926093601/https://en.wikipedia.org/wiki/Smoke_testing_(software)" target="_blank" rel="noreferrer noopener nofollow">冒烟测试</a>，在测试中，他们训练模型并进行预测，在一小块真实数据上运行整个端到端管道，以确保管道的每个阶段都按照预期运行，不会出现任何问题。</p>
+
+
+
+<p>对于模型的连续交付，在训练每个模型之后，生成模型质量报告，并且在它们最终被手动部署之前，由领域专家通过手动过程进行审查，在得到领域专家的验证并且通过所有先前的检查之后。</p>
+
+
+
+<h3 id="understanding-gitops">了解GitOps</h3>
+
+
+
+<p>GitOps在一些常见的<a href="https://web.archive.org/web/20220926093601/https://www.devopsagileskills.org/dasa-devops-principles/" target="_blank" rel="noreferrer noopener nofollow"> DevOps原则</a>、<a href="https://web.archive.org/web/20220926093601/https://www.netapp.com/devops-solutions/what-is-devops/" target="_blank" rel="noreferrer noopener nofollow">实践</a>和<a href="https://web.archive.org/web/20220926093601/https://www.guru99.com/devops-tools.html#:~:text=DevOps%20Tool%20is%20an%20application%20that%20helps%20automate%20the%20software%20development%20process.&amp;text=DevOps%20tool%20also%20enables%20teams,and%20helps%20reduce%20manual%20efforts." target="_blank" rel="noreferrer noopener nofollow">工具</a>之上应用了以Git为中心的方法。在GitOps中，存储在存储库中的代码和配置被认为是事实的来源，其中基础设施适应代码的变化。GitOps帮助他们在亚马逊EKS以团队要求的速度交付管道，没有运营问题。</p>
+
+
+
+<h3 id="code-quality-checks-and-using-jenkins-to-manage-the-ci-pipeline">代码质量检查和使用Jenkins管理CI渠道</h3>
+
+
+
+<p>Jenkins是开发人员中最流行的持续集成工具之一。该团队采用Jenkins进行持续集成，以使他们的测试、检查和评审套件更加高效。</p>
+
+
+<div class="custom-point-list">
+<ol><li>为了保持代码质量的一致性，他们把所有的代码检查都移到了包含模型代码的<a href="https://web.archive.org/web/20220926093601/https://www.docker.com/" target="_blank" rel="noreferrer noopener nofollow"> Docker </a>容器中，这样包括<a href="https://web.archive.org/web/20220926093601/https://pypi.org/project/flake8/" target="_blank" rel="noreferrer noopener nofollow"> flake8 </a>、<a href="https://web.archive.org/web/20220926093601/https://pypi.org/project/black/" target="_blank" rel="noreferrer noopener nofollow"> black </a>、<a href="https://web.archive.org/web/20220926093601/http://mypy-lang.org/" target="_blank" rel="noreferrer noopener nofollow"> mypy </a>、<a href="https://web.archive.org/web/20220926093601/https://pytest.org/" target="_blank" rel="noreferrer noopener nofollow"> pytest </a>在内的代码质量检查工具的版本和配置都统一了。这也帮助他们将本地开发设置与他们在Jenkins上使用的相统一。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="2"><li>Docker确保他们不再有不同版本的依赖关系的问题，这些问题可能会导致本地和Jenkins或生产中的不同结果。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="3"><li>对于本地开发，他们有一个<a href="https://web.archive.org/web/20220926093601/https://makefiletutorial.com/" target="_blank" rel="noreferrer noopener nofollow"> Makefile </a>来构建<a href="https://web.archive.org/web/20220926093601/https://docs.docker.com/engine/reference/commandline/images/" target="_blank" rel="noreferrer noopener nofollow"> Docker映像</a>并对代码运行所有的检查和测试。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="4"><li>对于代码审查，他们设置了Jenkins，它作为CI管道的一部分运行相同的检查。</li></ol>
+</div>
+
+
+<h3 id="using-argo-to-manage-ci-cd-pipelines">使用Argo管理CI/CD管道</h3>
+
+
+
+<p>该团队需要在不同的场景中针对不同客户的多个数据集测试他们的模型。正如Tymoteusz Wolodzko 在他的<a href="/web/20220926093601/https://neptune.ai/blog/mlops-at-greensteam-shipping-machine-learning-case-study" target="_blank" rel="noreferrer noopener"> explainer博客帖子</a>中承认的那样，这不是他们想要手动设置和运行的东西。</p>
+
+
+
+<p>他们需要能够轻松插入生产环境的流程编排和自动化管道。对他们的ML代码进行Dockerizing使得跨不同环境移动应用程序变得容易，这包括生产环境。</p>
+
+
+
+<p>对于编排，团队从<a href="https://web.archive.org/web/20220926093601/https://airflow.apache.org/" target="_blank" rel="noreferrer noopener nofollow">气流</a>切换到<a href="https://web.archive.org/web/20220926093601/https://argoproj.github.io/workflows/" target="_blank" rel="noreferrer noopener nofollow"> Argo工作流</a>，因此插入他们的容器只是写几行YAML代码的问题。</p>
+
+
+
+<p>Argo Workflows &amp; Pipelines是一个开源的容器原生工作流引擎，用于在Kubernetes上编排并行作业。这是一个完全为Kubernetes设计的云原生解决方案。您可以定义管道工作流，其中各个步骤被视为一个容器。</p>
+
+
+
+<p>Argo工作流允许团队在其亚马逊EKS集群上轻松运行机器学习或数据处理的计算密集型作业。流水线中的模型将根据预定的任务定期进行再训练，并接受必要的测试和检查。但是在部署模型之前，它们要经过领域专家的审查和审计。一旦专家确认模型适合部署，那么模型将被手动部署。</p>
+
+
+
+<p>下图显示了团队针对ML工作负载的整个体系:</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?ssl=1" target="_blank" rel="noopener" data-lbwps-width="1701" data-lbwps-height="750" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png"><img data-attachment-id="43006" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/blog/mlops-at-greensteam-shipping-machine-learning-case-study/attachment/greensteam-mlops-toolstack_1" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?fit=1701%2C750&amp;ssl=1" data-orig-size="1701,750" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GreenSteam-MLOPs-toolstack_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?fit=300%2C132&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?fit=1024%2C451&amp;ssl=1" src="../Images/0b6e9156723fa08f4306a9500a3b2e5c.png" alt="GreenSteam-MLOPs-toolstack_1" class="wp-image-43006 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?resize=1024%2C451&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?resize=1024%2C451&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="43006" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/blog/mlops-at-greensteam-shipping-machine-learning-case-study/attachment/greensteam-mlops-toolstack_1" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?fit=1701%2C750&amp;ssl=1" data-orig-size="1701,750" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GreenSteam-MLOPs-toolstack_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?fit=300%2C132&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?fit=1024%2C451&amp;ssl=1" src="../Images/0b6e9156723fa08f4306a9500a3b2e5c.png" alt="GreenSteam-MLOPs-toolstack_1" class="wp-image-43006" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GreenSteam-MLOPs-toolstack_1.png?resize=1024%2C451&amp;ssl=1"/></noscript></a><figcaption><em>MLOps technological stack at GreenSteams | <a href="/web/20220926093601/https://neptune.ai/blog/mlops-at-greensteam-shipping-machine-learning-case-study" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+<h2 id="continuous-integration-and-delivery-ci-cd-for-ml-with-aws-codepipeline-and-step-functions">ML与AWS代码管道和Step函数的持续集成和交付(CI/CD)</h2>
+
+
+
+<p>为了编排他们的CI/CD工作流，本节中的团队使用了<a href="https://web.archive.org/web/20220926093601/http://aws.amazon.com/codepipeline" target="_blank" rel="noreferrer noopener nofollow"> AWS代码管道</a>和<a href="https://web.archive.org/web/20220926093601/http://aws.amazon.com/step-functions" target="_blank" rel="noreferrer noopener nofollow"> AWS步骤功能</a>的组合，以确保他们正在构建一个自动化的MLOps管道。</p>
+
+
+
+<p><em>感谢</em> <a href="https://web.archive.org/web/20220926093601/https://www.linkedin.com/in/philipbasford/" target="_blank" rel="noreferrer noopener nofollow"> <em>菲尔·巴斯福德</em> </a> <em>让我采访他的团队如何为一个公开的ML用例做CI/CD。</em></p>
+
+
+
+<h3 id="industry">工业</h3>
+
+
+
+<p>运输和物流。</p>
+
+
+
+<h3 id="use-case">用例</h3>
+
+
+
+<p>对于这个用例，团队来自一家从事公共项目的咨询和专业服务公司。具体来说，他们构建了解决以下问题的机器学习应用程序:</p>
+
+
+<div class="custom-point-list">
+<ul><li>预测递送包裹需要多长时间，</li><li>基于非结构化地址数据预测位置，并将其解析到坐标系(纬度/经度)。</li></ul>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ul><li><a href="https://web.archive.org/web/20220926093601/http://aws.amazon.com/codebuild" target="_blank" rel="noreferrer noopener nofollow">AWS code build</a>–一个完全托管的持续集成服务，它编译源代码、运行测试并生成准备好部署的软件包。</li><li><a href="https://web.archive.org/web/20220926093601/http://aws.amazon.com/codepipeline" target="_blank" rel="noreferrer noopener nofollow">AWS code pipeline</a>–一项全面管理的持续交付服务，帮助您实现发布渠道的自动化。</li><li><a href="https://web.archive.org/web/20220926093601/http://aws.amazon.com/step-functions" target="_blank" rel="noreferrer noopener nofollow">AWS Step Functions</a>–一个无服务器的函数编排器，可以轻松对AWS Lambda函数和多个AWS服务进行排序。</li></ul>
+</div>
+
+
+<h3 id="overview">概观</h3>
+
+
+
+<p>AWS Cloud提供托管CI/CD工作流工具，如<a href="https://web.archive.org/web/20220926093601/https://aws.amazon.com/codepipeline/" target="_blank" rel="noreferrer noopener nofollow"> AWS CodePipeline </a>和<a href="https://web.archive.org/web/20220926093601/https://aws.amazon.com/step-functions/" target="_blank" rel="noreferrer noopener nofollow"> AWS Step Functions </a>，为他们的机器学习项目进行持续集成和持续交付。为了持续集成，团队使用<a href="https://web.archive.org/web/20220926093601/https://git-scm.com/" target="_blank" rel="noreferrer noopener nofollow"> git </a>向<a href="https://web.archive.org/web/20220926093601/https://aws.amazon.com/codecommit/" target="_blank" rel="noreferrer noopener nofollow"> AWS CodeCommit </a>提交，这将触发代码管道中的构建步骤(通过<a href="https://web.archive.org/web/20220926093601/https://aws.amazon.com/codebuild/" target="_blank" rel="noreferrer noopener nofollow"> AWS CodeBuild </a>作业)，AWS步骤功能处理来自代码管道的每个操作的工作流编排。</p>
+
+
+
+<h3 id="understanding-the-architecture">理解架构</h3>
+
+
+
+<p>AWS Step Functions的工作流编排流程使团队能够轻松管理因使用代码管道运行多个模型和管道而产生的复杂性。团队进行的多模型部署更易于管理和更新，因为CodePipeline中的每个管道作业都专注于一个过程，构建也更易于交付和故障排除。</p>
+
+
+
+<p>下面是一个使用AWS CodePipeline和Step函数来编排需要自定义容器的ML管道的项目示例。这里，CodePipeline调用步骤函数，并将容器图像URI和唯一容器图像标签作为参数传递给步骤函数:</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img data-attachment-id="60656" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/5-ways-ml-teams-use-ci-cd-in-production_3" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?fit=800%2C692&amp;ssl=1" data-orig-size="800,692" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="5 ways ML teams use CI CD in production_3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?fit=300%2C260&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?fit=800%2C692&amp;ssl=1" src="../Images/c2a29d3c03370be9b49ff774b269dd52.png" alt="Architecture to build a CI/CD pipeline for deploying custom machine learning models using AWS services" class="wp-image-60656 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?resize=800%2C692&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?resize=800%2C692&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60656" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/5-ways-ml-teams-use-ci-cd-in-production_3" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?fit=800%2C692&amp;ssl=1" data-orig-size="800,692" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="5 ways ML teams use CI CD in production_3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?fit=300%2C260&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?fit=800%2C692&amp;ssl=1" src="../Images/c2a29d3c03370be9b49ff774b269dd52.png" alt="Architecture to build a CI/CD pipeline for deploying custom machine learning models using AWS services" class="wp-image-60656" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_3.png?resize=800%2C692&amp;ssl=1"/></noscript><figcaption><em>Architecture to build a CI/CD pipeline for deploying custom machine learning models using AWS services | <a href="https://web.archive.org/web/20220926093601/https://aws.amazon.com/blogs/machine-learning/build-a-ci-cd-pipeline-for-deploying-custom-machine-learning-models-using-aws-services/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>你可以在这篇<a href="https://web.archive.org/web/20220926093601/https://aws.amazon.com/blogs/machine-learning/build-a-ci-cd-pipeline-for-deploying-custom-machine-learning-models-using-aws-services/" target="_blank" rel="noreferrer noopener nofollow">博客文章</a>中了解更多关于上述架构的信息。虽然这个团队选择使用这些工具来管理和编排，但值得注意的是，对于持续集成和持续交付(CI/CD)管道，AWS发布了<a href="https://web.archive.org/web/20220926093601/https://aws.amazon.com/sagemaker/pipelines/" target="_blank" rel="noreferrer noopener nofollow">亚马逊SageMaker Pipelines </a>，这是一种易于使用的、专门为ML设计的CI/CD服务。</p>
+
+
+
+<p>Pipelines是一个用于构建ML管道的本地工作流编排工具，它利用了SageMaker的直接集成。在这篇<a href="https://web.archive.org/web/20220926093601/https://aws.amazon.com/blogs/machine-learning/building-automating-managing-and-scaling-ml-workflows-using-amazon-sagemaker-pipelines/" target="_blank" rel="noreferrer noopener nofollow">博客文章</a>中，你可以了解更多关于使用Amazon SageMaker Pipelines构建、自动化、管理和扩展ML工作流的信息。</p>
+
+
+
+<h2 id="continuous-integration-and-delivery-ci-cd-for-ml-with-vertex-ai-and-tfx-on-google-cloud">在Google Cloud上使用Vertex AI和TFX为ML提供持续集成和交付(CI/CD)</h2>
+
+
+
+<p>在本节中，我们将了解一个团队，该团队能够在选择和使用工作流编排和管理工具时，利用比传统软件工程项目更适合机器学习项目的管道。</p>
+
+
+
+<p><em>本节利用</em> <a href="https://web.archive.org/web/20220926093601/https://www.linkedin.com/in/hanneshapke/" target="_blank" rel="noreferrer noopener nofollow"> <em>【汉尼斯】哈普克</em> </a> <em>【数字金融公司ML工程师】</em> <a href="https://web.archive.org/web/20220926093601/https://cloudonair.withgoogle.com/events/summit-ml-practitioners/watch?talk=t2_s3_rapid_iteration" target="_blank" rel="noreferrer noopener nofollow"> <em>工作坊</em> </a> <em>在Google Cloud的</em> <a href="https://web.archive.org/web/20220926093601/https://cloudonair.withgoogle.com/events/summit-ml-practitioners" target="_blank" rel="noreferrer noopener nofollow"> <em>应用ML在线峰会</em> </a> <em>期间关于“利用有限的DevOps资源进行快速迭代”。</em></p>
+
+
+
+<h3 id="industry">工业</h3>
+
+
+
+<p>商业智能和金融技术服务。</p>
+
+
+
+<h3 id="use-case">用例</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20220926093601/https://digits.com/" target="_blank" rel="noreferrer noopener nofollow">数字金融公司</a>。是一家金融科技公司，为初创公司和小型企业提供基于机器学习的可视化费用监控仪表板。他们的使用案例侧重于:</p>
+
+
+<div class="custom-point-list">
+<ol><li>为现代企业创建最强大的财务引擎，能够吸收公司的财务信息并将其转换为实时业务模型。</li><li>从非结构化文档中提取信息，为客户预测未来事件。</li><li>对信息进行聚类，找出对客户业务最重要的内容。</li></ol>
+</div>
+
+
+
+
+
+
+
+
+<h3 id="overview">概观</h3>
+
+
+
+<p>Digits的团队能够通过托管Vertex AI Pipelines产品和TensorFlow Extended来协调和管理其机器学习管道的持续集成、交付和部署，所有这些都在谷歌云基础设施上运行。</p>
+
+
+
+<p>在传统CI/CD工具上使用ML-native pipeline工具有助于团队确保模型质量的一致性，并确保模型在一个统一的管道中经历特征工程、模型评分、模型分析、模型验证和模型监控的标准工作流。</p>
+
+
+
+<h3 id="machine-learning-pipelines-with-tfx">TFX的机器学习管道</h3>
+
+
+
+<p>随着Tensorflow的扩展，当管道部署到测试环境或生产环境时，团队能够将机器学习堆栈的每个组件视为可由第三方工具编排的单独步骤，如<a href="https://web.archive.org/web/20220926093601/https://beam.apache.org/" target="_blank" rel="noreferrer noopener nofollow"> Apache Beam </a>、<a href="https://web.archive.org/web/20220926093601/https://airflow.apache.org/" target="_blank" rel="noreferrer noopener nofollow"> Apache Airflow </a>或<a href="https://web.archive.org/web/20220926093601/https://www.kubeflow.org/docs/components/pipelines/introduction/" target="_blank" rel="noreferrer noopener nofollow"> Kubeflow Pipelines </a>。他们还能够创建自定义组件并将其添加到管道中，而使用传统的CI/CD工具很难利用这些组件。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><img data-attachment-id="60654" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/5-ways-ml-teams-use-ci-cd-in-production_5" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?fit=1999%2C642&amp;ssl=1" data-orig-size="1999,642" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="5 ways ML teams use CI CD in production_5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?fit=300%2C96&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?fit=1024%2C329&amp;ssl=1" src="../Images/4d35a49d1085112cef7c2909fbda657c.png" alt="Machine Learning pipelines with TFX" class="wp-image-60654 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?resize=814%2C261&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?resize=814%2C261&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60654" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/5-ways-ml-teams-use-ci-cd-in-production_5" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?fit=1999%2C642&amp;ssl=1" data-orig-size="1999,642" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="5 ways ML teams use CI CD in production_5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?fit=300%2C96&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?fit=1024%2C329&amp;ssl=1" src="../Images/4d35a49d1085112cef7c2909fbda657c.png" alt="Machine Learning pipelines with TFX" class="wp-image-60654" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_5.png?resize=814%2C261&amp;ssl=1"/></noscript><figcaption><em>Machine learning pipelines with TFX | Adapted and modified from <a href="https://web.archive.org/web/20220926093601/https://learning.oreilly.com/library/view/building-machine-learning/9781492053187/" target="_blank" rel="noreferrer noopener nofollow">this source</a></em></figcaption></figure></div>
+
+
+<p>与此同时，他们还将他们的ML管道从Kubeflow转移到了来自<a href="https://web.archive.org/web/20220926093601/https://cloud.google.com/" target="_blank" rel="noreferrer noopener nofollow"> Google Cloud </a>的Vertex AI管道，帮助他们轻松地将模型开发(ML)和运营(Ops)结合到高性能和可复制的步骤中。</p>
+
+
+
+<p>使用该团队提供的Vertex AI管道的核心优势之一是，它帮助他们从管理管道(自托管Kubeflow管道)过渡到利用托管Vertex AI管道服务进行工作流编排，从而不再需要维护存储元数据的数据库，启动集群来托管和操作构建服务器和管道。</p>
+
+
+
+<h3 id="orchestrating-with-vertex-ai-pipelines">与顶点人工智能管道协调</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20220926093601/https://cloud.google.com/vertex-ai" target="_blank" rel="noreferrer noopener nofollow"> Vertex AI </a>是一个托管的ML平台，用于每个从业者加快实验速度，加速机器学习模型的部署。它通过以无服务器的方式编排ML工作流，并使用Vertex ML元数据存储工作流的工件，帮助团队自动化、监控和管理他们的ML系统。</p>
+
+
+
+<p>通过将ML工作流的工件存储在Vertex ML元数据中，他们可以分析其工作流工件的谱系，例如，ML模型的谱系可能包括团队用于创建模型的训练数据、超参数和代码。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><img data-attachment-id="60657" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/5-ways-ml-teams-use-ci-cd-in-production_2" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?fit=1999%2C1237&amp;ssl=1" data-orig-size="1999,1237" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="5 ways ML teams use CI CD in production_2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?fit=300%2C186&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?fit=1024%2C634&amp;ssl=1" src="../Images/4d0360512957ad0ec1aca169c751f840.png" alt="A screenshot of Vertex AI ML Pipeline orchestration from the Digits team" class="wp-image-60657 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?resize=803%2C497&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?resize=803%2C497&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60657" data-permalink="https://web.archive.org/web/20220926093601/https://neptune.ai/5-ways-ml-teams-use-ci-cd-in-production_2" data-orig-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?fit=1999%2C1237&amp;ssl=1" data-orig-size="1999,1237" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="5 ways ML teams use CI CD in production_2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?fit=300%2C186&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093601/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?fit=1024%2C634&amp;ssl=1" src="../Images/4d0360512957ad0ec1aca169c751f840.png" alt="A screenshot of Vertex AI ML Pipeline orchestration from the Digits team" class="wp-image-60657" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926093601im_/https://i0.wp.com/neptune.ai/wp-content/uploads/5-ways-ML-teams-use-CI-CD-in-production_2.png?resize=803%2C497&amp;ssl=1"/></noscript><figcaption><em>A screenshot of Vertex AI ML pipeline orchestration from the digits team | <a href="https://web.archive.org/web/20220926093601/https://youtu.be/rKC6rMFbOqY?t=627" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>该团队的工作流程包括用TensorFlow Extended准备和执行他们的机器学习管道，并将它们运送到Vertex AI。然后，他们可以从Vertex AI管道管理和协调他们的管道，而不必操作他们自己的集群。</p>
+
+
+
+<h3 id="benefits-from-using-machine-learning-pipelines">使用机器学习管道的好处</h3>
+
+
+
+<p>该团队能够从使用ML管道中受益，以多种方式编排和管理他们的ML工作负载。正如<a href="https://web.archive.org/web/20220926093601/https://www.linkedin.com/in/hanneshapke/" target="_blank" rel="noreferrer noopener nofollow">汉尼斯·哈普克</a>在<a href="https://web.archive.org/web/20220926093601/https://youtu.be/rKC6rMFbOqY?t=873%5D" target="_blank" rel="noreferrer noopener nofollow">这段视频</a>中所描述的，这家初创公司能够获得以下好处:</p>
+
+
+<div class="custom-point-list">
+<ul><li>使用ML管道<strong>减少了团队的DevOps需求</strong>。</li><li>当集群在其基础设施上托管管道时，迁移到<strong>托管的ML管道减少了运行24/7集群的费用。</strong></li><li>由于ML管道是ML工作流的原生部分，<strong>模型更新很容易集成并且是自动化的</strong>，解放了团队去关注其他项目。</li><li>所有ML项目的模型更新都是一致的,因为团队可以运行相同的测试并重用整个管道或管道的组件。</li><li>所有机器学习相关元数据和信息的一站式位置。</li><li>模型现在可以被自动跟踪和审计。</li></ul>
+</div>
+
+
+
+
+
+<h2 id="conclusion">结论</h2>
+
+
+
+<p>这篇文章揭示的一个有趣的观点是<strong>使用CI/CD工具不足以成功地操作您的机器学习工作负载</strong>。虽然本文中的大多数团队仍然使用传统的CI/CD工具，但我们开始看到ML-native管道工具的出现，这些工具可以帮助团队(无论其规模如何)更快、更可靠地交付更好的机器学习产品。</p>
+
+
+
+<p>如果您和您的团队正在考虑为您的机器学习工作负载采用CI/CD解决方案，那么与传统的基于软件工程的CI/CD工具相比，任何一种ML-native管道工具都可能值得开始使用，当然，这取决于您团队的环境以及有利于使用的工具或供应商。</p>
+
+
+
+<p>对于这些工具，您可以查看:</p>
+
+
+
+
+
+<p>关于在ML中利用CI/CD的后续步骤，您可以查看以下文章:</p>
+
+
+
+
+
+<p>下次见，行动愉快！</p>
+
+
+
+<h3 id="references-and-resources">参考资料和资源</h3>
+
+
+
+<h4 id="orchestrating-ci-cd-with-azure-devops">使用Azure DevOps编排CI/CD</h4>
+
+
+
+
+
+<h4 id="ci-cd-with-gitops-using-jenkins-and-argo-workflows">使用Jenkins和Argo工作流的CI/CD和GitOps</h4>
+
+
+
+
+
+<h4 id="simplified-ci-cd-on-aws-cloud-with-aws-codepipeline-and-step-functions">通过AWS代码管道和Step函数简化AWS云上的CI/CD</h4>
+
+
+
+
+
+<h4 id="using-vertex-ai-and-tfx-to-orchestrate-ml-pipelines-on-google-cloud">使用顶点人工智能和TFX在谷歌云上编排ML管道。</h4>
+
+
+
+
+
+
+<div id="author-box-new-format-block_607ece877c627" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">斯蒂芬·奥拉德勒</h3>
+    
+          <p class="article__authorContent-text">开发者倡导者和MLOps技术内容创建者。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>Continuum Industries案例研究:如何跟踪、监控和可视化CI/CD管道</h2>
+
+
+
+<p class="has-small-font-size">7分钟阅读| 2021年8月9日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p><a href="https://web.archive.org/web/20220926093601/https://www.continuum.industries/" target="_blank" rel="noreferrer noopener nofollow"> Continuum Industries </a>是一家基础设施行业的公司，希望自动化和优化线性基础设施资产的设计，如水管、架空传输线、海底电力线或电信电缆。</p>
+
+
+
+<p>其核心产品Optioneer允许客户输入工程设计假设和地理空间数据，并且<strong>使用进化优化算法来寻找可能的解决方案，以在给定约束的情况下连接A点到B点。</strong></p>
+
+
+<p id="block_610943f455774" class="separator separator-15"/>
+
+
+
+<figure class="wp-block-video"><video controls="" src="https://web.archive.org/web/20220926093601im_/https://neptune.ai/wp-content/uploads/Continuum-Industries-video.mp4"/></figure>
+
+
+<p id="block_617106e0168b3" class="separator separator-15"/>
+
+
+
+<p>首席科学家安德烈亚斯·马莱科斯(Andreas Malekos)致力于研究人工智能发动机，他解释道:</p>
+
+
+<div class="case-study-quote">
+    <p>“建造像电力线这样的东西是一个巨大的项目，所以你必须在开始之前获得正确的设计。你看到的设计越合理，你就能做出更好的决定。Optioneer可以在几分钟内为您提供设计资产，而成本只是传统设计方法的一小部分。”</p>
+    
+
+</div>
+
+
+
+<p>但是，创建和操作Optioneer引擎比看起来更具挑战性:</p>
+
+
+<div class="custom-point-list">
+<ul><li>目标函数不代表现实</li><li>有很多土木工程师事先不知道的假设</li><li>不同的客户给它提出完全不同的问题，算法需要足够健壮来处理这些问题</li></ul>
+</div>
+
+
+<p>与其构建完美的解决方案，不如向他们展示一系列有趣的设计选项，以便他们做出明智的决策。</p>
+
+
+
+<p>引擎团队利用来自机械工程、电子工程、计算物理、应用数学和软件工程的各种技能来实现这一目标。</p>
+
+
+
+<h2>问题</h2>
+
+
+
+<p>无论是否使用人工智能，构建一个成功的软件产品的一个副作用是，人们依赖它工作。当人们依赖您的优化引擎做出价值百万美元的基础设施设计决策时，您需要有一个强大的质量保证(QA)。</p>
+
+
+
+<p>正如Andreas所指出的，他们必须能够说，他们返回给用户的解决方案是:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>好</strong>，意思是这是一个土木工程师可以看到并同意的结果</li><li><strong>更正</strong>，这意味着计算并返回给最终用户的所有不同工程数量都尽可能准确</li></ul>
+</div>
+
+
+<p>除此之外，该团队还在不断改进优化引擎。但要做到这一点，您必须确保这些变化:</p>
+
+
+<div class="custom-point-list">
+<ul><li>不要以这样或那样的方式破坏算法</li><li>实际上，它们不仅改善了一个基础设施问题的结果，还改善了所有问题的结果</li></ul>
+</div>
+
+
+<p>基本上，您需要<strong>建立适当的验证和测试，</strong>但是团队试图解决的问题的性质带来了额外的挑战:</p>
+
+
+<div class="custom-point-list">
+<ul><li>您无法自动判断算法输出是否正确。<strong>这不像在ML中，你已经标记了数据</strong>来计算你的评估集的准确度或召回率。</li><li>您<strong>需要一组示例问题，代表算法在生产中需要解决的那类问题的</strong>。此外，这些问题需要被版本化，以便尽可能容易地实现可重复性。</li></ul>
+</div>
+
+<a class="button continous-post blue-filled" href="/web/20220926093601/https://neptune.ai/customers/continuum-industries" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

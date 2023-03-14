@@ -1,0 +1,567 @@
+<html>
+<head>
+<title>Understanding Few-Shot Learning in Computer Vision: What You Need to Know </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>理解计算机视觉中的少镜头学习:你需要知道什么</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/understanding-few-shot-learning-in-computer-vision#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/understanding-few-shot-learning-in-computer-vision#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>自从第一个<a href="/web/20221208040141/http://neptune.ai/blog/graph-neural-network-and-some-of-gnn-applications" target="_blank" rel="noreferrer noopener nofollow"> <strong>卷积神经网络</strong> ( <strong> CNN </strong>)算法</a>被创建以来，它们在<a href="/web/20221208040141/http://neptune.ai/blog/computer-vision-resources" target="_blank" rel="noreferrer noopener nofollow"> <strong>计算机视觉</strong> ( <strong> CV </strong> ) </a>任务上大幅提升了深度学习性能。</p>
+
+
+
+<p>2015年，微软报告称，他们的模型在对来自<a href="https://web.archive.org/web/20221208040141/http://www.image-net.org/" target="_blank" rel="noreferrer noopener nofollow"> ImageNet </a>数据集的图像进行分类方面实际上比人类更好。<a href="https://web.archive.org/web/20221208040141/https://www.sicara.ai/blog/2019-07-30-image-classification-few-shot-meta-learning" target="_blank" rel="noreferrer noopener nofollow">【1】</a></p>
+
+
+
+<p>如今，当涉及到使用数十亿张图像来解决一项特定任务时，计算机没有对手。尽管如此，在现实世界中，你很少能构建或找到有那么多样本的数据集。</p>
+
+
+
+<p>我们如何克服这个问题？如果我们在谈论一个<strong> CV </strong>任务，我们可以使用<a href="/web/20221208040141/http://neptune.ai/blog/data-augmentation-in-python" target="_blank" rel="noreferrer noopener nofollow">数据扩充</a> ( <strong> DA </strong>)，或者收集和标记附加数据。</p>
+
+
+
+<p>DA是一个强大的工具，可能是解决方案的重要组成部分。标记额外的样品是一项耗时且昂贵的任务，但它确实能提供更好的结果。</p>
+
+
+
+
+
+
+
+<p>如果数据集真的很小，这两种技术可能都帮不了我们。想象一个任务，我们需要建立一个每类只有一到两个样本的分类，每个样本都超级难找。</p>
+
+
+
+<p>这需要创新的方法。<a href="https://web.archive.org/web/20221208040141/https://arxiv.org/abs/1904.05046" target="_blank" rel="noreferrer noopener nofollow">少投学</a>(<strong/>)就是其中之一。</p>
+
+
+
+<p>在本文中，我们将讨论:</p>
+
+
+
+<ul><li>什么是<strong>少投学习</strong>——定义、目的和<strong> FSL </strong>问题示例</li><li>少量多次学习变化—<strong>多次学习、少量多次学习、一次学习、零次学习</strong></li><li>少击学习<strong> </strong>逼近<strong/>–<strong>元学习</strong>、<strong>数据级</strong>、<strong>参数级</strong></li><li><strong>元学习算法</strong>–定义，<strong>度量学习</strong>，<strong>基于梯度的元学习</strong></li><li>少镜头图像分类算法——<strong>模型不可知</strong> <strong>元学习</strong><strong>匹配</strong><strong>原型</strong>和<strong>关系网络</strong></li><li><strong>少拍物体检测</strong>–<strong>约洛玛姆</strong></li></ul>
+
+
+
+<p id="separator-block_5fcf6b5b40a9c" class="block-separator block-separator--5">什么是少投学习？</p>
+
+
+
+<h2 id="h-what-is-few-shot-learning"><strong>少镜头学习</strong>是机器学习的一个子领域。它是关于当你只有几个带有监督信息的训练样本时，对新数据进行分类。</h2>
+
+
+
+<p>FSL是一个相当年轻的地区，需要更多的研究和完善。从今天起，你可以在<strong> CV </strong>任务中使用它。计算机视觉模型可以用相对较少的训练样本很好地工作。在这篇文章中，我们将关注计算机视觉领域的<strong> FSL </strong>。</p>
+
+
+
+<p>例如:假设我们在医疗保健行业工作，在通过x光照片对骨骼疾病进行分类时遇到了问题。</p>
+
+
+
+<p>一些罕见的病理可能缺少足够的图像用于训练集中。这正是可以通过构建一个<strong> FSL </strong>分类器来解决的问题类型。</p>
+
+
+
+<p>少量变化</p>
+
+
+
+<p id="separator-block_5fcf9df040a9d" class="block-separator block-separator--5">让我们来看看<strong> FSL </strong>的不同变体和极端案例。总的来说，研究人员确定了四种类型:</p>
+
+
+
+<h2 id="h-few-shot-variations"><strong> N元学习(NSL) </strong></h2>
+
+
+
+<p><strong>少数镜头学习</strong></p>
+
+
+
+<ol><li><strong>一次性学习(OSL) </strong></li><li><strong>小于一或零射学习(ZSL) </strong></li><li>当我们谈论<strong> FSL </strong>时，我们通常指的是<strong>N-way-K-Shot-class化</strong>。</li><li><strong> N </strong>代表类别数，<strong> K </strong>代表每一类别中用于训练的样本数。</li></ol>
+
+
+
+<p>N次学习被认为是一个比其他所有概念都更广泛的概念。意思是<strong>少射</strong>、<strong>单射</strong>、<strong>零射学习</strong>是<strong> NSL </strong>的子场。</p>
+
+
+
+<p><strong>零距离拍摄</strong></p>
+
+
+
+<p>对我来说，ZSL最有趣。<strong>零投学习</strong>的目标是在没有任何训练实例的情况下，对看不见的类进行分类。</p>
+
+
+
+<p id="separator-block_5fcf9dfc40a9e" class="block-separator block-separator--5">这可能看起来有点疯狂，但请这样想:你能在没有看到一个物体的情况下对它进行分类吗？如果你对一个对象有一个大概的概念，它的外观，属性和功能，这应该不是问题。</p>
+
+
+
+<h3>这是你在做<strong> ZSL </strong>时使用的方法，根据<a href="https://web.archive.org/web/20221208040141/https://blog.floydhub.com/ten-trends-in-deep-learning-nlp/#zero-shot" target="_blank" rel="noreferrer noopener nofollow">目前的趋势</a> , <strong>零距离学习</strong>将很快变得更有效。</h3>
+
+
+
+<p> </p>
+
+
+
+<p><strong>单镜头和少镜头</strong></p>
+
+
+
+<p>至此，你可能已经看到了一个大概的概念，所以在<strong>一次性学习</strong>中，我们每个类只有一个样本也就不足为奇了。<strong>少投</strong>每班有两到五个样本，使它成为<strong> OSL </strong>更灵活的版本。</p>
+
+
+
+<p id="separator-block_5fcf9e0140a9f" class="block-separator block-separator--5">当我们谈论整体概念时，我们使用<strong>少量学习</strong>术语。但是这个领域还很年轻，所以人们会用不同的方式使用这些术语。当你阅读文章时，请记住这一点。</p>
+
+
+
+<h3>少量学习方法</h3>
+
+
+
+<p>好了，是时候转向更实际的领域，谈谈不同的<strong>少量学习</strong>解决问题的方法了。</p>
+
+
+
+<p>首先我们来定义一个<strong> N路K炮分类</strong>问题。想象一下我们有:</p>
+
+
+
+<p id="separator-block_5fcf9e0640aa0" class="block-separator block-separator--5">培训(支持)集包括:</p>
+
+
+
+<h2 id="h-few-shot-learning-approaches"><strong> N </strong>类标签</h2>
+
+
+
+<p><strong> K </strong>每类的标记图像(少量，每类少于十个样本)</p>
+
+
+
+<p><strong> Q </strong>查询图片</p>
+
+
+
+<ol><li>我们希望将<strong> Q </strong>查询图像归类到<strong> N </strong>类中。训练集中的<strong> N </strong> * <strong> K </strong>样本是我们仅有的例子。这里的主要问题是没有足够的训练数据。<a href="https://web.archive.org/web/20221208040141/https://www.sicara.ai/blog/2019-07-30-image-classification-few-shot-meta-learning" target="_blank" rel="noreferrer noopener nofollow">【1】</a><ol><li>FSL任务的第一步也是最明显的一步是从其他类似的问题中获取经验。这就是为什么<strong>的少投学习</strong>被定性为<strong>的元学习</strong>问题。</li><li>让我们弄清楚这一点:在传统的分类问题中，我们试图从训练数据中学习如何分类，并使用测试数据进行评估。</li></ol></li><li>在<strong>元学习</strong>中，我们学习如何在给定一组训练数据的情况下学习分类。我们用一组分类问题来解决其他不相关的问题。</li></ol>
+
+
+
+<p>一般来说，在解决<strong> FSL </strong>问题时，你应该考虑两种方法:</p>
+
+
+
+
+
+
+
+<p><strong>数据级方法(DLA) </strong></p>
+
+
+
+<p><strong>参数级方法(PLA) </strong></p>
+
+
+
+<p> </p>
+
+
+
+<p><strong>数据级方法</strong></p>
+
+
+
+<ul><li>这个方法真的很简单。它基于这样一个概念，如果你没有足够的数据来建立一个可靠的模型并避免过度拟合和欠拟合，你应该简单地添加更多的数据。</li><li>这就是为什么许多<strong> FSL </strong>问题是通过使用来自大型<strong>基础数据集</strong>的额外信息来解决的。<strong>基本数据集</strong>的关键特征是它没有我们在<strong>少量任务</strong>的支持集中拥有的类。例如，如果我们想对一种特定的鸟类进行分类，基本数据集可以包含许多其他鸟类的图像。</li></ul>
+
+
+
+<p id="separator-block_5fcf9e1640aa1" class="block-separator block-separator--5">我们自己也可以产生更多的数据。为了达到这个目的，我们可以使用<strong>数据增强</strong>，甚至<strong>生成对抗网络</strong> ( <strong> GANs </strong>)。</p>
+
+
+
+<h3> </h3>
+
+
+
+<p><strong>参数级方法</strong></p>
+
+
+
+<p>从<strong>参数级</strong>的角度来看，很容易在<strong>少量学习</strong>样本上过度拟合，因为它们经常具有广泛的高维空间。</p>
+
+
+
+<p>为了克服这个问题，我们应该限制参数空间，并使用正则化和适当的损失函数。该模型将概括有限数量的训练样本。</p>
+
+
+
+<p id="separator-block_5fcf9e2b40aa3" class="block-separator block-separator--5">另一方面，我们可以通过将模型定向到广泛的参数空间来增强模型性能。如果我们使用标准的优化算法，它可能不会给出可靠的结果，因为训练数据量很小。</p>
+
+
+
+<h3>这就是为什么在<strong>参数级别</strong>上，我们训练我们的模型在参数空间中寻找最佳路线，以给出最佳预测结果。正如我们上面已经提到的，这种技术被称为<strong>元学习</strong>。</h3>
+
+
+
+<p> </p>
+
+
+
+<p>在经典范式中，当我们有一个特定的任务时，一个算法正在学习它的任务性能是否随着经验而提高。在<strong>元学习</strong>范例中，我们有一组任务。一个算法正在学习它在每个任务中的性能是否随着经验和任务数量的增加而提高。这种算法叫做<strong>元学习</strong>T4算法。</p>
+
+
+
+<p>假设我们有一个测试任务<strong> TEST </strong>。我们将在一批训练任务<strong> TRAIN </strong>上训练我们的<strong>元学习</strong> <strong>算法</strong>。从试图解决<strong>训练</strong>任务中获得的训练经验将用于解决<strong>测试</strong>任务。</p>
+
+
+
+<p>解决一个<strong> FSL </strong>任务有一套步骤序列。假设我们有一个分类问题，就像我们之前提到的那样。首先，我们需要选择一个<strong>基础数据集</strong>。选择一个<strong>基础数据集</strong>至关重要。你想挑一个好的，所以要小心。</p>
+
+
+
+<p id="separator-block_5fcf9e3240aa4" class="block-separator block-separator--5">现在我们有了<strong>N-way-K-Shot-class ification</strong>问题(姑且称之为<strong>测试</strong>)和一个大的<strong>基本数据集</strong>，我们将把它用作<strong>元学习</strong>训练集(<strong>训练</strong>)。</p>
+
+
+
+
+
+
+
+<p>整个<strong>元训练</strong>过程将有有限数量的<strong>集</strong>。我们组成这样一集<strong/>:</p>
+
+
+
+<p>从<strong>训练</strong>中，我们采样<strong> N </strong>个类和<strong> K </strong>个类的支持集图像，以及<strong> Q </strong>个查询图像。这样，我们就形成了一个分类任务，类似于我们最终的<strong>测试</strong>任务。</p>
+
+
+
+<p>在每集结束时，模型的参数被训练以最大化来自查询集的<strong> Q </strong>图像的准确性。这是我们的模型学习解决一个看不见的分类问题的能力的地方。<a href="https://web.archive.org/web/20221208040141/https://www.sicara.ai/blog/2019-07-30-image-classification-few-shot-meta-learning" target="_blank" rel="noreferrer noopener nofollow">【1】</a></p>
+
+
+
+<p>模型的整体效率通过其在<strong>测试</strong>分类任务中的准确性来衡量。</p>
+
+
+
+<p>近年来，研究人员发表了许多解决<strong> FSL </strong>分类问题的<strong>元学习</strong>算法。它们都可以分为两大类:<strong>度量学习</strong>和<strong>基于梯度的元学习</strong>算法。</p>
+
+
+
+<p> </p>
+
+
+
+<p><strong>公制学习</strong></p>
+
+
+
+<p>当我们谈论<strong>度量学习</strong>时，我们通常指的是在对象上学习距离函数的技术。</p>
+
+
+
+
+
+
+
+<p>一般来说，<strong>度量学习</strong>算法学习比较数据样本。在<strong>少数</strong>分类问题的情况下，他们基于查询样本与支持样本的相似性对它们进行分类。</p>
+
+
+
+<p id="separator-block_5fcf9e3b40aa5" class="block-separator block-separator--5">正如你可能已经猜到的，如果我们正在处理图像，我们基本上训练一个<strong>卷积神经网络</strong>来输出一个图像嵌入向量，稍后将它与其他嵌入进行比较来预测类别。</p>
+
+
+
+<h3> </h3>
+
+
+
+<p><strong>基于梯度的元学习</strong></p>
+
+
+
+<p>对于基于<strong>梯度的</strong>方法，你需要构建一个<strong>元学习器</strong>和一个<strong>基础学习器</strong>。<br/> <br/> <strong>元学习者</strong>是跨集学习的模型，而<strong>基础学习者</strong>是由<strong>元学习者</strong>在每集内初始化和训练的模型。</p>
+
+
+
+<p>想象一集<strong>元训练</strong>，其中一些分类任务由一个<strong> N </strong> * <strong> K </strong>图像支持集和一个<strong> Q </strong>查询集定义:</p>
+
+
+
+<p id="separator-block_5fcf9e4140aa6" class="block-separator block-separator--5">我们选择一个<strong>元学习者</strong>模型，</p>
+
+
+
+<h3>剧集开始了，</h3>
+
+
+
+<p>我们初始化<strong>基础学习器</strong>(通常是一个<strong> CNN </strong>分类器)，</p>
+
+
+
+<p>我们在支持集上训练它(用于训练<strong>基础学习者</strong>的精确算法由<strong>元学习者</strong>定义)，</p>
+
+
+
+<ol><li><strong>基础学习者</strong>预测查询集合上的类别，</li><li><strong>元学习器</strong>参数根据分类错误导致的损失进行训练，</li><li>从这一点来看，根据您对<strong>元学习者</strong>的选择，管道可能会有所不同。<a href="https://web.archive.org/web/20221208040141/https://www.sicara.ai/blog/2019-07-30-image-classification-few-shot-meta-learning" target="_blank" rel="noreferrer noopener nofollow">【1】</a></li><li> </li><li>少镜头图像分类算法</li><li><em>这一段来自Etienne Bennequin写的“<a href="https://web.archive.org/web/20221208040141/https://www.sicara.ai/blog/2019-07-30-image-classification-few-shot-meta-learning" target="_blank" rel="noreferrer noopener nofollow">元学习的少镜头图像分类</a>”。</em></li><li>从总体上看，让我们继续讨论用于解决<strong>少镜头学习</strong>图像分类问题的具体<strong>元学习</strong>算法。</li></ol>
+
+
+
+<p id="separator-block_5fcf9e4540aa7" class="block-separator block-separator--5">在本节中，我们将介绍:</p>
+
+
+
+<h2 id="h-algorithms-for-few-shot-image-classification"><strong>模型不可知元学习(MAML) </strong></h2>
+
+
+
+<p><strong>匹配网络</strong></p>
+
+
+
+<p><strong>原型网络</strong></p>
+
+
+
+<p><strong>关系网络</strong></p>
+
+
+
+<ol><li> </li><li><strong>模型不可知的元学习</strong></li><li><a href="https://web.archive.org/web/20221208040141/https://arxiv.org/abs/1703.03400" target="_blank" rel="noreferrer noopener nofollow"> MAML </a>基于<strong>基于梯度的元学习</strong> ( <strong> GBML </strong>)概念。正如我们已经知道的，<strong> GBML </strong>是关于<strong>元学习者</strong>从训练<strong>基本模型</strong>中获得先前的经验，并学习所有任务的共同特征表示。</li><li>每当有新任务要学习时，具有先前经验的<strong>元学习者</strong>将使用新任务带来的少量新训练数据进行一点点微调。</li></ol>
+
+
+
+<p id="separator-block_5fcf9e4c40aa8" class="block-separator block-separator--5">尽管如此，我们不想从一个随机的参数初始化开始。如果我们这样做，我们的算法在几次更新后不会收敛到好的性能。</p>
+
+
+
+<h3><strong> MAML </strong>旨在解决这个问题。</h3>
+
+
+
+<p><strong> MAML </strong>为<strong>元学习者</strong>的参数提供了良好的初始化，以实现对新任务的最佳快速学习，仅使用少量梯度步骤，同时避免使用小数据集时可能发生的过拟合。</p>
+
+
+
+<p>这是如何做到的:</p>
+
+
+
+<p>元学习者在每集开始时创建其自身的副本(<strong> C </strong>),</p>
+
+
+
+<p>C 在剧集中接受训练(就像我们之前讨论过的，在<strong>基本模型</strong>的帮助下)，</p>
+
+
+
+<p><strong> C </strong>对查询集进行预测，</p>
+
+
+
+<p>根据这些预测计算的损失用于更新<strong> C，</strong></p>
+
+
+
+<ol><li>这种情况会一直持续到你完成所有的训练。</li><li>这种技术最大的优点是它被认为是不可知的<strong>元学习者</strong>算法选择。因此，<strong> MAML </strong>方法被广泛用于许多需要快速适应的<strong>机器学习</strong>算法，尤其是<strong>深度神经网络</strong>。</li><li> </li><li><strong>匹配网络</strong></li><li><a href="https://web.archive.org/web/20221208040141/https://arxiv.org/abs/1606.04080" target="_blank" rel="noreferrer noopener nofollow">匹配网络</a> ( <strong> MN </strong>)是第一个为解决<strong> FSL </strong>问题而设计的<strong>度量学习</strong>算法。</li></ol>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/6adc1edcda890049ee8918270bd62b0c.png" alt="maml-algorithm" class="wp-image-32776" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221208040141im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/maml-algorithm.png?ssl=1"/></figure>
+
+
+
+<p>对于<strong>匹配网络</strong>算法，你需要使用一个大的基础数据集来解决一个<strong>的少拍学习</strong>任务。如上所示，这个数据集被分割成几集。此后，对于每一集，匹配网络应用以下程序:</p>
+
+
+
+<p id="separator-block_5fcf9e5540aa9" class="block-separator block-separator--5">来自支持和查询集的每个图像被馈送到为它们输出嵌入的<strong> CNN </strong>，</p>
+
+
+
+<h3>使用从其嵌入到支持集嵌入的余弦距离的软最大值对每个查询图像进行分类，</h3>
+
+
+
+<p>所得分类上的<strong>交叉熵损失</strong>通过<strong> CNN </strong>反向传播。</p>
+
+
+
+<p>这样，<strong>匹配网络</strong>学习计算图像嵌入。这种方法允许<strong> MN </strong>在没有特定类别先验知识的情况下对图像进行分类。一切都是通过比较不同的类实例来完成的。</p>
+
+
+
+<ol><li>由于每一集的类别都不同，<strong>匹配网络</strong>计算图像的相关特征以区分类别。相反，在标准分类的情况下，算法学习特定于每个类别的特征。</li><li>值得一提的是，作者实际上对最初的算法提出了一些改进。例如，他们用双向<strong> LSTM </strong>增强了他们的算法。每个图像的嵌入依赖于其他图像的嵌入。<br/> <br/>所有的改进建议都可以在他们的<a href="https://web.archive.org/web/20221208040141/https://arxiv.org/pdf/1606.04080.pdf">初始</a>条中找到。不过，你必须记住，提高算法的性能可能会使计算时间更长。</li><li> </li></ol>
+
+
+
+<p><strong>原型网络</strong></p>
+
+
+
+<p><a href="https://web.archive.org/web/20221208040141/https://arxiv.org/abs/1703.05175" target="_blank" rel="noreferrer noopener nofollow"> <strong>原型网络</strong> </a> ( <strong> PN </strong>)类似于匹配网络。尽管如此，仍有一些小的差异有助于增强算法的性能。<strong> PN </strong>实际上比<strong> MN获得更好的结果。</strong></p>
+
+
+
+<p><strong> PN </strong>过程本质上是相同的，但是查询图像嵌入并不与来自支持集的每个图像嵌入进行比较。相反，<strong>原型网络</strong>提出了一种替代方法。</p>
+
+
+
+<p id="separator-block_5fcf9e5d40aaa" class="block-separator block-separator--5">在<strong> PN </strong>中，你需要形成<strong>级原型</strong>。它们基本上是通过平均来自该类的图像的嵌入而形成的类嵌入。然后，查询图像嵌入只与这些<strong>类原型</strong>进行比较。</p>
+
+
+
+<h3>值得一提的是，在一个<strong>单次学习</strong>问题的情况下，算法类似于<strong>匹配网络</strong>。</h3>
+
+
+
+<p>还有，<strong> PN </strong>用欧氏距离代替余弦距离。这被视为算法改进的主要部分。</p>
+
+
+
+<p> </p>
+
+
+
+<p><strong>关系网络</strong></p>
+
+
+
+<p>为构建匹配的和<strong>原型网络</strong>而进行的所有实验实际上都导致了<a href="https://web.archive.org/web/20221208040141/https://arxiv.org/pdf/1711.06025.pdf">关系网络</a> ( <strong> RN </strong>)的创建。<strong> RN </strong>建立在<strong> PN </strong>概念的基础上，但是对算法做了很大的改动。</p>
+
+
+
+<p>距离函数不是预先定义的，而是由算法学习的。<strong> RN </strong>有自己的<strong>关系</strong>模块来做这件事。如果你想了解更多，请查看<a href="https://web.archive.org/web/20221208040141/https://arxiv.org/pdf/1711.06025.pdf" target="_blank" rel="noreferrer noopener nofollow">初始文章</a>。</p>
+
+
+
+<p id="separator-block_5fcf9e6240aab" class="block-separator block-separator--5">整体结构如下。<strong>关系</strong>模块放在<strong>嵌入</strong>模块的上面，该模块是从输入图像中计算嵌入和<strong>类原型</strong>的部分。</p>
+
+
+
+<h3>关系模块被提供了查询图像的嵌入与每个类原型的连接，并且它为每一对输出一个<strong>关系分数</strong>。将<strong> Softmax </strong>应用于<strong>关系分数</strong>，我们得到一个预测。</h3>
+
+
+
+<p>少镜头目标检测</p>
+
+
+
+<p><em>这一节来自Etienne Bennequin写的《<a href="https://web.archive.org/web/20221208040141/https://arxiv.org/pdf/1909.13579.pdf" target="_blank" rel="noreferrer noopener nofollow">少镜头计算机视觉的元学习算法</a>》。</em></p>
+
+
+
+<p>很明显，在所有的<strong>计算机视觉</strong>任务中，我们都可能遇到<strong> FSL </strong>问题。我们已经考虑了<strong>少镜头</strong>图像分类，现在是时候解决<strong>少镜头物体检测</strong>问题了。</p>
+
+
+
+<p>让我们定义一个<strong>对象检测</strong>任务。假设我们有一个对象类型列表和一个图像，目标是检测图像上列表中的所有对象。如果满足以下条件，我们就说物体被检测到:</p>
+
+
+
+
+
+
+
+<p id="separator-block_5fcf9e6740aac" class="block-separator block-separator--5">我们通过绘制包含它的最小的边界框来定位它，</p>
+
+
+
+<h2 id="h-few-shot-object-detection">我们对物体进行了分类。</h2>
+
+
+
+<p>让我们继续定义<strong> N路K射物体检测</strong>任务。想象一下:</p>
+
+
+
+<p>一种支撑装置，包括:</p>
+
+
+
+<p><strong> N </strong>类标签、</p>
+
+
+
+<ol><li>对于每个类别，<strong> K个</strong>标记的图像包含至少一个属于该类别的对象，</li><li><strong> Q </strong>查询图片。</li></ol>
+
+
+
+<p>我们的目标是检测查询图像中属于<strong> N </strong>个给定类别之一的对象。</p>
+
+
+
+<ol><li>注意，与<strong>少拍</strong>图像分类问题有一个关键区别，因为一幅图像可以包含属于一个或几个<strong> N </strong>类的多个对象。我们可能会面临一个<a href="/web/20221208040141/http://neptune.ai/blog/how-to-deal-with-imbalanced-classification-and-regression-data" target="_blank" rel="noreferrer noopener">类不平衡问题</a>，因为我们的算法在每个类的至少<strong> K </strong>个示例对象上训练。<ol><li><strong>约洛玛姆</strong></li><li><strong>少拍物体探测</strong>领域正在快速发展，但没有太多有效的解决方案。这个问题最稳定的解决方案是<a href="https://web.archive.org/web/20221208040141/https://github.com/ebennequin/FewShotVision" target="_blank" rel="noreferrer noopener nofollow"> YOLOMAML </a>算法。</li></ol></li><li><strong> YOLOMAML </strong>有两个混搭的棋子:<a href="https://web.archive.org/web/20221208040141/https://pjreddie.com/darknet/yolo/" target="_blank" rel="noreferrer noopener">yolov 3</a>T4】物体检测架构，<strong> MAML </strong>算法。</li></ol>
+
+
+
+<p>如前所述，<strong> MAML </strong>可以应用于各种各样的<strong>深度神经网络</strong>，这就是为什么开发人员很容易将这两个部分结合起来。</p>
+
+
+
+<p><strong> YOLOMAML </strong>是<strong> MAML </strong>算法对<strong> YOLO </strong>探测器的直接应用。如果你想了解更多，请查看<a href="https://web.archive.org/web/20221208040141/https://github.com/ebennequin/FewShotVision" target="_blank" rel="noreferrer noopener nofollow">官方Github资源库</a>。</p>
+
+
+
+<p id="separator-block_5fcf9e6f40aad" class="block-separator block-separator--5">最后的想法</p>
+
+
+
+<h3>在这篇文章中，我们已经弄清楚了什么是<strong>少镜头学习</strong>，有什么<strong> FSL </strong>变异和问题处理方法，以及你可以使用什么算法来解决图像分类和<strong>物体检测FSL </strong>任务。</h3>
+
+
+
+<p>据我所知，<strong>小试牛刀学习</strong>是一个快速发展和有前途的领域，但仍然相当具有挑战性和未知性。还有更多的事情要做、研究和开发。</p>
+
+
+
+<p>希望有了这些信息，你在开始尝试<strong>少量学习</strong>领域时不会有任何问题。</p>
+
+
+
+<p><strong>附加资源</strong></p>
+
+
+
+<p><a href="https://web.archive.org/web/20221208040141/https://www.sicara.ai/blog/2019-07-30-image-classification-few-shot-meta-learning" target="_blank" rel="noreferrer noopener nofollow">“基于元学习的少镜头图像分类”，作者Etienne Bennequin </a></p>
+
+
+
+<p id="separator-block_5fcf68861ed01" class="block-separator block-separator--5"><a href="https://web.archive.org/web/20221208040141/https://arxiv.org/pdf/1909.13579.pdf" target="_blank" rel="noreferrer noopener nofollow">“少镜头计算机视觉的元学习算法”，作者Etienne Bennequin </a></p>
+
+
+
+<h2 id="h-final-thoughts"><a href="https://web.archive.org/web/20221208040141/https://blog.floydhub.com/n-shot-learning/" target="_blank" rel="noreferrer noopener nofollow">https://blog.floydhub.com/n-shot-learning/</a></h2>
+
+
+
+<p><a href="https://web.archive.org/web/20221208040141/https://medium.com/quick-code/understanding-few-shot-learning-in-machine-learning-bede251a0f67" target="_blank" rel="noreferrer noopener nofollow">https://medium . com/quick-code/understanding-little-shot-learning-in-machine-learning-Bede 251 A0 f 67</a></p>
+
+
+
+<p><a href="https://web.archive.org/web/20221208040141/https://towardsdatascience.com/model-agnostic-meta-learning-maml-8a245d9bc4ac" target="_blank" rel="noreferrer noopener nofollow">https://towards data science . com/model-agnostic-meta-learning-maml-8 a 245d 9 BC 4 AC</a></p>
+
+
+
+<p>https://deepai . org/publication/meta-learning-algorithms-for-less-shot-computer-vision # S2。SS3 </p>
+
+
+
+<h3><a href="https://web.archive.org/web/20221208040141/https://arxiv.org/pdf/1904.05046.pdf" target="_blank" rel="noreferrer noopener nofollow">https://arxiv.org/pdf/1904.05046.pdf</a></h3>
+
+
+
+<ol><li><a href="https://web.archive.org/web/20221208040141/https://www.borealisai.com/en/blog/tutorial-2-few-shot-learning-and-meta-learning-i/#:~:text=The%20goal%20of%20few-shot,class%20(one%20shot%20learning)" target="_blank" rel="noreferrer noopener nofollow">https://www . borealisai . com/en/blog/tutorial-2-little-shot-learning-and-meta-learning-I/#:~:text = The % 20 goal % 20 of % 20 little-shot，class % 20(one % 20 shot % 20 learning)</a></li><li><a href="https://web.archive.org/web/20221208040141/https://deepai.org/publication/few-shot-object-detection" target="_blank" rel="noreferrer noopener nofollow">https://deepai.org/publication/few-shot-object-detection</a></li><li><a href="https://web.archive.org/web/20221208040141/https://blog.floydhub.com/n-shot-learning/" target="_blank" rel="noreferrer noopener nofollow">https://blog.floydhub.com/n-shot-learning/</a></li><li><a href="https://web.archive.org/web/20221208040141/https://medium.com/quick-code/understanding-few-shot-learning-in-machine-learning-bede251a0f67" target="_blank" rel="noreferrer noopener nofollow">https://medium.com/quick-code/understanding-few-shot-learning-in-machine-learning-bede251a0f67</a></li><li><a href="https://web.archive.org/web/20221208040141/https://towardsdatascience.com/model-agnostic-meta-learning-maml-8a245d9bc4ac" target="_blank" rel="noreferrer noopener nofollow">https://towardsdatascience.com/model-agnostic-meta-learning-maml-8a245d9bc4ac</a></li><li><a href="https://web.archive.org/web/20221208040141/https://deepai.org/publication/meta-learning-algorithms-for-few-shot-computer-vision#S2.SS3" target="_blank" rel="noreferrer noopener nofollow">https://deepai.org/publication/meta-learning-algorithms-for-few-shot-computer-vision#S2.SS3</a></li><li><a href="https://web.archive.org/web/20221208040141/https://arxiv.org/pdf/1904.05046.pdf" target="_blank" rel="noreferrer noopener nofollow">https://arxiv.org/pdf/1904.05046.pdf</a></li><li><a href="https://web.archive.org/web/20221208040141/https://www.borealisai.com/en/blog/tutorial-2-few-shot-learning-and-meta-learning-i/#:~:text=The%20goal%20of%20few-shot,class%20(one%20shot%20learning)" target="_blank" rel="noreferrer noopener nofollow">https://www.borealisai.com/en/blog/tutorial-2-few-shot-learning-and-meta-learning-i/#:~:text=The%20goal%20of%20few-shot,class%20(one%20shot%20learning)</a></li><li><a href="https://web.archive.org/web/20221208040141/https://deepai.org/publication/few-shot-object-detection" target="_blank" rel="noreferrer noopener nofollow">https://deepai.org/publication/few-shot-object-detection</a></li></ol>
+        </div>
+        
+    </div>    
+</body>
+</html>

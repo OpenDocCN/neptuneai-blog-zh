@@ -1,0 +1,776 @@
+<html>
+<head>
+<title>How to Serve Machine Learning Models With TensorFlow Serving and Docker </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何用TensorFlow服务和Docker服务机器学习模型</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/how-to-serve-machine-learning-models-with-tensorflow-serving-and-docker#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/how-to-serve-machine-learning-models-with-tensorflow-serving-and-docker#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>机器学习(ML)有可能极大地改善业务，但这只有在模型投入生产并且用户可以与之互动的情况下才能实现。</p>
+
+
+
+<p>像<a href="https://web.archive.org/web/20221206051444/https://www.fastcompany.com/90246028/how-ai-is-helping-amazon-become-a-trillion-dollar-company" target="_blank" rel="noreferrer noopener nofollow">亚马逊</a>、<a href="https://web.archive.org/web/20221206051444/https://www.infoworld.com/article/2886132/how-machine-learning-ate-microsoft.html#:~:text=Machine%20learning%20has%20infiltrated%20Microsoft,Windows%208%20to%20Xbox%20games.&amp;text=Now%2C%20with%20machine%20learning%20available,%2C%20fault%20prediction%2C%20and%20more." target="_blank" rel="noreferrer noopener nofollow">微软</a>、<a href="https://web.archive.org/web/20221206051444/https://www.wired.com/2016/06/how-google-is-remaking-itself-as-a-machine-learning-first-company/" target="_blank" rel="noreferrer noopener nofollow">谷歌</a>、<a href="https://web.archive.org/web/20221206051444/https://9to5mac.com/2020/08/06/apple-using-machine-learning/" target="_blank" rel="noreferrer noopener nofollow">苹果</a>、<a href="https://web.archive.org/web/20221206051444/https://www.facebook.com/business/news/good-questions-real-answers-how-does-facebook-use-machine-learning-to-deliver-ads" target="_blank" rel="noreferrer noopener nofollow">脸书</a>这样的全球性公司，都有数百款ML机型在生产。从<a href="https://web.archive.org/web/20221206051444/https://blog.google/products/search/search-language-understanding-bert/" target="_blank" rel="noreferrer noopener nofollow">更好的搜索</a>到<a href="https://web.archive.org/web/20221206051444/https://www.amazon.science/the-history-of-amazons-recommendation-algorithm" target="_blank" rel="noreferrer noopener nofollow">推荐引擎</a>，到<a href="https://web.archive.org/web/20221206051444/https://deepmind.com/blog/article/deepmind-ai-reduces-google-data-centre-cooling-bill-40" target="_blank" rel="noreferrer noopener nofollow">数据中心冷却费用降低40%</a>，这些公司已经开始在他们业务的许多关键方面依赖ML。将模型投入生产并不是一件容易的事情，虽然该过程与传统软件相似，但它有一些微妙的差异，如模型再训练、数据偏斜或数据漂移，这些都应该考虑在内。</p>
+
+
+
+<p>放置ML模型的过程不是一个单一的任务，而是许多子任务的组合，每个子任务都有其自身的重要性。这样的子任务之一是模型服务。</p>
+
+
+
+<blockquote class="wp-block-quote is-style-large"><p>“模型服务就是展示一个经过训练的模型，以便端点可以访问它。这里的端点可以是直接用户或其他软件。</p></blockquote>
+
+
+
+<p>在本教程中，我将向您展示如何使用<a href="https://web.archive.org/web/20221206051444/https://www.tensorflow.org/tfx/guide/serving" target="_blank" rel="noreferrer noopener nofollow"> Tensorflow Serving </a>来服务ML模型，这是一个高效、灵活、高性能的机器学习模型服务系统，专为生产环境而设计。</p>
+
+
+
+<p>具体来说，您将学习:</p>
+
+
+
+<ul><li>如何使用docker安装Tensorflow服务</li><li>用Tensorflow训练并保存一个简单的图像分类器</li><li>使用Tensorflow服务服务保存的模型</li></ul>
+
+
+
+<p>在本教程结束时，您将能够获取任何保存的Tensorflow模型，并使其可供其他人使用。</p>
+
+
+
+<h2 id="h-before-you-start-prerequisite">开始之前(先决条件)</h2>
+
+
+
+<p>为了充分理解本教程，假设您:</p>
+
+
+
+
+
+
+
+<p>以下是一些帮助您开始的链接:</p>
+
+
+
+
+
+
+
+<p>现在简单说一下Tensorflow发球(TF发球)。</p>
+
+
+
+<h2 id="h-introduction-to-tensorflow-serving">Tensorflow服务简介</h2>
+
+
+
+<blockquote class="wp-block-quote is-style-default"><p>“TensorFlow服务是一个灵活、高性能的机器学习模型服务系统，专为生产环境而设计。TensorFlow服务使部署新算法和实验变得容易，同时保持相同的服务器架构和API。TensorFlow服务提供与TensorFlow模型的现成集成，但可以轻松扩展以服务于其他类型的模型。”<br/> — <a href="https://web.archive.org/web/20221206051444/https://www.tensorflow.org/tfx/guide/serving" target="_blank" rel="noreferrer noopener nofollow">来源</a></p></blockquote>
+
+
+
+<p>简单地说，TF Serving允许您通过模型服务器轻松地公开一个经过训练的模型。它提供了一个灵活的API，可以很容易地与现有系统集成。</p>
+
+
+
+<p>大多数模型服务教程展示了如何使用Flask或Django构建的web应用程序作为模型服务器。虽然这对于演示来说没问题，但在生产场景中效率非常低。</p>
+
+
+
+<p>根据Oreily的“<a href="https://web.archive.org/web/20221206051444/https://www.oreilly.com/library/view/building-machine-learning/9781492053187/" target="_blank" rel="noreferrer noopener nofollow">构建机器学习管道</a>”一书，你不应该依赖传统web应用来服务ML模型的一些原因包括:</p>
+
+
+
+<ol><li><strong>缺乏有效的模型版本控制:</strong>对经过训练的模型进行正确的版本控制非常重要，而大多数为服务模型而构建的web应用程序可能会错过这一部分，或者如果存在的话，管理起来可能会非常复杂。</li><li><strong>缺乏代码分离:</strong>数据科学/机器学习代码变得与软件/DevOps代码交织在一起。这很糟糕，因为数据科学团队与软件/DevOps团队有很大的不同，因此，当两个团队在相同的代码库上工作时，适当的代码管理会成为一种负担。</li><li><strong>低效的模型推理:</strong>用Flask/Django构建的web apps中的模型推理通常是低效的。</li></ol>
+
+
+
+<p>Tensorflow服务为您解决了这些问题。它处理模型服务、版本管理，让您基于策略服务模型，并允许您从不同的源加载您的模型。它在谷歌和世界各地的许多组织内部使用。</p>
+
+
+
+<p>您是否知道，由于TensorFlow + Neptune集成，您可以跟踪您的模型训练？在我们的<a href="https://web.archive.org/web/20221206051444/https://docs.neptune.ai/essentials/integrations/deep-learning-frameworks/tensorflow-keras" target="_blank" rel="noreferrer noopener">文档</a>中了解更多信息。</p>
+
+
+
+<h2 id="h-tensorflow-serving-architecture">张量流服务架构</h2>
+
+
+
+<p>在下图中，您可以看到TF服务架构的概述。这个高级架构显示了构成TF服务的重要组件。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/8dd4a1279b8e321e4eb445402460c7d9.png" alt="tensorflow serving" class="wp-image-26874" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206051444im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/tensorflow-serving.png?ssl=1"/><figcaption><em>Overview of the TensorFlow Serving architecture (</em><a href="https://web.archive.org/web/20221206051444/https://www.oreilly.com/library/view/building-machine-learning/9781492053187/" target="_blank" rel="noreferrer noopener nofollow"><em>Source</em></a><em>)</em></figcaption></figure></div>
+
+
+
+<p>在上图中从右到左，让我们从模型源开始:</p>
+
+
+
+<ul><li><strong>模型源</strong>提供插件和功能来帮助你从多个位置(例如GCS或AWS S3桶)加载模型或TF服务术语<em>服务</em>。一旦模型被加载，下一个组件——模型加载器——就会得到通知。</li><li><strong>模型加载器</strong>提供了从给定的源加载模型的功能，与模型类型无关，甚至与用例的数据类型无关。简而言之，模型加载器提供了从源代码加载和卸载模型(可服务的)的有效功能。</li><li><strong>模型管理器</strong>处理模型的整个生命周期。也就是说，它管理何时进行模型更新、使用哪个版本的模型进行推理、推理的规则和策略等等。</li><li>Servable处理程序提供了与TF服务通信所必需的API和接口。TF serving提供了两种重要的可服务处理程序——<a href="https://web.archive.org/web/20221206051444/https://en.wikipedia.org/wiki/Representational_state_transfer">REST</a>和<a href="https://web.archive.org/web/20221206051444/https://en.wikipedia.org/wiki/GRPC"> gRPC </a>。在本教程的后面部分，您将了解这两者之间的区别。</li></ul>
+
+
+
+<p>有关TS架构的更多详细信息，请访问下面的官方指南:</p>
+
+
+
+
+
+
+
+<p>在下一节中，我将绕一点弯路来快速介绍Docker。这是一个可选部分，我在这里介绍它是因为在安装TF Serving时您将使用Docker。</p>
+
+
+
+<h2 id="h-brief-introduction-to-docker-and-installation-guide">Docker简介和安装指南</h2>
+
+
+
+<p>Docker 是一个计算机程序，它使开发者能够以一种在另一台机器上容易复制的方式轻松打包应用程序或软件。Docker使用容器，它允许您将应用程序及其库和依赖项打包成一个单独的包，可以在另一个环境中部署。</p>
+
+
+
+<p>Docker类似于<a href="https://web.archive.org/web/20221206051444/https://en.wikipedia.org/wiki/Virtual_machine" target="_blank" rel="noreferrer noopener nofollow">虚拟机</a>,只有一些细微的区别，其中之一是Docker使用相同的操作系统，而VMs使用不同的操作系统实例来将应用程序相互隔离。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/2270492c8c796d7dbf6260efc555c412.png" alt="Containerized Application" class="wp-image-26876" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206051444im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Containerized-Application.png?resize=392%2C452&amp;ssl=1"/><figcaption><em>Containerized Application (<a href="https://web.archive.org/web/20221206051444/https://www.docker.com/resources/what-container" target="_blank" rel="noreferrer noopener nofollow">Source</a>)</em></figcaption></figure></div>
+
+
+
+<p>虽然我不会深入研究Docker，但我会带您安装它并提取一个简单的hello world Docker映像。</p>
+
+
+
+<p>首先，为您的操作系统下载并安装Docker:</p>
+
+
+
+
+
+
+
+<p>通过各自的安装程序下载并安装Docker后，在终端/命令提示符下运行以下命令，以确认Docker已成功安装:</p>
+
+
+
+<pre class="hljs"> docker run hello-world
+</pre>
+
+
+
+<p>它应该输出:</p>
+
+
+
+<pre class="hljs"><span class="livecodeserver">Unable <span class="hljs-built_in">to</span> find image ‘hello-world:latest’ locally
+latest: Pulling <span class="hljs-built_in">from</span> library/hello-world
+<span class="hljs-number">0e03</span>bdcc26d7: Pull complete
+Digest: sha256:<span class="hljs-number">4</span>cf9c47f86df71d48364001ede3a4fcd85ae80ce02ebad74156906caff5378bc
+Status: Downloaded newer image <span class="hljs-keyword">for</span> hello-world:latest
+Hello <span class="hljs-built_in">from</span> Docker!
+This message shows that your installation appears <span class="hljs-built_in">to</span> be working correctly.
+To generate this message, Docker took <span class="hljs-keyword">the</span> following steps:
+<span class="hljs-number">1.</span> The Docker client contacted <span class="hljs-keyword">the</span> Docker daemon.
+<span class="hljs-number">2.</span> The Docker daemon pulled <span class="hljs-keyword">the</span> “hello-world” image <span class="hljs-built_in">from</span> <span class="hljs-keyword">the</span> Docker Hub. (amd64)
+<span class="hljs-number">3.</span> The Docker daemon created <span class="hljs-keyword">a</span> <span class="hljs-built_in">new</span> container <span class="hljs-built_in">from</span> that image which runs <span class="hljs-keyword">the</span> executable that produces <span class="hljs-keyword">the</span> output you are currently reading.
+<span class="hljs-number">4.</span> The Docker daemon streamed that output <span class="hljs-built_in">to</span> <span class="hljs-keyword">the</span> Docker client, which sent <span class="hljs-keyword">it</span> <span class="hljs-built_in">to</span> your terminal.</span></pre>
+
+
+
+<p>如果您得到上面的输出，那么Docker已经成功安装在您的系统上。</p>
+
+
+
+<h3><strong>安装Tensorflow服务</strong></h3>
+
+
+
+<p>现在您已经正确安装了Docker，您将使用它来下载TF Serving。</p>
+
+
+
+<section id="note-block_5f7b4b1fdffe9" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/52781d497694480f64183f94c2b16979.png" data-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>没有Docker也可以安装Tensorflow Serving，但是推荐使用Docker，而且肯定是最简单的。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+
+
+
+<p id="separator-block_60097ea8cacbf" class="block-separator block-separator--5"> </p>
+
+
+
+<p>在您的终端中运行以下命令:</p>
+
+
+
+<pre class="hljs">docker pull tensorflow/serving
+</pre>
+
+
+
+
+
+
+
+<p>这需要一些时间，完成后，将从<a href="https://web.archive.org/web/20221206051444/https://hub.docker.com/" target="_blank" rel="noreferrer noopener nofollow"> Docker Hub </a>下载Tensorflow服务图像。</p>
+
+
+
+<p>如果您在具有GPU的实例上运行Docker，您也可以安装GPU版本:</p>
+
+
+
+<pre class="hljs">docker pull tensorflow/serving:latest-gpu</pre>
+
+
+
+<p>恭喜你。Tensorflow服务已安装。在下一节中，您将使用TensorFlow Keras训练并保存一个简单的图像分类器。</p>
+
+
+
+<h2 id="h-building-training-and-saving-an-image-classification-model">构建、训练和保存影像分类模型</h2>
+
+
+
+<p>为了演示模型服务，您将使用Tensorflow为手写数字创建一个简单的图像分类器。如果您没有安装TensorFlow，请在此处遵循本指南<a href="https://web.archive.org/web/20221206051444/https://www.tensorflow.org/install">。</a></p>
+
+
+
+<section id="note-block_5f7b4b93dffeb" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/52781d497694480f64183f94c2b16979.png" data-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>这不是一个模型优化教程，因此重点是简单性。因此，您不会进行任何大范围的超参数调整，并且构建的模型可能不是最佳的。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+
+
+
+<p id="separator-block_60097eb7cacc0" class="block-separator block-separator--5"> </p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206051444/https://en.wikipedia.org/wiki/MNIST_database" target="_blank" rel="noreferrer noopener nofollow"> MNIST手写数字分类数据集</a>是一个非常流行的图像分类任务。它包含人类手写的数字，任务是将这些数字分类为0到9之间的数字。因为数据集非常受欢迎，Tensorflow预装了它，因此，您可以轻松地加载它。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/481c1278ef61f21d5d0684f6b7cc5f8f.png" alt="Handwritten dataset" class="wp-image-26886" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206051444im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Handwritten-dataset.png?ssl=1"/><figcaption><em> MNIST Handwritten dataset (<a href="https://web.archive.org/web/20221206051444/https://en.wikipedia.org/wiki/MNIST_database#/media/File:MnistExamples.png" target="_blank" rel="noreferrer noopener nofollow">Source</a>)</em></figcaption></figure></div>
+
+
+
+<p>下面，我将指导您加载数据集，然后构建一个简单的深度学习分类器。</p>
+
+
+
+<p><strong>步骤1: </strong>创建一个新的项目目录，并在代码编辑器中打开它。我调用我的<strong> tf-server，</strong>，并在VsCode中打开它。</p>
+
+
+
+<p><strong>第二步:</strong>在项目文件夹中，创建一个名为<strong> model.py，</strong>的新脚本，并粘贴下面的代码:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">from</span> numpy <span class="hljs-keyword">import</span> asarray
+<span class="hljs-keyword">from</span> numpy <span class="hljs-keyword">import</span> unique
+<span class="hljs-keyword">from</span> numpy <span class="hljs-keyword">import</span> argmax
+<span class="hljs-keyword">from</span> tensorflow.keras.datasets.mnist <span class="hljs-keyword">import</span> load_data
+<span class="hljs-keyword">from</span> tensorflow.keras <span class="hljs-keyword">import</span> Sequential
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Dense
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Conv2D
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> MaxPool2D
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Flatten
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Dropout
+
+
+(x_train, y_train), (x_test, y_test) = load_data()
+print(f<span class="hljs-string">'Train: X={x_train.shape}, y={y_train.shape}'</span>)
+print(f<span class="hljs-string">'Test: X={x_test.shape}, y={y_test.shape}'</span>)
+
+
+x_train = x_train.reshape((x_train.shape[<span class="hljs-number">0</span>], x_train.shape[<span class="hljs-number">1</span>], x_train.shape[<span class="hljs-number">2</span>], <span class="hljs-number">1</span>))
+x_test = x_test.reshape((x_test.shape[<span class="hljs-number">0</span>], x_test.shape[<span class="hljs-number">1</span>], x_test.shape[<span class="hljs-number">2</span>], <span class="hljs-number">1</span>))
+
+
+x_train = x_train.astype(<span class="hljs-string">'float32'</span>) / <span class="hljs-number">255.0</span>
+x_test = x_test.astype(<span class="hljs-string">'float32'</span>) / <span class="hljs-number">255.0</span>
+
+
+input_shape = x_train.shape[<span class="hljs-number">1</span>:]
+
+
+n_classes = len(unique(y_train))
+
+
+model = Sequential()
+model.add(Conv2D(<span class="hljs-number">64</span>, (<span class="hljs-number">3</span>,<span class="hljs-number">3</span>), activation=<span class="hljs-string">'relu'</span>, input_shape=input_shape))
+model.add(MaxPool2D((<span class="hljs-number">2</span>, <span class="hljs-number">2</span>)))
+model.add(Conv2D(<span class="hljs-number">32</span>, (<span class="hljs-number">3</span>,<span class="hljs-number">3</span>), activation=<span class="hljs-string">'relu'</span>))
+model.add(MaxPool2D((<span class="hljs-number">2</span>, <span class="hljs-number">2</span>)))
+model.add(Flatten())
+model.add(Dense(<span class="hljs-number">50</span>, activation=<span class="hljs-string">'relu'</span>))
+model.add(Dropout(<span class="hljs-number">0.5</span>))
+model.add(Dense(n_classes, activation=<span class="hljs-string">'softmax'</span>))
+
+
+model.compile(optimizer=<span class="hljs-string">'adam'</span>, loss=<span class="hljs-string">'sparse_categorical_crossentropy'</span>, metrics=[<span class="hljs-string">'accuracy'</span>])
+
+
+model.fit(x_train, y_train, epochs=<span class="hljs-number">10</span>, batch_size=<span class="hljs-number">128</span>, verbose=<span class="hljs-number">1</span>)
+
+
+loss, acc = model.evaluate(x_test, y_test, verbose=<span class="hljs-number">0</span>)
+print(<span class="hljs-string">'Accuracy: %.3f'</span> % acc)
+
+
+ts = int(time.time())
+file_path = f<span class="hljs-string">"./img_classifier/{ts}/"</span>
+model.save(filepath=file_path, save_format=<span class="hljs-string">'tf'</span>)
+</pre>
+
+
+
+<p>上面的代码非常简单，首先，导入将要使用的必要包，并加载预先打包了Tensorflow的MNIST数据集。然后，您将数据整形为使用单通道(黑白)，然后通过除以1/255.0进行归一化。</p>
+
+
+
+<p>接下来，您创建一个简单的卷积神经网络(CNN ),在输出端有9个类，因为您要预测10个类(0–9)。然后，通过指定优化器、损失函数和指标来编译模型。</p>
+
+
+
+<p>接下来，使用128的批量大小来拟合10个时期的模型。拟合后，你在测试数据上评估，打印精度，最后保存模型。</p>
+
+
+
+
+
+
+
+<p>保存模型的代码是基于时间戳的。这是一个很好的做法，强烈推荐。</p>
+
+
+
+<p>您可以检查文件夹中保存的模型。它应该类似于下图所示:</p>
+
+
+
+<pre class="hljs">├── img_classifier
+│ ├── <span class="hljs-number">1600788643</span>
+│ │ ├── assets
+│ │ ├── saved_model.pb
+│ │ └── variables
+</pre>
+
+
+
+<h2 id="h-serving-saved-model-with-tensorflow-serving">使用Tensorflow服务服务保存的模型</h2>
+
+
+
+<p>一旦保存了模型，并且Docker正确安装了<a href="https://web.archive.org/web/20221206051444/https://www.tensorflow.org/tfx/guide/serving" target="_blank" rel="noreferrer noopener nofollow"> Tensorflow Serving </a>，您就可以将其作为API端点。</p>
+
+
+
+<p>值得一提的是，Tensorflow服务支持两种类型的API端点— REST和gRPC。</p>
+
+
+
+<ul><li><strong> REST </strong>是web应用使用的一种通信“协议”。它定义了客户端如何与web服务通信的通信方式。REST客户机使用标准的HTTP方法(如GET、POST、DELETE等)与服务器通信。请求的有效负载大多以JSON格式编码</li><li><a href="https://web.archive.org/web/20221206051444/https://en.wikipedia.org/wiki/GRPC" target="_blank" rel="noreferrer noopener nofollow"> <strong> gRPC </strong> </a> <strong> </strong>另一方面是最初在谷歌开发的通信协议。gRPC使用的标准数据格式称为<a href="https://web.archive.org/web/20221206051444/https://developers.google.com/protocol-buffers" target="_blank" rel="noreferrer noopener nofollow">协议缓冲区</a>。gRPC提供了低延迟的通信和比REST更小的负载，在推理过程中处理非常大的文件时是首选。</li></ul>
+
+
+
+<p>在本教程中，您将使用REST端点，因为它更容易使用和检查。还应该注意的是，Tensorflow服务将在您运行它时提供两个端点，因此您不需要担心额外的配置和设置。</p>
+
+
+
+<p>按照以下步骤为您的模型提供服务:</p>
+
+
+
+<p>首先在你的项目文件夹中<strong>、</strong>，打开一个终端，并在下面添加Docker命令:</p>
+
+
+
+<pre class="hljs">docker run -p 8501:8501 --name tfserving_classifier
+--mount <span class="hljs-built_in">type</span>=<span class="hljs-built_in">bind</span>,<span class="hljs-built_in">source</span>=/Users/tf-server/img_classifier/,target=/models/img_classifier
+<span class="hljs-_">-e</span> MODEL_NAME=img_classifier -t tensorflow/serving
+</pre>
+
+
+
+<p>让我们来理解每一个论点:</p>
+
+
+
+<ul><li><strong> -p 8501:8501: </strong>这是REST端点端口。每个预测请求都将发送到该端口。例如，您可以向<a href="https://web.archive.org/web/20221206051444/http://localhost:8501/" rel="nofollow"> http://localhost:8501 </a>发出一个预测请求。</li><li><strong> —名称tfserving_classifier: </strong>这是给予运行tfserving的Docker容器的名称。它可用于稍后启动和停止容器实例。</li><li><strong> — mount type=bind，source =/Users/TF-server/img _ classifier/，target =/models/img _ classifier:</strong>mount命令只是将模型从指定路径(<strong>/Users/TF-server/img _ classifier/</strong>)复制到Docker容器(<strong> /models/img_classifier </strong>)中，这样TF Serving就可以访问它了。</li></ul>
+
+
+
+<section id="note-block_5f7b4c95dffed" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/52781d497694480f64183f94c2b16979.png" data-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>如果遇到路径错误:</p>
+                                    </div>
+
+            </div>
+                    <div class="c-item c-item--wysiwyg_editor">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/52781d497694480f64183f94c2b16979.png" data-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p><i> docker:来自守护程序的错误响应:类型“bind”的挂载配置无效:绑定源路径不存在:/User/TF-server/img _ classifier/。</i></p>
+                                    </div>
+
+            </div>
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/52781d497694480f64183f94c2b16979.png" data-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>然后指定模型文件夹的完整路径。记住，不是模型本身，而是模型文件夹。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+
+
+
+<p id="separator-block_60097ed8cacc1" class="block-separator block-separator--5"> </p>
+
+
+
+<ul><li><strong>-e MODEL _ NAME = img _ classifier:</strong>要运行的模型名称。这是您用来保存模型的名称。</li><li><strong> -t tensorflow/serving: </strong>要运行的TF Serving Docker容器。</li></ul>
+
+
+
+<p>运行上面的命令启动Docker容器，TF Serving公开gRPC (0.0.0.0:8500)和REST (localhost:8501)端点。</p>
+
+
+
+
+
+
+
+<p>既然端点已经启动并运行，您可以通过HTTP请求对它进行推理调用。下面我们来演示一下。</p>
+
+
+
+<p>在您的项目文件夹中创建一个名为<strong> predict.py，</strong>的新脚本，并添加以下代码行来导入一些包:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> tensorflow.keras.datasets.mnist <span class="hljs-keyword">import</span> load_data
+</pre>
+
+
+
+<p><strong> requests </strong>包用于构造HTTP调用并将其发送到服务器，而<strong> json </strong>包将用于在发送数据(图像)之前对其进行解析。</p>
+
+
+
+<p>接下来，您将加载数据并对其进行预处理:</p>
+
+
+
+<pre class="hljs">
+(_, _), (x_test, y_test) = load_data()
+
+
+x_test = x_test.reshape((x_test.shape[<span class="hljs-number">0</span>], x_test.shape[<span class="hljs-number">1</span>], x_test.shape[<span class="hljs-number">2</span>], <span class="hljs-number">1</span>))
+
+x_test = x_test.astype(<span class="hljs-string">'float32'</span>) / <span class="hljs-number">255.0</span>
+</pre>
+
+
+
+<p>注意，我们只关心这里的测试数据。您将加载它，并执行您在模型训练期间添加的相同预处理步骤。</p>
+
+
+
+<p>接下来，定义REST端点URL:</p>
+
+
+
+<pre class="hljs">
+url = <span class="hljs-string">'http://localhost:8501/v1/models/img_classifier:predict'</span>
+</pre>
+
+
+
+<p>预测URL由几个重要部分组成。一般结构可能如下所示:</p>
+
+
+
+<p><strong>T1】http://{ HOST }:{ PORT }/v1/models/{ MODEL _ NAME }:{ VERB }</strong></p>
+
+
+
+<ul><li><strong>主机</strong>:您的模型服务器的域名或IP地址</li><li><strong>端口</strong>:你的URL的服务器端口。默认情况下，TF Serving对REST端点使用8501。</li><li><strong> MODEL_NAME </strong>:你服务的模特的名字。</li><li><strong>动词</strong>:动词与你的模特签名有关。您可以指定<em>预测</em>、<em>分类</em>或<em>回归</em>之一。</li></ul>
+
+
+
+<p>接下来，添加一个向端点发出请求的函数:</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">make_prediction</span><span class="hljs-params">(instances)</span>:</span>
+   data = json.dumps({<span class="hljs-string">"signature_name"</span>: <span class="hljs-string">"serving_default"</span>, <span class="hljs-string">"instances"</span>: instances.tolist()})
+   headers = {<span class="hljs-string">"content-type"</span>: <span class="hljs-string">"application/json"</span>}
+   json_response = requests.post(url, data=data, headers=headers)
+   predictions = json.loads(json_response.text)[<span class="hljs-string">'predictions'</span>]
+   <span class="hljs-keyword">return</span> predictions
+</pre>
+
+
+
+<p>在上面的预测代码中，首先定义一个JSON数据负载。TF Serving期望数据为JSON，格式为:</p>
+
+
+
+<p><strong> <em> { "签名_名称":"&lt;字符串&gt;"，</em> </strong> <br/> <strong> <em>"实例":&lt;值&gt; } </em> </strong></p>
+
+
+
+<p>“<strong>签名名</strong>”是可选的，可以忽略。“<strong>实例</strong>”另一方面是您想要预测的数据/输入/实例。你应该把它作为一个列表来传递。</p>
+
+
+
+<p>构造完参数后，您向端点发送一个请求，并加载返回的响应。</p>
+
+
+
+<p>为了测试这一点，您将对4幅测试图像进行预测，如下所示:</p>
+
+
+
+<section id="note-block_5f7b4e30dfff2" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--wysiwyg_editor">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/52781d497694480f64183f94c2b16979.png" data-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206051444/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>要运行<strong> predict.py </strong>文件，在新的终端窗口中运行<code>python predict.py</code>之前，确保TF服务容器仍然是活动的。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+
+
+
+<p id="separator-block_60097ee3cacc2" class="block-separator block-separator--5"> </p>
+
+
+
+<pre class="hljs">predictions = make_prediction(x_test[<span class="hljs-number">0</span>:<span class="hljs-number">4</span>])
+</pre>
+
+
+
+<pre class="hljs"><span class="dns">//output
+[[<span class="hljs-number">1</span>.<span class="hljs-number">55789715</span>e-<span class="hljs-number">12</span>, <span class="hljs-number">1</span>.<span class="hljs-number">01289466</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">1</span>.<span class="hljs-number">07480628</span>e-<span class="hljs-number">06</span>, <span class="hljs-number">1</span>.<span class="hljs-number">951177</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">1</span>.<span class="hljs-number">01430878</span>e-<span class="hljs-number">10</span>,
+<span class="hljs-number">5</span>.<span class="hljs-number">59054842</span>e-<span class="hljs-number">12</span>, <span class="hljs-number">1</span>.<span class="hljs-number">90570039</span>e-<span class="hljs-number">17</span>, <span class="hljs-number">0</span>.<span class="hljs-number">999998927</span>, <span class="hljs-number">4</span>.<span class="hljs-number">16908175</span>e-<span class="hljs-number">10</span>, <span class="hljs-number">5</span>.<span class="hljs-number">94038907</span>e-<span class="hljs-number">09</span>],
+[<span class="hljs-number">6</span>.<span class="hljs-number">92498414</span>e-<span class="hljs-number">09</span>, <span class="hljs-number">1</span>.<span class="hljs-number">17453965</span>e-<span class="hljs-number">07</span>, <span class="hljs-number">0</span>.<span class="hljs-number">999999762</span>, <span class="hljs-number">5</span>.<span class="hljs-number">34944755</span>e-<span class="hljs-number">09</span>, <span class="hljs-number">2</span>.<span class="hljs-number">81366846</span>e-<span class="hljs-number">10</span>,
+<span class="hljs-number">1</span>.<span class="hljs-number">96253143</span>e-<span class="hljs-number">13</span>, <span class="hljs-number">9</span>.<span class="hljs-number">2470593</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">3</span>.<span class="hljs-number">83119664</span>e-<span class="hljs-number">12</span>, <span class="hljs-number">5</span>.<span class="hljs-number">33368405</span>e-<span class="hljs-number">10</span>, <span class="hljs-number">1</span>.<span class="hljs-number">53420621</span>e-<span class="hljs-number">14</span>],
+[<span class="hljs-number">3</span>.<span class="hljs-number">00994889</span>e-<span class="hljs-number">11</span>, <span class="hljs-number">0.999996185</span>, <span class="hljs-number">4</span>.<span class="hljs-number">14686845</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">3</span>.<span class="hljs-number">98606517</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">3</span>.<span class="hljs-number">23575978</span>e-<span class="hljs-number">06</span>,
+<span class="hljs-number">1</span>.<span class="hljs-number">82125728</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">2</span>.<span class="hljs-number">17237588</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">1</span>.<span class="hljs-number">60862257</span>e-<span class="hljs-number">07</span>, <span class="hljs-number">2</span>.<span class="hljs-number">42824342</span>e-<span class="hljs-number">07</span>, <span class="hljs-number">4</span>.<span class="hljs-number">56675897</span>e-<span class="hljs-number">09</span>],
+[<span class="hljs-number">0.999992132</span>, <span class="hljs-number">5</span>.<span class="hljs-number">11100086</span>e-<span class="hljs-number">11</span>, <span class="hljs-number">2</span>.<span class="hljs-number">94807769</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">1</span>.<span class="hljs-number">22479553</span>e-<span class="hljs-number">11</span>, <span class="hljs-number">1</span>.<span class="hljs-number">47668822</span>e-<span class="hljs-number">09</span>,
+<span class="hljs-number">4</span>.<span class="hljs-number">50467552</span>e-<span class="hljs-number">10</span>, <span class="hljs-number">7</span>.<span class="hljs-number">61841738</span>e-<span class="hljs-number">06</span>, <span class="hljs-number">2</span>.<span class="hljs-number">56232635</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">6</span>.<span class="hljs-number">94065747</span>e-<span class="hljs-number">08</span>, <span class="hljs-number">2</span>.<span class="hljs-number">13664606</span>e-<span class="hljs-number">07</span>]]
+</span></pre>
+
+
+
+<p>这将返回一个与您预测的4幅图像相对应的4x 10数组，以及每个类别的概率值(0–9)。</p>
+
+
+
+<p>要获得实际的预测类，可以使用如下所示的“np.argmax”函数:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">for</span> pred <span class="hljs-keyword">in</span> predictions:
+    print(np.argmax(pred))
+</pre>
+
+
+
+<pre class="hljs"><span class="1c">
+<span class="hljs-number">7</span>
+<span class="hljs-number">2</span>
+<span class="hljs-number">1</span>
+<span class="hljs-number">0</span>
+</span></pre>
+
+
+
+<p>您还可以通过与真实值进行比较来检查预测的正确程度，如下所示:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">for</span> i, pred <span class="hljs-keyword">in</span> enumerate(predictions):
+    print(f<span class="hljs-string">"True Value: {y_test[i]}, Predicted Value: {np.argmax(pred)}"</span>)
+</pre>
+
+
+
+<pre class="hljs">//output
+<span class="hljs-keyword">True</span> <span class="hljs-keyword">Value</span>: <span class="hljs-number">7</span>, Predicted <span class="hljs-keyword">Value</span>: <span class="hljs-number">7</span>
+<span class="hljs-keyword">True</span> <span class="hljs-keyword">Value</span>: <span class="hljs-number">2</span>, Predicted <span class="hljs-keyword">Value</span>: <span class="hljs-number">2</span>
+<span class="hljs-keyword">True</span> <span class="hljs-keyword">Value</span>: <span class="hljs-number">1</span>, Predicted <span class="hljs-keyword">Value</span>: <span class="hljs-number">1</span>
+<span class="hljs-keyword">True</span> <span class="hljs-keyword">Value</span>: <span class="hljs-number">0</span>, Predicted <span class="hljs-keyword">Value</span>: <span class="hljs-number">0</span></pre>
+
+
+
+<p><strong> predict.py </strong>的完整代码如下所示:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> requests
+<span class="hljs-keyword">import</span> base64
+<span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> tensorflow.keras.datasets.mnist <span class="hljs-keyword">import</span> load_data
+
+
+(_, _), (x_test, y_test) = load_data()
+
+x_test = x_test.reshape((x_test.shape[<span class="hljs-number">0</span>], x_test.shape[<span class="hljs-number">1</span>], x_test.shape[<span class="hljs-number">2</span>], <span class="hljs-number">1</span>))
+
+x_test = x_test.astype(<span class="hljs-string">'float32'</span>) / <span class="hljs-number">255.0</span>
+
+
+url = <span class="hljs-string">'http://localhost:8501/v1/models/img_classifier:predict'</span>
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">make_prediction</span><span class="hljs-params">(instances)</span>:</span>
+   data = json.dumps({<span class="hljs-string">"signature_name"</span>: <span class="hljs-string">"serving_default"</span>, <span class="hljs-string">"instances"</span>: instances.tolist()})
+   headers = {<span class="hljs-string">"content-type"</span>: <span class="hljs-string">"application/json"</span>}
+   json_response = requests.post(url, data=data, headers=headers)
+   predictions = json.loads(json_response.text)[<span class="hljs-string">'predictions'</span>]
+   <span class="hljs-keyword">return</span> predictions
+
+predictions = make_prediction(x_test[<span class="hljs-number">0</span>:<span class="hljs-number">4</span>])
+
+<span class="hljs-keyword">for</span> i, pred <span class="hljs-keyword">in</span> enumerate(predictions):
+   print(f<span class="hljs-string">"True Value: {y_test[i]}, Predicted Value: {np.argmax(pred)}"</span>)
+</pre>
+
+
+
+<p>就是这样！您已经能够:</p>
+
+
+
+<ul><li>保存一个训练好的模型，</li><li>启动TF服务服务器，</li><li>并向其发送预测请求。</li></ul>
+
+
+
+<p>TF Serving为您处理所有的模型和API基础设施，以便您可以专注于模型优化。</p>
+
+
+
+<p>请注意，一旦新模型出现在model文件夹中，TF serving就会自动加载它。例如，更改模型的一些参数，如历元大小，然后重新训练模型。</p>
+
+
+
+<p>一旦训练完成并且您保存了模型，TF Serving会自动检测这个新模型，卸载旧模型，并加载新版本。</p>
+
+
+
+
+
+
+
+<p>模型的自动热交换非常有效，并且可以很容易地内置到<a href="/web/20221206051444/https://neptune.ai/blog/continuous-integration-for-machine-learning-with-github-actions-and-neptune" target="_blank" rel="noreferrer noopener nofollow"> ML CI/CD管道</a>中，这样您就可以更专注于模型优化，而不是模型服务基础设施。</p>
+
+
+
+<h2 id="h-best-practices-of-using-tensorflow-serving">使用Tensorflow服务的最佳实践</h2>
+
+
+
+<ul><li>通过Docker容器使用TF服务是明智的，也更容易，因为这可以很容易地与现有系统集成。如果需要更多的自定义构建或安装，可以从源代码构建TF Serving。跟随向导<a href="https://web.archive.org/web/20221206051444/https://github.com/tensorflow/serving/blob/master/tensorflow_serving/g3doc/building_with_docker.md" target="_blank" rel="noreferrer noopener nofollow">到这里</a>。</li><li>在推理过程中处理大型数据集时，<a href="https://web.archive.org/web/20221206051444/https://medium.com/@avidaneran/tensorflow-serving-rest-vs-grpc-e8cef9d4ff62" target="_blank" rel="noreferrer noopener nofollow">使用gRPC作为端点</a>会更有效。另外，请参见在Kubernetes 上设置<a href="https://web.archive.org/web/20221206051444/https://github.com/tensorflow/serving/blob/master/tensorflow_serving/g3doc/serving_kubernetes.md" target="_blank" rel="noreferrer noopener nofollow"> TF服务。</a></li><li>在Docker运行阶段加载模型时，可能会出现路径错误。您可以通过指定完整路径而不是绝对路径来解决这个问题。</li><li>建议将TF引入<a href="https://web.archive.org/web/20221206051444/https://www.tensorflow.org/tfx" rel="noreferrer noopener nofollow" target="_blank"> TFX管道</a>。这样模特在由TF上菜前会被<a href="https://web.archive.org/web/20221206051444/https://www.tensorflow.org/tfx/guide/evaluator" rel="noreferrer noopener nofollow" target="_blank">自动审查</a>。</li><li>有时，默认端口8501可能不可用或被其他系统进程使用，您可以在运行Docker映像时轻松地将其更改为另一个端口。</li></ul>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>在本教程中，您学习了如何:</p>
+
+
+
+<ul><li>通过Docker安装Tensorflow服务</li><li>训练并保存张量流图像分类器</li><li>通过REST端点服务保存的模型</li><li>通过TF服务端点使用模型进行推理</li></ul>
+
+
+
+<p>有了这些知识，您就可以为生产环境构建高效的模型管道，不仅可以伸缩，而且可以适当伸缩！</p>
+
+
+
+<p><strong> <a href="https://web.archive.org/web/20221206051444/https://github.com/risenW/tensorflow_serving_app" target="_blank" rel="noreferrer noopener nofollow">将</a>链接到Github上的项目代码</strong></p>
+        </div>
+        
+    </div>    
+</body>
+</html>

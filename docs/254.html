@@ -1,0 +1,770 @@
+<html>
+<head>
+<title>Logging in Reinforcement Learning Frameworks - What You Need to Know </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>登录强化学习框架——你需要知道什么</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/logging-in-reinforcement-learning-frameworks#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/logging-in-reinforcement-learning-frameworks#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>日志通常是一个重要的问题，因为框架有不同的方法。在本文中，我将向您展示日志记录是如何在流行的强化学习框架中实现的。</p>
+
+
+
+<p>在我的前一篇文章中，我讨论了如何理解强化学习代理，以及在训练和调试期间应该记录什么以及为什么要记录。</p>
+
+
+
+<p>在本教程中，<strong>我将向您展示日志如何在不同的框架中工作，以及如何轻松地向它们添加您自己的日志记录器</strong>(我将以Neptune为例)。框架包括<a href="https://web.archive.org/web/20221206025247/https://github.com/deepmind/acme" target="_blank" rel="noreferrer noopener nofollow"> Acme </a>、<a href="https://web.archive.org/web/20221206025247/https://docs.ray.io/en/master/rllib.html" target="_blank" rel="noreferrer noopener nofollow"> RLlib </a>、<a href="https://web.archive.org/web/20221206025247/https://spinningup.openai.com/en/latest/" target="_blank" rel="noreferrer noopener nofollow"> SpinningUp </a>和<a href="https://web.archive.org/web/20221206025247/https://stable-baselines.readthedocs.io/en/master/" target="_blank" rel="noreferrer noopener nofollow">稳定基线</a>。</p>
+
+
+
+<p>我创建了一个GitHub存储库，里面有本教程的所有补充材料<a href="https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging" target="_blank" rel="noreferrer noopener">在这里</a>。</p>
+
+
+
+
+
+
+<h2 id="h-approaches-to-logging-in-reinforcement-learning">强化学习中的登录方法</h2>
+
+
+
+<p>有两种最常见的日志记录方法，我称之为<strong>“存储然后记录”</strong>和<strong>“现在写”</strong>(一语双关)<strong>。</strong></p>
+
+
+
+<h2 id="h-store-then-log">存储然后记录</h2>
+
+
+
+<p>在这种方法中，<strong>您首先在运行时存储指标，在指定的时间间隔(比如每10 000个时间步长)之后，您计算这些指标的聚合统计信息并记录它们</strong>。</p>
+
+
+
+<p>原则上，这意味着您可以存储，例如，跨许多集的集回报，并汇总结果以获得跨存储值的平均集回报。</p>
+
+
+
+<p>这在随机环境中非常有用，或者当你的策略是随机的，每次运行代理时你可以得到不同的事件回报。如果是这种情况，您必须考虑平均值来减少日志中的噪声。</p>
+
+
+
+<p>这种日志记录方法可以在旋转上升和稳定基线框架中找到。</p>
+
+
+
+<h3><strong>旋转起来</strong></h3>
+
+
+
+<p>在spin Up中，更容易看到“存储然后记录”的方法，因为代码非常简单，所以我们将使用它来描述这种方法，然后我将讨论如何将这样的自定义日志程序添加到上述两个框架中。</p>
+
+
+
+<h3><strong/>示例中的“存储然后记录”</h3>
+
+
+
+<p>下面是旋转(纪元)记录器API。我删掉了不太重要的代码。</p>
+
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Logger</span>:</span>
+    <span class="hljs-string">"""
+    A Logger tailored for tracking average values over epochs.
+
+    Typical use case: there is some quantity which is calculated many times
+    throughout an epoch, and at the end of the epoch, you would like to
+    report the average / std / min / max value of that quantity.
+    """</span>
+    [...]
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">store</span><span class="hljs-params">(self, **kwargs)</span>:</span>
+
+        <span class="hljs-string">"""
+        Save something into the epoch_logger's current state.
+
+        Provide an arbitrary number of keyword arguments with numerical
+        values.
+        """</span>
+
+        [...]
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">log_tabular</span><span class="hljs-params">(self, key, val=None, with_min_and_max=False, average_only=False)</span>:</span>
+        <span class="hljs-string">"""
+        Log a value or possibly the mean/std/min/max values of a diagnostic.
+
+        Args:
+            key (string): The name of the diagnostic. If you are logging a
+                diagnostic whose state has previously been saved with
+                ``store``, the key here has to match the key you used there.
+            val: A value for the diagnostic. If you have previously saved
+                values for this key via ``store``, do *not* provide a ``val``
+                here.
+            with_min_and_max (bool): If true, log min and max values of the
+                diagnostic over the epoch.
+            average_only (bool): If true, do not log the standard deviation
+                of the diagnostic over the epoch.
+        """</span>
+
+        [...]
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dump_tabular</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-string">"""
+        Write all of the diagnostics from the current iteration.
+
+        Writes both to stdout, and to the output file.
+        """</span>
+
+        [...]</pre>
+
+
+
+<p>可以看到，logger有三个主要方法:<em> store </em>、<em> log_tabular、</em>和<em> dump_tabular </em>。</p>
+
+
+
+<ul><li><strong> <em>存储</em> </strong>每次被调用的数量要汇总并计算日志。它只是存储值，如剧集回报或一些学习指标，用于未来的计算。</li><li><strong> <em> log_tabular </em> </strong>在epoch结束时被调用，记录存储的指标的统计数据。您可以选择记录平均值和标准差(参数<em> average_only=False </em>)，或仅记录平均值(参数<em> average_only=True </em>)，或另外记录最小值和最大值(参数<em> with_min_and_max=True </em>)。</li><li><strong> <em> dump_tabular </em> </strong>在命令行中完成操作并打印日志。<strong>这是为计算的统计数据添加您的自定义目的地的地方，例如将它们发送到Neptune。</strong></li></ul>
+
+
+
+<p>现在让我们看一下在旋转VPG实现中使用“存储然后记录”方法和EpochLogger的代码示例(同样，为了清楚起见，稍微做了修改和删减)。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">update</span><span class="hljs-params">()</span>:</span>
+    ...some policy optimization code...
+    logger.store(LossPi=pi_l_old, LossV=v_l_old)
+
+
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(epochs):
+    
+    <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> range(steps_per_epoch):
+        a, ... = ...get action...
+
+        next_o, r, d, _ = env.step(a)
+        ep_ret += r
+        ep_len += <span class="hljs-number">1</span>
+
+        ...
+
+        <span class="hljs-keyword">if</span> d <span class="hljs-keyword">is</span> <span class="hljs-keyword">True</span>:
+            
+            logger.store(EpRet=ep_ret, EpLen=ep_len)
+            ...
+
+    
+    update()
+
+    
+    logger.log_tabular(<span class="hljs-string">'Epoch'</span>, epoch)
+    logger.log_tabular(<span class="hljs-string">'EpRet'</span>, with_min_and_max=<span class="hljs-keyword">True</span>)
+    logger.log_tabular(<span class="hljs-string">'EpLen'</span>, average_only=<span class="hljs-keyword">True</span>)
+    logger.log_tabular(<span class="hljs-string">'LossPi'</span>, average_only=<span class="hljs-keyword">False</span>)
+    logger.log_tabular(<span class="hljs-string">'LossV'</span>, average_only=<span class="hljs-keyword">False</span>)
+    logger.dump_tabular()</pre>
+
+
+
+<h3><strong>定制记录器</strong></h3>
+
+
+
+<p>正在旋转的日志程序存在于<em> logx.py </em>文件中，不幸的是，没有简单的方法来覆盖它以将日志发送到Neptune。在其设计中非常简单的旋转是非常硬编码的，这阻碍了在不修改原始代码的情况下扩展它的能力。也就是说，我为你修改了代码，你可以从<a href="https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging/tree/master/spinning_up">这里</a>得到。在链接中，您还可以找到一个示例运行脚本。</p>
+
+
+
+<p>要使用日志程序，请用上面提供的实现替换正在运行的代码中的<em> logx.py </em>文件(在<a href="https://web.archive.org/web/20221206025247/https://spinningup.openai.com/en/latest/user/installation.html#installing-spinning-up">安装</a>期间克隆的)。然后，您可以在启动中运行任何现有的代理，如下所示:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> gym
+<span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+
+<span class="hljs-keyword">from</span> spinup <span class="hljs-keyword">import</span> ppo_tf1 <span class="hljs-keyword">as</span> ppo
+
+env_fn = <span class="hljs-keyword">lambda</span> : gym.make(<span class="hljs-string">'LunarLander-v2'</span>)
+
+ac_kwargs = dict(hidden_sizes=[<span class="hljs-number">64</span>,<span class="hljs-number">64</span>], activation=tf.nn.relu)
+
+neptune.init(project_qualified_name=<span class="hljs-string">'&lt;namespace/project_name&gt;'</span>)
+experiment = neptune.create_experiment()
+
+logger_kwargs = dict(output_dir=<span class="hljs-string">'path/to/output_dir'</span>,
+                     exp_name=<span class="hljs-string">'experiment_name'</span>,
+                     neptune_experiment=experiment)
+
+ppo(env_fn=env_fn, ac_kwargs=ac_kwargs, steps_per_epoch=<span class="hljs-number">5000</span>, epochs=<span class="hljs-number">250</span>, logger_kwargs=logger_kwargs)
+</pre>
+
+
+
+<p>更多信息请参见Spinning Up网站的<a href="https://web.archive.org/web/20221206025247/https://spinningup.openai.com/en/latest/user/running.html#launching-from-scripts" target="_blank" rel="noreferrer noopener nofollow">运行实验</a>部分。</p>
+
+
+
+<h3><strong>稳定基线</strong></h3>
+
+
+
+<p>稳定基线是一个更高级的框架，就日志记录方法而言，它在本质上非常类似于向上旋转，但是，与向上旋转相比，它是可扩展的。<a href="https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging/tree/master/stable_baselines">在这里</a>你可以找到我为你准备的Neptune记录器代码和运行示例。你可以根据自己的需要进行调整。</p>
+
+
+
+<p>现在让我们看看如何在稳定的基线中实现Neptune实验的定制日志输出。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">from</span> stable_baselines <span class="hljs-keyword">import</span> logger
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NeptuneLogger</span><span class="hljs-params">(logger.KVWriter)</span>:</span>
+    <span class="hljs-string">"""Stable Baselines Neptune logger."""</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, experiment)</span>:</span>
+        super().__init__()
+        self._experiment = experiment
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">writekvs</span><span class="hljs-params">(self, kvs)</span>:</span>
+        <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> sorted(kvs.items()):
+            <span class="hljs-keyword">if</span> hasattr(v, <span class="hljs-string">'dtype'</span>):
+                v = float(v)
+            self._experiment.log_metric(k, v)</pre>
+
+
+
+<p>在这里你可以看到如何使用我们的记录器。我们首先导入它，然后创建Neptune实验，并将我们的记录器添加到默认的记录器输出中。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">import</span> stable_baselines  
+<span class="hljs-keyword">from</span> stable_baselines <span class="hljs-keyword">import</span> logger
+
+<span class="hljs-keyword">from</span> logger <span class="hljs-keyword">import</span> NeptuneLogger
+
+neptune.init(project_qualified_name=<span class="hljs-string">'&lt;namespace/project_name&gt;'</span>)
+experiment = neptune.create_experiment()
+
+logger_ = logger.Logger.CURRENT
+logger_.output_formats.append(NeptuneLogger(experiment))
+
+...further training code...
+</pre>
+
+
+
+<p>您可以在此找到更多关于培训稳定基线代理<a href="https://web.archive.org/web/20221206025247/https://stable-baselines.readthedocs.io/en/master/guide/quickstart.html" target="_blank" rel="noreferrer noopener nofollow">的信息。</a></p>
+
+
+
+<h2 id="h-write-now">现在写</h2>
+
+
+
+<p>这是一个概念上更简单的方法，因为你不需要存储任何东西。你只需记录可用的值，例如在每集之后。您记录或“立即”写入值，因此得名“立即写入”。是Acme和RLlib用的。</p>
+
+
+
+<p>这种简单的方法有其缺点。主要问题是记录值中的高噪声。我们可以在这里回忆随机环境/政策的问题，但是训练统计数据作为一个损失，受到高方差的影响。</p>
+
+
+
+<p>在命令行中查看每一集的打印值将是一场噩梦。但是只要我们使用像Neptune这样的实验跟踪工具，这并不是什么大问题。</p>
+
+
+
+<p>Neptune将获取所有这些细粒度的值，对它们进行平均，并将它们与最大值和最小值一起呈现在可解释的图表上(如图1中的阴影区域所示)。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/3d8c227e4d35b0c04071498749ce1312.png" alt="RL visualization Neptune" class="wp-image-31273" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206025247im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/RL-visualization-Neptune-1.png?ssl=1"/><figcaption><em>Figure 1. DDPG’s critic loss on the Y-axis and timesteps on the X-axis. The agent was trained on the Humanoid MuJoCo environment.</em></figcaption></figure></div>
+
+
+
+<h3><strong>过滤器</strong></h3>
+
+
+
+<p>如果您仍然希望手动修复日志中差异较大的问题，可以使用过滤器。</p>
+
+
+
+<p>过滤器是记录器上的包装器，它在记录值之前对值进行一些转换。</p>
+
+
+
+<p>对于Acme，我为你准备了两个。一个用于值平滑(参见本系列讲座的<a href="https://web.archive.org/web/20221206025247/https://www.youtube.com/watch?v=lAq96T8FkTw" target="_blank" rel="noreferrer noopener nofollow">指数加权移动平均线</a>，或EMA，来自吴恩达)，另一个用于计算聚集统计数据，如“存储然后记录”。</p>
+
+
+
+<p>所有这些最好用一个例子来描述，所以让我们跳到极致。</p>
+
+
+
+<h3><strong>极致</strong></h3>
+
+
+
+<p>和以前一样，我将使用两者中更简单的框架来介绍这种方法。然后我们将讨论自定义记录器和过滤器的实现。</p>
+
+
+
+<h3><strong/>示例中的“现在写”</h3>
+
+
+
+<p>下面是取自Acme <em> EnvironmentLoop </em>类的“立即编写”方法(为了清楚起见，稍作修改)。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run_episode</span><span class="hljs-params">()</span>:</span>
+    ...reset any counts <span class="hljs-keyword">and</span> start the environment...
+    
+    <span class="hljs-keyword">while</span> <span class="hljs-keyword">not</span> timestep.last():
+        
+        
+        action = actor.select_action(timestep.observation)
+        timestep = environment.step(action)
+        episode_return += timestep.reward
+
+        ...
+
+        <span class="hljs-keyword">if</span> should_update:
+            actor.update()
+
+    
+    episode_steps += <span class="hljs-number">1</span>
+    
+    steps_per_second = episode_steps / (time.time() - start_time)
+    result = {
+        <span class="hljs-string">'episode_length'</span>: episode_steps,
+        <span class="hljs-string">'episode_return'</span>: episode_return,
+        <span class="hljs-string">'steps_per_second'</span>: steps_per_second,
+    }
+    logger.write(result)</pre>
+
+
+
+<p>如您所见，记录器是一个简单的对象。每集之后，你把结果写到里面。结果是一个字典，其中的键是日志名，值是度量。没什么复杂的。</p>
+
+
+
+<h3><strong>定制记录器</strong></h3>
+
+
+
+<p>让我们来看看我为您准备的自定义Neptune日志程序代码和过滤器。记录器和过滤器在示例运行脚本旁的<a href="https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging/tree/master/acme">处</a>可用。</p>
+
+
+
+<h4><strong>记录器</strong></h4>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> collections
+<span class="hljs-keyword">import</span> re
+
+<span class="hljs-keyword">import</span> acme.utils.loggers <span class="hljs-keyword">as</span> acme_loggers
+<span class="hljs-keyword">import</span> acme.utils.tree_utils <span class="hljs-keyword">as</span> acme_tree
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NeptuneLogger</span><span class="hljs-params">(acme_loggers.base.Logger)</span>:</span>
+    <span class="hljs-string">"""Neptune logger for Acme.
+    Args:
+        prefix (string): The string used to prefix data keys in a name of a log.
+          Can be None in which case no prefix is used.
+        index_name (string): The data key which value to use as a log index.
+          Can be None in which case no index is used.
+    """</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, experiment, prefix=None, index_name=None)</span>:</span>
+        super()
+        self._experiment = experiment
+        self._prefix = prefix
+        self._index_name = index_name <span class="hljs-keyword">or</span> <span class="hljs-string">''</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span><span class="hljs-params">(self, values)</span>:</span>
+        <span class="hljs-string">"""Send `values` to Neptune."""</span>
+        values = acme_loggers.to_numpy(values)
+        index = values.pop(self._index_name, <span class="hljs-keyword">None</span>)
+        <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">in</span> values.items():
+            prefixed_key = f<span class="hljs-string">'{self._prefix}/{key}'</span> <span class="hljs-keyword">if</span> self._prefix <span class="hljs-keyword">else</span> key
+            <span class="hljs-keyword">if</span> index:
+                self._experiment.log_metric(prefixed_key, index, value)
+            <span class="hljs-keyword">else</span>:
+                self._experiment.log_metric(prefixed_key, value)</pre>
+
+
+
+<p>这很简单，你只需要实现一个方法--如Neptune记录器所示。</p>
+
+
+
+<p>现在让我们跳到过滤器。</p>
+
+
+
+<h4><strong>平滑滤波器</strong></h4>
+
+
+
+<pre class="hljs">
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SmoothingFilter</span><span class="hljs-params">(acme_loggers.base.Logger)</span>:</span>
+    <span class="hljs-string">"""Logger which writes to another logger, smoothing matching data.
+    Args:
+        to (Logger): An object to which the current object will forward the
+          original data and its results when `write` is called.
+        smoothing_regex (string): A regex of data keys which should be smoothed.
+        smoothing_coeff (float): A desired smoothing strength between 0 and 1.
+    Note:
+        For example values of regex = 'return' and coeff = 0.99 will calculate
+        the running average of all data which contain 'return' in their key.
+        It's calculated according to: average = 0.99 * average + 0.01 * value.
+        Warm-up period of length 10 is also applied (see the comment in code).
+    """</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, to, smoothing_regex, smoothing_coeff)</span>:</span>
+        super()
+        self._to = to
+        self._smoothing_regex = smoothing_regex
+        self._smoothing_coeff = smoothing_coeff
+
+        self._previous_values = collections.defaultdict(float)
+        self._smoothing_coeffs = collections.defaultdict(float)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span><span class="hljs-params">(self, values)</span>:</span>
+        <span class="hljs-string">"""Smooths matching data and forwards it with the original data."""</span>
+        values_ = dict(values)
+
+        <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">in</span> values.items():
+            <span class="hljs-keyword">if</span> re.search(self._smoothing_regex, key) <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">None</span>:
+                smoothed_key = f<span class="hljs-string">'{key}_smoothed_{self._smoothing_coeff}'</span>
+                prev_value = self._previous_values[smoothed_key]
+                prev_smoothing_coeff = self._smoothing_coeffs[smoothed_key]
+
+                
+                
+                
+                
+                
+                new_smoothing_coeff = (prev_smoothing_coeff * <span class="hljs-number">0.9</span> +
+                                       self._smoothing_coeff * <span class="hljs-number">0.1</span>)
+                smoothed_value = (value * (<span class="hljs-number">1</span> - prev_smoothing_coeff) +
+                                  prev_value * prev_smoothing_coeff)
+
+                self._previous_values[smoothed_key] = smoothed_value
+                self._smoothing_coeffs[smoothed_key] = new_smoothing_coeff
+                values_[smoothed_key] = smoothed_value
+
+        self._to.write(values_)</pre>
+
+
+
+<p>您将一个正则表达式传递给平滑过滤器，<strong>它将平滑匹配正则表达式</strong>的日志值。您还可以使用<em> smoothing_coeff </em>参数在0和1之间控制平滑强度。</p>
+
+
+
+<p>例如，regex = 'return '和coeff = 0.99的值将计算键中包含' return '的所有数据的移动平均值。它是根据:平均值= 0.99 *平均值+ 0.01 *值来计算的。还应用了长度为10的预热期(参见代码中的注释)。它有助于解决EMA上<a href="https://web.archive.org/web/20221206025247/https://www.youtube.com/watch?v=lWzo8CajF5s">链接的</a>讲座中描述的不准确的早期值。</p>
+
+
+
+<p>注意，一个正则表达式可以很容易地用“or”操作符匹配多个不同的指标名称(在这里阅读更多<a href="https://web.archive.org/web/20221206025247/https://www.ocpsoft.org/tutorials/regular-expressions/or-in-regex/"/>)。</p>
+
+
+
+<h4><strong>聚集过滤器</strong></h4>
+
+
+
+<pre class="hljs">
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AggregateFilter</span><span class="hljs-params">(acme_loggers.base.Logger)</span>:</span>
+    <span class="hljs-string">"""Logger which writes to another logger, aggregating matching data.
+    Args:
+        to (Logger): An object to which the current object will forward the
+          aggregated data when `dump` is called.
+        aggregate_regex (string): A regex of data keys which should be
+          aggregated.
+    Note:
+        For not matched keys the last value will be forwarded.
+    """</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, to, aggregate_regex)</span>:</span>
+        super()
+        self._to = to
+        self._aggregate_regex = aggregate_regex
+
+        self._cache = []
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span><span class="hljs-params">(self, values)</span>:</span>
+        self._cache.append(values)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dump</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-string">"""Calculates statistics and forwards them to the target logger."""</span>
+        results = {}
+
+        stacked_cache = acme_tree.stack_sequence_fields(self._cache)
+        <span class="hljs-keyword">for</span> key, values <span class="hljs-keyword">in</span> stacked_cache.items():
+            <span class="hljs-keyword">if</span> re.search(self._aggregate_regex, key) <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">None</span>:
+                results.update({
+                    f<span class="hljs-string">'{key}_mean'</span>: np.mean(values),
+                    f<span class="hljs-string">'{key}_std'</span>: np.std(values),
+                    f<span class="hljs-string">'{key}_median'</span>: np.median(values),
+                    f<span class="hljs-string">'{key}_max'</span>: np.max(values),
+                    f<span class="hljs-string">'{key}_min'</span>: np.min(values),
+                })
+            <span class="hljs-keyword">else</span>:
+                results[key] = values[<span class="hljs-number">-1</span>]
+
+        self._to.write(results)
+        self._cache.clear()</pre>
+
+
+
+<p><strong>这个非常类似于“存储然后记录”方法</strong>的行为。方法<em> write </em>不会立即记录这些值，而是存储它们。然后，您还有一个方法<em> dump </em>来计算聚合统计数据，如average、std。戴夫。、min和max，并将它们写入过滤器包装的记录器。</p>
+
+
+
+<p>有关详细信息，请参见此代码和以前的过滤器代码。此外，<a href="https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging/tree/master/acme">在这里</a>您将找到一个完整的示例，说明如何使用我们的定制记录器和过滤器运行Acme培训和评估。</p>
+
+
+
+<h4>如何做到这一切？</h4>
+
+
+
+<p>您可以通过包装记录器来使用过滤器。请看下面的摘录。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> acme.utils.loggers <span class="hljs-keyword">as</span> acme_loggers
+<span class="hljs-keyword">import</span> logger <span class="hljs-keyword">as</span> neptune_loggers
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">make_logger</span><span class="hljs-params">(experiment,
+                prefix=None,
+                time_delta=<span class="hljs-number">1.0</span>,
+                aggregate_regex=None,
+                smoothing_regex=None,
+                smoothing_coeff=<span class="hljs-number">0.99</span>)</span>:</span>
+    <span class="hljs-string">"""Creates an aggregate of Neptune and Terminal loggers with some filters.
+
+    Args:
+        experiment (NeptuneExperiment): Neptune experiment to log to.
+        prefix (string): The logger name (used also as NeptuneLogger prefix).
+        time_delta (float): Time (in seconds) between logging events.
+        aggregate_regex (string): A regex of data keys which should be
+          aggregated. If None, then no aggregation.
+        smoothing_regex (string): A regex of data keys which should be smoothed.
+          If None, then no smoothing.
+        smoothing_coeff (float between 0 and 1): A desired smoothing strength.
+    """</span>
+    neptune_logger = neptune_loggers.NeptuneLogger(
+        experiment, prefix, index_name=<span class="hljs-string">'epoch'</span>)
+    terminal_logger = acme_loggers.terminal.TerminalLogger(prefix)
+    logger = acme_loggers.aggregators.Dispatcher(
+        [neptune_logger, terminal_logger])
+
+    <span class="hljs-keyword">if</span> smoothing_regex:
+        logger = neptune_loggers.SmoothingFilter(
+            logger, smoothing_regex, smoothing_coeff)
+
+    logger = acme_loggers.filters.NoneFilter(logger)
+    logger = acme_loggers.filters.TimeFilter(logger, time_delta)
+
+    <span class="hljs-keyword">if</span> aggregate_regex:
+        logger = neptune_loggers.AggregateFilter(
+            logger, aggregate_regex)
+
+    <span class="hljs-keyword">return</span> logger</pre>
+
+
+
+<p>然后，使用这个方法为代理、训练循环和评估循环创建记录器。下面我包括了代码片段，完整的运行示例是<a href="https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging/blob/master/acme/run_d4pg.py" target="_blank" rel="noreferrer noopener nofollow">这里是</a>。</p>
+
+
+
+<pre class="hljs">
+[...]
+
+  
+  agent = d4pg.D4PG(
+      environment_spec=environment_spec,
+      policy_network=agent_networks[<span class="hljs-string">'policy'</span>],
+      critic_network=agent_networks[<span class="hljs-string">'critic'</span>],
+      observation_network=agent_networks[<span class="hljs-string">'observation'</span>],
+      sigma=<span class="hljs-number">1.0</span>,  
+      logger=make_logger(experiment, prefix=<span class="hljs-string">'learner'</span>),
+  )
+
+  
+  train_loop = acme.EnvironmentLoop(
+      environment,
+      agent,
+      label=<span class="hljs-string">'train_loop'</span>,
+      logger=make_logger(experiment,
+                         prefix=<span class="hljs-string">'train'</span>,
+                         smoothing_regex=<span class="hljs-string">'return'</span>)
+  )
+
+[...]
+
+  
+  eval_actor = actors.FeedForwardActor(policy_network=eval_policy)
+  eval_env = make_environment()
+  eval_logger = make_logger(experiment,
+                            prefix=<span class="hljs-string">'eval'</span>,
+                            aggregate_regex=<span class="hljs-string">'return'</span>)
+  eval_loop = acme.EnvironmentLoop(
+      eval_env,
+      eval_actor,
+      label=<span class="hljs-string">'eval_loop'</span>,
+      logger=eval_logger,
+  )
+
+[...]</pre>
+
+
+
+<p>您将在repo中找到关于运行Acme的更多信息，包括示例，<a href="https://web.archive.org/web/20221206025247/https://github.com/deepmind/acme/tree/master/examples" target="_blank" rel="noreferrer noopener nofollow">在这里</a>。</p>
+
+
+
+<h3><strong> RLlib </strong></h3>
+
+
+
+<p>与稳定基线的情况一样，RLlib是一个更高级的框架，它使用与Acme相同的日志记录策略。我为您提供了允许您将Neptune日志添加到RLlib的代码。<a href="https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging/tree/master/rllib" target="_blank" rel="noreferrer noopener nofollow">在这里</a>您将找到日志程序代码和示例运行脚本。让我们先看看伐木工。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> ray <span class="hljs-keyword">import</span> tune
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NeptuneLogger</span><span class="hljs-params">(tune.logger.Logger)</span>:</span>
+    <span class="hljs-string">"""RLlib Neptune logger.
+    Example usage:
+    ```
+    import ray
+    from ray import tune
+    ray.init()
+    tune.run(
+        "PPO",
+        stop={"episode_reward_mean": 200},
+        config={
+            "env": "CartPole-v0",
+            "num_gpus": 0,
+            "num_workers": 1,
+            "lr": tune.grid_search([0.01, 0.001, 0.0001]),
+            "logger_config": {"neptune_project_name": '&lt;user name&gt;/sandbox'},
+        },
+        loggers=tune.logger.DEFAULT_LOGGERS + (NeptuneLogger,),
+    )
+    ```
+    """</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_init</span><span class="hljs-params">(self)</span>:</span>
+        logger_config = self.config.get(<span class="hljs-string">'logger_config'</span>)
+        neptune.init(logger_config.get(<span class="hljs-string">'neptune_project_name'</span>))
+        self.neptune_experiment = neptune.create_experiment(
+            name=str(self.trial),  
+            params=self.config,
+        )
+
+<span class="hljs-meta">    @staticmethod</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dict_multiple_get</span><span class="hljs-params">(dict_, indices)</span>:</span>
+        <span class="hljs-string">"""Access the nested value."""</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isinstance(indices, list):
+            indices = [indices]
+
+        value = dict_
+        index = <span class="hljs-keyword">None</span>
+        <span class="hljs-keyword">for</span> index <span class="hljs-keyword">in</span> indices:
+            <span class="hljs-keyword">try</span>:
+                value = value[index]
+            <span class="hljs-keyword">except</span> KeyError:
+                print(<span class="hljs-string">"Skipping"</span>, indices)
+                <span class="hljs-keyword">return</span> {}
+
+        <span class="hljs-keyword">if</span> isinstance(value, dict):
+            <span class="hljs-keyword">return</span> value
+        <span class="hljs-keyword">else</span>:
+            <span class="hljs-keyword">return</span> {index: value}
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_result</span><span class="hljs-params">(self, result)</span>:</span>
+        list_to_traverse = [
+            [],
+            [<span class="hljs-string">'custom_metrics'</span>],
+            [<span class="hljs-string">'evaluation'</span>],
+            [<span class="hljs-string">'info'</span>, <span class="hljs-string">'num_steps_trained'</span>],
+            [<span class="hljs-string">'info'</span>, <span class="hljs-string">'learner'</span>],
+            [<span class="hljs-string">'info'</span>, <span class="hljs-string">'exploration_infos'</span>, <span class="hljs-number">0</span>],
+            [<span class="hljs-string">'info'</span>, <span class="hljs-string">'exploration_infos'</span>, <span class="hljs-number">1</span>],
+            [<span class="hljs-string">'info'</span>, <span class="hljs-string">'learner'</span>, <span class="hljs-string">"default_policy"</span>]
+        ]
+
+        <span class="hljs-keyword">for</span> indices <span class="hljs-keyword">in</span> list_to_traverse:
+            res_ = self.dict_multiple_get(result, indices)
+            prefix = <span class="hljs-string">'/'</span>.join([str(idx) <span class="hljs-keyword">for</span> idx <span class="hljs-keyword">in</span> indices])
+            <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">in</span> res_.items():
+                prefixed_key = <span class="hljs-string">'/'</span>.join([prefix, key])
+                <span class="hljs-keyword">if</span> isinstance(value, float) <span class="hljs-keyword">or</span> isinstance(value, int):
+                    self.neptune_experiment.log_metric(
+                        prefixed_key, value)
+                <span class="hljs-keyword">elif</span> (isinstance(value, np.ndarray) <span class="hljs-keyword">or</span>
+                      isinstance(value, np.number)):
+                    self.neptune_experiment.log_metric(
+                        prefixed_key, float(value))
+                
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">close</span><span class="hljs-params">(self)</span>:</span>
+        neptune.stop()</pre>
+
+
+
+<p>上面的海王星记录器的例子可能看起来很可怕，但它真的不是。它所做的只是从嵌套的结果字典中访问list_to_traverse中列出的日志。在这个过程中，它会为每个值添加前缀，这些值是根据原始嵌套数据结构中的键构建的。然后它会处理值数据类型，瞧！请随意复制这段代码，并根据您的日志需求进行修改。</p>
+
+
+
+<p>下面你可以看到如何添加您的自定义记录器到RLlib培训。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> ray
+<span class="hljs-keyword">from</span> ray <span class="hljs-keyword">import</span> tune
+
+<span class="hljs-keyword">from</span> logger <span class="hljs-keyword">import</span> NeptuneLogger
+
+ray.init()
+tune.run(
+    <span class="hljs-string">"PPO"</span>,
+    stop={<span class="hljs-string">"episode_reward_mean"</span>: <span class="hljs-number">200</span>},
+    config={
+        <span class="hljs-string">"env"</span>: <span class="hljs-string">"CartPole-v0"</span>,
+        <span class="hljs-string">"num_gpus"</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-string">"num_workers"</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-string">"lr"</span>: tune.grid_search([<span class="hljs-number">0.01</span>, <span class="hljs-number">0.001</span>, <span class="hljs-number">0.0001</span>]),
+        <span class="hljs-string">"logger_config"</span>: {<span class="hljs-string">"neptune_project_name"</span>: <span class="hljs-string">"&lt;namespace/project_name&gt;"</span>},
+    },
+    loggers=tune.logger.DEFAULT_LOGGERS + (NeptuneLogger,),
+)</pre>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>现在你有了它，两种日志方法和四个框架。<a href="https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging" target="_blank" rel="noreferrer noopener nofollow">在这里</a>你会发现所有的代码与示例运行脚本。</p>
+
+
+
+<p>玩得开心，祝你的RL实验好运！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

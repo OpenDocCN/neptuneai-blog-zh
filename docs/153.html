@@ -1,0 +1,1005 @@
+<html>
+<head>
+<title>Create a Face Recognition Application Using Swift, Core ML, and TuriCreate </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>使用Swift、Core ML和TuriCreate创建一个人脸识别应用程序</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/create-a-face-recognition-application#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/create-a-face-recognition-application#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>面部识别技术已经出现了一段时间，涉及到越来越多的应用，肯定会彻底改变我们的生活。依赖这些技术的应用程序向最终客户保证了数据隐私和安全性的高度可靠性。尽管最近的一些伦理争议，如<a href="https://web.archive.org/web/20220928195528/https://www.technologyreview.com/2021/04/09/1022240/clearview-ai-nypd-emails/" target="_blank" rel="noreferrer noopener nofollow"> Clearview AI </a>在很大程度上呼应了公共面部识别的可能威胁，但人们一直渴望学习和理解这项技术的工作原理。</p>
+
+
+
+<p>如今，谷歌、脸书或苹果等领先的科技行业提供第三方软件来帮助开发者快速构建和迭代使用这些技术扰乱市场并帮助塑造未来时代的产品。后者的一个明显例子是苹果。最近几个月发布了其视觉API的主要更新，这是他们所有与计算机视觉相关的事情的主要框架。</p>
+
+
+
+<p>Vision API包括以下功能:</p>
+
+
+<div class="custom-point-list">
+<ul><li>本地人脸检测API</li><li>使用ARkit进行人脸跟踪</li><li>文本和条形码识别</li><li>光栅重合</li><li>Vision允许为各种图像任务使用定制的核心ML模型</li></ul>
+</div>
+
+
+
+
+
+
+<p>在本文中，我们将通过查看以下内容，尝试对这些技术有更多的了解:</p>
+
+
+
+
+
+<p><strong> <em>注</em> </strong> <em>:您可以在我的</em> <a href="https://web.archive.org/web/20220928195528/https://github.com/aymanehachcham/FaceRecogntion-CoreML" target="_blank" rel="noreferrer noopener nofollow"> <em> Github repo </em> </a>中找到整个项目的代码</p>
+
+
+
+
+
+
+<h2 id="apple-core-ml-framework">苹果核心ML框架之旅</h2>
+
+
+
+<p><strong> Core ML </strong>是苹果的机器学习框架，通过充分利用所有模型的统一表示，开发人员可以在设备上部署强大的ML模型。</p>
+
+
+
+<p>更具体地说，<em> Core ML </em>旨在为设备体验提供优化的性能，允许开发人员从各种ML模型中进行选择，他们可以在已经配备了专用神经引擎和ML加速器的Apple硬件上部署这些模型。</p>
+
+
+
+
+
+
+
+<h3>如何在设备上进行ML部署</h3>
+
+
+
+<p>在展示Core ML 3.0中的新功能之前，我想解释一下将一个训练好的模型从Pytorch或Tensorflow导出到Core ML并最终部署到IOS应用程序中的不同步骤。</p>
+
+
+
+
+
+
+
+<p>核心ML文档推荐使用一个python包来简化从第三方培训库(如<a href="https://web.archive.org/web/20220928195528/https://www.tensorflow.org/lite/performance/coreml_delegate" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow </a>和<a href="https://web.archive.org/web/20220928195528/https://pytorch.org/mobile/ios/" rel="noreferrer noopener nofollow" target="_blank"> PyTorch </a>)到核心ML格式的迁移。</p>
+
+
+
+<p>使用coremltools软件包，您可以:</p>
+
+
+<div class="custom-point-list">
+<ul><li>轻松转换来自第三方库的训练模型的权重和结构</li><li>优化和超调核心ML模型</li><li>利用Catalyst和核心ML验证macOS转换</li></ul>
+</div>
+
+
+<p>很明显，并不是所有的模型都被支持，但是在每一次更新中，他们试图增加对更多神经结构、线性模型、集成算法等的支持。你可以在他们的<a href="https://web.archive.org/web/20220928195528/https://coremltools.readme.io/docs/what-are-coreml-tools" target="_blank" rel="noreferrer noopener nofollow">官方文档网站</a>找到当前支持的库和框架如下:</p>
+
+
+<p id="block_61af4cdaca279" class="separator separator-10"/>
+
+
+<div class="medium-table">
+        <div class="mt-row heading">
+            <p class="mt-col">模型类别</p>
+            <p class="mt-col">支持的软件包</p>
+        </div>
+    
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Supported packages:
+                    </span>
+                                                                <p>Tensorflow 1 <br/> Tensorflow 2 <br/> Pytorch (1.4.0+) <br/> Keras (2.0.4+) <br/> ONNX (1.6.0) <br/> Caffe</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Supported packages:
+                    </span>
+                                                                <p>XGBoost <br/> Sci-kit学习</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p>广义线性模型</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Supported packages:
+                    </span>
+                                                                <p>Sci-kit学习</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Supported packages:
+                    </span>
+                                                                <p>LIBSVM</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p>数据管道(后处理和预处理)</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Supported packages:
+                    </span>
+                                                                <p>Sci-kit学习</p>
+                                    </div>
+                    </div>
+    </div>
+
+
+<p id="block_60a3993ad9823" class="separator separator-20">使用Pytorch的转换示例</p>
+
+
+
+<h3>为了说明如何轻松利用<em> coremltools </em>并将一个经过训练的Pytorch模型转换为Core ML格式，我将给出一个简单的实际操作示例，说明如何使用<em> TorchScript </em>和<a href="https://web.archive.org/web/20220928195528/https://pytorch.org/docs/stable/generated/torch.jit.trace.html" target="_blank" rel="noreferrer noopener nofollow"> <em> torch </em>转换来自<a href="https://web.archive.org/web/20220928195528/https://pytorch.org/vision/stable/index.html" target="_blank" rel="noreferrer noopener nofollow"> torchvision库</a>的<strong> <em> MobileNetV2 </em> </strong>模型。<em> jit.trace </em> </a>对模型权重进行量化和压缩。</h3>
+
+
+
+<p><strong> <em>注意</em> </strong> <em>:这个例子的代码可以在coremltools </em> <a href="https://web.archive.org/web/20220928195528/https://coremltools.readme.io/docs/pytorch-conversion" target="_blank" rel="noreferrer noopener nofollow"> <em>官方文档</em> </a> <em>页面</em>中找到</p>
+
+
+
+<p>模型转换的步骤:</p>
+
+
+
+<p>加载MobileNetV2的预训练版本，并将其设置为评估模式</p>
+
+
+<div class="custom-point-list">
+<ol><li>使用torch.jit.trace模块生成Torchscript对象</li><li>使用coremltools将TorchScript对象转换为Core ML</li><li>首先，您需要安装coremltools python包:</li></ol>
+</div>
+
+
+<p>按照官方文档的建议使用Anaconda</p>
+
+
+
+<p>创建conda虚拟环境:</p>
+
+
+<div class="custom-point-list">
+<ul><li>激活您的康达虚拟环境:</li></ul>
+</div>
+
+
+<pre class="hljs">conda create --name coreml-env python=<span class="hljs-number">3.6</span></pre>
+
+
+<div class="custom-point-list">
+<ul><li>安装conda-forge的coremltools</li></ul>
+</div>
+
+
+<pre class="hljs">conda activate coreml-env</pre>
+
+
+<div class="custom-point-list">
+<ul><li>或者使用pip和virtualenv软件包:</li></ul>
+</div>
+
+
+<pre class="hljs">conda install -c conda-forge coremltools </pre>
+
+
+
+<p>安装virtualenv软件包:</p>
+
+
+<div class="custom-point-list">
+<ul><li>sudo pip安装虚拟</li></ul>
+</div>
+
+
+<p>激活虚拟环境并安装coremltools:</p>
+
+
+
+
+
+<pre class="hljs">virtualenv coreml-env</pre>
+
+
+<div class="custom-point-list">
+<ul><li>加载预训练版本的MobileNetV2</li></ul>
+</div>
+
+
+<pre class="hljs">source coreml-env/bin/activate
+pip install -u coremltools</pre>
+
+
+
+<h4>使用torchvision库导入在ImageNet上训练的MobileNetV2版本。</h4>
+
+
+
+<p>将模型设置为评估模式:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+Import torchvision
+
+mobile_net  = torchvision.models.mobilenet_v2(pretrained=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<p>使用torch.jit.trace生成Torchscript对象</p>
+
+
+
+<pre class="hljs">mobile_net.eval()</pre>
+
+
+
+<h4>Torch jit跟踪模块采用与模型通常采用的输入张量维数完全相同的输入示例。跟踪只正确记录那些不依赖于数据的函数和模块(例如，张量中的数据没有条件)，并且没有未跟踪的外部依赖项(例如，执行I/O或访问全局变量)。</h4>
+
+
+
+<p>给出随机数据的轨迹:</p>
+
+
+
+<p>从单独的文件下载分类标签:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+
+
+input = torch.randn(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">224</span>, <span class="hljs-number">224</span>)
+mobile_net_traced = torch.jit.trace(mobile_net, input)</pre>
+
+
+
+<p>使用coremltools将TorchScript对象转换为Core ML格式</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> urllib
+label_url = <span class="hljs-string">'https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt'</span>
+class_labels = urllib.request.urlopen(label_url).read().decode(<span class="hljs-string">"utf-8"</span>).splitlines()
+
+class_labels = class_labels[<span class="hljs-number">1</span>:] 
+<span class="hljs-keyword">assert</span> len(class_labels) == <span class="hljs-number">1000</span></pre>
+
+
+
+<h4>多亏了<strong>统一转换API </strong>，转换成核心ML格式才成为可能。</h4>
+
+
+
+<p><strong> <em> MLModel </em> </strong>扩展封装了核心ML模型的预测方法、配置和模型描述。正如您所看到的，coremltools包帮助您将来自各种训练工具的训练模型转换成核心ML模型。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> coremltools <span class="hljs-keyword">as</span> ct
+
+model = ct.convert(
+    mobile_net_traced,
+    inputs=[ct.ImageType(name=<span class="hljs-string">"traced_input"</span>, shape=input.shape)]
+    classifier_config = ct.ClassifierConfig(class_labels) 
+)
+
+model.save(<span class="hljs-string">"MobileNetV2.mlmodel"</span>)</pre>
+
+
+
+<p>核心ML内部ML工具</p>
+
+
+
+<h3>从我们到目前为止所讨论的内容中，我们了解了Core ML是如何工作的，以及将模型从第三方库转换成Core ML格式是多么容易。现在，让我们来看看如何使用苹果内部的人工智能生态系统来构建、训练和部署一个ML模型。</h3>
+
+
+
+<p>苹果在他们的整个ML框架中集成的两个主要工具是:</p>
+
+
+
+<p>Turi Create</p>
+
+
+
+
+
+<h4>如果您希望快速迭代模型实现，以完成系统推荐、对象检测、图像分割、图像相似性或活动分类等任务，这应该是您的目标。</h4>
+
+
+
+<p>Turi Create非常有用的一点是，它已经为每个任务定义了预训练模型，您可以使用自定义数据集对其进行微调。Turi-Create使您能够使用python构建和训练您的模型，然后将其导出到Core ML，以便在IOS、macOS、watchOS和tvOS应用程序中使用。</p>
+
+
+
+<p>What is incredibly useful with Turi Create is that it already defines pretrained models for each task that you can fine-tune with your custom datasets. Turi-Create enables you to build and train your model using python and then just export it to Core ML for use in IOS, macOS, watchOS, and tvOS apps.</p>
+
+
+<p id="block_61af4d71ca28c" class="separator separator-10">机器学习任务</p>
+
+
+<div class="medium-table">
+        <div class="mt-row heading">
+            <p class="mt-col">描述</p>
+            <p class="mt-col">个性化和定制用户选择</p>
+        </div>
+    
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>对图像进行标记和分类</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>识别图画和手势</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>识别和分类声音</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>分类和检测场景中的对象</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>风格化的图像和视频</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>使用传感器对活动进行检测和分类</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>寻找图像之间的相似之处</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>预测标签</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>预测数值</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>以无人监督的方式对相似的数据点进行分组</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>分析情感分析</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Description:
+                    </span>
+                                                                <p>创建ML</p>
+                                    </div>
+                    </div>
+    </div>
+
+
+<p id="block_60a39b98d9824" class="separator separator-20">与Turi create不同，Create ML使用户能够构建和训练他们的ML模型，而无需编写太多代码。macOS上可用的Create ML提供了一个图形界面，您可以在其中拖放您的训练数据，并选择您想要训练的模型类型(语音识别、图像分类、对象检测等)。)</p>
+
+
+
+<h4>核心ML 3.0中的新特性</h4>
+
+
+
+<p>在2019年WWDC发布会上，苹果发布了几个关于Core ML和板上新功能的有趣公告。我会给你一个关于新增强的快速总结，以防你错过。</p>
+
+
+
+
+
+
+
+<h3>到目前为止，Core ML 3.0中引入的最令人兴奋的特性是可以直接在设备上训练部署的模型。在此之前，我们只有设备上的推理，这基本上意味着我们在其他机器上训练模型，然后利用训练好的模型在设备上进行预测。</h3>
+
+
+
+<p>通过设备上的培训，您可以执行<strong>转移学习</strong>或<strong>在线学习</strong>，在那里您可以调整现有的模型，以随着时间的推移提高性能和可持续性。</p>
+
+
+
+
+
+<p>他们包括新型的神经网络层</p>
+
+
+
+<p>他们主要关注中间操作层，如屏蔽、张量操作、控制流和布尔逻辑。</p>
+
+
+<div class="custom-point-list">
+<ol start="2"><li>如果你对所有更新都感兴趣，请随时观看<a href="https://web.archive.org/web/20220928195528/https://developer.apple.com/videos/play/wwdc2019/704/" target="_blank" rel="noreferrer noopener nofollow"> WWDC 2019 </a>视频。</li></ol>
+</div>
+
+
+<p>人脸识别和Apple Vision API</p>
+
+
+
+
+
+
+
+<p>苹果的视觉框架旨在提供一个高级API，包含随时可用的复杂计算机视觉模型。他们在2019年发布的最新版本包括令人兴奋的功能和改进，再次展示了设备上的机器学习模型是他们移动武器库中的一个巨大部分，他们肯定非常重视它。</p>
+
+
+
+<h2 id="face-recognition-technologies">用苹果自己的话说:</h2>
+
+
+
+<p><strong> <em>视觉</em> </strong> <em>是一个新的功能强大且易于使用的框架，通过一致的接口为计算机视觉挑战提供解决方案。了解如何使用视觉来检测面部、计算面部标志、跟踪物体等</em>。</p>
+
+
+
+<p>vision API可分为三个主要部分:</p>
+
+
+
+<p><strong> 1。请求</strong>:当你请求框架分析实际场景，它返回给你任何被发现的物体。它被称为请求<strong>对<em>进行分析。</em> </strong>不同种类的请求由多个API类处理:</p>
+
+
+
+<p><strong>vndetectfacerectangles请求</strong>:人脸检测</p>
+
+
+
+<p><strong> VNDetectBarcodesRequest: </strong>条形码检测</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>VNDetectTextRectanglesRequest</strong>:图像内的可见文本区域</li><li><strong> VNCoreMLRequest </strong>:请求使用核心ML功能进行图像分析</li><li><strong> VNClassifyImageRequest </strong>:图像分类请求</li><li><strong>VNDetectFaceLandmarksRequest:</strong>请求分析人脸并检测特定的拓扑区域，如鼻子、嘴、嘴唇等。基于用包含计算的面部标志的数据训练的模型</li><li><strong> VNTrackObjectRequest: </strong>视频场景内的实时对象跟踪。</li><li><strong> 2。请求处理器</strong>:分析并执行您触发的请求。它处理从发送请求到执行请求之间发生的所有相关的中间事务。</li><li><strong> VNImageRequestHandler </strong>:处理图像分析的请求</li></ul>
+</div>
+
+
+<p><strong> VNSequenceRequestHandler </strong>:处理实时对象跟踪的请求，例如，他们专注于跟踪制作视频时生成的各种图像序列或帧。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong> 3。观察:</strong>请求返回的结果被包装到观察类中，每个观察类引用相应的请求类型。</li><li><strong>VNClassificationObservation:</strong>图像分析产生的分类信息</li></ul>
+</div>
+
+
+<p><strong> VNFaceObservation </strong>:专门针对人脸检测。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>VNDetectedObjectObservation</strong>:用于物体检测。</li><li><strong>VNCoreMLFeatureValueObservation</strong>:用核心ML模型预测图像分析得到的键值信息的集合。</li><li><strong>vnhorizonto observation</strong>:确定场景中物体的角度和地平线。</li><li><strong>VNImageAlignmentObservation</strong>:检测对齐两幅图像内容所需的变换。</li><li><strong> VNPixelBufferObservation </strong>:嵌入式核心ML模型处理后的输出图像。</li><li>用Turicreate训练人脸识别模型</li><li>我们将训练一个图像分类器，利用<strong> resnet-50 </strong>的<strong> Turi-reate </strong>预训练版本来检测和识别我们的正确面部。这个想法是用精选的人类面部数据集执行一些迁移学习，然后将模型导出到Core ML，用于<strong>设备上部署</strong>。</li></ul>
+</div>
+
+
+<h2 id="face-recognition-model">设置</h2>
+
+
+
+<p>要继续学习，您需要在系统中安装Python 3.6和anaconda。</p>
+
+
+
+<h3>然后会创建一个康达虚拟环境，安装turicreate 5.0。</h3>
+
+
+
+<p>创建conda虚拟环境:</p>
+
+
+
+<p>激活您的conda环境:</p>
+
+
+<div class="custom-point-list">
+<ul><li>收集和分离培训数据</li></ul>
+</div>
+
+
+<pre class="hljs">conda create --name face_recog python=<span class="hljs-number">3.6</span></pre>
+
+
+<div class="custom-point-list">
+<ul><li>为了训练我们的分类器，我们需要一些人脸样本和其他与人脸不对应的事物样本，如动物图像、实物等。最终，我们将需要创建两个数据文件夹，包含我们的脸和其余图像的图像。</li></ul>
+</div>
+
+
+<pre class="hljs">conda activate face_recog</pre>
+
+
+
+
+
+<pre class="hljs">pip install turicreate==<span class="hljs-number">5.03</span></pre>
+
+
+
+<h3>为了收集我们面部的图像，我们可以使用手机的前置摄像头给自己拍照。我们可以从ImageNet或任何其他类似的提供商那里获得其他图像。</h3>
+
+
+
+<p>数据扩充</p>
+
+
+
+<p><em>数据扩充</em>很有帮助，因为扫描过程中从前置摄像头拍摄的照片可能有不同的光照、曝光、方向、裁剪等，我们希望考虑所有的情况。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img data-attachment-id="46018" data-permalink="https://web.archive.org/web/20220928195528/https://neptune.ai/blog/create-a-face-recognition-application/attachment/image-collection" data-orig-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?fit=1158%2C699&amp;ssl=1" data-orig-size="1158,699" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-collection" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?fit=300%2C181&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?fit=1024%2C618&amp;ssl=1" src="../Images/ac9b46b7f6112bc2e017e0aa2ba7fa53.png" alt="image-collection" class="wp-image-46018 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?resize=768%2C464&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928195528im_/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?resize=768%2C464&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="46018" data-permalink="https://web.archive.org/web/20220928195528/https://neptune.ai/blog/create-a-face-recognition-application/attachment/image-collection" data-orig-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?fit=1158%2C699&amp;ssl=1" data-orig-size="1158,699" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="image-collection" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?fit=300%2C181&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?fit=1024%2C618&amp;ssl=1" src="../Images/ac9b46b7f6112bc2e017e0aa2ba7fa53.png" alt="image-collection" class="wp-image-46018" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928195528im_/https://i0.wp.com/neptune.ai/wp-content/uploads/image-collection.jpg?resize=768%2C464&amp;ssl=1"/></noscript><figcaption><em>Source: Author </em></figcaption></figure></div>
+
+
+
+<h3>为了扩充我们的数据，我们将依赖一个非常有用的python包Augmentor，它完全可以在Github上获得。</h3>
+
+
+
+<p>使用增强器，我们可以应用广泛的随机数据增强，如<strong>旋转</strong>、<strong>缩放</strong>、<strong>剪切</strong>或<strong>裁剪</strong>。我们将创建一个数据处理函数，负责所有的转换。</p>
+
+
+
+<p>Augmentor将生成1500个额外的面部数据样本。</p>
+
+
+
+<p>模特培训</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> Augmentor <span class="hljs-keyword">as</span> augment
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">data_processing</span><span class="hljs-params">(root_dir: str)</span>:</span>
+    data = augment.Pipeline(root_dir)
+    data.rotate(probability=<span class="hljs-number">0.7</span>, max_left_rotation=<span class="hljs-number">10</span>, max_right_rotation=<span class="hljs-number">10</span>)
+    data.zoom(probability=<span class="hljs-number">0.5</span>, min_factor=<span class="hljs-number">1.1</span>, max_factor=<span class="hljs-number">1.5</span>)
+    data.skew(probability=<span class="hljs-number">0.5</span>, magnitude=<span class="hljs-number">0.5</span>)
+    data.shear(probability=<span class="hljs-number">0.5</span>, max_shear_left=<span class="hljs-number">10</span>, max_shear_right=<span class="hljs-number">10</span>)
+    data.crop_random(probability=<span class="hljs-number">0.5</span>, percentage_area=<span class="hljs-number">0.9</span>, randomise_percentage_area=<span class="hljs-keyword">True</span>)
+    data.sample(<span class="hljs-number">1500</span>)</pre>
+
+
+
+<p>我们将在我们的虚拟环境中创建一个简单的python脚本，其中我们调用<strong> turicreate resnet-50 </strong>预训练模型，并用我们收集的相应数据对其进行训练。</p>
+
+
+
+<h3>从培训文件夹加载图像</h3>
+
+
+
+<p>从文件夹名称创建目标标签:艾曼-面/非艾曼-面</p>
+
+
+<div class="custom-point-list">
+<ol><li>用新数据微调模型</li><li>将训练好的模型导出到核心ML格式。</li><li>模型将开始训练，并在整个过程中显示历元结果。</li><li>构建IOS应用程序</li></ol>
+</div>
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> turicreate <span class="hljs-keyword">as</span> tc
+<span class="hljs-keyword">import</span> os
+
+data = tc.image_analysis.load_images(<span class="hljs-string">'Training Data'</span>, with_path=<span class="hljs-keyword">True</span>)
+
+data[<span class="hljs-string">'label'</span>] = data[<span class="hljs-string">'path'</span>].apply(<span class="hljs-keyword">lambda</span> path: os.path.basename(os.path.dirname(path)))
+
+model = tc.image_classifier.create(data, target=<span class="hljs-string">'label'</span>, model=<span class="hljs-string">'resnet-50'</span>, max_iterations=<span class="hljs-number">100</span>)
+
+model.export_coreml(<span class="hljs-string">'face_recognition.mlmodel'</span>)</pre>
+
+
+
+<p>我们将建立一个小的IOS应用程序，检测和识别我的脸在前置摄像头流。该应用程序将触发我的iphone的前置摄像头，并使用我们之前训练的turicreate模型进行实时人脸识别。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="45997" data-permalink="https://web.archive.org/web/20220928195528/https://neptune.ai/blog/create-a-face-recognition-application/attachment/terminal-training" data-orig-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?fit=2274%2C1366&amp;ssl=1" data-orig-size="2274,1366" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="terminal-training" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?fit=300%2C180&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?fit=1024%2C615&amp;ssl=1" src="../Images/931a3a1dd0792d936a351ccb6cd66ed9.png" alt="" class="wp-image-45997 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?resize=1024%2C615&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928195528im_/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?resize=1024%2C615&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="45997" data-permalink="https://web.archive.org/web/20220928195528/https://neptune.ai/blog/create-a-face-recognition-application/attachment/terminal-training" data-orig-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?fit=2274%2C1366&amp;ssl=1" data-orig-size="2274,1366" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="terminal-training" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?fit=300%2C180&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?fit=1024%2C615&amp;ssl=1" src="../Images/931a3a1dd0792d936a351ccb6cd66ed9.png" alt="" class="wp-image-45997" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928195528im_/https://i0.wp.com/neptune.ai/wp-content/uploads/terminal-training.png?resize=1024%2C615&amp;ssl=1"/></noscript><figcaption><em>Displaying training stats on the terminal</em></figcaption></figure></div>
+
+
+
+
+
+
+<h2 id="ios-application">打开XCode并创建一个单视图应用程序。应用程序的一般UX相当简单，有两个ViewControllers:</h2>
+
+
+
+<p>入口点ViewController定义了一个极简布局，带有一个自定义按钮来激活前置摄像头</p>
+
+
+
+<p>一个CameraViewController，管理相机流并执行实时推理来识别我的脸。</p>
+
+
+<div class="custom-point-list">
+<ul><li>设置布局</li><li>让我们去掉主要的故事板文件，因为我总是喜欢以编程方式编写所有的应用程序，而完全不依赖于任何XML。</li></ul>
+</div>
+
+
+<h3>删除主故事板文件，更改info.plist文件以删除故事板名称，并编辑SceneDelegate文件:</h3>
+
+
+
+<p>设计入口点LayoutViewController的布局，将应用程序的徽标图像放在最上面部分的中心，并将导航到CameraViewController的按钮设置在其稍下方。</p>
+
+
+<div class="custom-point-list">
+<ul><li>ViewController布局:</li></ul>
+</div>
+
+
+<pre class="hljs">var window: UIWindow?
+func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    guard let windowScene = (scene <span class="hljs-keyword">as</span>? UIWindowScene) <span class="hljs-keyword">else</span> { <span class="hljs-keyword">return</span> }
+    window = UIWindow(frame: windowScene.coordinateSpace.bounds)
+    window?.windowScene = windowScene
+    
+    window?.rootViewController = LayoutViewController()
+    window?.makeKeyAndVisible()
+}</pre>
+
+
+
+<p>处理人脸识别方法:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="45999" data-permalink="https://web.archive.org/web/20220928195528/https://neptune.ai/blog/create-a-face-recognition-application/attachment/application-diagram" data-orig-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?fit=862%2C575&amp;ssl=1" data-orig-size="862,575" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="application-diagram" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?fit=300%2C200&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?fit=862%2C575&amp;ssl=1" src="../Images/3b886338192e9fcbc4bfad8711e746fb.png" alt="" class="wp-image-45999 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?resize=862%2C575&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928195528im_/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?resize=862%2C575&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="45999" data-permalink="https://web.archive.org/web/20220928195528/https://neptune.ai/blog/create-a-face-recognition-application/attachment/application-diagram" data-orig-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?fit=862%2C575&amp;ssl=1" data-orig-size="862,575" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="application-diagram" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?fit=300%2C200&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928195528/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?fit=862%2C575&amp;ssl=1" src="../Images/3b886338192e9fcbc4bfad8711e746fb.png" alt="" class="wp-image-45999" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928195528im_/https://i0.wp.com/neptune.ai/wp-content/uploads/application-diagram.png?resize=862%2C575&amp;ssl=1"/></noscript><figcaption><em>Application Mockup, Source: Author</em></figcaption></figure></div>
+
+
+
+
+
+<pre class="hljs">let logo: UIImageView = {
+    let image = UIImageView(image: 
+    image.translatesAutoresizingMaskIntoConstraints = false
+   <span class="hljs-keyword">return</span> image
+}()</pre>
+
+
+
+
+
+<pre class="hljs">let faceRecognitionButton: CustomButton = {
+        let button = CustomButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: 
+        button.setTitle(<span class="hljs-string">"Object detection"</span>, <span class="hljs-keyword">for</span>: .normal)
+        let icon = UIImage(systemName: <span class="hljs-string">"crop"</span>)?.resized(newSize: CGSize(width: <span class="hljs-number">50</span>, height: <span class="hljs-number">50</span>))
+        button.addRightImage(image: icon!, offset: <span class="hljs-number">30</span>)
+        button.backgroundColor = .systemPurple
+        button.layer.borderColor = UIColor.systemPurple.cgColor
+        button.layer.shadowOpacity = <span class="hljs-number">0.3</span>
+        button.layer.shadowColor = UIColor.systemPurple.cgColor
+        
+        <span class="hljs-keyword">return</span> button       
+    }()</pre>
+
+
+<div class="custom-point-list">
+<ul><li>人脸识别视图控制器</li></ul>
+</div>
+
+
+<pre class="hljs">override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        addButtonsToSubview()
+    }
+
+fileprivate func addButtonsToSubview() {
+    view.addSubview(logo)
+    view.addSubview(faceRecognitionButton)
+}
+
+fileprivate func setupView() {    
+    logo.centerXAnchor.constraint(equalTo:  self.view.centerXAnchor).isActive = true
+    logo.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: <span class="hljs-number">20</span>).isActive = true
+    
+    faceRecognitionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    faceRecognitionButton.widthAnchor.constraint(equalToConstant: view.frame.width - <span class="hljs-number">40</span>).isActive = true
+    faceRecognitionButton.heightAnchor.constraint(equalToConstant: <span class="hljs-number">60</span>).isActive = true
+    faceRecognitionButton.bottomAnchor.constraint(equalTo: openToUploadBtn.topAnchor, constant: <span class="hljs-number">-40</span>).isActive = true
+}</pre>
+
+
+<div class="custom-point-list">
+<ul><li>该ViewController采用实时摄像机预览，并触发模型对摄像机流产生的每一帧进行实时推理。在操作每个视频帧时，我们应该格外小心，因为我们可能会由于实时推断而使可用资源迅速超载，并使应用程序崩溃，从而导致内存泄漏。</li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-meta">@objc func handleFaceRecognition() {</span>
+           
+       let controller = FaceRecognitionViewController()
+
+       let navController = UINavigationController(rootViewController: controller)
+       
+       self.present(navController, animated: true, completion: nil)
+    }</pre>
+
+
+
+<h3>为了在相机设置过程中保持稳定的每秒帧数，建议将分辨率和视频质量降低到:30 FPS和640×480。</h3>
+
+
+
+<p>实例化模型</p>
+
+
+
+
+
+<pre class="hljs">var videoCapture: VideoCapture!
+    let semaphore = DispatchSemaphore(value: <span class="hljs-number">1</span>)
+    
+    let videoPreview: UIView = {
+       let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        <span class="hljs-keyword">return</span> view
+    }()
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.videoCapture.start()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.videoCapture.stop()
+    }
+    
+    // MARK: - SetUp Camera preview
+    func setUpCamera() {
+        videoCapture = VideoCapture()
+        videoCapture.delegate = self
+        videoCapture.fps = <span class="hljs-number">30</span>
+        videoCapture.setUp(sessionPreset: .vga640x480) { success <span class="hljs-keyword">in</span>
+            
+            <span class="hljs-keyword">if</span> success {
+                <span class="hljs-keyword">if</span> let previewLayer = self.videoCapture.previewLayer {
+                    self.videoPreview.layer.addSublayer(previewLayer)
+                    self.resizePreviewLayer()
+                }
+                self.videoCapture.start()
+            }
+        }
+    }</pre>
+
+
+
+<p>我们需要实例化之前获得的核心ML模型(<em> face_recognition.mlmodel </em>)并开始进行预测。这个想法是通过输入帧来触发模型。该模型应返回封装边界框的多数组对象。最后的步骤将是预测，解析对象，并在脸部周围画一个方框。</p>
+
+
+
+<h3>实现<strong><em>VideoCaptureDelegate</em></strong>启动模型推理。</h3>
+
+
+
+<p>定义对每一帧执行推理的预测函数。</p>
+
+
+
+<pre class="hljs">func initModel() {
+    <span class="hljs-keyword">if</span> let faceRecognitionModel = <span class="hljs-keyword">try</span>? VNCoreMLModel(<span class="hljs-keyword">for</span>: face_recognition().model) {
+        self.visionModel = visionModel
+        request = VNCoreMLRequest(model: visionModel, completionHandler: visionRequestDidComplete)
+        request?.imageCropAndScaleOption = .scaleFill
+    } <span class="hljs-keyword">else</span> {
+        fatalError(<span class="hljs-string">"fail to create the model"</span>)
+    }
+}</pre>
+
+
+<div class="custom-point-list">
+<ul><li>最后，在后处理阶段，在每个预测上画一个方框。</li></ul>
+</div>
+
+
+<pre class="hljs">extension FaceRecognitionViewController: VideoCaptureDelegate {
+    func videoCapture(_ capture: VideoCapture, didCaptureVideoFrame pixelBuffer: CVPixelBuffer?, timestamp: CMTime) {
+        // the captured image <span class="hljs-keyword">from</span> camera <span class="hljs-keyword">is</span> contained on pixelBuffer
+        <span class="hljs-keyword">if</span> !self.isInferencing, let pixelBuffer = pixelBuffer {
+            self.isInferencing = true
+            // make predictions
+            self.predictFaces(pixelBuffer: pixelBuffer)
+        }
+    }
+}</pre>
+
+
+<div class="custom-point-list">
+<ul><li>扩展facecognitionviewcontroller { func visionrequestdiddomplete(请求:VNRequest，错误:error？){ if let predictions = request . results as？[VNRecognizedObjectObservation]{ dispatch queue . main . async { self。bounding box view . predicted objects = predictions self . is referencing = false } } else { self . is referencing = false } self . semaphore . signal()} }</li></ul>
+</div>
+
+
+<pre class="hljs">extension FaceRecognitionViewController {
+    func predictFaces(pixelBuffer: CVPixelBuffer) {
+        guard let request = request <span class="hljs-keyword">else</span> { fatalError() }
+        
+        self.semaphore.wait()
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer)
+        <span class="hljs-keyword">try</span>? handler.perform([request])
+    }</pre>
+
+
+<div class="custom-point-list">
+<ul><li>最终输出</li></ul>
+</div><p>结论</p><h2>苹果的vision API为希望将ML模型集成到他们的应用程序中的移动开发者开辟了新的可能性。整个图书馆的设计非常直观，易于理解。没有必要携带机器学习的重要背景来享受核心ML的乐趣，开箱即用的各种工具和功能非常令人鼓舞。</h2>
+
+
+
+
+
+
+
+<h2>苹果通过增加对新架构的支持来不断改进他们的ML库，并确保与他们的硬件无缝集成。</h2>
+
+
+
+<p>您可以随时通过改进数据集或创建自己的网络并使用coremltools进行转换来改进这些模型。</p>
+
+
+
+<p>参考</p>
+
+
+
+<p>艾曼·哈克姆</p>
+
+
+
+<h3>Spotbills的数据科学家|机器学习爱好者。</h3>
+
+
+
+
+
+
+<div id="author-box-new-format-block_606d8744a96bd" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name"><strong>阅读下一篇</strong></h3>
+    
+          <p class="article__authorContent-text">ML实验跟踪:它是什么，为什么重要，以及如何实施</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">10分钟阅读|作者Jakub Czakon |年7月14日更新</p>
+
+
+
+<h2>ML Experiment Tracking: What It Is, Why It Matters, and How to Implement It</h2>
+
+
+
+<p class="has-small-font-size">我来分享一个听了太多次的故事。</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"><em>“…我们和我的团队正在开发一个ML模型，我们进行了大量的实验，并获得了有希望的结果… </em></p>
+
+
+
+<p><em>…不幸的是，我们无法确切地说出哪种性能最好，因为我们忘记了保存一些模型参数和数据集版本… </em></p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-left is-style-default"><p><em>…几周后，我们甚至不确定我们实际尝试了什么，我们需要重新运行几乎所有的东西"</em></p><p>不幸的ML研究员。</p><p>事实是，当你开发ML模型时，你会进行大量的实验。</p><p>这些实验可能:</p></blockquote>
+
+
+
+<p>使用不同的模型和模型超参数</p>
+
+
+
+<p>使用不同的培训或评估数据，</p>
+
+
+<div class="custom-point-list">
+<ul><li>运行不同的代码(包括您想要快速测试的这个小变化)</li><li>在不同的环境中运行相同的代码(不知道安装的是PyTorch还是Tensorflow版本)</li><li>因此，它们可以产生完全不同的评估指标。</li><li>跟踪所有这些信息会很快变得非常困难。特别是如果你想组织和比较这些实验，并且确信你知道哪个设置产生了最好的结果。</li></ul>
+</div>
+
+
+<p>这就是ML实验跟踪的用武之地。</p>
+
+
+
+<p>Keeping track of all that information can very quickly become really hard. Especially if you want to organize and compare those experiments and feel confident that you know which setup produced the best result.  </p>
+
+
+
+<p>This is where ML experiment tracking comes in. </p>
+
+
+<a class="button continous-post blue-filled" href="/web/20220928195528/https://neptune.ai/blog/ml-experiment-tracking" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

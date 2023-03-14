@@ -1,0 +1,478 @@
+<html>
+<head>
+<title>The KNN Algorithm - Explanation, Opportunities, Limitations </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>KNN算法——解释、机会、局限</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/knn-algorithm-explanation-opportunities-limitations#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/knn-algorithm-explanation-opportunities-limitations#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>k近邻(KNN)是一个非常简单，易于理解，通用的机器学习算法。它被用于许多不同的领域，如手写检测、图像识别和视频识别。当标记数据过于昂贵或不可能获得时，KNN最有用，它可以在各种预测类型的问题中实现高精度。</p>
+
+
+
+<p>KNN是一种简单的算法，基于目标函数的局部最小值，用于学习期望精度和准确度的未知函数。该算法还可以找到未知输入的邻域、其范围或距离以及其他参数。它基于“信息增益”的原则——算法找出最适合预测未知值的信息。</p>
+
+
+
+<p>在本文中，我们将探索KNN算法背后的关键概念，并分析一个真实世界的KNN用例。</p>
+
+
+
+<h2 id="paradigm">懒惰学习范式与KNN算法</h2>
+
+
+
+<p>众所周知，KNN是一种不需要任何数据训练的最大似然算法。这与依赖训练数据集对未知数据进行预测的急切学习方法有很大不同。有了KNN，你根本不需要训练阶段。</p>
+
+
+
+<p>KNN依靠可观测数据的相似性和复杂的距离度量来生成准确的预测。这种技术一开始可能看起来有点违反直觉，不值得信任，但实际上非常可靠。它在许多领域都很流行，包括:</p>
+
+
+
+<ul><li><strong> <em>计算机视觉</em> </strong> : KNN执行分类任务。它可以很好地处理图像数据，并且被认为是基于相似性对一堆不同图像进行分类的一个很好的选择。</li><li><strong> <em>内容推荐</em> </strong> : KNN对内容推荐很棒。它被用在许多推荐系统引擎中，即使已经有更新的、更强大的系统可用，它仍然是相关的。</li></ul>
+
+
+
+
+
+
+
+<h2 id="dimensionality">维度的诅咒</h2>
+
+
+
+<p>维数灾难意味着<strong> KNN在特征数量少的情况下表现最好</strong>。当要素数量增加时，就需要更多的数据。当有更多的数据时，它会产生一个过拟合问题，因为没有人知道哪部分噪声会对模型产生影响。在低维情况下，表现更好(如<a href="https://web.archive.org/web/20221206001844/https://www.researchgate.net/publication/232406523_An_Improved_k-Nearest_Neighbor_Algorithm_for_Text_Categorization" target="_blank" rel="noreferrer noopener nofollow">顾和邵2014 </a>的研究所示)。</p>
+
+
+
+<h2 id="knn-inner-workings">KNN内部运作</h2>
+
+
+
+<p>令人惊讶的是，KNN算法非常容易理解。对于不在数据集中的观察，该算法将简单地查找K个实例，这些实例基于与该观察最近的周长被定义为相似的。任何数据点都属于一个特定的组，如果它足够接近它的话。</p>
+
+
+
+<p>对于<strong> K </strong>邻居，算法会用它们的输出来计算我们想要预测的观测值的变量y。</p>
+
+
+
+<p>因此:</p>
+
+
+
+<ul><li>如果KNN用于回归任务，预测将基于K个最接近的观测值的<strong> <em>平均值</em> </strong>或<strong> <em>中值</em> </strong>。</li><li>如果KNN用于分类目的，最接近的观测值的<strong> <em>模式</em> </strong>将用于预测。</li></ul>
+
+
+
+<h3>近距离观察KNN的建筑</h3>
+
+
+
+<p>假设我们有:</p>
+
+
+
+<ul><li>一个数据集<strong> <em> D </em> </strong>，</li><li>一个定义的距离度量，我们将用它来测量一组观察值之间的距离，</li><li>以及整数<strong> <em> K </em> </strong>，表示我们应该考虑建立邻近度的最近邻居的最小数量。</li></ul>
+
+
+
+<p>为了预测输出<strong><em/></strong>进行新的观察<strong><em/></strong>，将遵循以下步骤:</p>
+
+
+
+<ol><li>计算<strong> <em> X </em> </strong>可观测值与所有数据点之间的总距离。</li><li>保留构成到可观察点<strong><em>【x .</em></strong>的较小距离的<strong> <em> K </em> </strong>观察值</li><li>用<strong><em>【y】</em></strong>输出取自<strong><em/></strong>观察值:<ol><li>应用<strong> <em> y </em> </strong>扣除的平均值如果是回归问题，</li><li>如果是分类问题，使用<strong> <em> y </em> </strong>扣款模式。</li></ol></li><li>最终预测将是步骤3中计算的值。</li><li><em>该算法的详细版本可以在伪代码</em>中找到:</li></ol>
+
+
+
+
+
+
+
+<h3>距离和相似性在KNN是如何进行的</h3>
+
+
+
+<p>在其核心，KNN使用不同种类的距离度量来评估两个数据点的接近程度(它们的相似性)。KNN的一个核心假设是:</p>
+
+
+
+<blockquote class="wp-block-quote"><p>给定的两个点彼此越接近，它们就越相关和相似。</p></blockquote>
+
+
+
+<p>几个距离度量确定相关性和相似性。即使有大量的距离函数可供选择，我们也应该始终使用最适合我们数据性质的函数。值得注意的指标包括:</p>
+
+
+
+
+
+
+
+
+<p id="separator-block_60ec18471d90a" class="block-separator block-separator--20"> </p>
+
+
+
+<p><strong> <em>注</em> </strong> <em>:我强烈建议你查阅</em> <a href="https://web.archive.org/web/20221206001844/https://arxiv.org/pdf/1708.04321.pdf" target="_blank" rel="noreferrer noopener nofollow"> <em>这篇文章</em> </a> <em>关于使用KNN进行分类任务时距离度量选择的影响。</em></p>
+
+
+
+<p>大多数ML库都提供了现成的度量标准。因此，您不需要从头开始编写代码，但您可能希望这样做只是为了了解它们是如何工作的。</p>
+
+
+
+<h3>选择K值</h3>
+
+
+
+<p>为了选择适合您的数据的K值，我们使用不同的K值多次运行KNN算法。我们将使用准确性作为评估K性能的度量。如果精度值与K的变化成比例，那么它就是K值的一个很好的候选值。</p>
+
+
+
+<p>当选择K的最佳值时，我们必须记住每组的特征数和样本量。我们的数据集中的特征和组越多，为了找到适当的k值，我们需要做出的选择就越大。</p>
+
+
+
+<p>当我们把K值减小到1时，我们的预测变得不稳定。准确性降低，并且度量“F-Measure”对异常值变得更加敏感。为了获得更好的结果，请增加K值，直到F测量值高于阈值。</p>
+
+
+
+
+
+
+
+<p>此外，您不应该忘记考虑K值对样本类分布的影响。如果您倾向于在一个组中有许多人，那么您应该增加k。相反，如果您的数据集经常在一个组中有大量的人，您需要减少k。</p>
+
+
+
+<p>以下是针对特定数据集改变K值的一些示例:</p>
+
+
+
+
+
+
+
+<p>如您所见，使用的邻居越多，分割就越准确。然而，当我们增加<strong> K </strong>值直到达到<strong> N </strong>(数据点的总数)时，我们严重地冒着过度拟合我们的模型的风险，使它不能很好地概括看不见的观察结果。</p>
+
+
+
+<h2 id="use-case">KNN算法的实际使用案例</h2>
+
+
+
+<p>为了说明我们到目前为止所解释的内容，我们将尝试使用KNN对一个众所周知的数据集进行分析，该数据集记录了美国威斯康星州临床患者的乳腺癌症状。</p>
+
+
+
+<p>首先，让我们从<a href="https://web.archive.org/web/20221206001844/https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+%28Original%29" target="_blank" rel="noreferrer noopener nofollow"> UCI机器学习库</a>下载数据集。您会发现数据文件夹中有每个属性的详细解释和我们将尝试预测的目标变量。</p>
+
+
+
+
+
+
+
+<h3>设置项目</h3>
+
+
+
+<p>下载数据集并安装所有必需的软件包:</p>
+
+
+
+<pre class="hljs">pip install scikit-learn
+pip install matplotlib
+pip install pandas
+</pre>
+
+
+
+<p>导入数据集并以csv格式读取:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+
+data = pd.read_csv(<span class="hljs-string">'breast-cancer-wisconsin.data'</span>)
+data.info()</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/f8940fdcb7487560a3f704bc7bc0a537.png" alt="KNN dataset description" class="wp-image-48712" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001844im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/KNN-dataset-description.png?ssl=1"/><figcaption><em>Description of the dataset | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>添加数据集列名:</p>
+
+
+
+<pre class="hljs">data.columns = [<span class="hljs-string">'Id'</span>, <span class="hljs-string">'Clump Thickness'</span>, <span class="hljs-string">'Unifomrmity of Cell size'</span>, <span class="hljs-string">'Unifomrmity of Cell shape'</span>, <span class="hljs-string">'Marginal Adhesion'</span>,
+                <span class="hljs-string">'Single Epithelial Cell Size'</span>, <span class="hljs-string">'Bare Nuclei'</span>, <span class="hljs-string">'Bland Chromatin'</span>, <span class="hljs-string">'Normal Nucleoli'</span>, <span class="hljs-string">'Mitoses'</span>, <span class="hljs-string">'Class'</span>]</pre>
+
+
+
+<h3>使用Plotly库可视化数据</h3>
+
+
+
+<p>数据集明显不平衡，分布不均匀。如果我们绘制两组目标变量，良性组记录的病例比恶性组多得多。这可以解释为，有些事件比其他事件更不可能发生。</p>
+
+
+
+<p>这是一个比较良性和恶性记录之间平衡的图:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> chart_studio.plotly <span class="hljs-keyword">as</span> py
+<span class="hljs-keyword">import</span> plotly.graph_objects <span class="hljs-keyword">as</span> go
+<span class="hljs-keyword">import</span> plotly.offline <span class="hljs-keyword">as</span> pyoff
+
+target_balance = data[<span class="hljs-string">'Class'</span>].value_counts().reset_index()
+target_balance
+
+target_class = go.Bar(
+    name = <span class="hljs-string">'Target Balance'</span>,
+    x = [<span class="hljs-string">'2-Benign, '</span><span class="hljs-number">4</span>-Malignant<span class="hljs-string">'],
+    y = target_balance['</span>Class<span class="hljs-string">']
+)
+
+fig = go.Figure(target_class)
+pyoff.iplot(fig)</span></pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/f19ef70861616c5ea92ffab4be622327.png" alt="KNN Begning-Malignant classes" class="wp-image-48713" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001844im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/KNN-Begning-Malignant-classes.png?ssl=1"/><figcaption><em>Beginning and Malignant Group Classes | Credit: Author</em></figcaption></figure></div>
+
+
+
+<p>另一个有见地的统计数据是两组临床患者的有丝分裂水平。1级最低，9级最高。有丝分裂水平是导致肿瘤生长和进化的重要因素。自然地，恶性组将登记更多患有晚期有丝分裂阶段的患者。</p>
+
+
+
+<pre class="hljs">
+beg_class_pat = data.loc[data[<span class="hljs-string">'Class'</span>] == <span class="hljs-number">2</span>]
+mal_class_pat = data.loc[data[<span class="hljs-string">'Class'</span>] == <span class="hljs-number">4</span>]
+
+Mith_10_beg = beg_class_pat[<span class="hljs-string">'Mitoses'</span>].value_counts().reset_index()
+Mith_10_mal = mal_class_pat[<span class="hljs-string">'Mitoses'</span>].value_counts().reset_index()</pre>
+
+
+
+<pre class="hljs">
+fig = go.Figure(data=[
+    go.Bar(name=<span class="hljs-string">'Levels of Mitoses in Begnin Group'</span>, x=[<span class="hljs-string">'1'</span>, <span class="hljs-string">'2'</span>, <span class="hljs-string">'3'</span>, <span class="hljs-string">'4'</span>, <span class="hljs-string">'5'</span>, <span class="hljs-string">'6'</span>, <span class="hljs-string">'7'</span>, <span class="hljs-string">'8'</span>, <span class="hljs-string">'9'</span>, <span class="hljs-string">'10'</span>],
+           y=Mith_10_beg[<span class="hljs-string">'Mitoses'</span>]),
+    go.Bar(name=<span class="hljs-string">'Levels of Mitoses in Malignant Group'</span>, x=[<span class="hljs-string">'1'</span>, <span class="hljs-string">'2'</span>, <span class="hljs-string">'3'</span>, <span class="hljs-string">'4'</span>, <span class="hljs-string">'5'</span>, <span class="hljs-string">'6'</span>, <span class="hljs-string">'7'</span>, <span class="hljs-string">'8'</span>, <span class="hljs-string">'9'</span>, <span class="hljs-string">'10'</span>],
+           y=Mith_10_mal[<span class="hljs-string">'Mitoses'</span>]),
+])
+fig.update_layout(barmode=<span class="hljs-string">'group'</span>)
+fig.show()</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/97b766bff955259dccc6c40a348c4aa6.png" alt="KNN level of mitoses" class="wp-image-48714" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001844im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/KNN-level-of-mitoses.png?ssl=1"/><figcaption><em>Level of Mitosis in Both clinical Groups | Credit: Author</em></figcaption></figure></div>
+
+
+
+<h3>初始化你的海王星人工智能实验</h3>
+
+
+
+<p>我通常喜欢从创建一个虚拟环境开始，在那里我将安装项目所需的包。</p>
+
+
+
+<pre class="hljs">conda create --name neptune python=<span class="hljs-number">3.6</span></pre>
+
+
+
+<ul><li>然后，安装Neptune客户端库及其所有依赖项。一个更新的版本已经发布，它包含了很多很酷的新特性和ML集成。查看这里:<a href="https://web.archive.org/web/20221206001844/https://docs.neptune.ai/migration-guide" target="_blank" rel="noreferrer noopener">海王星Doc首页</a>。</li></ul>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/1a613b37011147133302a134660ea09e.png" alt="Neptune migration guide" class="wp-image-48716" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001844im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-migration-guide.png?ssl=1"/><figcaption><em>New Documentation Website, migrate your old projects to the newest API | Source: <a href="https://web.archive.org/web/20221206001844/https://docs.neptune.ai/migration-guide" target="_blank" rel="noreferrer noopener">Neptune Docs</a></em></figcaption></figure></div>
+
+
+
+<ul><li>安装Neptune及其依赖项，并启用jupyter集成:</li></ul>
+
+
+
+<pre class="hljs">pip  install neptune-client
+pip install -U neptune-notebooks
+jupyter nbextension enable --py neptune-notebooks</pre>
+
+
+
+<p><em>你也可以在Neptune的官方文档网站上查看安装设置指南:</em> <a href="https://web.archive.org/web/20221206001844/https://docs.neptune.ai/getting-started/installation"> <em> Neptune Doc </em> s </a></p>
+
+
+
+<ul><li>从在Neptune <a href="https://web.archive.org/web/20221206001844/https://docs.neptune.ai/getting-started/installation" target="_blank" rel="noreferrer noopener">中创建你的项目开始。</a></li><li>获取您的API令牌，将您的笔记本与您的Neptune会话<a href="https://web.archive.org/web/20221206001844/https://docs.neptune.ai/getting-started/hello-world" target="_blank" rel="noreferrer noopener">连接起来。</a></li><li>启用与Neptune的连接:</li></ul>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+
+run = neptune.init(
+api_token=<span class="hljs-string">'YOUR_TOKEN_API'</span>,
+project=<span class="hljs-string">'aymane.hachcham/KNN-Thorough-Tour'</span>,
+)</pre>
+
+
+
+<ul><li>从你的实验开始。设置我们将使用的所需参数:</li></ul>
+
+
+
+<pre class="hljs">run[<span class="hljs-string">"Algorithm"</span>] = <span class="hljs-string">"KNN"</span>
+
+params = {
+    <span class="hljs-string">"algorithm"</span>: auto,
+    <span class="hljs-string">"leaf_size"</span>: <span class="hljs-number">30</span>,
+    <span class="hljs-string">"metric"</span>: minkowski,
+    <span class="hljs-string">"metric_params"</span>: <span class="hljs-keyword">None</span>,
+    <span class="hljs-string">"N_jobs"</span>: <span class="hljs-keyword">None</span>,
+    <span class="hljs-string">"N_neighbors"</span>: <span class="hljs-keyword">None</span>,
+    <span class="hljs-string">"P"</span>: <span class="hljs-number">2</span>
+    <span class="hljs-string">"weight"</span>: uniform
+}
+run[<span class="hljs-string">"parameters"</span>] = params</pre>
+
+
+
+<ul><li>在开始使用KNN模型之前，考虑对数据进行预处理。所有属性都是int64类型，没有空值。我们还需要将数据分成训练和测试两部分。</li></ul>
+
+
+
+<pre class="hljs">
+data = data.loc[data[<span class="hljs-string">'Bare Nuclei'</span>] != <span class="hljs-string">'?'</span>]
+data[<span class="hljs-string">'Bare Nuclei'</span>] = data[<span class="hljs-string">'Bare Nuclei'</span>].astype(<span class="hljs-string">'int64'</span>)
+
+features = data.loc[:, data.columns != <span class="hljs-string">'Class'</span>]
+features = features.loc[:, features.columns != <span class="hljs-string">'Id'</span>]
+target = data[<span class="hljs-string">'Class'</span>]
+
+x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=<span class="hljs-number">0.2</span>, random_state=<span class="hljs-number">123</span>) </pre>
+
+
+
+<h3>训练模型</h3>
+
+
+
+<h4>选择最佳K值</h4>
+
+
+
+<p>我们将遍历一系列三个不同的K值，并尝试查看哪个K最适合我们的情况和数据。首先，让我们试着理解K到底影响算法什么。如果我们看到最后一个例子，假设所有6个训练观察值保持不变，利用给定的K值，我们可以制作每个类别的边界。对于算法来说，这是K的一个很好很有用的性质。但是，你可能知道，K的值不是静态的。K的值随着每次连续的迭代而变化。这意味着第二次我们将为每个类设置不同的边界值。</p>
+
+
+
+
+
+
+
+<p>我们将使用neptune.log_metric()记录Neptune中的每一次K迭代。</p>
+
+
+
+<pre class="hljs">
+accuracy_K = []
+<span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> range(<span class="hljs-number">1</span>, <span class="hljs-number">10</span>):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(x_train, y_train)
+    preds = knn.predict(x_test)
+    accuracy = metrics.accuracy_score(y_test, y_pred=preds)
+    accuracy_K.append(accuracy)
+    run[<span class="hljs-string">'KValue_accuray'</span>].log(accuracy)</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/8c8ddcee7458690fa7345d12af91dcc0.png" alt="KNN log value in Neptune" class="wp-image-48719" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001844im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/KNN-log-value-in-Neptune.png?ssl=1"/><figcaption><em>KNN log value in Neptune | Credit: Author</em></figcaption></figure></div>
+
+
+
+<p>我们观察到达到的最大值是0.992，并且它出现在K = 6时。K = {2，4，5}的其他值是0.98。由于我们有3个以上的候选人共享相同的值，我们可以得出结论，最佳K值是5。</p>
+
+
+
+<p>在这个特殊的例子中，我们用闵可夫斯基距离来描述KNN模型。但是如果你尝试不同的距离，你可能会得到其他的K值。</p>
+
+
+
+<p>KNN分类器如下所示:</p>
+
+
+
+<pre class="hljs">KNeighborsClassifier(algorithm=<span class="hljs-string">'auto'</span>, leaf_size=<span class="hljs-number">30</span>, metric=<span class="hljs-string">'minkowski'</span>, metric_params=<span class="hljs-keyword">None</span>, n_jobs=<span class="hljs-keyword">None</span>, n_neighbors=<span class="hljs-number">5</span>, p=<span class="hljs-number">2</span>, weights=<span class="hljs-string">'uniform'</span>)</pre>
+
+
+
+<p>一旦我们确定最佳值K为5，我们将继续使用数据训练模型，并检查其总体准确性得分。</p>
+
+
+
+<pre class="hljs">knn = KNeighborsClassifier(n_neighbors=<span class="hljs-number">5</span>)
+knn.fit(x_train, y_train)
+predictions = knn.predict(x_test)
+metrics.accuracy_score(y_test, predictions)
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/6f07052638b88a9585c0fd4c63838cf7.png" alt="KNN accuracy score" class="wp-image-48721" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206001844im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/KNN-accuracy-score.png?ssl=1"/><figcaption><em>Final accuracy score | Credit: Author</em></figcaption></figure></div>
+
+
+
+<h2 id="limitations">KNN限制</h2>
+
+
+
+<p>KNN是一个很容易理解的算法。它不依赖于任何在内部工作并做出预测的ML模型。KNN是一种分类算法，只需要知道类别的数量(一个或多个)。这意味着它可以很容易地确定是否应该添加一个新的类别，而不需要任何关于可能有多少其他类别的数据。</p>
+
+
+
+<p>这种简单的缺点是，它不能预测罕见的事情(如新的疾病)，KNN无法预测，因为它不知道一种罕见的事情在其他健康人群中的流行程度。</p>
+
+
+
+<p>虽然KNN在测试集上产生了很好的准确性，但分类器在时间和内存方面仍然较慢和昂贵。它需要大的存储器来存储用于预测的整个训练数据集。此外，欧几里德距离对量值非常敏感，因此数据集中具有较高量值的要素的权重总是大于具有较低量值的要素的权重。</p>
+
+
+
+<p>最后，我们应该记住，KNN不适合我们上面提到的大规模数据集。</p>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>希望你现在对KNN算法的工作原理有了更多的了解。我们探讨了许多关于KNN如何存储整个数据集来进行预测的概念。</p>
+
+
+
+<p>KNN是许多不基于学习模型进行预测的懒惰学习算法之一。KNN通过平均输入观测值和已有数据之间的相似性，即时做出预测。</p>
+
+
+
+<p>我将为您留下一些有用的资源，让您进一步了解KNN:</p>
+
+
+
+
+
+
+
+<p>感谢您的阅读！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

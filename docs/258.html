@@ -1,0 +1,363 @@
+<html>
+<head>
+<title>Deep Dive Into Error Analysis and Model Debugging in Machine Learning (and Deep Learning) </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>深入研究机器学习(和深度学习)中的错误分析和模型调试</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/deep-dive-into-error-analysis-and-model-debugging-in-machine-learning-and-deep-learning#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/deep-dive-into-error-analysis-and-model-debugging-in-machine-learning-and-deep-learning#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>“赢得一场<a href="/web/20221112083336/https://neptune.ai/blog/image-classification-tips-and-tricks-from-13-kaggle-competitions" target="_blank" rel="noreferrer noopener"> Kaggle </a>比赛并不能让你为现实世界的数据科学做好准备！”这话我听得多了。当我还是个新手的时候，我想知道“什么？我在排行榜上有99%的准确率。那简直太完美了！”但现在我明白了他们的意思。</p>
+
+
+
+<blockquote class="wp-block-quote is-style-default"><p>获得良好的准确性就像在比赛前赢得掷硬币比赛一样。</p><p>很好，但是还有很多工作要做。</p></blockquote>
+
+
+
+<p>在竞赛和研究中，在你训练一个模型后，你做误差分析，找出模型的问题所在。然后，对您的模型进行一些更改，并在训练集上对其进行重新训练。但是，有时通过使用一个沉重而复杂的模型，你会得到一个很好的验证和测试分数。在比赛中，你会在这一点上停下来，因为你是在一个单一的指标上被评判的。在这个行业中，即使在你的测试数据集上获得了很高的分数，仍然有一些重要的步骤需要完成。</p>
+
+
+
+<p>在这篇文章中，我们将深入探讨为什么你应该仔细检查你的模型，即使你得到了一个好的度量。</p>
+
+
+
+<p>具体来说，我们将研究:</p>
+
+
+<div class="custom-point-list">
+<ul><li>分析你的模型在你的测试数据上哪里出错了，以及如何基于这些见解对你的模型进行系统化的修改。</li><li>在三个层面上执行误差分析——预测、数据和特征。</li><li>如何在您的模型培训管道中查找并修复错误。</li><li>为生产中的模型寻找和解决bug的想法。</li></ul>
+</div>
+
+
+<h2>误差分析</h2>
+
+
+
+<p>对于您的ML项目，如果您获得了85%的准确率，您应该问自己——为什么其他15%的测试示例被错误分类？<a href="https://web.archive.org/web/20221112083336/https://www.quora.com/How-do-you-do-error-analysis-in-machine-learning" target="_blank" rel="noreferrer noopener nofollow">这通常是你错误分析的起点</a>。</p>
+
+
+
+<p>具有讽刺意味的是，如果您在测试集上获得了100%的性能，您也应该有所怀疑。如果有数据泄露怎么办？</p>
+
+
+
+<p>让我们来看看3个不同层次的误差分析——预测、数据和特征。</p>
+
+
+
+<h3>预言</h3>
+
+
+
+<p>一个简单的开始方法是将这15%的误差分解成一些有洞察力的东西——一个混乱矩阵。它给你一种不准确的模式的感觉。大多数的类是否被错误地分类到一个特定的类中(在不平衡的情况下可能是大多数类)？</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="31032" data-permalink="https://web.archive.org/web/20221112083336/https://neptune.ai/normalized-confusion-matrix" data-orig-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?fit=512%2C384&amp;ssl=1" data-orig-size="512,384" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="normalized-confusion-matrix" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?fit=300%2C225&amp;ssl=1" data-large-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?fit=512%2C384&amp;ssl=1" decoding="async" src="../Images/5ab7a12a4773eb380f1796b9e82e3fc7.png" alt="normalized confusion matrix" class="wp-image-31032 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?resize=512%2C384&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221112083336im_/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?resize=512%2C384&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="31032" data-permalink="https://web.archive.org/web/20221112083336/https://neptune.ai/normalized-confusion-matrix" data-orig-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?fit=512%2C384&amp;ssl=1" data-orig-size="512,384" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="normalized-confusion-matrix" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?fit=300%2C225&amp;ssl=1" data-large-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?fit=512%2C384&amp;ssl=1" decoding="async" src="../Images/5ab7a12a4773eb380f1796b9e82e3fc7.png" alt="normalized confusion matrix" class="wp-image-31032" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221112083336im_/https://i0.wp.com/neptune.ai/wp-content/uploads/normalized-confusion-matrix.png?resize=512%2C384&amp;ssl=1"/></noscript><figcaption><em>We can see that the misclassified Versicolor was predicted as Virginia. | <a href="https://web.archive.org/web/20221112083336/https://scikit-learn.org/stable/_images/sphx_glr_plot_confusion_matrix_002.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="640" data-lbwps-height="480" data-lbwps-srcsmall="https://scikit-learn.org/stable/_images/sphx_glr_plot_confusion_matrix_002.png">Source</a></em></figcaption></figure></div>
+
+
+
+<p>例如，如果您正在处理电子邮件数据集中的命名实体识别，您可能有五个类，其中两个是日期。说出邮件的发送日期和回复日期。</p>
+
+
+
+<p>很有可能该模型在识别日期方面做得很好，但是很难将日期分成两类。在这种情况下，一个简单的解决方案是识别日期，并应用一些启发式方法来区分它们。</p>
+
+
+
+<p>另一种全面评估你的模型的方法是<strong>看看你的模型与你的基线相比表现如何。</strong>你的基线是否比你的复杂模型更好地对一些类进行分类？整体改善边际吗？如果有，为什么？</p>
+
+
+
+<p>另一种验证模型可信度的方法是<strong>亲自挑选预测</strong>。例如，分析一些低置信度的正确分类可以告诉您模型是否很难评估简单(从人类的角度来看)的示例。分类错误的例子容易预测吗？这些都是特征工程方面出了问题的迹象。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="31034" data-permalink="https://web.archive.org/web/20221112083336/https://neptune.ai/error-analysis-text" data-orig-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?fit=512%2C288&amp;ssl=1" data-orig-size="512,288" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="error-analysis-text" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?fit=512%2C288&amp;ssl=1" decoding="async" src="../Images/2dbc7e3c8dce87c2909ab76185c3c9ce.png" alt="error analysis text" class="wp-image-31034 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?resize=512%2C288&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221112083336im_/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?resize=512%2C288&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="31034" data-permalink="https://web.archive.org/web/20221112083336/https://neptune.ai/error-analysis-text" data-orig-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?fit=512%2C288&amp;ssl=1" data-orig-size="512,288" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="error-analysis-text" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?fit=512%2C288&amp;ssl=1" decoding="async" src="../Images/2dbc7e3c8dce87c2909ab76185c3c9ce.png" alt="error analysis text" class="wp-image-31034" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221112083336im_/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-text.png?resize=512%2C288&amp;ssl=1"/></noscript><figcaption><em>Original image</em></figcaption></figure></div>
+
+
+
+<p>ML Operations最近从软件开发中借鉴了一些想法来衡量一个模型的健壮性。在软件开发中，每一个新代码在发布前都必须通过测试。您也可以为ML模型创建一套测试。</p>
+
+
+
+<p>例如，可以通过在几个明显的精选示例上测试模型来确保最低预期性能。如果模型在这些例子中的任何一个都失败了，那么它就不适合上线。</p>
+
+
+
+<p>类似地，人们可以改变这些例子中的一些细节并看到效果。“德怀特是个好人”和“T2是个好人”的情感得分应该差不多。在这种情况下，名称被更改。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="31036" data-permalink="https://web.archive.org/web/20221112083336/https://neptune.ai/adversarial-attacks-nlp" data-orig-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?fit=912%2C316&amp;ssl=1" data-orig-size="912,316" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="adversarial-attacks-NLP" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?fit=300%2C104&amp;ssl=1" data-large-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?fit=912%2C316&amp;ssl=1" decoding="async" src="../Images/e4ab7f15f08c8eb23c693ca997779d8d.png" alt="adversarial attacks NLP" class="wp-image-31036 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?resize=912%2C316&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221112083336im_/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?resize=912%2C316&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="31036" data-permalink="https://web.archive.org/web/20221112083336/https://neptune.ai/adversarial-attacks-nlp" data-orig-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?fit=912%2C316&amp;ssl=1" data-orig-size="912,316" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="adversarial-attacks-NLP" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?fit=300%2C104&amp;ssl=1" data-large-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?fit=912%2C316&amp;ssl=1" decoding="async" src="../Images/e4ab7f15f08c8eb23c693ca997779d8d.png" alt="adversarial attacks NLP" class="wp-image-31036" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221112083336im_/https://i0.wp.com/neptune.ai/wp-content/uploads/adversarial-attacks-NLP.png?resize=912%2C316&amp;ssl=1"/></noscript><figcaption><em>Examples of adversarial attacks in NLP | <a href="https://web.archive.org/web/20221112083336/https://arxiv.org/abs/2005.05909" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<h3>数据</h3>
+
+
+
+<p>我无法计算一个模型因为数据质量差而失败的次数。当您花费数周时间实施一些复杂的架构，然后发现数据有错误时，这是非常令人沮丧的。</p>
+
+
+
+<p><strong>在实施基线</strong>之前，始终确保数据是您期望的样子。因为后来，你不想知道你的糟糕指标是因为你的模型还是你的数据。</p>
+
+
+
+<p>现在，我说的<em>数据不好是什么意思？</em>在我回答这个问题之前，你必须记住一条黄金法则——<em>了解你的数据</em>:</p>
+
+
+<div class="custom-point-list">
+<ul><li>是如何产生的？</li><li>什么时候产生的？</li><li>谁生成的？</li><li>它是如何储存的？</li><li>所有的都储存起来了吗？</li><li>你应该知道一切。</li></ul>
+</div>
+
+
+<p>现在，我们准备讨论<em>高质量数据</em>。</p>
+
+
+
+<p>考虑从发票图像中识别命名实体的NLP任务。为此，您需要文本形式的图像内容。该文本是从第三方OCR(光学字符识别)软件获得的。</p>
+
+
+
+
+
+
+
+<p>如果你使用过像<em> tesseract </em>这样的开源软件，输出的文本可能会有很多拼写错误。这大大增加了你的词汇量。清理这些乱七八糟的东西变得很乏味。结果，你的NER任务变得不必要的困难。这里的数据质量很差。</p>
+
+
+
+<p>考虑另一个例子，工厂机器上的传感器捕获关于机器的数据——温度、声级等。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img data-attachment-id="31040" data-permalink="https://web.archive.org/web/20221112083336/https://neptune.ai/error-analysis-result" data-orig-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?fit=512%2C215&amp;ssl=1" data-orig-size="512,215" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="error-analysis-result" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?fit=300%2C126&amp;ssl=1" data-large-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?fit=512%2C215&amp;ssl=1" decoding="async" src="../Images/d424c4448fe329ca44271ea8c021729c.png" alt="error analysis result" class="wp-image-31040 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?resize=563%2C236&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221112083336im_/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?resize=563%2C236&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="31040" data-permalink="https://web.archive.org/web/20221112083336/https://neptune.ai/error-analysis-result" data-orig-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?fit=512%2C215&amp;ssl=1" data-orig-size="512,215" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="error-analysis-result" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?fit=300%2C126&amp;ssl=1" data-large-file="https://web.archive.org/web/20221112083336/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?fit=512%2C215&amp;ssl=1" decoding="async" src="../Images/d424c4448fe329ca44271ea8c021729c.png" alt="error analysis result" class="wp-image-31040" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221112083336im_/https://i0.wp.com/neptune.ai/wp-content/uploads/error-analysis-result.png?resize=563%2C236&amp;ssl=1"/></noscript><figcaption><em>OCR output can be erroneous. The word good is misread as goal. | <a href="https://web.archive.org/web/20221112083336/https://stackabuse.com/pytesseract-simple-python-optical-character-recognition/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>作为一名数据科学家，你的任务是开发一个模型来检测机器中的异常行为。原来<strong>传感器已经损坏</strong>好几个星期了，而且没有更换。因此，您丢失了大量数据。你的数据(有一个时间维度)有一个缺口。</p>
+
+
+
+<p>数据的另一个潜在问题可能是注释的<strong>准确性。同样，您应该知道数据是如何被注释的。公开还是由专门的团队？注释者有足够的专业知识来标记数据吗？</strong></p>
+
+
+
+<p>一个小而重要的错误可能是<strong>训练和验证数据</strong>的不适当分割。不保持两个部分的分布，特别是在<a href="/web/20221112083336/https://neptune.ai/blog/how-to-deal-with-imbalanced-classification-and-regression-data" target="_blank" rel="noreferrer noopener">不平衡的数据</a>会导致结果不准确。</p>
+
+
+
+
+
+
+
+<p class="has-text-align-center has-small-font-size"><em>该示例显示了对具有一维输入(X轴)和一维连续预测变量(Y轴)的数据拟合曲线。训练样本覆盖X中的某个范围，这不同于测试示例覆盖的X中的范围。因为训练数据不代表真实曲线，所以拟合曲线是不准确的。| <a href="https://web.archive.org/web/20221112083336/https://miro.medium.com/max/1232/1*L8Ua86qfwVRJAnaH_KZdFQ.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="616" data-lbwps-height="411" data-lbwps-srcsmall="https://miro.medium.com/max/1232/1*L8Ua86qfwVRJAnaH_KZdFQ.png">来源</a> </em></p>
+
+
+
+<p>一种常见的做法是对数据集应用扩充。如果您扩充了您的数据，您是否应用了有效的转换？例如，在汽车和自行车之间的图像分类中，垂直反转图像以创建合成示例几乎没有意义。模型不太可能看到颠倒的汽车或自行车。</p>
+
+
+
+<h3>特征</h3>
+
+
+
+<p>在你训练好你的模型之后，你如何检查你的特征是否良好？您99%的验证准确性可能是由不良功能造成的，这些功能是利用数据泄漏设计的。</p>
+
+
+
+<p>在这种情况下，模型将高度依赖于此功能。这可以用SHAP或莱姆框架(模型可解释性)来验证。另一个常见的漏洞是在整个数据集上安装一个缩放器或矢量器，然后进行分割。这应该避免，因为您在培训中间接使用了验证数据。</p>
+
+
+
+
+
+
+
+<p class="has-text-align-center">该图显示了像LIME这样的解释者如何为预测的每个特征分配贡献分数。| <a href="https://web.archive.org/web/20221112083336/https://blog.dominodatalab.com/wp-content/uploads/2019/01/JP-SHAP-LIME-Image-a8.png" target="_blank" rel="noreferrer noopener nofollow">来源</a> </p>
+
+
+
+<div id="blog-cta-intext-block_619274d3ad354" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">编者按</h3>
+  <div class="blog-cta-intext__content"><p><a href="https://web.archive.org/web/20221112083336/https://docs.neptune.ai/integrations-and-supported-tools/model-visualization-and-debugging/dalex" target="_blank" rel="noreferrer noopener"> DALEX </a>是一个结合了很多模型解释和预测解释技术的可解释框架。你可以<a href="/web/20221112083336/https://neptune.ai/blog/explainable-and-reproducible-machine-learning-with-dalex-and-neptune" target="_blank" rel="noreferrer noopener">在这里阅读关于Dalex。</a></p>
+</div>
+  </div>
+
+
+<p>不同的模型有不同的数据条件。基于距离的模型更适合缩放输入。确保你的特征服从这样的假设。此外，功能必须符合<em>常识</em>规则。比如特征之一是人类年龄，就不需要200年那么荒谬的数值。确保在过多修改数据之前编写这样的测试。</p>
+
+
+
+<p>分析神经网络中的特征要困难得多，因为它们实际上无法解释。一个有用的小技巧是检查每一层的参数值的分布。训练较差的网络会有几个参数值或梯度接近于零的图层，这些图层永远不会流向网络中的某个区域。</p>
+
+
+
+
+
+
+
+<h2>调试模型训练管道</h2>
+
+
+
+<p>我们在三个核心组件中寻找错误，但还有更多空间。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221112083336/https://jonathan-hui.medium.com/debug-a-deep-learning-network-part-5-1123c20f960d" target="_blank" rel="noreferrer noopener">深度学习系统中的模型训练管道更加复杂</a> s，主要是因为深度学习提供的灵活性。难的是<strong>神经网络无声无息地失效</strong>。通常，您能够成功运行训练代码，但是您不会得到想要的结果。有很多方法可以找出网络的问题。</p>
+
+
+
+<h3>调试深度学习模型</h3>
+
+
+
+<p>例如，<strong>损失曲线在诊断深层网络</strong>时非常方便。您可以通过绘制训练和验证损失曲线来检查您的模型是否过拟合。也可以检查一下自己的学习率是过高还是过低。如果损失曲线过早在一个高值处变平，则学习率可能较低。如果损失曲线遵循锯齿形模式，则学习率太高。</p>
+
+
+
+<p>当训练LSTM/RNN时，损失曲线中的尖峰指向爆炸梯度。在这种情况下，剪切渐变会有所帮助。</p>
+
+
+
+
+
+
+
+<p><strong>现代深度学习模型中注意力是必须的</strong>。它显著提高了模型性能。然而，它也是一个很好的解释工具。考虑一个机器翻译任务。你需要建立一个编码器-解码器模型，将英语翻译成波兰语。注意力权重允许你直观地检查哪个英语单词对翻译的波兰语单词最重要。</p>
+
+
+
+<p>训练深度学习模型的一些准则:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>从一个简单的网络</strong>开始——没有批量规范，没有辍学，没有正规化或任何花哨的技巧。可能只是一个CNN/RNN和一个分类层。</li><li><strong>溢出单批</strong>数据。</li><li><strong>手动检查中间输出和最终输出的形状</strong>。即使你没有发现任何代码错误。神经网络无声无息地失败了。</li><li>尝试<strong>尽可能多的使用DL框架APIs】避免自己写函数。例如，使用PyTorch的数据加载器或图像转换器，而不是自己编写。</strong></li><li>调整模型时，不要一次更改多个超参数的值。<strong>一次调整一个超参数。</strong></li></ul>
+</div>
+
+
+<div id="blog-cta-intext-block_61927505ad355" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">有关系的</h3>
+  <div class="blog-cta-intext__content"><p>你可能想看看这个关于<a href="https://web.archive.org/web/20221112083336/http://josh-tobin.com/troubleshooting-deep-neural-networks.html" target="_blank" rel="noreferrer noopener nofollow">神经网络故障诊断的伟大资源。</a></p>
+</div>
+  </div>
+
+
+<h2>评估生产中的模型</h2>
+
+
+
+<p>到目前为止，我们已经讨论了模型训练中的错误分析。然而，在生产环境中有一些事情需要注意。大多数时候，你没有标签来检查你的预测是否正确。您必须依靠试探法来查看模型性能是否下降。</p>
+
+
+
+<p>ML模型是根据具有某种分布的数据来训练的。如果生产环境中的数据具有不同的分布，那么模型性能将是次优的。这个问题很常见，被称为<em>模型漂移</em>。</p>
+
+
+
+<p>我们如何检测到这一点？由于我们在生产中没有标签，我们依靠一些替代措施。例如，如果特征的分布不同于训练集特征，则模型漂移是可能的。</p>
+
+
+
+<p><strong>在生产中评估模型是一个巨大的话题，我们有另外一篇文章专门讨论这个问题:</strong> <a href="/web/20221112083336/https://neptune.ai/blog/concept-drift-best-practices" target="_blank" rel="noreferrer noopener"> <strong>处理概念漂移的最佳实践</strong> </a>。</p>
+
+
+
+<h2>最后的想法</h2>
+
+
+
+<p>机器学习中的错误分析<strong>不仅仅是为了提高你的目标指标的性能</strong>，也是为了确保在静态训练和验证数据集上表现良好的模型在生产中也一样好。</p>
+
+
+
+<p>它包括理解你的训练过程中的限制——数据、特征或模型，并试图使这些方面尽可能健壮。不幸的是，没有可以应用于任何ML问题的详细框架。计算机视觉问题可能需要不同于NLP问题的错误分析。但这正是这个过程的创意所在！</p>
+
+
+
+<p>希望你学到了一些东西。欢迎在海王星博客上查看更多令人惊叹的人工智能/人工智能文章。</p>
+
+
+
+
+<div id="author-box-new-format-block_60421833aff63" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">德鲁维尔·卡拉尼</h3>
+    
+          <p class="article__authorContent-text">i3systems India的数据科学家 <br/>一位热爱数学和编程的数据科学家。他以前的经验使他能够处理大规模的自然语言处理问题，如聊天机器人和文档理解。他认为，教育大众了解技术及其影响与开发新技术同样重要。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="is-layout-flow wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>ML实验跟踪:它是什么，为什么重要，以及如何实施</h2>
+
+
+
+<p class="has-small-font-size">10分钟阅读|作者Jakub Czakon |年7月14日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>我来分享一个听了太多次的故事。</p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-left is-style-default"><p><em>“…我们和我的团队正在开发一个ML模型，我们进行了大量的实验，并获得了有希望的结果… </em></p><p><em>…不幸的是，我们无法确切地说出哪种性能最好，因为我们忘记了保存一些模型参数和数据集版本… </em></p><p><em>…几周后，我们甚至不确定我们实际尝试了什么，我们需要重新运行几乎所有的东西"</em></p><p>不幸的ML研究员。</p></blockquote>
+
+
+
+<p>事实是，当你开发ML模型时，你会进行大量的实验。</p>
+
+
+
+<p>这些实验可能:</p>
+
+
+<div class="custom-point-list">
+<ul><li>使用不同的模型和模型超参数</li><li>使用不同的培训或评估数据，</li><li>运行不同的代码(包括您想要快速测试的这个小变化)</li><li>在不同的环境中运行相同的代码(不知道安装的是PyTorch还是Tensorflow版本)</li></ul>
+</div>
+
+
+<p>因此，它们可以产生完全不同的评估指标。</p>
+
+
+
+<p>跟踪所有这些信息会很快变得非常困难。特别是如果你想组织和比较这些实验，并且确信你知道哪个设置产生了最好的结果。</p>
+
+
+
+<p>这就是ML实验跟踪的用武之地。</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221112083336/https://neptune.ai/blog/ml-experiment-tracking" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

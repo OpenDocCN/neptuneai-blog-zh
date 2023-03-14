@@ -1,0 +1,395 @@
+<html>
+<head>
+<title>Building Machine Learning Pipelines: Common Pitfalls </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>构建机器学习管道:常见陷阱</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/building-ml-pipelines-common-pitfalls#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/building-ml-pipelines-common-pitfalls#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>近年来，机器学习取得了快速进步，这导致许多公司和初创公司在不了解陷阱的情况下钻研该领域。常见的例子是<a href="/web/20220926092926/https://neptune.ai/blog/build-mlops-pipelines-with-github-actions-guide" target="_blank" rel="noreferrer noopener">构建ML管道</a>时遇到的陷阱。</p>
+
+
+
+<p>机器学习管道很复杂，有几种方式可能会失败或被误用。参与ML项目的利益相关者需要了解机器学习管道如何失败，可能的陷阱，以及如何避免这样的陷阱。</p>
+
+
+
+<p>在构建机器学习管道时，有几个陷阱你应该知道。最常见的陷阱是<a href="https://web.archive.org/web/20220926092926/https://www.thinkautomation.com/bots-and-ai/the-ai-black-box-problem/" target="_blank" rel="noreferrer noopener nofollow">黑盒问题</a>——管道太复杂，难以理解。这可能会导致无法识别给定系统的问题，或者为什么它不能按预期工作。</p>
+
+
+
+<p>为了理解其他陷阱，我们将看一看典型的ML管道架构，包括所涉及的步骤，以及在各个步骤下要避免的陷阱。</p>
+
+
+
+<h2>通用ML流水线架构</h2>
+
+
+
+<p>机器学习管道帮助团队组织和自动化ML工作流。该管道还为ML(和数据)工程师提供了一种管理培训数据、编排培训和服务工作以及管理生产模型的方法。</p>
+
+
+
+<p>让我们回顾一下定义其架构的ML管道中的典型过程。</p>
+
+
+<p id="block_62583ef777c5b" class="separator separator-10"/>
+
+
+
+
+
+
+<p id="block_62583eff77c5c" class="separator separator-5"/>
+
+
+
+<p>ML管道应关注以下步骤:</p>
+
+
+<div class="custom-point-list">
+<ol><li><strong>数据摄取</strong>:收集必要的数据是整个程序的第一步。用于培训的数据将由数据科学家或具有业务专长的人员组成的专业团队与数据工程师共同定义。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="2"><li><strong>数据验证和</strong> <a href="/web/20220926092926/https://neptune.ai/blog/data-preprocessing-guide" target="_blank" rel="noreferrer noopener"> <strong>预处理</strong> </a>:采集的数据有很多变化。这通常是手动完成的，以格式化、清理、标注和增强数据，从而确保模型的数据质量可以接受。该模型的特征是将在培训和生产中使用的数据值。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="3"><li><strong>模特培训</strong>:培训是整个程序中最重要的一个环节。数据科学家将模型与以前的数据进行匹配以进行学习，训练它对看不见的数据进行预测。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="4"><li><strong>模型分析和验证</strong>:为了保证较高的预测精度，根据测试和验证数据对训练好的模型进行验证。当比较测试的结果时，模型可能已经根据不同的数据进行了调整/修改/训练。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="5"><li><strong>模型部署</strong>:最后阶段是将ML模型应用于生产设置。因此，本质上，最终用户可以利用它来获得基于实时数据的预测。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="6"><li><strong>管道协调</strong> : <a href="/web/20220926092926/https://neptune.ai/blog/best-workflow-and-pipeline-orchestration-tools" target="_blank" rel="noreferrer noopener">管道协调技术</a>采用简单的协作界面来自动化和管理所有管道流程，在某些情况下还包括基础设施。</li></ol>
+</div>
+
+<div class="custom-point-list">
+<ol start="7"><li><strong>元数据管理</strong>:这一步跟踪<a href="/web/20220926092926/https://neptune.ai/blog/ml-metadata-store" target="_blank" rel="noreferrer noopener">元数据</a>，如代码版本、模型版本、超参数值、环境和评估度量结果，以一种使它们在公司内部可访问和协作的方式组织它们。</li></ol>
+</div>
+
+
+<p>就ML管道架构而言，有几种选择是可能的，我们将依赖这些ML管道和服务提供商，如<a href="https://web.archive.org/web/20220926092926/https://cloud.google.com/gcp?utm_source=google&amp;utm_medium=cpc&amp;utm_campaign=emea-de-all-en-bkws-all-all-trial-e-gcp-1011340&amp;utm_content=text-ad-none-any-DEV_c-CRE_500236788645-ADGP_Hybrid%20%7C%20BKWS%20-%20EXA%20%7C%20Txt%20~%20GCP%20~%20General%23v1-KWID_43700060393213373-aud-488003287435%3Akwd-6458750523-userloc_9043981&amp;utm_term=KW_google%20cloud-NET_g-PLAC_&amp;gclid=CjwKCAjwoduRBhA4EiwACL5RPzJRiaBnMPPmAM7vV7o6G37rqSGnliVQy2OwUcPbEOSmQ8IgaToLjRoCdMkQAvD_BwE&amp;gclsrc=aw.ds" target="_blank" rel="noreferrer noopener nofollow">谷歌云</a>和<a href="https://web.archive.org/web/20220926092926/https://aws.amazon.com/" target="_blank" rel="noreferrer noopener nofollow"> AWS </a>。<a href="https://web.archive.org/web/20220926092926/https://www.googleadservices.com/pagead/aclk?sa=L&amp;ai=DChcSEwii99X95tT2AhV1j2gJHfQaDpsYABABGgJ3Zg&amp;ae=2&amp;ohost=www.google.com&amp;cid=CAESbeD2ky8xCHR4Oa43oWJ57Im53iX9I9Z7llYj4gwqxV9OEA0r5nIGDs2Fmbl8UBfjWRYNziAtMbelI9iRTX7C2fPOtFfuZRB7_voTSaHRxyCXWamJPX9JRL-n___oQidJBaVL6TdV3VGZZMZLAd4&amp;sig=AOD64_1ekS-zcfctbT5ohRJ5lVIvC3LLRg&amp;q&amp;adurl&amp;ved=2ahUKEwjR2s395tT2AhUzhv0HHeGPBK0Q0Qx6BAgCEAE&amp;dct=1" target="_blank" rel="noreferrer noopener nofollow">例如，Azure ML </a> pipeline帮助创建、管理和优化机器学习工作流。它是ML工作流的一个独立的可部署流程。它使用起来非常简单，并提供了各种额外的管道，每个管道都有不同的功能。</p>
+
+
+
+<h2>ML管道步骤中的常见陷阱</h2>
+
+
+
+<p>从接收数据到建模、操作模型，运行ML管道可能非常繁琐。在ML应用程序的生命周期中，管理管道也是一个很大的困难。在本节中，您将了解在构建ML管道的每个步骤中可能遇到的常见陷阱。</p>
+
+
+
+<h3>数据摄取步骤</h3>
+
+
+
+<h4>处理各种数据源</h4>
+
+
+
+<p>数据接收是指将数据从许多来源移动到一个集中的数据库中，通常是一个数据仓库，下游系统可以在那里使用这些数据。这可以在实时或批处理模式下完成。数据接收和数据版本控制构成了数据分析架构的核心。关于这一步，最常见的陷阱是不同的数据格式和类型，根据数据的性质，这些格式和类型可能会使流程变得混乱和不同。</p>
+
+
+
+<h5>成批处理方式</h5>
+
+
+
+<p>最流行的数据摄取模型<a href="https://web.archive.org/web/20220926092926/https://www.projectmanager.com/blog/what-is-batching" target="_blank" rel="noreferrer noopener nofollow">批处理</a>。在批处理中，摄取层根据定义获取源数据，并将其移动到数据仓库或其他数据库。批处理可能由时间表、预定义的逻辑序列或某些预定义的标准启动。因为批处理通常不太昂贵，所以当不需要实时数据接收时，经常使用批处理。</p>
+
+
+
+<h5>实时流模式</h5>
+
+
+
+<p><a href="https://web.archive.org/web/20220926092926/https://www.googleadservices.com/pagead/aclk?sa=L&amp;ai=DChcSEwimtrf45NT2AhX2kGgJHYYbAXMYABABGgJ3Zg&amp;ae=2&amp;ohost=www.google.com&amp;cid=CAESbeD2han1hI1uDV8UqkLFWVuwFxCzytKOWlDHgsKUla58_OHCx0Jn-REUb-CozWNvsnj69dHjyKfW6XMXy5X_3GsvpuQTnJfANS-jYCC5yv19whlPxXWqALuKneB3IaoJJVu3ZHpqB3ycvdXWygI&amp;sig=AOD64_21PfyRfwnQqK9aUJhfJqLQ7-H1Qw&amp;q&amp;adurl&amp;ved=2ahUKEwjW3a745NT2AhWMg_0HHQ2-ASMQ0Qx6BAgEEAE&amp;dct=1" target="_blank" rel="noreferrer noopener nofollow">实时流</a>是一种将数据从源实时接收到目标的技术。流没有周期性元素，这意味着数据一旦在源上变得可访问，就被接收到数据仓库中。没有等待期。这需要一个能够持续监控数据生产者的新数据的系统。</p>
+
+
+
+<h4>解决办法</h4>
+
+
+
+<p>这里最重要的规则是在整个管道中保持一致的数据层。</p>
+
+
+
+<p>即使是从各种数据源获取数据，也要始终注意用相似的格式维护数据。</p>
+
+
+<div class="custom-point-list">
+<ul><li>您需要良好的报告和其他下游分析系统，这些系统要有良好的数据质量和可追踪的数据血统才能正常工作。</li><li>您的数据需要保持一致，因为可能会通过不同的模式(实时和批处理)接收数据</li></ul>
+</div>
+
+
+<h3>数据验证和处理</h3>
+
+
+
+<h4>选择错误的架构</h4>
+
+
+
+<p>数据验证和数据处理是可能被管道问题阻碍的两个步骤。因为数据源会定期变化，所以随着时间的推移收集的数据的格式和类型也会变化，所以使数据输入系统适应未来是一个重要的问题。</p>
+
+
+
+<p>在数据输入和管道过程中，速度可能是一个问题。例如，建立一个实时管道是非常昂贵的，因此评估你的公司真正需要的速度是至关重要的。</p>
+
+
+
+<h4>忽视数据质量监控</h4>
+
+
+
+<p>例如，在计算机能够执行一个批处理任务之前，它的所有输入数据必须准备好；这意味着必须对其进行彻底检查。<a href="https://web.archive.org/web/20220926092926/https://blog.datumize.com/the-five-most-common-data-quality-issues-and-how-to-overcome-them" target="_blank" rel="noreferrer noopener nofollow">数据质量问题</a>，批处理作业中出现的数据错误、差错和软件故障会使整个流程陷入停顿甚至更糟，导致<a href="https://web.archive.org/web/20220926092926/https://www.kdnuggets.com/2022/01/machine-learning-models-die-silence.html" target="_blank" rel="noreferrer noopener nofollow">静默模型故障</a>。</p>
+
+
+
+<h4>解决办法</h4>
+
+
+
+<p>必须彻底监控数据质量，以确保管道中的后续步骤使用高质量数据..微小的数据错误，如日期输入错误，可能会导致批处理失败。</p>
+
+
+
+<p>也就是说，我们必须始终记住，运行在生产服务器上的模型将利用真实世界的数据为用户做出预测，因此我们还需要监控数据分布随时间的<a href="https://web.archive.org/web/20220926092926/https://huyenchip.com/2022/02/07/data-distribution-shifts-and-monitoring.html" target="_blank" rel="noreferrer noopener nofollow">变化。</a></p>
+
+
+
+<p>创建ML模型并不是一项简单的任务，要使模型在不同的环境中表现良好，需要高质量的数据。进入管道的坏数据不仅会导致您的模型无法正常运行，还可能会在做出关键业务决策时带来灾难性后果，尤其是在医疗保健或无人驾驶汽车等任务关键型行业。</p>
+
+
+
+<h3>模特培训</h3>
+
+
+
+<h4>在模型训练期间使用未经验证的非结构化数据</h4>
+
+
+
+<p>机器学习工程师在人工智能研究中最常见的错误之一是使用未经验证的非结构化数据。未验证的数据可能包含诸如重复、数据冲突、分类不准确或不完整、差异以及其他可能导致整个训练过程异常的数据问题。</p>
+
+
+
+<h4>解决办法</h4>
+
+
+
+<p>当然，补救所有这些问题的一个方法是利用一个<a href="/web/20220926092926/https://neptune.ai/blog/best-ml-experiment-tracking-tools" target="_blank" rel="noreferrer noopener">实验跟踪工具</a>。通过这种方式，您可以跟踪所有管道运行会话、训练数据的多个版本，并且在生产阶段，只需单击几下鼠标，即可轻松监控模型版本和数据流。<a href="/web/20220926092926/https://neptune.ai/product/experiment-tracking" target="_blank" rel="noreferrer noopener"> Neptune.ai </a>是在这种情况下使用的合适工具。</p>
+
+
+
+<h3>模型验证和分析</h3>
+
+
+
+<h4>粗心的预处理会在模型验证期间引入训练/测试泄漏</h4>
+
+
+
+<p>模型验证在部署之前正确评估模型的真实性能。有一些要点需要记住:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>模型应用</strong>:我们的模型可能用于关键任务应用。靠谱吗？</li><li><strong>模型可推广性</strong>:当我们的模型被部署并且在现实世界中表现不佳时，我们不希望获得极好的测试集性能而感到失望。</li><li><strong>模型评估</strong>:在部署期间，我们不会总是知道新输入的基本事实。因此，在部署后衡量模型的性能可能很困难。</li></ul>
+</div>
+
+
+<p>在这个陷阱下，有两件事要永远记住:</p>
+
+
+<div class="custom-point-list">
+<ol><li>一个<a href="https://web.archive.org/web/20220926092926/https://machinelearningmastery.com/data-preparation-without-data-leakage/" target="_blank" rel="noreferrer noopener nofollow">简单的训练/测试分割</a>隐含地假设我们的数据由<a href="https://web.archive.org/web/20220926092926/https://www.statisticshowto.com/iid-statistics/" target="_blank" rel="noreferrer noopener nofollow"> iid样本</a>组成。</li><li>如果我们的数据违反了iid假设，那么测试集的性能可能会误导我们，导致我们高估模型的预测能力。</li></ol>
+</div>
+
+
+<h4>解决方法</h4>
+
+
+<div class="custom-point-list">
+<ul><li>如果您的数据是iid，那么您可以使用标准分割或交叉验证。以下是Scikit-learn的一些实现:</li><li>当你的数据有一个<a href="https://web.archive.org/web/20220926092926/https://towardsdatascience.com/sequence-models-and-recurrent-neural-networks-rnns-62cadeb4f1e1" target="_blank" rel="noreferrer noopener nofollow">顺序结构</a>(比如文本流、音频片段、视频片段)，那么你应该使用一个适合这种情况的<a href="https://web.archive.org/web/20220926092926/https://medium.com/analytics-vidhya/cross-validation-what-why-and-how-machine-learning-f8a1159ce5ff" target="_blank" rel="noreferrer noopener nofollow">交叉验证器</a>。</li></ul>
+</div>
+
+
+<h3>模型部署</h3>
+
+
+
+<h4>思考部署是最后一步</h4>
+
+
+
+<p>一个普遍的误解是，机器学习模型在部署后会自动纠正自己，并且不应该对模型做什么。这在诸如强化学习的领域中可能是真实的，然而，即使使用这种技术，模型参数也要在一段时间内更新以达到最优。</p>
+
+
+
+<p>当然，典型的ML模型并非如此，在部署阶段会出现很多错误。一个常见的错误是忽略生产中的监控模型性能和使用成本。</p>
+
+
+
+<h4>解决办法</h4>
+
+
+<div class="custom-point-list">
+<ul><li>为了确保模型得到监控，我们可以利用<a href="/web/20220926092926/https://neptune.ai/blog/ml-model-monitoring-best-tools" target="_blank" rel="noreferrer noopener">各种模型监控工具</a>，这取决于它们的易用性、灵活性、监控功能、开销和警报系统。</li></ul>
+</div>
+
+
+<p>此外，根本原因分析可用于确定问题的根本原因，然后通过正确的行动计划来解决问题。</p>
+
+
+
+
+
+
+<h3>元数据管理</h3>
+
+
+
+<h4>忽视管道元数据管理</h4>
+
+
+
+<p>正如您在本文中了解到的，使用ML管道会很快变得非常复杂。每个步骤都会产生元数据，如果不加以管理，可能会导致潜在的问题，例如无法跟踪和调试管道故障。</p>
+
+
+
+<h4>解决办法</h4>
+
+
+
+<p>使用管道元数据管理工具来跟踪和管理管道每个步骤产生的元数据。做得很好的工具之一是<a href="/web/20220926092926/https://neptune.ai/" target="_blank" rel="noreferrer noopener"> Neptune.ai </a>。另一个擅长管理管道元数据的工具是<a href="https://web.archive.org/web/20220926092926/https://kedro.readthedocs.io/en/stable/tutorial/create_pipelines.html" target="_blank" rel="noreferrer noopener nofollow"> Kedro </a>(由于有了<a href="https://web.archive.org/web/20220926092926/https://docs.neptune.ai/integrations-and-supported-tools/automation-pipelines/kedro" target="_blank" rel="noreferrer noopener"> Neptune-Kedro插件</a>，实际上可以很容易地将它们集成在一起)。</p>
+
+
+
+<p>使用Neptune.ai，您可以轻松跟踪所有ML管道实验和元数据。当处理生产设置时，Neptune可以用来避免问题。</p>
+
+
+
+
+
+
+<h3>元数据管理和实验跟踪</h3>
+
+
+
+<p><a href="/web/20220926092926/https://neptune.ai/blog/ml-metadata-store" target="_blank" rel="noreferrer noopener"> ML元数据存储</a>是用于管理模型管道元数据的<a href="/web/20220926092926/https://neptune.ai/mlops-tool-stack" target="_blank" rel="noreferrer noopener"> MLOps栈</a>的重要组件。<a href="/web/20220926092926/https://neptune.ai/"> Neptune.ai </a>是一个集中式元数据存储，可以在任何MLOps进程中使用。</p>
+
+
+<p id="block_6258431477c5d" class="separator separator-10"/>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20220926092926/https://neptune.ai/building-ml-pipelines-common-pitfalls1" target="_blank" rel="noopener"><img data-attachment-id="64900" data-permalink="https://web.archive.org/web/20220926092926/https://neptune.ai/building-ml-pipelines-common-pitfalls1" data-orig-file="https://web.archive.org/web/20220926092926/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?fit=1999%2C571&amp;ssl=1" data-orig-size="1999,571" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Building ML Pipelines – Common Pitfalls1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926092926/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?fit=300%2C86&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926092926/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?fit=1024%2C292&amp;ssl=1" src="../Images/90ef8a97d9f48877ac535ff9df481783.png" alt="Example of run comparisons in Neptune.ai for Speech recognition project" class="wp-image-64900 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926092926/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?resize=1024%2C292&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926092926im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?resize=1024%2C292&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="64900" data-permalink="https://web.archive.org/web/20220926092926/https://neptune.ai/building-ml-pipelines-common-pitfalls1" data-orig-file="https://web.archive.org/web/20220926092926/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?fit=1999%2C571&amp;ssl=1" data-orig-size="1999,571" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Building ML Pipelines – Common Pitfalls1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926092926/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?fit=300%2C86&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926092926/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?fit=1024%2C292&amp;ssl=1" src="../Images/90ef8a97d9f48877ac535ff9df481783.png" alt="Example of run comparisons in Neptune.ai for Speech recognition project" class="wp-image-64900" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926092926im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Building-ML-Pipelines-Common-Pitfalls1.png?resize=1024%2C292&amp;ssl=1"/></noscript></a><figcaption><em>Example of run comparisons in Neptune.ai for speech recognition project | <a href="https://web.archive.org/web/20220926092926/https://app.neptune.ai/aymane.hachcham/Speech-Recognition-TF/experiments?compare=IwGl7Mg&amp;split=cmp&amp;dash=charts&amp;viewId=standard-view" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+<p id="block_6258431b77c5e" class="separator separator-5"/>
+
+
+
+<p>上面的例子显示了一个仪表板<a href="https://web.archive.org/web/20220926092926/https://docs.neptune.ai/you-should-know/comparing-runs" target="_blank" rel="noreferrer noopener">比较了指标和来自管道中实验的训练结果</a>。实验培训超出了上面的例子，它包括如下几个方便的功能:</p>
+
+
+<div class="custom-point-list">
+<ul><li><a href="/web/20220926092926/https://neptune.ai/blog/how-to-track-hyperparameters" target="_blank" rel="noreferrer noopener">超参数</a></li><li>学习曲线</li><li>培训代码和配置文件</li><li>预测(图像、表格等。)</li><li>诊断图表(混淆矩阵、ROC曲线等。)—您可以使用外部库(如Plotly等)记录交互式图表。</li><li>控制台日志</li><li>硬件日志</li><li>模型二进制文件或模型资产的位置</li><li>数据集版本</li><li>链接到记录的模型训练运行和实验</li><li>模型描述和注释</li></ul>
+</div>
+
+
+<p>要了解更多，你可以查看<a href="https://web.archive.org/web/20220926092926/https://docs.neptune.ai/" target="_blank" rel="noreferrer noopener"> Neptune的文档</a>，它非常详尽。在这里，您可以学习如何<a href="https://web.archive.org/web/20220926092926/https://docs.neptune.ai/how-to-guides/neptune-api/pipelines" target="_blank" rel="noreferrer noopener">将Neptune.ai与您的管道</a>集成。</p>
+
+
+
+<h2>总结想法</h2>
+
+
+
+<p>如您所见，在设计处理ML流程所有不同阶段的管道时，可能会出现很多问题。尤其是在生产过程中，可能会出现一些意外问题，从而导致严重的问题，甚至在某些情况下导致业务损失。</p>
+
+
+
+<p>我们在这里讨论的陷阱很常见，在本文中，我们列出了一些解决方案。本文还向您简要介绍了可能导致事情偏离最初计划的原因。</p>
+
+
+
+<p>最后，如果它符合您的工作流程，我会强烈推荐Neptune.ai作为您的管道元数据存储，无论您或您的同事在哪里运行您的管道——无论是在云中、本地、笔记本中还是其他任何地方。</p>
+
+
+
+
+<div id="author-box-new-format-block_606d8744a96bd" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">艾曼·哈克姆</h3>
+    
+          <p class="article__authorContent-text">Spotbills的数据科学家|机器学习爱好者。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>最佳MLOps工具以及如何评估它们</h2>
+
+
+
+<p class="has-small-font-size">12分钟阅读| Jakub Czakon |年8月25日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>在我们的一篇文章中——<a href="https://web.archive.org/web/20220926092926/https://neptune.ai/blog/tools-libraries-frameworks-methodologies-ml-startups-roundup" target="_blank" rel="noreferrer noopener">机器学习团队实际使用的最好的工具、库、框架和方法——我们从41家ML初创公司学到的东西</a>——Acerta的CTO Jean-Christophe Petkovich解释了他们的ML团队如何接近MLOps。</p>
+
+
+
+<p><strong>据他所说，一个完整的MLOps系统有几个要素:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>您需要能够构建包含预处理数据和生成结果所需的所有信息的模型工件。</li><li>一旦您能够构建模型工件，您必须能够跟踪构建它们的代码，以及它们被训练和测试的数据。</li><li>您需要跟踪所有这三样东西，模型、它们的代码和它们的数据，是如何关联的。</li><li>一旦您可以跟踪所有这些内容，您还可以将它们标记为准备就绪，进行生产，并通过CI/CD流程运行它们。</li><li>最后，为了在该过程的最后实际部署它们，您需要某种方法来基于该模型工件旋转服务。</li></ul>
+</div>
+
+
+<p>这是对如何在公司中成功实施MLOps的高度概括。但是理解高层需要什么只是拼图的一部分。另一个是采用或创建适当的工具来完成工作。</p>
+
+
+
+<p>这就是为什么我们编制了一份<strong>最佳MLOps工具</strong>的清单。我们将它们分为六类，以便您可以为您的团队和业务选择合适的工具。让我们开始吧！</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20220926092926/https://neptune.ai/blog/best-mlops-tools" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

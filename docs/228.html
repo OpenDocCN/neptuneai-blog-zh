@@ -1,0 +1,590 @@
+<html>
+<head>
+<title>How to Organize Your LightGBM ML Model Development Process - Examples of Best Practices </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何组织你的LightGBM ML模型开发过程——最佳实践范例</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/how-to-organize-your-lightgbm-ml-model-development-process-examples-of-best-practices#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/how-to-organize-your-lightgbm-ml-model-development-process-examples-of-best-practices#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p><a href="https://web.archive.org/web/20221206214705/https://lightgbm.readthedocs.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow"> LightGBM </a>是一个分布式高效的<a href="https://web.archive.org/web/20221206214705/https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html" target="_blank" rel="noreferrer noopener nofollow">梯度推进框架</a>，使用基于树的学习。它以快速训练、准确性和有效利用内存而闻名。它使用逐叶树生长算法，与逐深度生长算法相比，这种算法往往收敛得更快。</p>
+
+
+
+<p>LightGBM很棒，用LightGBM构建模型很容易。但是，当您使用不断变化的功能和超参数配置训练模型的许多版本时，很容易迷失在所有这些元数据中。</p>
+
+
+
+<p>在Excel表格或文本文件中管理这些配置会很快变得一团糟。幸运的是，今天有许多工具和库可以帮助你跟踪这一切。</p>
+
+
+
+<p>本文将介绍如何使用最流行的实验和模型管理库Neptune来处理各种版本的ML模型。我还将向您展示如何通过几个步骤将实验管理添加到您当前的工作流程中。</p>
+
+
+
+<section id="blog-intext-cta-block_61a4c2a20549b" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>如何跟踪LightGBM模型构建元数据:<a href="https://web.archive.org/web/20221206214705/https://docs.neptune.ai/integrations-and-supported-tools/model-training/lightgbm" target="_blank" rel="noopener"> Neptune + LightGBM集成</a></p>
+    
+    </section>
+
+
+<h2 id="h-how-ml-model-development-with-lightgbm-looks-like-today">用LightGBM进行ML模型开发的现状</h2>
+
+
+
+<h3><strong>获取数据集</strong></h3>
+
+
+
+<p>任何模型开发过程都将从获取数据集开始。让我们使用Scikit-learn来生成一个回归数据集。之后，我们将它分成训练集和测试集。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+<span class="hljs-keyword">from</span> sklearn.datasets <span class="hljs-keyword">import</span> make_regression
+
+X, y = make_regression(n_samples=<span class="hljs-number">100000</span>, n_features=<span class="hljs-number">10</span>, n_informative=<span class="hljs-number">8</span>,  random_state=<span class="hljs-number">101</span>)
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+X = pd.DataFrame(X,columns=[<span class="hljs-string">"F1"</span>,<span class="hljs-string">"F2"</span>,<span class="hljs-string">"F3"</span>,<span class="hljs-string">"F4"</span>,<span class="hljs-string">"F5"</span>,<span class="hljs-string">"F6"</span>,<span class="hljs-string">"F7"</span>,<span class="hljs-string">"F8"</span>,<span class="hljs-string">"F9"</span>,<span class="hljs-string">"F10"</span>])
+y = pd.DataFrame(y,columns=[<span class="hljs-string">"Target"</span>])
+
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="hljs-number">0.30</span>, random_state=<span class="hljs-number">101</span>)</pre>
+
+
+
+<h3><strong>训练LightGBM模型</strong></h3>
+
+
+
+<p>此时，我们可以开始训练<a href="/web/20221206214705/https://neptune.ai/blog/lightgbm-parameters-guide" target="_blank" rel="noreferrer noopener"> LightGBM </a>模型的过程。然而，我们需要解决几个问题:</p>
+
+
+
+<ul><li>根据<code>train</code>方法的要求，将训练集和验证集定义为<code>lgb.Dataset</code>格式</li><li>定义培训参数</li></ul>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> lightgbm <span class="hljs-keyword">as</span> lgb
+lgb_train = lgb.Dataset(X_train, y_train)
+lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
+params = {<span class="hljs-string">'boosting_type'</span>: <span class="hljs-string">'gbdt'</span>,
+              <span class="hljs-string">'objective'</span>: <span class="hljs-string">'regression'</span>,
+              <span class="hljs-string">'num_leaves'</span>: <span class="hljs-number">40</span>,
+              <span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.1</span>,
+              <span class="hljs-string">'feature_fraction'</span>: <span class="hljs-number">0.9</span>
+              }
+gbm = lgb.train(params,
+    lgb_train,
+    num_boost_round=<span class="hljs-number">200</span>,
+    valid_sets=[lgb_train, lgb_eval],
+    valid_names=[<span class="hljs-string">'train'</span>,<span class="hljs-string">'valid'</span>]],
+   )
+</pre>
+
+
+
+<p>培训之后，我们应该保存模型，以便在部署过程中使用。</p>
+
+
+
+<pre class="hljs">gbm.save_model(<span class="hljs-string">'mode.pkl'</span>)
+</pre>
+
+
+
+<p>我们现在可以运行预测并将它们保存在CSV文件中。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+pd.DataFrame(predictions, columns=[<span class="hljs-string">"Predictions"</span>]).to_csv(<span class="hljs-string">"light_predictions.csv"</span>)</pre>
+
+
+
+<p>在构建机器学习模型时，需要对上述所有项目(代码、参数、数据版本、度量和预测)进行管理和版本化。您可以使用git、电子表格、配置、文件系统等来完成这项工作。但是，今天我将向您展示如何使用Neptune.ai对所有内容进行版本控制。</p>
+
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><p class="wp-block-embed__wrapper"><iframe title="Tracking Experiments Data With Neptune-client Library" src="https://web.archive.org/web/20221206214705if_/https://www.youtube.com/embed/w9S5srkfSI4?list=PLKePQLVx9tOd8TEGdG4PAKz0Owqdv1aaw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="">视频</iframe></p></figure>
+
+
+
+<h2 id="h-organizing-ml-development-in-neptune">在Neptune组织ML开发</h2>
+
+
+
+<h3><strong>安装包并设置Neptune </strong></h3>
+
+
+
+<p>首先，我们需要安装Neptune客户端包。</p>
+
+
+
+<pre class="hljs">pip install neptune-client
+</pre>
+
+
+
+<p>使用Neptune笔记本，我们可以将笔记本检查点保存到Neptune。让我们也安装它:</p>
+
+
+
+<pre class="hljs">pip install neptune-notebooks
+</pre>
+
+
+
+<p>为了完成集成，我们需要启用这个扩展:</p>
+
+
+
+<pre class="hljs">jupyter nbextension enable --py neptune-notebooks
+</pre>
+
+
+
+<p><em> <strong>注</strong>:如果你不用笔记本，可以跳过这一部分。</em></p>
+
+
+
+<p>现在我们正在安装软件包，让我们也把Neptune Contrib软件包拿出来。这个包将使我们能够在训练LightGBM模型时将我们的度量记录到Neptune。</p>
+
+
+
+<pre class="hljs">pip install neptune-contrib[monitoring]
+</pre>
+
+
+
+<h3><strong>将你的脚本连接到Neptune </strong></h3>
+
+
+
+<p>为了让Neptune客户端与<a href="/web/20221206214705/https://neptune.ai/login" target="_blank" rel="noreferrer noopener"> Neptune AI </a>进行通信，我们需要设置一个帐户并获取API密钥。登录后，单击个人资料图片即可获得API密钥。</p>
+
+
+
+
+
+
+
+<p>第一步是创建一个项目。当您登录到您的帐户时，这可以在“项目”选项卡下完成。</p>
+
+
+
+
+
+
+
+<p>之后我们需要初始化我们和Neptune AI之间的通信。</p>
+
+
+
+<p>第一步是通过点击Neptune图标将我们的笔记本连接到Neptune。</p>
+
+
+
+
+
+
+
+<p>现在将提示您输入API令牌。一旦连接成功，你就可以通过点击上传按钮将你的笔记本上传到Neptune。</p>
+
+
+
+
+
+
+
+<p>之后，我们使用<code>neptune.init</code>来初始化我们和neptune.ai项目之间的通信。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune
+neptune.init(project_qualified_name=<span class="hljs-string">'mwitiderrick/LightGBM, api_token='</span>YOUR_API_KEY<span class="hljs-string">')</span></pre>
+
+
+
+<h3><strong>创建实验并保存超参数</strong></h3>
+
+
+
+<p>开始登录Neptune的第一件事是创建一个实验。这是一个命名空间，您可以在其中记录度量、预测、可视化和任何其他内容(<a href="https://web.archive.org/web/20221206214705/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display" target="_blank" rel="noreferrer noopener">查看您可以在Neptune </a>中记录和显示的所有元数据类型的完整列表)。</p>
+
+
+
+<p>让我们创建一个实验并记录模型超参数。</p>
+
+
+
+<pre class="hljs">neptune.create_experiment(<span class="hljs-string">'LightGBM'</span>,params=params)
+</pre>
+
+
+
+<p>运行<code>neptune.create_experiment</code>输出海王星实验的链接。</p>
+
+
+
+<p>可以点开看看训练过程直播。</p>
+
+
+
+<p>现在，没有记录太多，但是我们可以在parameters部分看到超参数。</p>
+
+
+
+<p>“参数”选项卡显示用于训练LightGBM模型的参数。</p>
+
+
+
+
+
+
+
+<h3><strong>创建Neptune回调并将其传递给“train”</strong></h3>
+
+
+
+<p>为了将训练指标记录到Neptune，我们使用了来自<code>neptune-contrib</code>库的现成回调。这很酷，因为这是我们在训练阶段唯一需要添加的东西。</p>
+
+
+
+<p>有了回调设置，海王星照顾其余的。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> lightgbm <span class="hljs-keyword">as</span> lgb
+gbm = lgb.train(params,
+    lgb_train,
+    num_boost_round=<span class="hljs-number">200</span>,
+    valid_sets=[lgb_train, lgb_eval],
+    valid_names=[<span class="hljs-string">'train'</span>,<span class="hljs-string">'valid'</span>],
+    callbacks=[neptune_monitor()],
+   )
+</pre>
+
+
+
+<p><em> <strong>注意:</strong>在笔记本上工作时，一旦完成运行实验，确保您的运行<code>neptune.stop()</code>完成当前工作(在脚本中实验自动停止)。</em></p>
+
+
+
+<p>点击Neptune上的项目，将显示与该特定项目相关的所有实验。</p>
+
+
+
+
+
+
+
+<p>单击单个实验将显示该特定实验的图表和日志。</p>
+
+
+
+
+
+
+
+<p>日志部分显示了用于生成上述图表的培训和验证指标。</p>
+
+
+
+<p>有趣的是，我们可以在模型训练时监控RAM和CPU的使用情况。这些信息可以在实验的监控部分找到。</p>
+
+
+
+
+
+
+
+<p>当我们看图表时，海王星允许我们放大和缩小不同的地方。这对于更深入地分析模型的训练是重要的。</p>
+
+
+
+
+
+
+
+<p>此外，我们可以选择几个实验并比较它们的性能。</p>
+
+
+
+
+
+
+
+<h3><strong>版本测试指标</strong></h3>
+
+
+
+<p>Neptune还允许我们记录我们的测试指标。这是使用<code>neptune.log_metric</code>功能完成的。</p>
+
+
+
+<pre class="hljs">neptune.log_metric(<span class="hljs-string">'Root Mean Squared Error'</span>, np.sqrt(mean_squared_error(y_test, predictions)))
+neptune.log_metric(<span class="hljs-string">'Mean Squarred Error'</span>, mean_squared_error(y_test, predictions))
+neptune.log_metric(<span class="hljs-string">'Mean Absolute Error'</span>, mean_absolute_error(y_test, predictions))</pre>
+
+
+
+
+
+
+
+<h3><strong>版本数据集</strong></h3>
+
+
+
+<p>在Neptune中对数据集哈希进行版本控制也非常有用。这将使您能够在执行实验时跟踪数据集的不同版本。这可以用Python的<code>hashlib</code>模块和Neptune的<code>set_property</code>函数来完成。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> hashlib
+neptune.set_property(<span class="hljs-string">'x_train_version'</span>, hashlib.md5(X_train.values).hexdigest())
+neptune.set_property(<span class="hljs-string">'y_train_version'</span>, hashlib.md5(y_train.values).hexdigest())
+neptune.set_property(<span class="hljs-string">'x_test_version'</span>, hashlib.md5(X_test.values).hexdigest())
+neptune.set_property(<span class="hljs-string">'y_test_version'</span>, hashlib.md5(y_test.values).hexdigest())
+</pre>
+
+
+
+<p>之后，您可以在项目的details选项卡下看到版本。</p>
+
+
+
+
+
+
+
+<p>你也可以使用一个数据版本化工具，比如<a href="https://web.archive.org/web/20221206214705/https://dvc.org/doc/command-reference/add#example-single-file" target="_blank" rel="noreferrer noopener nofollow"> DVC </a>来管理数据集的版本。此后，您可以记录。dcv文件到Neptune。</p>
+
+
+
+<p>为了做到这一点，你首先要添加文件到dvc。这是在当前工作目录下的终端上完成的。</p>
+
+
+
+<pre class="hljs">$ dvc add data.csv
+</pre>
+
+
+
+<p>这将创建。dvc文件，您可以登录到Neptune。</p>
+
+
+
+<pre class="hljs">neptune.log_artifact(<span class="hljs-string">'data.csv.dvc'</span>)
+</pre>
+
+
+
+<h3><strong>版本型号二进制</strong></h3>
+
+
+
+<p>还可以使用<code>neptune.log_artifact()</code>将模型的各种版本保存到Neptune。</p>
+
+
+
+
+
+
+
+<h3><strong>修改你认为你还需要的东西</strong></h3>
+
+
+
+<p>Neptune还提供了使用您最喜欢的绘图库记录其他东西的能力，例如模型解释器和交互式图表。</p>
+
+
+
+<p>记录<a href="https://web.archive.org/web/20221206214705/https://modeloriented.github.io/DALEX/" target="_blank" rel="noreferrer noopener nofollow">解释者</a>是使用<code>log_explainer</code>函数完成的。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> neptunecontrib.api <span class="hljs-keyword">import</span> log_explainer, log_global_explanations
+<span class="hljs-keyword">import</span> dalex <span class="hljs-keyword">as</span> dx
+
+expl = dx.Explainer(model, X, y, label=<span class="hljs-string">"LightGBM"</span>)
+log_global_explanations(expl, numerical_features=[<span class="hljs-string">"F1"</span>,<span class="hljs-string">"F2"</span>,<span class="hljs-string">"F3"</span>,<span class="hljs-string">"F4"</span>,<span class="hljs-string">"F5"</span>,<span class="hljs-string">"F6"</span>,<span class="hljs-string">"F7"</span>,<span class="hljs-string">"F8"</span>,<span class="hljs-string">"F9"</span>,<span class="hljs-string">"F10"</span>])
+log_explainer(<span class="hljs-string">'explainer.pkl'</span>, expl)</pre>
+
+
+
+<p>这样做之后，这个实验的工件部分将会提供这个经过腌制的解释器和图表。</p>
+
+
+
+
+
+
+
+
+
+
+
+<p>同样重要的是要注意，即使您使用LightGBM Scikit-learn包装器，日志也可以工作。你唯一要做的就是在模型的拟合阶段通过Neptune回调。请注意，您可以添加评估集以及评估指标。</p>
+
+
+
+<pre class="hljs">model.fit(X_test,y_test,eval_set=[(X_train,y_train),(X_test,y_test)],eval_metric=[<span class="hljs-string">'mean_squared_error'</span>,<span class="hljs-string">'root_mean_squared_error'</span>],callbacks=[neptune_monitor()])</pre>
+
+
+
+<p id="separator-block_5ff70370043bb" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-organize-experiments-in-a-dashboard">在仪表板中组织实验</h2>
+
+
+
+<p>有了Neptune，您可以灵活地决定想要在仪表板上看到什么。</p>
+
+
+
+<p>您可以随意在仪表板中添加或删除列。例如，您可以添加“在笔记本中创建”列，以便立即访问笔记本检查点。</p>
+
+
+
+
+
+
+
+<p>您还可以按列降序或升序筛选仪表板。如果您想删除列，只需单击x按钮。</p>
+
+
+
+
+
+
+
+<p>Neptune还允许您将实验分组到视图中并保存它们。保存的视图可以共享或固定在仪表板上。</p>
+
+
+
+
+
+
+
+<p id="separator-block_5ff70379043bc" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-collaborate-on-ml-experiments-with-your-team">与您的团队合作进行ML实验</h2>
+
+
+
+<p>海王星实验可以通过邀请你的队友合作来分享。</p>
+
+
+
+
+
+
+
+<p>可以通过首先公开项目来共享项目。一旦公开，你就可以通过链接与任何人自由分享。</p>
+
+
+
+
+
+
+
+<section id="note-block_5fedcad4be1c4" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/46e6fbc8c192ce13a324dca2298693a0.png" data-src="https://web.archive.org/web/20221206214705/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206214705/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>使用团队计划时，您可以与队友分享您的私人项目。该团队计划对研究、非营利组织和Kagglers也是免费的。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+
+
+
+<p id="separator-block_600ef74eab976" class="block-separator block-separator--5"> </p>
+
+
+
+<p>人们可以分享他们在Neptune上做的任何事情，例如，我可以通过发送一个<a href="https://web.archive.org/web/20221206214705/https://app.neptune.ai/mwitiderrick/LightGBM/experiments?split=bth&amp;dash=leaderboard&amp;viewId=standard-view" target="_blank" rel="noreferrer noopener nofollow">链接</a>来分享我之前做的比较。</p>
+
+
+
+
+
+
+
+
+
+
+
+<p id="separator-block_5ff70385043bd" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-download-model-artifacts-programmatically">以编程方式下载模型工件</h2>
+
+
+
+<p>Neptune还允许你下载任何实验的文件。这使您能够从Python代码中下载单个文件。例如，您可以使用<code>download_artifact</code>方法下载单个文件。例如，要下载我们之前上传的模型，我们只需要获取实验对象并使用它来下载模型。该模型存储在我们当前工作目录的模型文件夹中。</p>
+
+
+
+<pre class="hljs">project = neptune.init(<span class="hljs-string">'mwitiderrick/LightGBM'</span>,api_token=<span class="hljs-string">'YOUR_TOKEN'</span>)
+my_exp = project.get_experiments(id=<span class="hljs-string">'LIG-8'</span>)[<span class="hljs-number">0</span>]
+experiment.download_artifact(<span class="hljs-string">"light.pkl"</span>,<span class="hljs-string">"model"</span>)</pre>
+
+
+
+<p>当您想要将您的模型转移到生产中时，这很方便。然而，这是另一篇文章的主题。</p>
+
+
+
+<p id="separator-block_5ff70388043be" class="block-separator block-separator--5">结论</p>
+
+
+
+<h2 id="h-conclusion">希望这已经向您展示了使用Neptune向您的LightGBM训练脚本添加<a href="/web/20221206214705/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>和模型版本化是多么容易。</h2>
+
+
+
+<p>具体来说，我们讲述了如何:</p>
+
+
+
+<p>设置海王星</p>
+
+
+
+<ul><li>使用Neptune回调来记录我们的LightGBM培训课程</li><li>分析和比较海王星的实验</li><li>海王星上各种项目版本</li><li>与团队成员协作</li><li>从海王星下载你的神器</li><li>希望有了这些信息，LightGBM模型现在会更清晰，更易于管理。</li></ul>
+
+
+
+<p>感谢阅读！</p>
+
+
+
+<p>Thanks for reading!</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

@@ -1,0 +1,516 @@
+<html>
+<head>
+<title>Keras Tuner: Lessons Learned From Tuning Hyperparameters of a Real-Life Deep Learning Model </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>Keras Tuner:从现实深度学习模型的超参数调整中获得的经验</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/keras-tuner-tuning-hyperparameters-deep-learning-model#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/keras-tuner-tuning-hyperparameters-deep-learning-model#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>你的机器学习模型的性能取决于你的配置。对于每个机器学习工程师来说，找到模型和训练算法的最佳配置是一个巨大的挑战。</p>
+
+
+
+<p>模型配置可以定义为一组影响模型架构的超参数。在深度学习的情况下，这些可以是像层数或激活函数类型这样的事情。另一方面，训练算法配置影响训练过程的速度和质量。您可以将学习率值视为训练配置中参数的一个很好的示例。</p>
+
+
+
+<p>为了选择正确的超参数集，我们进行超参数调整。尽管调优可能会耗费时间和CPU，但最终结果是值得的，可以释放您的模型的最大潜力。</p>
+
+
+
+<p>如果你像我一样，是一名使用TensorFlow/Keras的深度学习工程师，那么你应该考虑使用<strong> Keras Tuner。</strong>这是一款非常棒的工具，有助于以智能、便捷的方式进行超参数调整。</p>
+
+
+
+
+
+
+
+<p>在这篇文章中，我将告诉你我如何喜欢在深度学习项目中实现Keras Tuner。</p>
+
+
+
+<h2 id="h-why-real-projects-matter">为什么真正的项目很重要</h2>
+
+
+
+<p>我所做的一切都是基于一个真实的项目。这不是一个玩具问题，提到这一点很重要，因为你可能已经看到了其他不是基于真实项目的文章。嗯，不是这个！</p>
+
+
+
+
+
+
+
+<p>为什么参与反映现实生活的项目如此重要？很简单:这些项目的核心要复杂得多。在小的合成问题上可能工作良好的工具，在现实生活的挑战中可能表现不佳。所以，今天我将向你展示<strong>你可以从</strong> <strong> Keras Tuner </strong>、<strong> </strong>中期待什么样的真正价值，以及如何在你自己的深度学习项目中实现它。</p>
+
+
+
+<h2 id="h-project-description-problem-statement">项目描述和问题陈述</h2>
+
+
+
+<p>我们将做一个图像分割任务。我们将尝试在纸张扫描图像上分割多个感兴趣的对象。我们的最终目标是使用分段提取特定的文本片段。下面的纸张扫描是我们将要使用的示例:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/5bfd2210031995a27207ecf6224ecd1f.png" alt="Keras tuner input image" class="wp-image-39939" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206110800im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Keras-tuner-input-image.png?ssl=1"/><figcaption><em>Example of an input image where we will need to segment text objects of our interest</em></figcaption></figure></div>
+
+
+
+<p>我们可以利用计算机视觉的最新进展来解决这个问题。例如，由Ronneberger，Fischer和Brox在2015年首次推出的用于分割医学图像的U-NET是一种深度学习神经网络，我们可以利用它来实现我们的目的。U-NET的输出是一组遮罩，其中每个遮罩包含一个感兴趣的特定对象。</p>
+
+
+
+<div class="is-layout-flex wp-container-3 wp-block-columns">
+<div class="is-layout-flow wp-block-column">
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/73e42c8c9ba46c75358a9294681b787f.png" alt="Real UNET " class="wp-image-39940" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206110800im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Real-UNET-1.png?resize=408%2C408&amp;ssl=1"/><figcaption><em>Real UNET’s output for an input image introduced previously. Table ordering numbers are segmented in a single mask<br/></em></figcaption></figure></div>
+</div>
+
+
+
+<div class="is-layout-flow wp-block-column">
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/f7cf2c682c78cd3bc97a18e2653c0be2.png" alt="Real UNET " class="wp-image-39941" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206110800im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Real-UNET-2.png?resize=408%2C408&amp;ssl=1"/><figcaption><em>Real UNET’s output for an input image introduced previously. Stamp region is segmented in a single mask<br/></em></figcaption></figure></div>
+</div>
+</div>
+
+
+
+<p>基本上，对于一个包含一些物体的输入图像，我们的深度神经网络在训练的时候，要把我们感兴趣的所有物体分割出来，返回一组遮罩；每个遮罩对应于一个特定类别的对象。如果你对U-NET及其工作原理感兴趣，我强烈推荐阅读这篇<a href="https://web.archive.org/web/20221206110800/https://arxiv.org/pdf/1505.04597.pdf" target="_blank" rel="noreferrer noopener nofollow">研究论文</a>。</p>
+
+
+
+<h2 id="h-model-metrics-selection">模型和指标选择</h2>
+
+
+
+<p>我们不会从头开始创建一个模型。自2015年推出U-NET以来，我们已经有了多种实施方案。让我们利用这一点。</p>
+
+
+
+<p>我已经导入了模型，我将初始化模型类的一个对象。让我们看一下文档来了解可变参数:</p>
+
+
+
+<pre class="hljs">Signature:
+unet(
+    input_size=(<span class="hljs-number">512</span>, <span class="hljs-number">512</span>, <span class="hljs-number">1</span>),
+    start_neurons=<span class="hljs-number">64</span>,
+    net_depth=<span class="hljs-number">4</span>,
+    output_classes=<span class="hljs-number">1</span>,
+    dropout=<span class="hljs-keyword">False</span>,
+    bn_after_act=<span class="hljs-keyword">False</span>,
+    activation=<span class="hljs-string">'mish'</span>,
+    pretrained_weights=<span class="hljs-keyword">None</span>,
+)
+Docstring:
+Generates U-Net architecture model (refactored version)
+
+Parameters:
+    input_size : tuple (h, w, ch) <span class="hljs-keyword">for</span> the input dimentions
+    start_neurons : number of conv units <span class="hljs-keyword">in</span> the first layer
+    net_depth : number of convolution cascades including the middle cascade
+    dropout : <span class="hljs-keyword">True</span> -&gt; use dropouts
+    bn_after_act : <span class="hljs-keyword">True</span> -&gt; BatchNormalizations <span class="hljs-keyword">is</span> placed after activation layers. Before otherwise
+    activation : Type of activation layers: <span class="hljs-string">'mish'</span> - Mish-activation (default), <span class="hljs-string">'elu'</span> = ELU, <span class="hljs-string">'lrelu'</span> - LeakyReLU, <span class="hljs-string">'relu'</span> - ReLU
+    pretrained_weights - <span class="hljs-keyword">None</span> <span class="hljs-keyword">or</span> path to weights-file
+Return:
+    U-net model
+File:      ~/ml_basis/synthetic_items/models/unet.py
+Type:      function</pre>
+
+
+
+<p class="has-text-align-center"><em>显示一组初始化参数的U-NET类的Docstring】</em></p>
+
+
+
+<p>正如我们从docstring中看到的，有八个参数定义了我们未来的模型。只有五个参数影响模型的架构。另外三个参数<code>input_size, output_classes</code>和<code>pretrained_weights</code>，让我们分别定义输入图像的大小、输出类的数量以及从先前预训练的模型到权重的路径。</p>
+
+
+
+<p>我们将关注5个参数中的一个，这5个参数使模型的架构更加清晰。这就是我们将使用Keras调谐器进行超参数调谐的地方。</p>
+
+
+
+<p>为了通过超参数调整找到最佳的模型架构，我们需要为模型评估选择一个度量。为了解决这个问题，让我们回忆一下U-NET对每个图像像素执行二进制分类，将每个像素链接到一个特定的对象类。与图像尺寸相比，我们的问题域中感兴趣的对象非常小。考虑到这一点，我们应该想出一个度量标准来最好地解释像素分类中的这种不平衡。这也是<a href="https://web.archive.org/web/20221206110800/https://en.wikipedia.org/wiki/F-score" target="_blank" rel="noreferrer noopener nofollow"> F1得分</a>在车型评估方面表现尤为出色的地方。</p>
+
+
+
+<h2 id="h-keras-tuner-implementation">Keras调谐器实现</h2>
+
+
+
+<h3>可用调谐器的高级概述</h3>
+
+
+
+<p>如何使用Keras Tuner充分利用我们的模型？首先要说的是，Keras有多个调谐器。他们使用不同的算法进行超参数搜索。以下是算法，以及Keras中相应的调谐器:</p>
+
+
+
+<ul><li><code>kerastuner.tuners.hyperband.Hyperband</code>为基于超波段的算法；</li><li><code>kerastuner.tuners.bayesian.BayesianOptimization</code>为基于高斯过程的算法；</li><li><code>kerastuner.tuners.randomsearch.RandomSearch</code>为随机搜索调谐器。</li></ul>
+
+
+
+<p>为了让你对这些方法有一个初步的直觉，我可以说<code>RandomSearch</code>是效率最低的方法。它不从先前测试的参数组合中学习，而只是从搜索空间中随机抽取参数组合。</p>
+
+
+
+<p><code>BayesianOptimization</code>与<code>RandomSearch</code>相似，都是对超参数组合的子集进行采样。关键的区别在于<code>BayesianOptimization</code>并不是随机地对超参数组合进行采样，而是遵循一种内在的概率方法。这种方法考虑了已经测试过的组合，并使用该信息对下一个测试组合进行采样。</p>
+
+
+
+<p><code>Hyperband</code>是<code>RandomSearch</code>在搜索时间和资源分配方面的优化版本。</p>
+
+
+
+<p>如果你是一个好奇的人，想了解更多关于随机搜索、贝叶斯优化和HyperBand的知识，我绝对推荐<a href="/web/20221206110800/https://neptune.ai/blog/hyperband-and-bohb-understanding-state-of-the-art-hyperparameter-optimization-algorithms" target="_blank" rel="noreferrer noopener">这篇文章</a>。</p>
+
+
+
+<h3>定义搜索空间并建立模型</h3>
+
+
+
+<p>Keras tuner提供了一种优雅的方式来定义模型和调谐器将使用的参数的搜索空间——您可以通过创建一个<strong>模型构建器函数</strong>来完成这一切。为了向您展示它是多么简单和方便，下面是我们项目的模型构建器功能:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">model_builder</span><span class="hljs-params">(hp)</span>:</span>
+    <span class="hljs-string">"""
+    Build model for hyperparameters tuning
+
+    hp: HyperParameters class instance
+    """</span>
+
+    
+    start_neurons = hp.Int(name = <span class="hljs-string">'start_neurons'</span>, min_value = <span class="hljs-number">16</span>, max_value = <span class="hljs-number">128</span>, step = <span class="hljs-number">16</span>)
+    net_depth = hp.Int(name = <span class="hljs-string">'net_depth'</span>, min_value = <span class="hljs-number">2</span>, max_value = <span class="hljs-number">6</span>)
+    dropout = hp.Boolean(name = <span class="hljs-string">'dropout'</span>, default = <span class="hljs-keyword">False</span>)
+    bn_after_act = hp.Boolean(name = <span class="hljs-string">'bn_after_act'</span>, default = <span class="hljs-keyword">False</span>)
+    activation = hp.Choice(name = <span class="hljs-string">'activation'</span>, values = [<span class="hljs-string">'mish'</span>, <span class="hljs-string">'elu'</span>, <span class="hljs-string">'lrelu'</span>], ordered = <span class="hljs-keyword">False</span>)
+
+    input_size = (<span class="hljs-number">544</span>,<span class="hljs-number">544</span>,<span class="hljs-number">3</span>)
+    target_labels = [str(i) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">21</span>)]
+
+    
+    model = u(input_size = input_size,
+              start_neurons = start_neurons,
+              net_depth = net_depth,
+              output_classes = len(target_labels),
+              dropout = dropout,
+              bn_after_act = bn_after_act,
+              activation = activation)
+
+    
+    model.compile(optimizer = Adam(lr = <span class="hljs-number">1e-3</span>),
+                  loss = weighted_cross_entropy,
+                  metrics = [f1, precision, recall, iou])
+
+    <span class="hljs-keyword">return</span> model</pre>
+
+
+
+<p>您可能已经注意到，在模型构建器功能中，我们使用了多种方法来定义超参数的搜索空间—<code>hp.Int, hp.Boolean</code>和<code>hp.Choice</code>。</p>
+
+
+
+<p>这些方法的操作方式没有什么特别之处，只是简单地定义了可以在参数搜索空间中使用的值。真正重要的是，作为工程师，我们如何为每个参数选择方法，并为要采样的值定义最佳范围/选项。</p>
+
+
+
+<p>例如，仔细考虑<code>hp.Int</code>中的参数非常重要，给它有意义的最小值和最大值(<code>min_value</code>和<code>max_value</code>)以及一个合适的<code>step</code>。这里您的目标是不要被选项的数量淹没，这会导致调优过程花费太多的时间和资源。同样重要的是，不要限制搜索空间，否则调优器甚至不会考虑可能的最佳值。根据你的专业技能、知识和问题领域，考虑什么样的价值观可能是最好的测试。</p>
+
+
+
+<p>除了<code>hp.Int, hp.Boolean</code>和<code>hp.Choice</code>之外，还有一些其他选项可供我们在搜索空间中定义值。你可以通过<a href="https://web.archive.org/web/20221206110800/https://keras-team.github.io/keras-tuner/documentation/hyperparameters/" target="_blank" rel="noreferrer noopener nofollow">文档</a>熟悉这些方法。</p>
+
+
+
+<p>作为创建模型构建器函数的最后一步，我们在返回模型之前对其进行<code>.compile</code>。</p>
+
+
+
+<h3>调谐器初始化</h3>
+
+
+
+<p>到目前为止，您应该已经有了一个定义好的模型构建器函数，并且知道您想要使用什么算法来进行超参数调整。如果您已经设置好了函数和算法，那么您就可以启动一个调谐器对象了。</p>
+
+
+
+<p>对于我们正在进行的图像分割项目，我决定坚持使用<code>Hyperband</code>算法，因此我的初始化代码如下所示:</p>
+
+
+
+<pre class="hljs">
+tuner = kt.Hyperband(hypermodel = model_builder,
+                     objective = kt.Objective(<span class="hljs-string">"val_f1"</span>, direction=<span class="hljs-string">"max"</span>),
+                     max_epochs = <span class="hljs-number">20</span>,
+					 project_name=<span class="hljs-string">'hyperband_tuner'</span>)</pre>
+
+
+
+<p>初始化期间使用四个参数:</p>
+
+
+
+<ul><li><code>hypermodel</code>是我们之前定义的模型生成器函数；</li><li><code>objective</code>是我们的模型试图改进的指标(最大化或最小化)。您可能会从上面的代码片段中注意到，我显式指定了我选择的度量函数的名称(val_f1，代表验证数据集的<a href="https://web.archive.org/web/20221206110800/https://en.wikipedia.org/wiki/F-score" target="_blank" rel="noreferrer noopener nofollow"> f1得分</a>)以及它必须前进的方向(max)；</li><li><code>max_epochs</code>定义用于训练每个模型的总时期数。<a href="https://web.archive.org/web/20221206110800/https://keras-team.github.io/keras-tuner/documentation/tuners/" target="_blank" rel="noreferrer noopener nofollow">官方文档</a>建议“将此值设置为比您最大模型的预期收敛时间稍高的值”；</li><li><code>project_name</code>是放置和存储所有调整相关结果的文件夹路径。</li></ul>
+
+
+
+<h3>调整流程启动</h3>
+
+
+
+<p>启动hypertuning过程类似于在Keras/TensorFlow中拟合模型，除了我们在tuner对象上使用<code>.search</code>方法而不是常规的<code>.fit</code>方法。下面是我如何开始该项目的调优工作:</p>
+
+
+
+<pre class="hljs">tuner.search(training_data=train_dg,
+             steps_per_epoch=batches_per_epoch,
+             validation_data=valid_dg,
+             validation_steps=len(glob(img_dir + <span class="hljs-string">'/*'</span>)) / valid_batch_size,
+             epochs=<span class="hljs-number">50</span>,
+             shuffle=<span class="hljs-keyword">True</span>,
+             verbose=<span class="hljs-number">1</span>,
+             initial_epoch=<span class="hljs-number">0</span>,
+             callbacks=[ClearTrainingOutput()],
+             use_multiprocessing=<span class="hljs-keyword">True</span>,
+             workers=<span class="hljs-number">6</span>)</pre>
+
+
+
+<p><code>.search</code>方法和其中使用的所有参数你应该已经很熟悉了，我唯一想指出的是<code>ClearTrainingOutput()</code>回调，它本质上只是在每个训练周期结束时清除输出。下面是<code>ClearTrainingOutput</code>回调的代码:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClearTrainingOutput</span><span class="hljs-params">(tf.keras.callbacks.Callback)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_train_end</span><span class="hljs-params">(*args, **kwargs)</span>:</span>
+        IPython.display.clear_output(wait = <span class="hljs-keyword">True</span>)</pre>
+
+
+
+<h3>获取优化结果</h3>
+
+
+
+<p>最激动人心的部分来了。让我们看看调音师表现如何。我们很好奇我们能够实现什么样的结果，以及哪种型号配置带来了这样的性能。</p>
+
+
+
+<p>要检查超调作业的摘要，我们只需在一个<code>tuner</code>实例上使用<code>.results_summary()</code>。以下是完整的代码:</p>
+
+
+
+<pre class="hljs">tuner.results_summary()</pre>
+
+
+
+<p>运行时，我们在项目中使用的调谐器的输出如下所示:</p>
+
+
+
+<pre class="hljs">Results summary:
+
+Results <span class="hljs-keyword">in</span> hyperband_tuner
+Showing <span class="hljs-number">10</span> best trials
+Objective(name=<span class="hljs-string">'val_f1'</span>, direction=<span class="hljs-string">'max'</span>)
+
+Trial summary
+Hyperparameters:
+start_neurons: <span class="hljs-number">32</span>
+net_depth: <span class="hljs-number">5</span>
+dropout: <span class="hljs-keyword">False</span>
+bn_after_act: <span class="hljs-keyword">True</span>
+activation: mish
+tuner/epochs: <span class="hljs-number">15</span>
+tuner/initial_epoch: <span class="hljs-number">0</span>
+tuner/bracket: <span class="hljs-number">0</span>
+tuner/round: <span class="hljs-number">0</span>
+Score: <span class="hljs-number">0.9533569884300232</span>
+
+Trial summary
+Hyperparameters:
+start_neurons: <span class="hljs-number">80</span>
+net_depth: <span class="hljs-number">5</span>
+dropout: <span class="hljs-keyword">False</span>
+bn_after_act: <span class="hljs-keyword">True</span>
+activation: elu
+tuner/epochs: <span class="hljs-number">10</span>
+tuner/initial_epoch: <span class="hljs-number">0</span>
+tuner/bracket: <span class="hljs-number">1</span>
+tuner/round: <span class="hljs-number">0</span>
+Score: <span class="hljs-number">0.9258414387702942</span>
+
+Trial summary
+Hyperparameters:
+start_neurons: <span class="hljs-number">128</span>
+net_depth: <span class="hljs-number">3</span>
+dropout: <span class="hljs-keyword">True</span>
+bn_after_act: <span class="hljs-keyword">False</span>
+activation: elu
+tuner/epochs: <span class="hljs-number">18</span>
+tuner/initial_epoch: <span class="hljs-number">3</span>
+tuner/bracket: <span class="hljs-number">1</span>
+tuner/round: <span class="hljs-number">1</span>
+tuner/trial_id: <span class="hljs-number">5</span>bc455f16fad434a9452c51a71c741b0
+Score: <span class="hljs-number">0.9170311570167542</span>
+..............
+Trial summary
+Hyperparameters:
+start_neurons: <span class="hljs-number">48</span>
+net_depth: <span class="hljs-number">3</span>
+dropout: <span class="hljs-keyword">True</span>
+bn_after_act: <span class="hljs-keyword">False</span>
+activation: mish
+tuner/epochs: <span class="hljs-number">3</span>
+tuner/initial_epoch: <span class="hljs-number">0</span>
+tuner/bracket: <span class="hljs-number">1</span>
+tuner/round: <span class="hljs-number">0</span>
+Score: <span class="hljs-number">0.5333467721939087</span>
+
+Trial summary
+Hyperparameters:
+start_neurons: <span class="hljs-number">96</span>
+net_depth: <span class="hljs-number">3</span>
+dropout: <span class="hljs-keyword">True</span>
+bn_after_act: <span class="hljs-keyword">True</span>
+activation: mish
+tuner/epochs: <span class="hljs-number">3</span>
+tuner/initial_epoch: <span class="hljs-number">0</span>
+tuner/bracket: <span class="hljs-number">1</span>
+tuner/round: <span class="hljs-number">0</span>
+Score: <span class="hljs-number">0.5279057025909424</span>
+
+Trial summary
+Hyperparameters:
+start_neurons: <span class="hljs-number">32</span>
+net_depth: <span class="hljs-number">3</span>
+dropout: <span class="hljs-keyword">False</span>
+bn_after_act: <span class="hljs-keyword">False</span>
+activation: elu
+tuner/epochs: <span class="hljs-number">3</span>
+tuner/initial_epoch: <span class="hljs-number">0</span>
+tuner/bracket: <span class="hljs-number">1</span>
+tuner/round: <span class="hljs-number">0</span>
+Score: <span class="hljs-number">0.5064906477928162</span></pre>
+
+
+
+<p>在上面的代码片段中，我将<code>.results_summary()</code>的输出缩短到只有6次试验，显示了前3名和后3名的模型。您可能会注意到，对于我们选择的指标(f1得分)，最差的模型只能达到50 %，而最佳模型的性能达到了惊人的95.3 %。</p>
+
+
+
+<h3>结果和业务影响</h3>
+
+
+
+<p>表现最好和最差之间的差距超过45 %。从这样的差异中，我们可以得出这样的结论:</p>
+
+
+
+<ul><li>Keras Tuner在寻找模型参数的最佳设置方面做了令人难以置信的工作，显示了度量增长的两倍；</li><li>作为工程师，我们定义了适当的搜索空间进行采样；</li><li>Keras Tuner不仅适用于玩具问题，更重要的是，适用于现实生活中的项目。</li></ul>
+
+
+
+
+
+
+
+<p>让我也分享一下我们获得的业务影响。使用超参数调优针对特定问题域进行了更好优化的模型使我们的服务获得了更稳定、更准确的长期性能。与我们其他类似但未经优化的服务相比，我们的服务接受率提高了15 %，分类置信度提高了25 %。</p>
+
+
+
+<h2 id="h-results-tracking-sharing">结果跟踪和分享</h2>
+
+
+
+<p>是时候做一些<a href="/web/20221206110800/https://neptune.ai/blog/mlops-what-it-is-why-it-matters-and-how-to-implement-it-from-a-data-scientist-perspective" target="_blank" rel="noreferrer noopener">小动作</a>了。好消息:如果你使用<a href="/web/20221206110800/https://neptune.ai/" target="_blank" rel="noreferrer noopener"> Neptune </a>，它现在支持与Keras Tuner的完全集成。</p>
+
+
+<p>借助Neptune集成，您可以:</p>
+
+
+
+<ul><li>查看每个试验的记录指标图表，</li><li>查看每次试验的参数，</li><li>查看搜索过程中的硬件消耗，</li><li>训练后记录最佳参数，</li><li>对数超参数搜索空间，</li><li>记录Keras Tuner项目目录中所有试验的信息</li></ul>
+
+
+
+<p>相当刺激！让我向您展示我如何在我的项目中集成Neptune进行跟踪，以便在云中存储调优结果。</p>
+
+
+
+<p>我将跳过基本步骤，如<a href="https://web.archive.org/web/20221206110800/https://docs.neptune.ai/getting-started/hello-world" target="_blank" rel="noreferrer noopener">海王星初始化</a>和<a href="https://web.archive.org/web/20221206110800/https://docs.neptune.ai/administration/projects#create-project" target="_blank" rel="noreferrer noopener">实验创建</a>，因为它在<a href="https://web.archive.org/web/20221206110800/https://docs.neptune.ai/" target="_blank" rel="noreferrer noopener">官方文档</a>中有很好的描述。</p>
+
+
+
+<p>相反，我将把重点放在将Neptune应用到您的项目工作流中所需的代码更改上。唯一的变化是调谐器初始化部分。下面是进行更改后初始化的样子:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptunecontrib.monitoring.kerastuner <span class="hljs-keyword">as</span> npt_utils
+
+
+tuner = kt.Hyperband(hypermodel = model_builder,
+                     objective = kt.Objective(<span class="hljs-string">"val_f1"</span>, direction=<span class="hljs-string">"max"</span>),
+                     max_epochs = <span class="hljs-number">20</span>,
+                     project_name = <span class="hljs-string">'hyperband_tuner'</span>,
+					 logger = npt_utils.NeptuneLogger())</pre>
+
+
+
+<p>我们在调谐器中添加了logger，因此我们可以在每次试用后记录以下内容:</p>
+
+
+
+<ul><li>在“超参数/值”文本日志下运行参数；</li><li>损失和编译Keras模型时定义的所有指标；</li><li>搜索过程中CPU、GPU和内存的硬件消耗。</li></ul>
+
+
+
+<p>除此之外，我还利用<code>.log_tuner_info()</code>方法将更多信息从Keras Tuner对象记录到Neptune。我是这样做的:</p>
+
+
+
+<pre class="hljs">npt_utils.log_tuner_info(tuner)</pre>
+
+
+
+<p>这将记录我们想要跟踪的几乎所有内容:</p>
+
+
+
+<ul><li>最佳分数(“最佳分数”度量)；</li><li>最佳参数(' best_parameters '属性)；</li><li>每次运行的得分(“run_score”，度量)；</li><li>调谐器项目目录(' TUNER_PROJECT_NAME '项目)；</li><li>参数空间(“超参数/空间”文本日志)；</li><li>用作目标的指标/损失的名称(“目标/名称”属性)；</li><li>用作目标的指标/损失的方向(“目标/方向”属性)；</li><li>调谐器id(“tuner _ id”属性)；</li><li>最佳试用id ('best_trial_id '属性)。</li></ul>
+
+
+
+<p>有兴趣了解更多吗？观看此<a href="https://web.archive.org/web/20221206110800/https://www.loom.com/share/089eac8375054169a4b46548c7a6ea1a" target="_blank" rel="noreferrer noopener nofollow">指导视频</a>，其中展示了另一个项目的端到端集成示例。另一个巨大的灵感来源是<a href="https://web.archive.org/web/20221206110800/https://docs.neptune.ai/integrations-and-supported-tools/hyperparameter-optimization/keras-tuner" target="_blank" rel="noreferrer noopener">官方文件</a>。</p>
+
+
+
+
+
+
+
+<p>在本文中，我们介绍了一个真实项目中完整的Keras tuner实现，展示了它通过选择最佳参数集来提高模型性能的潜力。</p>
+
+
+
+<p>我们了解了搜索空间定义的重要性，现在知道如何设置我们自己的调优器并开始调优工作。</p>
+
+
+
+<p>最后，我向您展示了如何将Neptune集成到您的项目中，并跟踪您的试验结果。</p>
+
+
+
+<p>我希望这篇文章是有帮助的，你现在知道如何开始使用Keras调谐器，以及它能为你做什么。感谢阅读！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

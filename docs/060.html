@@ -1,0 +1,635 @@
+<html>
+<head>
+<title>Multi GPU Model Training: Monitoring and Optimizing </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>多GPU模型训练:监控和优化</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/multi-gpu-model-training-monitoring-and-optimizing#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/multi-gpu-model-training-monitoring-and-optimizing#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>你是否纠结于在多个GPU上监控和优化深度神经网络的训练？如果是的话，你来对地方了。</p>
+
+
+
+<p>在本文中，我们将讨论Pytorch Lightning的多GPU训练，并找出优化训练过程应该采用的最佳实践。我们还将看到如何在训练过程中监控所有GPU的使用情况。</p>
+
+
+
+<p>让我们从一些基础知识开始。</p>
+
+
+
+<h2>什么是使用GPU的分布式训练？</h2>
+
+
+
+<p>有时对于复杂的任务，如在<a href="/web/20221006025927/https://neptune.ai/resources/computer-vision-projects-pytorch-lightning">计算机视觉</a>或自然语言处理中，训练一个<a href="https://web.archive.org/web/20221006025927/https://www.bmc.com/blogs/deep-neural-network/" target="_blank" rel="noreferrer noopener nofollow">深度神经网络</a> (DNN)涉及到解决数百万或数十亿参数的梯度下降，因此它成为一个计算复杂的过程，可能需要几天甚至几周才能完成。</p>
+
+
+
+<p>例如，生成式预训练变压器3 (GPT-3)是一个自回归语言模型，具有1750亿个参数，在单个NVIDIA Tesla V100 GPU上训练它需要大约355年。但是如果用1024个NVIDIA A100 GPUs并行训练同一个模型，我们可以估计训练时间在34天左右。因此，在GPU上进行并行训练是目前广泛使用的加速过程的方法。</p>
+
+
+
+<p>另请查看:<a href="https://web.archive.org/web/20221006025927/https://neptune.ai/blog/distributed-training-frameworks-and-tools" rel="nofollow">https://Neptune . ai/blog/distributed-training-frameworks-and-tools</a></p>
+
+
+
+<p>为了清楚地了解我们如何能够使用多个GPU来训练深度神经网络，让我们简单地看看神经网络是如何训练的:</p>
+
+
+<div class="custom-point-list">
+<ul><li>深度神经网络模型通常使用<a href="https://web.archive.org/web/20221006025927/https://builtin.com/data-science/gradient-descent" target="_blank" rel="noreferrer noopener nofollow">小批量梯度下降</a>进行训练，其中训练数据被随机采样为小批量。</li><li>将小批量输入模型，分两个阶段遍历模型:<ul><li>前进传球</li><li>偶数道次</li></ul></li><li>正向传递生成预测，并计算预测和地面实况之间的损失。</li><li>反向传递通过网络的层传递误差(称为反向传播),以获得梯度来更新模型权重。</li><li>通过正向和反向阶段的小批量被称为迭代，并且时期被定义为通过整个训练数据集执行正向-反向传递。</li><li>训练过程持续多个时期，直到模型收敛。</li></ul>
+</div>
+
+
+<p>如果这对你来说似乎是压倒性的，我会建议这篇<a href="https://web.archive.org/web/20221006025927/https://towardsdatascience.com/how-do-we-train-neural-networks-edd985562b73">文章</a>来更深入地了解神经网络是如何被训练的。</p>
+
+
+
+<p>为了加快训练过程，我们使用多个GPU来并行化训练过程，并且<strong>数据并行</strong>和<strong>模型并行</strong>是用于并行化任务的两种技术。</p>
+
+
+
+<h3>数据并行性</h3>
+
+
+
+<p>在数据并行中，每个GPU保存模型的副本，并且数据被分成n个分区，其中每个分区用于在每个GPU上训练模型的副本。</p>
+
+
+
+<p>当应用异步数据并行时，参数服务器负责权重更新。每个GPU将其梯度发送到参数服务器，然后参数服务器更新权重，并将更新后的权重发送回该GPU。</p>
+
+
+
+<p>这样，GPU之间就没有同步了。这种方法解决了分布式计算环境中不稳定的网络问题，但是它引入了不一致性问题。此外，这种方法不会减少GPU之间的数据传输次数。</p>
+
+
+
+<h3>模型并行性</h3>
+
+
+
+<p>模型并行性在多个GPU之间划分模型，其中每个GPU负责模型的指定层的权重更新。中间数据，例如用于前向传递的神经网络层的输出和用于后向传递的梯度，在GPU之间传送。</p>
+
+
+
+<p>由于这些分区具有依赖性，在模型并行性的简单实现中，一次只有一个GPU是活动的，导致GPU利用率低。为了实现并行执行，流水线并行将输入小批分成多个微批，并在多个GPU之间流水线执行这些微批。下图对此进行了概述:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img data-attachment-id="65653" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-pipeline-parallelism" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?fit=1600%2C474&amp;ssl=1" data-orig-size="1600,474" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-Pipeline-parallelism" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?fit=300%2C89&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?fit=1024%2C303&amp;ssl=1" src="../Images/1163d9596c21453744dc160401d4149b.png" alt="Pipeline parallelism" class="wp-image-65653 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?resize=1024%2C303&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?resize=1024%2C303&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="65653" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-pipeline-parallelism" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?fit=1600%2C474&amp;ssl=1" data-orig-size="1600,474" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-Pipeline-parallelism" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?fit=300%2C89&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?fit=1024%2C303&amp;ssl=1" src="../Images/1163d9596c21453744dc160401d4149b.png" alt="Pipeline parallelism" class="wp-image-65653" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-Pipeline-parallelism.png?resize=1024%2C303&amp;ssl=1"/></noscript><figcaption><em>Pipeline parallelism |  <a href="https://web.archive.org/web/20221006025927/https://arxiv.org/abs/1811.06965" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>上图表示的是一个模型，有4个层放在4个不同的GPU上(纵轴)。横轴表示随着时间的推移对该模型进行训练，表明GPU得到了更高效的利用。但是，仍然存在一个气泡(如图所示),其中某些GPU没有得到利用。</p>
+
+
+
+<p>为了对模型并行性和数据并行性有一个完整的了解，我强烈建议阅读<a href="/web/20221006025927/https://neptune.ai/blog/distributed-training">分布式培训:数据科学家指南</a>。</p>
+
+
+
+<h2>PyTorch Lightning的多GPU训练</h2>
+
+
+
+<p>在本节中，我们将重点讨论如何使用<a href="https://web.archive.org/web/20221006025927/https://www.pytorchlightning.ai/#grid-section" target="_blank" rel="noreferrer noopener nofollow"> PyTorch Lightning </a>在多个GPU上进行训练，因为它在去年越来越受欢迎。PyTorch Lightning使用起来非常简单方便，它帮助我们缩放模型，没有样板文件。样板代码是大多数人在缩放模型时容易出错的地方。</p>
+
+
+
+
+
+
+<p>有一些编码实践可以帮助您毫无问题地将代码迁移到GPU。你应该参考<a href="https://web.archive.org/web/20221006025927/https://pytorch-lightning.readthedocs.io/en/1.4.3/advanced/multi_gpu.html#preparing-your-code" target="_blank" rel="noreferrer noopener nofollow"> PyTorch Lightning文档</a>来获得更多关于这个的信息。</p>
+
+
+
+<h3>分布式模式</h3>
+
+
+
+<p>在本节中，我们将介绍Pytorch lightning提供的不同分布式模式。</p>
+
+
+
+<h4>数据并行</h4>
+
+
+
+<p>我们可以在一台拥有多个GPU的机器上训练一个模型。使用DataParallel (DP)方法，一个批处理会在一个节点的所有选定GPU之间平均分配，之后根节点会聚合所有结果。但是Pytorch lightning开发人员不建议使用这种方法，因为它还不稳定，如果在forward()或*_step()方法中为模块分配状态，您可能会看到错误或行为不当。</p>
+
+
+
+<pre class="hljs">
+trainer = Trainer(gpus=<span class="hljs-number">4</span>, accelerator=<span class="hljs-string">"dp"</span>)</pre>
+
+
+
+<h4>分布式数据并行</h4>
+
+
+
+<p>分布式数据并行(DDP)的工作方式如下:</p>
+
+
+<div class="custom-point-list">
+<ul><li>每个节点上的每个GPU都有自己的进程。</li><li>每个GPU都可以看到整个数据集的子集。它只会看到那个子集。</li><li>每个进程初始化模型。</li><li>每个进程并行执行完整的向前和向后传递。</li><li>梯度在所有过程中被同步和平均。</li><li>每个进程更新它的优化器。</li></ul>
+</div>
+
+
+<p>我们可以通过两种方式使用该方法，即“ddp”和“ddp_spawn”。在“ddp”方法中，使用正确的环境变量多次调用脚本。</p>
+
+
+
+<pre class="hljs">
+trainer = Trainer(gpus=<span class="hljs-number">8</span>, accelerator=<span class="hljs-string">"ddp"</span>)
+
+
+trainer = Trainer(gpus=<span class="hljs-number">8</span>, accelerator=<span class="hljs-string">"ddp"</span>, num_nodes=<span class="hljs-number">4</span>)</pre>
+
+
+
+<p>虽然在大多数情况下这似乎是一个不错的选择，但它有一些局限性，因为它不能在Jupyter Notebook、Google COLAB和Kaggle等工具中工作。此外，当有一个没有根包的嵌套脚本时，它似乎不起作用。在这些情况下，首选“ddp_spawn”方法。</p>
+
+
+
+<p>“ddp_spawn”除了使用torch.multiprocessing.spawn()方法启动训练过程之外，与ddp完全一样。因此，人们可能会认为总是首选“ddp_spawn”方法而不是“ddp ”,但“ddp_spawn”也有这些限制:</p>
+
+
+<div class="custom-point-list">
+<ul><li>spawn方法在子流程中训练模型，而主流程中的模型不会更新。</li><li>Dataloader(num_workers=N)，其中N很大，使用DDP训练会遇到瓶颈，即它会非常慢或者根本不起作用。这是PyTorch的限制。</li><li>这个方法强制所有东西都是可选择的。</li></ul>
+</div>
+
+
+<pre class="hljs">
+trainer = Trainer(gpus=<span class="hljs-number">8</span>, accelerator=<span class="hljs-string">"ddp_spawn"</span>)</pre>
+
+
+
+<p>就速度和性能而言,“ddp”方法应始终优先于“ddp_spawn”。</p>
+
+
+
+<h4>分布式数据并行2</h4>
+
+
+
+<p>DDP2在单台机器上的行为类似于DP，但在多个节点上使用时，它就相当于DDP。有时，在同一台机器上使用所有批次而不是子集可能是有用的，ddp2方法在这种情况下可能会很方便。DDP2执行以下操作:</p>
+
+
+<div class="custom-point-list">
+<ul><li>将数据的子集复制到每个节点。</li><li>在每个节点上初始化一个模型。</li><li>使用DP向前和向后传递。</li><li>跨节点同步渐变。</li><li>应用优化程序更新。</li></ul>
+</div>
+
+
+<pre class="hljs">
+trainer = Trainer(gpus=<span class="hljs-number">8</span>, accelerator=<span class="hljs-string">"ddp2"</span>, num_nodes=<span class="hljs-number">4</span>)</pre>
+
+
+
+<p>目前不建议使用这种技术，因为它对所有PyTorch版本&gt; = 1.9都不适用，不清楚如何使它适用于PyTorch &gt;= 1.9，并且没有对这种方法进行功能测试</p>
+
+
+
+<h4>霍罗沃德</h4>
+
+
+
+<p><a href="https://web.archive.org/web/20221006025927/https://github.com/horovod/horovod" target="_blank" rel="noreferrer noopener nofollow"> Horovod </a>是一个用于TensorFlow、Keras、PyTorch和Apache MXNet的分布式深度学习培训框架，它使分布式深度学习变得快速和易于使用。</p>
+
+
+<div class="custom-point-list">
+<ul><li>每个进程都使用单个GPU来处理固定的数据子集。</li><li>在反向过程中，梯度在所有GPU上并行平均。</li><li>在进入下一阶段之前，在开始下一步之前，同步应用这些梯度。</li><li>在训练脚本中，Horovod将检测环境中的工作人员数量，并自动调整学习速率以补偿增加的总批量。</li></ul>
+</div>
+
+
+<p>Horovod使用相同的训练脚本支持单GPU、多GPU和多节点训练。它可以在培训脚本中配置为与任意数量的GPUs进程一起运行，如下所示:</p>
+
+
+
+<pre class="hljs">
+trainer = Trainer(accelerator=<span class="hljs-string">"horovod"</span>, gpus=<span class="hljs-number">1</span>)</pre>
+
+
+
+<pre class="hljs">
+trainer = Trainer(accelerator=<span class="hljs-string">"horovod"</span>)</pre>
+
+
+
+<p>启动培训作业时，驱动程序应用程序将用于指定工作进程的总数:</p>
+
+
+
+<pre class="hljs">
+horovodrun -np <span class="hljs-number">4</span> python train.py
+
+
+horovodrun -np <span class="hljs-number">8</span> -H hostname1:<span class="hljs-number">4</span>,hostname2:<span class="hljs-number">4</span> python train.py</pre>
+
+
+
+<h4>共享培训</h4>
+
+
+
+<p>在训练大型模型或尝试较大批量时，您可能会遇到一些内存问题。人们可能会想到在这种情况下使用模型并行，但是目前，由于与之相关的复杂实现，我们使用分片训练来代替。</p>
+
+
+
+<p>在底层，分片训练类似于数据并行训练，只是优化器状态和梯度是跨GPU分片的。在内存受限的多GPU设置中，或者在训练较大的模型(500M以上的参数模型)时，强烈建议使用这种方法。</p>
+
+
+
+<p>要使用分片训练，您需要首先使用下面的命令安装<a href="https://web.archive.org/web/20221006025927/https://github.com/facebookresearch/fairscale"> FairScale </a>。</p>
+
+
+
+<pre class="hljs">pip install fairscale
+
+trainer = Trainer(strategy=<span class="hljs-string">"ddp_sharded"</span>)</pre>
+
+
+
+<p>当使用分片训练策略时，在内存和性能之间存在折衷，因为由于设备之间的高度分布式通信，训练可能变得更慢。</p>
+
+
+
+<h2>如何在多个GPU上优化训练</h2>
+
+
+
+<p>当在多个GPU上训练具有大型数据集的大型模型时，我们可能会遇到一些内存或性能瓶颈问题。在本节中，我们将了解如何优化培训流程。</p>
+
+
+
+<h3>FairScale激活检查点</h3>
+
+
+
+<p>激活检查点一旦在正向传递中不再需要激活，就从内存中释放激活。然后，根据需要为向后传递重新计算它们。当中间层产生大量激活时，激活检查点非常有用。</p>
+
+
+
+<p>与PyTorch实现不同，FairScales的检查点包装器还可以正确处理批处理规范层，确保由于多次转发而正确跟踪统计数据。</p>
+
+
+
+<p>这在训练较大的模型时节省了内存，但是，需要包装您想要使用激活检查点的模块。你可以在这里阅读更多相关信息<a href="https://web.archive.org/web/20221006025927/https://pytorch-lightning.readthedocs.io/en/stable/advanced/model_parallel.html#fairscale-activation-checkpointing" target="_blank" rel="noreferrer noopener nofollow">。</a></p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> fairscale.nn <span class="hljs-keyword">import</span> checkpoint_wrapper
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Model</span><span class="hljs-params">(LightningModule)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">init</span><span class="hljs-params">(self)</span>:</span>
+        super().__init__()
+        self.block1 = checkpoint_wrapper(nn.Sequential(nn.Linear(<span class="hljs-number">32</span>, <span class="hljs-number">32</span>),       nn.ReLU()))
+        self.block_2 = nn.Linear(<span class="hljs-number">32</span>, <span class="hljs-number">2</span>)</pre>
+
+
+
+<h3>混合精度(16位)定型</h3>
+
+
+
+<p>默认情况下，PyTorch和大多数深度学习框架一样，使用32位浮点(FP32)算法。另一方面，许多深度学习模型可以通过16位等低位浮点实现完全的准确性。因为它们需要更少的存储器，所以有可能训练和部署大型神经网络，这导致由于更少的存储器带宽需求而增强数据传输操作。</p>
+
+
+
+<p>但是要使用16位浮点，您必须:</p>
+
+
+<div class="custom-point-list">
+<ul><li>支持16位精度的GPU，如NVIDIA pascal架构或更新版本。</li><li>你的优化算法，即training_step，应该是数值稳定的。</li></ul>
+</div>
+
+
+<p>混合精度结合了32位和16位浮点的使用，提高了性能，并消除了我们可能面临的任何内存问题。Lightning通过本机或APEX amp后端为GPU提供混合精度训练。</p>
+
+
+
+<pre class="hljs">Trainer(precision=<span class="hljs-number">16</span>, amp_backend=<span class="hljs-string">"native"</span>)
+
+Trainer(amp_backend=<span class="hljs-string">"apex"</span>, precision=<span class="hljs-number">16</span>)</pre>
+
+
+
+<p>除非您需要更精细的控制，否则建议始终使用本机amp_backend。</p>
+
+
+
+<h3>比起数据并行(DP ),更喜欢分布式数据并行(DDP)</h3>
+
+
+
+<p>正如前面提到的，我们应该更喜欢使用DDP策略而不是DP。这背后的原因是DP每批使用3个转移步骤，而DDP仅使用2个转移步骤，因此速度更快。</p>
+
+
+
+<p>DP执行以下步骤:</p>
+
+
+<div class="custom-point-list">
+<ol><li>将模型复制到设备。</li><li>将数据复制到设备。</li><li>将每个器件的输出复制回主器件。</li></ol>
+</div>
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="65659" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-data-parallel-strategy" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?fit=1080%2C608&amp;ssl=1" data-orig-size="1080,608" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-data-parallel-strategy" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?fit=1024%2C576&amp;ssl=1" src="../Images/af1a22ac674b295981e6708060b46646.png" alt="GPU data parallel strategy" class="wp-image-65659 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?resize=902%2C507&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?resize=902%2C507&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="65659" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-data-parallel-strategy" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?fit=1080%2C608&amp;ssl=1" data-orig-size="1080,608" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-data-parallel-strategy" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?fit=1024%2C576&amp;ssl=1" src="../Images/af1a22ac674b295981e6708060b46646.png" alt="GPU data parallel strategy" class="wp-image-65659" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-data-parallel-strategy.gif?resize=902%2C507&amp;ssl=1"/></noscript><figcaption><em>GPU data parallel strategy | <a href="https://web.archive.org/web/20221006025927/https://pytorch-lightning.readthedocs.io/en/latest/guides/speed.html" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure>
+
+
+
+<p>DDP执行以下步骤:</p>
+
+
+<div class="custom-point-list">
+<ol><li>将数据移动到设备。</li><li>传输和同步渐变。</li></ol>
+</div>
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img data-attachment-id="65661" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-distributed-data-parallel-strategy-1" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?fit=1080%2C608&amp;ssl=1" data-orig-size="1080,608" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-distributed-data-parallel-strategy-1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?fit=1024%2C576&amp;ssl=1" src="../Images/58905c097e3582f392f268baf688c3a5.png" alt="GPU distributed data parallel strategy" class="wp-image-65661 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?resize=900%2C506&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?resize=900%2C506&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="65661" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-distributed-data-parallel-strategy-1" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?fit=1080%2C608&amp;ssl=1" data-orig-size="1080,608" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-distributed-data-parallel-strategy-1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?fit=1024%2C576&amp;ssl=1" src="../Images/58905c097e3582f392f268baf688c3a5.png" alt="GPU distributed data parallel strategy" class="wp-image-65661" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-distributed-data-parallel-strategy-1.gif?resize=900%2C506&amp;ssl=1"/></noscript><figcaption><em>GPU distributed data parallel strategy | <a href="https://web.archive.org/web/20221006025927/https://pytorch-lightning.readthedocs.io/en/latest/guides/speed.html">Source</a></em></figcaption></figure></div>
+
+
+<p>随着技术和策略的改变，我们也可以在代码中做一些改变来优化我们的训练过程，下面是其中的一些。</p>
+
+
+
+<h3>增加批量</h3>
+
+
+
+<p>如果您在训练时使用小批量，则更多的时间将花费在训练数据的加载和卸载上，而不是计算操作上，这会降低训练速度。因此，建议使用更大的批处理大小来提高GPU利用率。但是增加批量大小可能会对模型的准确性产生不利影响，因此我们应该用不同的批量大小进行实验，以找到最佳的批量大小。</p>
+
+
+
+<h3>使用PyTorch的DataLoader方法更快地加载数据</h3>
+
+
+
+<p>Pytorch中的DataLoader类是加载和批处理数据的一种快速简便的方法。我们可以使用参数“num_workers ”,通过将它的值设置为一个以上来更快地为训练加载数据。使用PyTorch lightning时，它会为您推荐num_workers的最佳值。</p>
+
+
+
+<p>但是，如果数据集非常大，因为加载器工作进程和父进程将为父进程中从工作进程访问的所有Python对象消耗相同数量的CPU内存，则可能会遇到内存问题。避免这个问题的一个方法是在Dataloader __getitem__方法中使用Pandas、Numpy或PyArrow对象，而不是python对象。</p>
+
+
+
+<h3>将梯度设置为无</h3>
+
+
+
+<p>我们可以通过覆盖optimizer_zero_grad()方法并将其设置为None来提高性能和速度，而不是将梯度设置为零，这样通常会占用更少的内存。</p>
+
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Model</span><span class="hljs-params">(LightningModule)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">optimizer_zero_grad</span><span class="hljs-params">(self, epoch, batch_idx, optimizer, optimizer_idx)</span>:</span>
+        optimizer.zero_grad(set_to_none=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<h3>模型切换</h3>
+
+
+
+<p>当我们必须在分布式设置中使用多个优化器执行梯度累积时，这种方法特别有用。当执行梯度累积时，将sync_grad设置为False将阻止此同步，并提高您的训练速度。</p>
+
+
+
+<p>LightningOptimizer为高级用户提供了一个toggle_model()函数作为contextlib.contextmanager()。这里有一个来自PyTorch Lightning官方文档的例子。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleGAN</span><span class="hljs-params">(LightningModule)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+        super().__init__()
+        self.automatic_optimization = <span class="hljs-keyword">False</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">training_step</span><span class="hljs-params">(self, batch, batch_idx)</span>:</span>
+        
+        
+        g_opt, d_opt = self.optimizers()
+
+        X, _ = batch
+        X.requires_grad = <span class="hljs-keyword">True</span>
+        batch_size = X.shape[<span class="hljs-number">0</span>]
+
+        real_label = torch.ones((batch_size, <span class="hljs-number">1</span>), device=self.device)
+        fake_label = torch.zeros((batch_size, <span class="hljs-number">1</span>), device=self.device)
+
+        
+        
+        
+        is_last_batch_to_accumulate = (batch_idx + <span class="hljs-number">1</span>) % <span class="hljs-number">2</span> == <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> self.trainer.is_last_batch
+
+        g_X = self.sample_G(batch_size)
+
+        
+        
+        
+        <span class="hljs-keyword">with</span> d_opt.toggle_model(sync_grad=is_last_batch_to_accumulate):
+            d_x = self.D(X)
+            errD_real = self.criterion(d_x, real_label)
+
+            d_z = self.D(g_X.detach())
+            errD_fake = self.criterion(d_z, fake_label)
+
+            errD = errD_real + errD_fake
+
+            self.manual_backward(errD)
+            <span class="hljs-keyword">if</span> is_last_batch_to_accumulate:
+                d_opt.step()
+                d_opt.zero_grad()
+
+        
+        
+        
+        <span class="hljs-keyword">with</span> g_opt.toggle_model(sync_grad=is_last_batch_to_accumulate):
+            d_z = self.D(g_X)
+            errG = self.criterion(d_z, real_label)
+
+            self.manual_backward(errG)
+            <span class="hljs-keyword">if</span> is_last_batch_to_accumulate:
+                g_opt.step()
+                g_opt.zero_grad()
+
+        self.log_dict({<span class="hljs-string">"g_loss"</span>: errG, <span class="hljs-string">"d_loss"</span>: errD}, prog_bar=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<p>正如您在代码中看到的，我们将sync_grad参数设置为False，并仅在一个时期结束时或每两个批次后将其设置为True。通过这样做，我们实际上是在每两个批次之后或者在时期结束时累积梯度。</p>
+
+
+
+<h3>避免。item()，。numpy()，。cpu()调用</h3>
+
+
+
+<p>避免。item()，。numpy()，。cpu()调用代码。如果您必须删除连接的图调用，您可以使用。请改用detach()方法。这是因为这些调用中的每一个都将导致数据从GPU传输到CPU，并将导致性能大幅下降。</p>
+
+
+
+<h3>清除缓存</h3>
+
+
+
+<p>每次调用torch.cuda.empty_cache()方法，所有的GPU都要等待同步。所以避免不必要的调用这个方法。</p>
+
+
+
+<h2>如何在多个GPU上监控训练</h2>
+
+
+
+<p>在训练模型时，监控GPU的使用是非常重要的，因为它可能会提供一些有用的见解来改进训练，如果GPU未得到充分利用，我们可以相应地处理它。有各种工具，如Neptune和Wandb，可用于<a href="https://web.archive.org/web/20221006025927/https://docs.neptune.ai/how-to-guides/neptune-api/distributed-computing" target="_blank" rel="noreferrer noopener">监控多个GPU上的训练。</a></p>
+
+
+
+<p>在本节中，我们将使用Neptune来监控GPU和GPU内存，同时在多个GPU上进行训练。</p>
+
+
+
+<h3>用海王星监控训练</h3>
+
+
+
+<p>Neptune是一个可以在任何MLOps工作流中使用的<a href="/web/20221006025927/https://neptune.ai/blog/metadata-store" target="_blank" rel="noreferrer noopener">元数据存储库</a>。它允许我们在训练时监控我们的资源，因此我们可以使用它来监控训练时使用的不同GPU的使用情况。</p>
+
+
+
+<p>将Neptune并入PyTorch Lightning代码非常简单，您所要做的就是创建一个NeptuneLogger对象并将其传递给Trainer对象，如下所示:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pytorch_lightning <span class="hljs-keyword">import</span> Trainer
+<span class="hljs-keyword">from</span> pytorch_lightning.loggers <span class="hljs-keyword">import</span> NeptuneLogger
+
+
+neptune_logger = NeptuneLogger(
+    api_key=<span class="hljs-string">"ANONYMOUS"</span>,  
+    project=<span class="hljs-string">"common/pytorch-lightning-integration"</span>,  
+    tags=[<span class="hljs-string">"training"</span>, <span class="hljs-string">"resnet"</span>],  
+)
+
+
+trainer = Trainer(max_epochs=<span class="hljs-number">10</span>, logger=neptune_logger)
+
+
+trainer.fit(my_model, my_dataloader)</pre>
+
+
+
+<p>如果这是你第一次接触Neptune，我强烈建议你通过这个<a href="https://web.archive.org/web/20221006025927/https://docs.neptune.ai/getting-started/installation" target="_blank" rel="noreferrer noopener">一步一步的指南</a>来安装所有必要的库以使它工作。之后，查看<a href="https://web.archive.org/web/20221006025927/https://docs.neptune.ai/integrations-and-supported-tools/model-training/pytorch-lightning" target="_blank" rel="noreferrer noopener">海王星+ PyTorch闪电集成文档</a>。</p>
+
+
+
+<p>运行该文件后，您应该会得到一个到控制台的链接。您可以看到<a href="https://web.archive.org/web/20221006025927/https://docs.neptune.ai/you-should-know/displaying-metadata#monitoring" target="_blank" rel="noreferrer noopener">监控部分</a>(下图中的圆圈)，在这里您可以看到所有GPU在训练时的使用情况以及一些其他指标。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img data-attachment-id="65666" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-model-training" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?fit=1600%2C730&amp;ssl=1" data-orig-size="1600,730" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-model-training" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?fit=300%2C137&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?fit=1024%2C467&amp;ssl=1" src="../Images/40bbe89b0659451dc823f8feeea4d204.png" alt="GPU model training" class="wp-image-65666 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?resize=1024%2C467&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?resize=1024%2C467&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="65666" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-model-training" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?fit=1600%2C730&amp;ssl=1" data-orig-size="1600,730" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-model-training" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?fit=300%2C137&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?fit=1024%2C467&amp;ssl=1" src="../Images/40bbe89b0659451dc823f8feeea4d204.png" alt="GPU model training" class="wp-image-65666" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-training.png?resize=1024%2C467&amp;ssl=1"/></noscript><figcaption><em>Monitor training on multiple GPUs | <a href="https://web.archive.org/web/20221006025927/http://Monitor%20training%20on%20multiple%20GPUs,%20source:%20https://app.neptune.ai/neptune-ai/Ships/e/SHIP-1883/monitoring" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+<p>让我们看看我们可以从GPU利用率图表中推断出什么样的有意义的见解。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img data-attachment-id="65667" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-model-monitoring" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?fit=1426%2C640&amp;ssl=1" data-orig-size="1426,640" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-model-monitoring" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?fit=300%2C135&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?fit=1024%2C460&amp;ssl=1" src="../Images/163a2c02cebb4b389345d58e3e61b8c3.png" alt="GPU model monitoring" class="wp-image-65667 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?resize=838%2C376&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?resize=838%2C376&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="65667" data-permalink="https://web.archive.org/web/20221006025927/https://neptune.ai/attachment/gpu-model-monitoring" data-orig-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?fit=1426%2C640&amp;ssl=1" data-orig-size="1426,640" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GPU-model-monitoring" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?fit=300%2C135&amp;ssl=1" data-large-file="https://web.archive.org/web/20221006025927/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?fit=1024%2C460&amp;ssl=1" src="../Images/163a2c02cebb4b389345d58e3e61b8c3.png" alt="GPU model monitoring" class="wp-image-65667" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221006025927im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GPU-model-monitoring.png?resize=838%2C376&amp;ssl=1"/></noscript><figcaption><em>Monitor training on multiple GPUs | <a href="https://web.archive.org/web/20221006025927/https://app.neptune.ai/neptune-ai/Ships/e/SHIP-1883/monitoring" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+<div class="custom-point-list">
+<ul><li>正如您在上面看到的，GPU的使用是波动的，有一些短暂的时间没有被使用，解释其原因并不容易。</li><li>这可能发生在验证期间，因为我们在此阶段不计算梯度，或者这可能是由于一些其他瓶颈，例如，您可能使用CPU对数据使用一些数据预处理技术，这可能非常慢。</li><li>此外，在Caffe等一些框架中，默认情况下在验证阶段只使用一个GPU，因此在这种情况下，您可能会发现只有一个GPU的使用率很高。</li><li>因此，根据您训练神经网络的方式，您可能会发现一个不同的图表，表明不同的GPU是如何被利用的。</li></ul>
+</div>
+
+
+<h2>结论</h2>
+
+
+
+<p>本文讨论了我们为什么要用多个GPU来训练机器学习模型。我们还发现了使用Pytorch lightning在多个GPU上进行训练是多么容易，以及优化训练过程的最佳方法。最后，我们发现了如何在训练时使用Neptune来监控GPU的使用情况。</p>
+
+
+
+<p>如果你正在寻找关于这个主题的深入知识，我建议你浏览这个广泛的资源<a href="https://web.archive.org/web/20221006025927/https://aaronharlap.github.io//papers/aharlap_dissertation.pdf" target="_blank" rel="noreferrer noopener nofollow">改进共享计算环境中的ML应用</a>或者这个<a href="https://web.archive.org/web/20221006025927/https://arxiv.org/pdf/1809.02839.pdf" target="_blank" rel="noreferrer noopener nofollow">研究论文。</a></p>
+
+
+
+<h3>参考</h3>
+
+
+
+
+
+
+<div id="author-box-new-format-block_61e6cef6506de" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">米尔扎·穆杰塔巴</h3>
+    
+          <p class="article__authorContent-text">经验丰富的机器学习工程师，具有金融服务行业的工作经历。精通分析技能、PHP、数据科学、数据分析和数据分析。拥有技术学士学位的优秀工程专业人士——来自克什米尔大学的BTech专注于计算机科学。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>如何跟踪海王星的PyTorch闪电实验</h2>
+
+
+
+<p class="has-small-font-size">5分钟阅读|作者Jakub Czakon |年7月19日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>使用PyTorch Lightning并想知道应该选择哪个记录器来跟踪您的实验？</p>
+
+
+
+<p>考虑使用PyTorch Lightning来构建您的深度学习代码，并且不介意了解它的日志功能吗？</p>
+
+
+
+<p>不知道闪电有一个相当可怕的海王星积分？</p>
+
+
+
+<p>这篇文章(很可能)适合你。</p>
+
+
+
+<h2>为什么是PyTorch闪电和海王星？</h2>
+
+
+
+<p>如果你从未听说过，PyTorch Lightning 是PyTorch之上的一个非常轻量级的包装器，它更像是一个编码标准而不是框架。这种格式可以让你摆脱大量的样板代码，同时保持简单易懂。</p>
+
+
+
+<p>其结果是一个框架，为研究人员、学生和生产团队提供了尝试疯狂想法的终极灵活性，而不必学习另一个框架，同时自动化掉所有的工程细节。</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221006025927/https://neptune.ai/blog/pytorch-lightning-neptune-integration" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

@@ -1,0 +1,1514 @@
+<html>
+<head>
+<title>Optuna vs Hyperopt: Which Hyperparameter Optimization Library Should You Choose? </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>Optuna vs Hyperopt:应该选择哪个超参数优化库？</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/optuna-vs-hyperopt#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/optuna-vs-hyperopt#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>思考应该选择哪个库进行超参数优化？</p>
+
+
+
+<p>使用远视有一段时间了，想改变一下吗？</p>
+
+
+
+<p>刚刚听说了Optuna，你想看看它是如何工作的吗？</p>
+
+
+
+<p>很好！</p>
+
+
+
+<p>在本文中，我将:</p>
+
+
+<div class="custom-point-list">
+<ul><li>向您展示一个在实际问题中使用Optuna和Hyperopt的示例，</li><li>在API、文档、功能等方面比较Optuna和Hyperopt，</li><li>给你我的综合评分和你应该使用哪个超参数优化库的建议。</li></ul>
+</div>
+
+
+<p>让我们开始吧。</p>
+
+
+
+
+
+
+<h2 id="content">评定标准</h2>
+
+
+
+
+
+<h2 id="1">易用性和API</h2>
+
+
+
+<p>在这一节中，我想看看如何为这两个库运行一个基本的超参数调优脚本，看看它有多自然和易用，以及什么是API。</p>
+
+
+
+<div class="wp-container-3 wp-block-columns border-columns">
+<div class="wp-container-1 wp-block-column">
+<h2 class="has-text-align-center">optina</h2>
+
+
+
+<p>您在一个函数中定义了您的<strong>搜索空间和目标。</strong></p>
+
+
+
+<p>此外，您从<em>试验</em>对象中抽取超参数。因此，<strong>参数空间是在执行</strong>时定义的。对于那些因为这种<strong>命令式方法而喜欢Pytorch的人来说，</strong> Optuna会感觉很自然。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(trial)</span>:</span>
+    params = {<span class="hljs-string">'learning_rate'</span>: trial.suggest_loguniform(<span class="hljs-string">'learning_rate'</span>, <span class="hljs-number">0.01</span>, <span class="hljs-number">0.5</span>),
+              <span class="hljs-string">'max_depth'</span>: trial.suggest_int(<span class="hljs-string">'max_depth'</span>, <span class="hljs-number">1</span>, <span class="hljs-number">30</span>),
+              <span class="hljs-string">'num_leaves'</span>: trial.suggest_int(<span class="hljs-string">'num_leaves'</span>, <span class="hljs-number">2</span>, <span class="hljs-number">100</span>),
+              <span class="hljs-string">'min_data_in_leaf'</span>: trial.suggest_int(<span class="hljs-string">'min_data_in_leaf'</span>, <span class="hljs-number">10</span>, <span class="hljs-number">1000</span>),
+              <span class="hljs-string">'feature_fraction'</span>: trial.suggest_uniform(<span class="hljs-string">'feature_fraction'</span>, <span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>),
+              <span class="hljs-string">'subsample'</span>: trial.suggest_uniform(<span class="hljs-string">'subsample'</span>, <span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>)}
+    <span class="hljs-keyword">return</span> train_evaluate(params)</pre>
+
+
+
+<p>然后，创建<em>研究</em>对象并对其进行优化。最棒的是<strong>你可以选择</strong>是否要<strong>最大化或最小化</strong>你的目标。这在优化AUC等指标时非常有用，因为您不必在训练前改变目标的符号，然后在训练后转换最佳结果以获得正分数。</p>
+
+
+
+<pre class="hljs">study = optuna.create_study(direction=<span class="hljs-string">'maximize'</span>)
+study.optimize(objective, n_trials=<span class="hljs-number">100</span>)
+</pre>
+
+
+
+<p>就是这样。</p>
+
+
+
+<p>您可能想知道的关于优化的一切都可以在<em>研究</em>对象中找到。</p>
+
+
+
+<p>我喜欢Optuna的一点是，我可以定义如何动态地对我的搜索空间进行采样，这给了我很大的灵活性。选择优化方向的能力也很不错。</p>
+
+
+
+<p>如果你想看完整的代码示例，你可以<a href="/web/20221007120429/https://neptune.ai/blog/optuna-vs-hyperopt#12" target="_blank" rel="noreferrer noopener">向下滚动到示例脚本</a>。</p>
+
+
+
+<h3 class="has-text-align-center"><strong> 10 / 10 </strong></h3>
+</div>
+
+
+
+<div class="wp-container-2 wp-block-column">
+<h2 class="has-text-align-center">远视</h2>
+
+
+
+<p>首先定义参数搜索空间:</p>
+
+
+
+<pre class="hljs">SPACE = {<span class="hljs-string">'learning_rate'</span>: 
+hp.loguniform(<span class="hljs-string">'learning_rate'</span>,np.log(<span class="hljs-number">0.01</span>),np.log(<span class="hljs-number">0.5</span>)),
+         <span class="hljs-string">'max_depth'</span>: 
+hp.choice(<span class="hljs-string">'max_depth'</span>, range(<span class="hljs-number">1</span>, <span class="hljs-number">30</span>, <span class="hljs-number">1</span>)),
+         <span class="hljs-string">'num_leaves'</span>: 
+hp.choice(<span class="hljs-string">'num_leaves'</span>, range(<span class="hljs-number">2</span>, <span class="hljs-number">100</span>, <span class="hljs-number">1</span>)),
+         <span class="hljs-string">'subsample'</span>: 
+hp.uniform(<span class="hljs-string">'subsample'</span>, <span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>)}</pre>
+
+
+
+<p>然后，创建一个想要最小化的目标函数。这意味着你将不得不<strong>翻转你的目标</strong>的符号，以获得更高更好的指标，如AUC。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(params)</span>:</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">-1.0</span> * train_evaluate(params)</pre>
+
+
+
+<p>最后，实例化<em> Trials() </em>对象，并在参数搜索<em>空间</em>最小化<em>目标</em>。</p>
+
+
+
+<pre class="hljs">trials = Trials()
+_ = fmin(objective, SPACE, trials=trials, algo=tpe.suggest, max_evals=<span class="hljs-number">100</span>)</pre>
+
+
+
+<p>…完成了！</p>
+
+
+
+<p>关于被测试的超参数和相应分数的所有信息都保存在<em>试验</em>对象中。</p>
+
+
+
+<p>我不喜欢的是，即使在最简单的情况下，我也需要实例化<em> Trials() </em>。我宁愿让<em> fmin </em>返回<em>试用版</em>并默认进行实例化。</p>
+
+
+
+<h3 class="has-text-align-center"><strong> 9 / 10 </strong></h3>
+
+
+
+<p>这两个库在这里都做得很好，但是我觉得<strong> Optuna稍微好一点</strong>,因为它具有灵活性、对采样参数的命令式方法以及较少的样板文件。</p>
+</div>
+</div>
+
+
+
+<p><strong>易用性和API </strong></p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p><span><strong/></span>&gt;远视</p><p>选项、方法和超级(超级参数)</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2 id="2">在现实生活中，运行超参数优化需要远离黄金路径的许多额外选项。我特别感兴趣的领域有:</h2>
+
+
+
+<p>搜索空间</p>
+
+
+<div class="custom-point-list">
+<ul><li>优化方法/算法</li><li>回收</li><li>持续和重新开始参数扫描</li><li>修剪没有希望的运行</li><li>处理异常</li><li>在这一节中，我将比较Optuna和Hyperopt。</li></ul>
+</div>
+
+
+<p>搜索空间</p>
+
+
+
+<h3 id="3">在本节中，我想比较搜索空间的定义、定义复杂空间的灵活性以及每个参数类型(浮点型、整数型、分类型)的采样选项。</h3>
+
+
+
+<p>optina</p>
+
+
+
+<div class="wp-container-6 wp-block-columns border-columns">
+<div class="wp-container-4 wp-block-column">
+<h2 class="has-text-align-center">您可以找到所有超参数类型的采样选项:</h2>
+
+
+
+<p>对于分类参数，您可以使用<em>trials . suggest _ categorial</em></p>
+
+
+<div class="custom-point-list">
+<ul><li>对于整数有<em> trials.suggest_int </em></li><li>对于浮点参数，您有<em>个试验.建议_统一</em>、<em>个试验.建议_统一</em>甚至更奇特的<em>个试验.建议_离散_统一</em></li><li>特别是对于整数参数，您可能希望有更多的选项，但它处理的是大多数用例。这个库的最大特点是，你可以从参数空间中动态采样，你可以随心所欲。您可以使用if语句，可以更改搜索间隔，可以使用来自<em> trial </em>对象的信息来指导您的搜索。</li></ul>
+</div>
+
+
+<p>太棒了，你可以做任何事情！</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(trial)</span>:</span>
+    classifier_name = trial.suggest_categorical(<span class="hljs-string">'classifier'</span>, [<span class="hljs-string">'SVC'</span>, <span class="hljs-string">'RandomForest'</span>])
+    <span class="hljs-keyword">if</span> classifier_name == <span class="hljs-string">'SVC'</span>:
+        svc_c = trial.suggest_loguniform(<span class="hljs-string">'svc_c'</span>, <span class="hljs-number">1e-10</span>, <span class="hljs-number">1e10</span>)
+        classifier_obj = sklearn.svm.SVC(C=svc_c)
+    <span class="hljs-keyword">else</span>:
+        rf_max_depth = int(trial.suggest_loguniform(<span class="hljs-string">'rf_max_depth'</span>, <span class="hljs-number">2</span>, <span class="hljs-number">32</span>))
+        classifier_obj = sklearn.ensemble.RandomForestClassifier(max_depth=rf_max_depth)
+
+    ...</pre>
+
+
+
+<p><strong> 10 / 10 </strong></p>
+
+
+
+<h3 class="has-text-align-center">远视</h3>
+</div>
+
+
+
+<div class="wp-container-5 wp-block-column">
+<h2 class="has-text-align-center">搜索空间是Hyperopt真正为您提供大量采样选项的地方:</h2>
+
+
+
+<p>对于分类参数，您有<em> hp.choice </em></p>
+
+
+<div class="custom-point-list">
+<ul><li>对于整数，你得到<em> hp.randit </em>，<em> hp.quniform </em>，<em> hp.qloguniform </em>和<em> hp.qlognormal </em></li><li>对于浮动，我们有<em> hp.normal </em>，<em> hp.uniform </em>，<em> hp.lognormal </em>和<em> hp.loguniform </em> <strong> </strong></li><li>据我所知，这是目前最广泛的采样功能。</li></ul>
+</div>
+
+
+<p>您可以在运行优化之前定义您的搜索空间，但是您可以创建非常复杂的参数空间:</p>
+
+
+
+<p>通过将<em> hp.choice </em>与其他采样方法相结合，我们可以拥有条件空间。当你在为涉及预处理、特征工程和模型训练的机器学习管道优化超参数时，这<strong>是有用的。</strong></p>
+
+
+
+<pre class="hljs">SPACE = hp.choice(<span class="hljs-string">'classifier_type'</span>, [
+    {
+        <span class="hljs-string">'type'</span>: <span class="hljs-string">'naive_bayes'</span>,
+    },
+    {
+        <span class="hljs-string">'type'</span>: <span class="hljs-string">'svm'</span>,
+        <span class="hljs-string">'C'</span>: hp.lognormal(<span class="hljs-string">'svm_C'</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>),
+        <span class="hljs-string">'kernel'</span>: hp.choice(<span class="hljs-string">'svm_kernel'</span>, [
+            {<span class="hljs-string">'ktype'</span>: <span class="hljs-string">'linear'</span>},
+            {<span class="hljs-string">'ktype'</span>: <span class="hljs-string">'RBF'</span>, <span class="hljs-string">'width'</span>: hp.lognormal(<span class="hljs-string">'svm_rbf_width'</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)},
+            ]),
+    },
+    {
+        <span class="hljs-string">'type'</span>: <span class="hljs-string">'dtree'</span>,
+        <span class="hljs-string">'criterion'</span>: hp.choice(<span class="hljs-string">'dtree_criterion'</span>, [<span class="hljs-string">'gini'</span>, <span class="hljs-string">'entropy'</span>]),
+        <span class="hljs-string">'max_depth'</span>: hp.choice(<span class="hljs-string">'dtree_max_depth'</span>,
+            [<span class="hljs-keyword">None</span>, hp.qlognormal(<span class="hljs-string">'dtree_max_depth_int'</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>)]),
+        <span class="hljs-string">'min_samples_split'</span>: hp.qlognormal(<span class="hljs-string">'dtree_min_samples_split'</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>),
+    },
+    ])</pre>
+
+
+
+<p><strong> 10 / 10 </strong></p>
+
+
+
+<h3 class="has-text-align-center">不得不说<strong>他们俩</strong>我都喜欢。我可以很容易地定义嵌套搜索空间，并且我有很多针对所有参数类型的采样选项。<strong> Optuna有命令式的参数定义</strong>，提供了更多的灵活性，而<strong>hyperpt有更多的参数采样选项</strong>。</h3>
+</div>
+</div>
+
+
+
+<p><strong>搜索空间</strong></p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>Optuna =远视</p><p>优化方法</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h3 id="4">Optuna和Hyperopt <strong>都使用相同的优化方法</strong>。他们有:</h3>
+
+
+
+<p><span> <strong> <em> rand.suggest </em> </strong>【远视】<strong><em>samplers . random sampler</em></strong>【Optuna】</span></p>
+
+
+
+<p>你对参数的标准随机搜索。</p>
+
+
+
+<p><span> <em> <strong> tpe.suggest </strong> </em>(远视)和<strong><em>samplers . TPE . sampler . TPE sampler</em></strong>(Optuna)</span></p>
+
+
+
+<p>Parzen估计树(TPE)。这种方法背后的想法类似于之前关于<a href="/web/20221007120429/https://neptune.ai/blog/scikit-optimize" target="_blank" rel="noreferrer noopener"> Scikit Optimize </a>的博文中所解释的。我们<strong>使用一个便宜的代理模型来估计昂贵的目标函数</strong>在一组参数上的性能。</p>
+
+
+
+<p>Scikit Optimize和Parzen Tree Estimators(TPE)中使用的方法之间的区别在于，我们要估计尾部的密度，而不是估计实际性能(点估计)。我们希望能够判断跑步是好的(右尾)还是坏的(左尾)。</p>
+
+
+
+<p>我喜欢AutoML.org弗莱堡的<a href="https://web.archive.org/web/20221007120429/https://www.automl.org/" target="_blank" rel="noreferrer noopener">的了不起的人们从</a><a href="https://web.archive.org/web/20221007120429/https://www.automl.org/wp-content/uploads/2019/05/AutoML_Book.pdf" target="_blank" rel="noreferrer noopener"> AutoML_Book </a>中摘录的以下解释。</p>
+
+
+
+<p>树Parzen估计器对密度函数p(λ|y &lt; α)和p(λ|y ≥ α)进行建模，而不是对给定配置λ的观测值y的概率p(y|λ)进行建模。给定百分位数α(通常设置为15%)，观察值分为好的观察值和坏的观察值，简单的一维Parzen窗口用于模拟这两种分布。</p>
+
+
+
+<blockquote class="wp-block-quote is-style-default"><p>通过使用p(λ|y &lt; α)和p(λ|y ≥ α),您可以估计参数配置相对于以前最佳配置的预期改进。</p></blockquote>
+
+
+
+<p>有趣的是，对于Optuna和Hyperopt来说，在优化器中都没有指定<strong> α </strong>参数的选项。</p>
+
+
+
+<p>optina</p>
+
+
+
+<div class="wp-container-9 wp-block-columns border-columns">
+<div class="wp-container-7 wp-block-column">
+<h2 class="has-text-align-center"><strong> <em> <u>一体化。</u> </em> </strong></h2>
+
+
+
+<p>Optuna允许您使用来自Scikit-Optimize (skopt)的采样器。</p>
+
+
+
+<p>Skopt提供了许多基于树的方法作为代理模型的选择。</p>
+
+
+
+<p>为了使用它们，您需要:</p>
+
+
+
+<p>创建一个<em> SkoptSampler </em>实例，在<em> skopt_kwargs </em>参数中指定代理模型和获取函数的参数，</p>
+
+
+<div class="custom-point-list">
+<ul><li>将<em>采样器</em>实例传递给<em> optuna.create_study </em>方法</li><li><em> <strong>梅干。成功halvingpruner</strong>T3】</em></li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> optuna.integration <span class="hljs-keyword">import</span> SkoptSampler
+
+sampler = SkoptSampler(skopt_kwargs={<span class="hljs-string">'base_estimator'</span>:<span class="hljs-string">'RF'</span>,
+                                     <span class="hljs-string">'n_random_starts'</span>:<span class="hljs-number">10</span>,
+                                     <span class="hljs-string">'base_estimator'</span>:<span class="hljs-string">'ET'</span>,
+                                     <span class="hljs-string">'acq_func'</span>:<span class="hljs-string">'EI'</span>,
+                                     <span class="hljs-string">'acq_func_kwargs'</span>: {<span class="hljs-string">'xi'</span>:<span class="hljs-number">0.02</span>})
+study = optuna.create_study(sampler=sampler)
+study.optimize(objective, n_trials=<span class="hljs-number">100</span>)</pre>
+
+
+
+<p>你也可以使用多臂bandit方法之一，称为异步连续减半算法(ASHA)。如果你对细节<a href="https://web.archive.org/web/20221007120429/https://arxiv.org/abs/1810.05934" target="_blank" rel="noreferrer noopener">感兴趣，请阅读论文</a>，但大意是:</p>
+
+
+
+<p>运行一段时间的参数配置</p>
+
+
+<div class="custom-point-list">
+<ul><li>每隔一段时间删除(一半)最没有希望的运行</li><li>多运行一些参数配置</li><li>每隔一段时间删除(一半)最没有希望的运行</li><li>当只剩下一个配置时停止</li><li>通过这样做，搜索可以集中在更有希望的运行上。然而，配置预算的静态分配在实践中是一个问题(一种叫做<a href="https://web.archive.org/web/20221007120429/https://arxiv.org/abs/1603.06560" target="_blank" rel="noreferrer noopener"> HyperBand </a>的新方法解决了这个问题)。</li></ul>
+</div>
+
+
+<p>在Optuna中使用ASHA非常容易。只需将一个<em>成功的HalvingPruner </em>传递给<em>。create_study() </em>一切就绪:</p>
+
+
+
+<p>简单明了。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> optuna.pruners <span class="hljs-keyword">import</span> SuccessiveHalvingPruner
+
+optuna.create_study(pruner=SuccessiveHalvingPruner())
+study.optimize(objective, n_trials=<span class="hljs-number">100</span>)</pre>
+
+
+
+<p>如果你想了解更多，你可以看看我的关于Scikit Optimize的文章。</p>
+
+
+
+<p>总的来说，现在优化函数有很多选择。然而，有一些重要的，如<a href="https://web.archive.org/web/20221007120429/https://github.com/automl/HpBandSter" target="_blank" rel="noreferrer noopener">超级乐队或BOHB </a>失踪。</p>
+
+
+
+<p><strong> 8 / 10 </strong></p>
+
+
+
+<h3 class="has-text-align-center">远视</h3>
+
+
+
+<p><em><strong/></em></p>
+</div>
+
+
+
+<div class="wp-container-8 wp-block-column">
+<h2 class="has-text-align-center">最近添加的自适应TPE是由ElectricBrain发明的，它实际上是他们在TPE基础上实验的一系列(不那么)小的改进。</h2>
+
+
+
+<p>作者在这篇引人入胜的博文中彻底解释了他们对TPE的方法和修改。</p>
+
+
+
+<p>超级好用。代替<em> tpe.suggest </em>你需要将<em> atpe.suggest </em>传递给你的<em> fmin </em>函数。</p>
+
+
+
+<p>我真的很喜欢这种在库中包含新优化算法的努力，特别是因为这是一种新的原创方法，而不仅仅是与现有算法的集成。</p>
+
+
+
+<p>希望在未来的多臂bandid方法，如Hyperband，BOHB，或基于树的方法，如SMAC3也将包括在内。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> hyperopt <span class="hljs-keyword">import</span> fmin, atpe
+
+best = fmin(objective, SPACE, 
+            max_evals=<span class="hljs-number">100</span>, 
+            algo=atpe.suggest)
+</pre>
+
+
+
+<p><strong> 8 / 10 </strong></p>
+
+
+
+<p><strong>优化方法</strong></p>
+
+
+
+<h3 class="has-text-align-center">Optuna =远视</h3>
+</div>
+</div>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>复试</p><p>在这一节中，我想看看在每次迭代之后定义回调来监控/快照/修改训练有多容易。这是有用的，尤其是当你的训练是长期的和/或分散的。</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h3 id="5">optina</h3>
+
+
+
+<p>用户回调在<em>的<em>回调</em>参数下<strong>得到了很好的支持</strong>。优化()</em>方法。只需传递一个将<em>研究</em>和<em>试验</em>作为输入的可调用列表，您就可以开始了。</p>
+
+
+
+<div class="wp-container-12 wp-block-columns border-columns">
+<div class="wp-container-10 wp-block-column">
+<h2 class="has-text-align-center">因为您可以访问<em>研究</em>和<em>试验</em>，所以您可以灵活地检查、提前停止或修改未来的搜索。</h2>
+
+
+
+<p><strong> 10 / 10 </strong></p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">neptune_monitor</span><span class="hljs-params">(study, trial)</span>:</span>
+    neptune.log_metric(<span class="hljs-string">'run_score'</span>, trial.value)
+    neptune.log_text(<span class="hljs-string">'run_parameters'</span>, str(trial.params))
+...
+study.optimize(objective, n_trials=<span class="hljs-number">100</span>, callbacks=[neptune_monitor])</pre>
+
+
+
+<p>远视</p>
+
+
+
+<h3 class="has-text-align-center">本质上没有回调，但是你可以把你的回调函数放在<em>目标</em>中，它将在每次调用<em>目标</em>时被执行。</h3>
+</div>
+
+
+
+<div class="wp-container-11 wp-block-column">
+<h2 class="has-text-align-center">我不喜欢它，但我想我可以忍受。</h2>
+
+
+
+<p><strong>2010年6月</strong></p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">monitor_callback</span><span class="hljs-params">(params, score)</span>:</span>
+    neptune.send_metric(<span class="hljs-string">'run_score'</span>, score)
+    neptune.send_text(<span class="hljs-string">'run_parameters'</span>, str(params))
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(params)</span>:</span>
+    score = <span class="hljs-number">-1.0</span> * train_evaluate(params) 
+    monitor_callback(params, score)
+    <span class="hljs-keyword">return</span> score</pre>
+
+
+
+<p>Optuna让<em>回调</em>参数变得非常简单，而在Hyperopt中，你必须修改目标。</p>
+
+
+
+<h3 class="has-text-align-center"><strong>回调</strong></h3>
+</div>
+</div>
+
+
+
+<p><span><strong/></span>&gt;远视</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>注意:</p><p><em>opt . utils . Neptune _ monitor</em>:记录运行分数和运行参数，并绘制迄今为止的分数</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+<div class="note">
+    <h3><em> opt_utils.log_study </em>:记录最佳结果、最佳参数和研究对象本身</h3>
+    <div class="content">
+                    
+                    <div class="wysiwyg_editor">
+                                    <ul>
+<li>只需将此添加到您的脚本中:</li>
+<li>持续和重新启动</li>
+</ul>
+                            </div>
+                    <div class="wysiwyg_editor">
+                                    <p>保存和加载您的超参数搜索可以节省您的时间和金钱，并有助于获得更好的结果。让我们比较一下这两个框架。</p>
+                            </div>
+                    <div class="html_code">
+                                <pre class="hljs"><span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">import</span> neptunecontrib.monitoring.optuna <span class="hljs-keyword">as</span> opt_utils
+
+neptune.init(<span class="hljs-string">'jakub-czakon/blog-hpo'</span>)
+neptune.create_experiment(name=<span class="hljs-string">'optuna sweep'</span>)
+
+monitor = opt_utils.NeptuneMonitor()
+study = optuna.create_study(direction=<span class="hljs-string">'maximize'</span>)
+study.optimize(objective, n_trials=<span class="hljs-number">100</span>, callbacks=[monitor])
+opt_utils.log_study(study)</pre>                            </div>
+                    
+            </div>
+</div>
+
+
+
+
+
+<h3 id="6">optina</h3>
+
+
+
+<p>简单地使用<em> joblib.dump </em>来腌制<em>试验</em>对象。</p>
+
+
+
+<div class="wp-container-15 wp-block-columns border-columns">
+<div class="wp-container-13 wp-block-column">
+<h2 class="has-text-align-center">…您可以稍后使用<em> joblib.load </em>加载它以重新开始搜索。</h2>
+
+
+
+<p>就是这样。</p>
+
+
+
+<pre class="hljs">study.optimize(objective, n_trials=<span class="hljs-number">100</span>)
+joblib.dump(study, <span class="hljs-string">'artifacts/study.pkl'</span>)</pre>
+
+
+
+<p>对于<strong>分布式设置</strong>,您可以使用研究的<strong>名称</strong>,以及数据库的<strong> URL，在此您将分布式研究用于实例化新研究。例如:</strong></p>
+
+
+
+<pre class="hljs">study = joblib.load(<span class="hljs-string">'../artifacts/study.pkl'</span>)
+study.optimize(objective, n_trials=<span class="hljs-number">200</span>)</pre>
+
+
+
+<p>很好很容易。</p>
+
+
+
+<p>关于在<a href="/web/20221007120429/https://neptune.ai/blog/optuna-vs-hyperopt#11" target="_blank" rel="noreferrer noopener">速度和并行化</a>部分使用Optuna运行分布式超参数优化的更多信息。</p>
+
+
+
+<pre class="hljs">study = optuna.create_study(
+                    study_name=<span class="hljs-string">'example-study'</span>, 
+                    storage=<span class="hljs-string">'sqlite:///example.db'</span>, 
+                    load_if_exists=<span class="hljs-keyword">True</span>)
+</pre>
+
+
+
+<p><strong> 10 / 10 </strong></p>
+
+
+
+<p>远视</p>
+
+
+
+<h3 class="has-text-align-center">与Optuna类似，使用<em> joblib.dump </em>来处理<em>试验</em>对象。</h3>
+</div>
+
+
+
+<div class="wp-container-14 wp-block-column">
+<h2 class="has-text-align-center">…用<em> joblib.load </em>加载并重启。</h2>
+
+
+
+<p>简单和工程没有问题。</p>
+
+
+
+<pre class="hljs">trials = Trials()  
+_ = fmin(objective, SPACE, trials=trials, 
+         algo=tpe.suggest, max_evals=<span class="hljs-number">100</span>)
+joblib.dump(trials, <span class="hljs-string">'artifacts/hyperopt_trials.pkl'</span>)</pre>
+
+
+
+<p>如果您正在以一种<strong>分布式</strong>方式优化超参数，您可以加载连接到MongoDB的<em> MongoTrials() </em>对象。在<a href="/web/20221007120429/https://neptune.ai/blog/optuna-vs-hyperopt#11" target="_blank" rel="noreferrer noopener">速度和并行化</a>一节中有更多关于使用Hyperopt运行分布式超参数优化的信息。</p>
+
+
+
+<pre class="hljs">trials = joblib.load(<span class="hljs-string">'artifacts/hyperopt_trials.pkl'</span>)
+_ = fmin(objective, SPACE, trials=trials, 
+         algo=tpe.suggest, max_evals=<span class="hljs-number">200</span>)</pre>
+
+
+
+<p><strong> 10 / 10 </strong></p>
+
+
+
+<p>两者都使工作变得容易并完成。</p>
+
+
+
+<h3 class="has-text-align-center"><strong>持续并重启</strong></h3>
+
+
+
+<p>Optuna =远视</p>
+</div>
+</div>
+
+
+
+<p><a href="https://web.archive.org/web/20221007120429/https://neptune.ai/blog/optuna-vs-hyperopt#content-list"/></p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>运行修剪</p><p>并非所有的超参数配置都是相同的。对于他们中的一些人，你可以很快看出他们不会得到高分。理想情况下，您希望尽快停止这些运行，而是尝试不同的参数。</p><p>Optuna为您提供了一个通过<strong>修剪回调的选项。</strong>支持多种机器学习框架:</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h3 id="7"><em> KerasPruningCallback, TFKerasPruningCallback </em></h3>
+
+
+
+<p><em> TensorFlowPruningHook </em></p>
+
+
+
+<p><em>pytorchchinitelusingandler，pytorchlineninginingcallback</em></p>
+
+
+<div class="custom-point-list">
+<ul><li><em> FastAIPruningCallback </em></li><li>light gbmpunigcallback</li><li><em> XGBoostPruningCallback </em></li><li><em>还有更</em></li><li>你可以在文档中读到它们。</li><li>例如，在lightGBM训练的情况下，您可以将这个回调传递给<em> lgb.train </em>函数。</li><li>只有Optuna给你这个选择，所以这是一个明显的胜利。</li></ul>
+</div>
+
+
+<p><strong>运行修剪</strong></p>
+
+
+
+<p><span><strong/></span>&gt;远视</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train_evaluate</span><span class="hljs-params">(X, y, params, pruning_callback=None)</span>:</span>
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=<span class="hljs-number">0.2</span>, random_state=<span class="hljs-number">1234</span>)
+
+    train_data = lgb.Dataset(X_train, label=y_train)
+    valid_data = lgb.Dataset(X_valid, label=y_valid, reference=train_data)
+
+    callbacks = [pruning_callback] <span class="hljs-keyword">if</span> pruning_callback <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">None</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">None</span>
+
+    model = lgb.train(params, train_data,
+                      num_boost_round=NUM_BOOST_ROUND,
+                      early_stopping_rounds=EARLY_STOPPING_ROUNDS,
+                      valid_sets=[valid_data],
+                      valid_names=[<span class="hljs-string">'valid'</span>],
+                      callbacks=callbacks)
+    score = model.best_score[<span class="hljs-string">'valid'</span>][<span class="hljs-string">'auc'</span>]
+    <span class="hljs-keyword">return</span> score
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(trial)</span>:</span>
+    params = {<span class="hljs-string">'learning_rate'</span>: trial.suggest_loguniform(<span class="hljs-string">'learning_rate'</span>, <span class="hljs-number">0.01</span>, <span class="hljs-number">0.5</span>),
+              <span class="hljs-string">'max_depth'</span>: trial.suggest_int(<span class="hljs-string">'max_depth'</span>, <span class="hljs-number">1</span>, <span class="hljs-number">30</span>),
+              <span class="hljs-string">'num_leaves'</span>: trial.suggest_int(<span class="hljs-string">'num_leaves'</span>, <span class="hljs-number">2</span>, <span class="hljs-number">100</span>),
+              <span class="hljs-string">'min_data_in_leaf'</span>: trial.suggest_int(<span class="hljs-string">'min_data_in_leaf'</span>, <span class="hljs-number">10</span>, <span class="hljs-number">1000</span>),
+              <span class="hljs-string">'feature_fraction'</span>: trial.suggest_uniform(<span class="hljs-string">'feature_fraction'</span>, <span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>),
+              <span class="hljs-string">'subsample'</span>: trial.suggest_uniform(<span class="hljs-string">'subsample'</span>, <span class="hljs-number">0.1</span>, <span class="hljs-number">1.0</span>)}
+
+    pruning_callback = LightGBMPruningCallback(trial, <span class="hljs-string">'auc'</span>, <span class="hljs-string">'valid'</span>)
+    <span class="hljs-keyword">return</span> train_evaluate(params, pruning_callback)</pre>
+
+
+
+<p>处理异常</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>如果由于错误的参数组合、随机训练错误或其他问题导致您的一次运行失败，您可能会丢失到目前为止在研究中评估的所有<em>parameter _ configuration:score</em>对。</p><p>您可以在每次迭代后使用回调来保存这些信息，或者使用DB来存储这些信息，如<a href="/web/20221007120429/https://neptune.ai/blog/optuna-vs-hyperopt#11" target="_blank" rel="noreferrer noopener">速度和并行化</a>一节中所述。</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h3 id="8">但是，即使出现例外情况，您也可能希望让这项研究继续进行。为了使之成为可能，Optuna允许您将允许的异常传递给<em>。optimize() </em>方法。</h3>
+
+
+
+<p>还是那句话，只有Optuna支持这个。</p>
+
+
+
+<p><strong>处理异常</strong></p>
+
+
+
+<p><span><strong/></span>&gt;远视</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">objective</span><span class="hljs-params">(trial)</span>:</span>
+    params = {<span class="hljs-string">'learning_rate'</span>: trial.suggest_loguniform(<span class="hljs-string">'learning_rate'</span>, <span class="hljs-number">0.01</span>, <span class="hljs-number">0.5</span>),
+              <span class="hljs-string">'max_depth'</span>: trial.suggest_int(<span class="hljs-string">'max_depth'</span>, <span class="hljs-number">1</span>, <span class="hljs-number">30</span>),
+              <span class="hljs-string">'num_leaves'</span>: trial.suggest_int(<span class="hljs-string">'num_leaves'</span>, <span class="hljs-number">2</span>, <span class="hljs-number">100</span>)}
+
+    print(non_existent_variable)
+
+    <span class="hljs-keyword">return</span> train_evaluate(params)
+
+study = optuna.create_study(direction=<span class="hljs-string">'maximize'</span>)
+study.optimize(objective, n_trials=<span class="hljs-number">100</span>, catch=(NameError,))</pre>
+
+
+
+<p>证明文件</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>当你是一个库或框架的用户时，在你需要的时候找到你需要的信息是绝对重要的。这就是文档/支持渠道发挥作用的地方，它们可以创建或破坏一个库。</p><p>让我们看看Optuna和Hyperopt在这方面的比较。</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2 id="9">optina</h2>
+
+
+
+<p>是<strong>真的好</strong>。</p>
+
+
+
+<p>有一个<a href="https://web.archive.org/web/20221007120429/https://optuna.org/" target="_blank" rel="noreferrer noopener nofollow">适当的网页</a>解释了所有的基本概念，并告诉你在哪里可以找到更多的信息。</p>
+
+
+
+<div class="wp-container-18 wp-block-columns border-columns">
+<div class="wp-container-16 wp-block-column">
+<h2 class="has-text-align-center">此外，有一个完整的和非常容易理解的<a href="https://web.archive.org/web/20221007120429/https://optuna.readthedocs.io/en/latest/tutorial/index.html" target="_blank" rel="noreferrer noopener">文档。</a></h2>
+
+
+
+<p>它包含:</p>
+
+
+
+<p>包含简单和高级示例的教程</p>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="20413" data-permalink="https://web.archive.org/web/20221007120429/https://neptune.ai/optuna_docs-2" data-orig-file="https://web.archive.org/web/20221007120429/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?fit=927%2C682&amp;ssl=1" data-orig-size="927,682" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="optuna_docs" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221007120429/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?fit=300%2C221&amp;ssl=1" data-large-file="https://web.archive.org/web/20221007120429/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?fit=927%2C682&amp;ssl=1" src="../Images/dea3752e3e05b6403f3b01b5c3d542ee.png" alt="" class="wp-image-20413 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221007120429/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?resize=927%2C682&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221007120429im_/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?resize=927%2C682&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="20413" data-permalink="https://web.archive.org/web/20221007120429/https://neptune.ai/optuna_docs-2" data-orig-file="https://web.archive.org/web/20221007120429/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?fit=927%2C682&amp;ssl=1" data-orig-size="927,682" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="optuna_docs" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221007120429/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?fit=300%2C221&amp;ssl=1" data-large-file="https://web.archive.org/web/20221007120429/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?fit=927%2C682&amp;ssl=1" src="../Images/dea3752e3e05b6403f3b01b5c3d542ee.png" alt="" class="wp-image-20413" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221007120429im_/https://i0.wp.com/neptune.ai/wp-content/uploads/optuna_docs-1.png?resize=927%2C682&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>API参考与所有的函数包含美丽的文件字符串。为了给你一个概念，想象一下在你的docstrings中有图表，这样你可以更好地理解在你的函数中发生了什么。如果你不相信我，请查看一下<em> <a href="https://web.archive.org/web/20221007120429/https://optuna.readthedocs.io/en/latest/reference/samplers.html#optuna.samplers.BaseSampler" target="_blank" rel="noreferrer noopener"> BaseSampler </a> </em>。</p>
+
+
+
+<p>还有一点很重要，那就是来自<a href="https://web.archive.org/web/20221007120429/https://preferred.jp/ja/" target="_blank" rel="noreferrer noopener"> Preferred Networks </a>的支持团队非常关心这个项目。他们对Github的问题做出回应，社区也围绕着Github不断成长，有很多很棒的功能想法和pr出现。查看<a href="https://web.archive.org/web/20221007120429/https://github.com/pfnet/optuna/issues" target="_blank" rel="noreferrer noopener"> Github项目问题版块</a>，看看那里发生了什么。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong> 10 / 10 </strong></li><li>远视</li></ul>
+</div>
+
+
+<p>它最近更新了，现在已经很好了。</p>
+
+
+
+<h3 class="has-text-align-center">这里可以找到<a href="https://web.archive.org/web/20221007120429/http://hyperopt.github.io/hyperopt/scaleout/mongodb/" target="_blank" rel="noreferrer noopener nofollow">。</a></h3>
+</div>
+
+
+
+<div class="wp-container-17 wp-block-column">
+<h2 class="has-text-align-center">您可以轻松找到以下信息:</h2>
+
+
+
+<p>如何开始</p>
+
+
+
+<p>如何定义简单和高级搜索空间</p>
+
+
+
+<p>如何运行安装</p>
+
+
+<div class="custom-point-list">
+<ul><li>如何通过MongoDB或Spark并行运行Hyperopt</li><li>不幸的是，有些事情我不喜欢:</li><li>文档字符串中缺少API引用所有函数/方法</li><li>大多数方法/函数都缺少docstrings本身，这迫使您阅读实现(这里有一些积极的副作用:)</li></ul>
+</div>
+
+
+<p>没有使用自适应TPE <em>的例子。</em>我不确定我是否正确使用了它，我是否应该指定一些额外的(超级)超级参数。缺少docstrings在这里对我也没有帮助。</p>
+
+
+<div class="custom-point-list">
+<ul><li>文档里有一些404的链接。</li><li>总的来说，最近有了很大的进步，但我有时还是会有点迷失。我希望随着时间的推移，它会变得更好，所以请保持关注。</li><li>好的是<strong>，有很多关于它的博文</strong>。其中一些我认为有用的是:</li><li>文档不是这个项目最强的方面，但是因为它是经典的，所以有很多资源。</li></ul>
+</div>
+
+
+<p><strong>2010年6月</strong></p>
+
+
+
+<p><strong>文档</strong></p>
+
+
+
+
+
+<p><span><strong/></span>&gt;远视</p>
+
+
+
+<h3 class="has-text-align-center">形象化</h3>
+</div>
+</div>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>可视化超参数搜索非常有用。您可以获得参数之间交互的信息，并了解下一步应该在哪里搜索。</p><p>这就是为什么我想比较Optuna和Hyperopt提供的可视化套装。</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2 id="10">optina</h2>
+
+
+
+<p>在<em><strong>optuna . visualization</strong></em>模块中有一些很棒的可视化效果:</p>
+
+
+
+<p><em> plot_contour: </em>在交互图表上绘制参数交互。您可以选择想要探索的超参数。</p>
+
+
+
+<div class="wp-container-21 wp-block-columns border-columns">
+<div class="wp-container-19 wp-block-column">
+<h2 class="has-text-align-center"><em>plot _ optimization _ history:</em>显示所有试验的分数，以及到目前为止每个点的最佳分数。</h2>
+
+
+
+<p><em>plot _ parallel _ coordinate:</em>交互可视化超参数和分数</p>
+
+
+<div class="custom-point-list">
+<ul><li><em> plot_slice: </em>展示了搜索的<strong>演变。你可以看到在超参数空间中你的搜索去了哪里，以及<strong>空间的哪些部分被探索得更多。</strong></strong></li></ul>
+</div>
+
+
+<pre class="hljs">plot_contour(study, params=[<span class="hljs-string">'learning_rate'</span>,
+                            <span class="hljs-string">'max_depth'</span>,
+                            <span class="hljs-string">'num_leaves'</span>,
+                            <span class="hljs-string">'min_data_in_leaf'</span>,
+                            <span class="hljs-string">'feature_fraction'</span>,
+                            <span class="hljs-string">'subsample'</span>])</pre>
+
+
+
+<figure class="wp-block-video"><video controls="" src="https://web.archive.org/web/20221007120429im_/https://neptune.ai/wp-content/uploads/optuna_contour_plot-1.mp4"/></figure>
+
+
+<div class="custom-point-list">
+<ul><li>总的来说，Optuna中的<strong>可视化是不可思议的</strong>！</li></ul>
+</div>
+
+
+<pre class="hljs">plot_optimization_history(study)</pre>
+
+
+
+<figure class="wp-block-video"><video controls="" src="https://web.archive.org/web/20221007120429im_/https://neptune.ai/wp-content/uploads/optuna_history_plot-1.mp4"/></figure>
+
+
+<div class="custom-point-list">
+<ul><li>它们允许您放大超参数交互，并帮助您决定如何运行下一次参数扫描。了不起的工作。</li></ul>
+</div>
+
+
+<pre class="hljs">plot_parallel_coordinate(study)</pre>
+
+
+
+<figure class="wp-block-video"><video controls="" src="https://web.archive.org/web/20221007120429im_/https://neptune.ai/wp-content/uploads/optuna_parallel_plot-1.mp4"/></figure>
+
+
+<div class="custom-point-list">
+<ul><li><strong> 10 / 10 </strong></li></ul>
+</div>
+
+
+<pre class="hljs">plot_slice(study)</pre>
+
+
+
+<figure class="wp-block-video"><video controls="" src="https://web.archive.org/web/20221007120429im_/https://neptune.ai/wp-content/uploads/optuna_slice_plot-1.mp4"/></figure>
+
+
+
+<p>Optuna中可用的可视化给我留下了非常深刻的印象。有用、互动、美观。</p>
+
+
+
+<p><strong>可视化</strong></p>
+
+
+
+<h3 class="has-text-align-center"><span><strong/></span>&gt;远视</h3>
+</div>
+
+
+
+
+</div>
+
+
+
+<p>注意:</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>如果你想玩这些可视化，你可以使用我为每个实验保存为“study.pkl”的<em> <strong>研究</strong> </em>对象。</p><p>速度和并行化</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+<div class="note">
+    <h3>当谈到超参数优化时，能够在您的机器或许多机器(集群)上分布您的训练可能是至关重要的。</h3>
+    <div class="content">
+                    <div class="wysiwyg_editor">
+                                    <p>这就是为什么，我检查了Optuna和Hyperopt的分布式训练选项。</p>
+<p>optina</p>
+<p>您可以在一台机器或一群机器上运行分布式超参数优化，这实际上非常简单。</p>
+                            </div>
+                    
+            </div>
+</div>
+
+
+<p id="block_5ffdd6350b9fd" class="separator separator-5">对于一台机器，你只需改变你的<em>中的<em> n_jobs </em>参数。优化()</em>方法。</p>
+
+
+
+
+
+
+
+
+<h2 id="11">要在集群上运行它，您需要<strong>创建一个驻留在数据库</strong>中的研究(您可以<a href="https://web.archive.org/web/20221007120429/https://optuna.readthedocs.io/en/latest/tutorial/004_distributed.html#distributed" target="_blank" rel="noreferrer noopener">在许多关系数据库</a>中进行选择)。</h2>
+
+
+
+<p>有两种选择可以做到这一点。您可以通过命令行界面来完成:</p>
+
+
+
+<p>您也可以在优化脚本中创建一个研究。</p>
+
+
+
+<div class="wp-container-24 wp-block-columns border-columns">
+<div class="wp-container-22 wp-block-column">
+<h2 class="has-text-align-center">通过使用<em> load_if_exists=True </em>你可以<strong>以同样的方式对待你的主脚本和工作脚本</strong>，这简化了很多事情！</h2>
+
+
+
+<p>最后，您可以从多台机器上运行您的工作脚本，它们都将使用来自研究数据库的相同信息。</p>
+
+
+
+<p>容易和工作像一个魅力！</p>
+
+
+
+<pre class="hljs">study.optimize(objective, n_trials=<span class="hljs-number">100</span>, n_jobs=<span class="hljs-number">12</span>)</pre>
+
+
+
+<p><strong> 10 / 10 </strong></p>
+
+
+
+<p>远视</p>
+
+
+
+<pre class="hljs">optuna create-study \
+    --study-name <span class="hljs-string">"distributed-example"</span> \
+    --storage <span class="hljs-string">"sqlite:///example.db"</span></pre>
+
+
+
+<p>你可以将你的计算分布在一群机器上。很好，一步一步的指导可以在Tanay Agrawal的博客文章中找到，但是简单来说，你需要:</p>
+
+
+
+<p><strong>启动一个装有MongoDB </strong>的服务器，它将从您的工人培训脚本中获取结果，并发送下一个参数集进行尝试，</p>
+
+
+
+<pre class="hljs">study = optuna.create_study(
+    study_name=<span class="hljs-string">'distributed-example'</span>, 
+    storage=<span class="hljs-string">'sqlite:///example.db'</span>,
+    load_if_exists=<span class="hljs-keyword">True</span>)
+study.optimize(objective, n_trials=<span class="hljs-number">100</span>)</pre>
+
+
+
+<p>在您的训练脚本中，创建一个指向您在上一步中启动的数据库服务器的<em> MongoTrials() </em>对象，而不是<em> Trials() </em>，</p>
+
+
+
+<pre class="hljs">terminal-1$ python run_worker.py</pre>
+
+
+
+<pre class="hljs">terminal-25$ python run_worker.py</pre>
+
+
+
+<p>将你的<em>目标</em>函数移动到一个单独的<em>目标. py </em>脚本中，并将其重命名为函数，</p>
+
+
+
+<h3 class="has-text-align-center">编译您的Python训练脚本，</h3>
+</div>
+
+
+
+<div class="wp-container-23 wp-block-column">
+<h2 class="has-text-align-center">跑<em> <strong>远视-蒙哥-工</strong> </em></h2>
+
+
+
+<p>虽然它完成了任务，但感觉并不完美。您需要围绕<em>目标</em>函数做一些杂耍，在CLI中启动MongoDB可能会使事情变得更容易。</p>
+
+
+<div class="custom-point-list">
+<ul><li>值得一提的是，<strong>通过<em> SparkTrials </em>对象与Spark </strong>的集成是最近才添加的。有一个<a href="https://web.archive.org/web/20221007120429/http://hyperopt.github.io/hyperopt/scaleout/spark/" target="_blank" rel="noreferrer noopener">逐步指南</a>来帮助你开始，你甚至可以使用<a href="https://web.archive.org/web/20221007120429/https://github.com/hyperopt/hyperopt/blob/master/download_spark_dependencies.sh" target="_blank" rel="noreferrer noopener"> spark-installation脚本</a>来使事情变得更容易。</li><li>完全按照您期望的方式工作。</li><li>简单又好看！</li><li><strong> 9 / 10 </strong></li><li>两个库都支持分布式培训，这很好。然而，Optuna在更简单、更友好的界面方面做得更好。</li></ul>
+</div>
+
+
+<p><strong>速度和并行化</strong></p>
+
+
+
+<p><span><strong/></span>&gt;远视</p>
+
+
+
+<pre class="hljs">best = hyperopt.fmin(fn = objective,
+                     space = search_space,
+                     algo = hyperopt.tpe.suggest,
+                     max_evals = <span class="hljs-number">64</span>,
+                     trials = hyperopt.SparkTrials())</pre>
+
+
+
+<p>实验结果*</p>
+
+
+
+<p>*需要明确的是，这些是针对一个示例问题和<strong>的<strong>结果，每个库/配置运行一次</strong>，它们不保证通用性。要运行一个合适的基准测试，您需要在不同的数据集上运行多次。</strong></p>
+
+
+
+<h3 class="has-text-align-center">也就是说，作为一名从业者，我希望看到对每个问题的随机搜索有所改进。否则，为什么要去HPO图书馆呢？</h3>
+</div>
+</div>
+
+
+
+<p>好的，作为一个例子，让我们在一个表格，<strong>二元分类</strong>问题上调整<strong> lightGBM </strong>模型的超参数。如果您想像我一样使用相同的数据集，您应该:</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>为了让训练更快，我将<strong>的助推轮数固定为300，并提前30轮停止</strong>。</p><p>所有的训练和评估逻辑都放在<em> train_evaluate </em>函数中。我们可以<strong>将其视为一个黑盒</strong>，它获取数据和超参数集并生成AUC评估分数。</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2 id="12">注意:</h2>
+
+
+
+<p>您实际上可以将每个以参数作为输入并输出分数的脚本转换成这样的<strong> train_evaluate。</strong>完成后，您可以将其视为黑盒并调整您的参数。</p>
+
+
+
+<p>要根据一组参数训练模型，您需要运行如下内容:</p>
+
+
+
+<p>对于这项研究，我试图在<strong> 100运行预算</strong>内找到最佳参数。</p>
+
+
+
+
+
+<p>我做了6个实验:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> lightgbm <span class="hljs-keyword">as</span> lgb
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+NUM_BOOST_ROUND = <span class="hljs-number">300</span>
+EARLY_STOPPING_ROUNDS = <span class="hljs-number">30</span>
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train_evaluate</span><span class="hljs-params">(X, y, params)</span>:</span>
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, 
+                                                          test_size=<span class="hljs-number">0.2</span>, 
+                                                          random_state=<span class="hljs-number">1234</span>)
+
+    train_data = lgb.Dataset(X_train, label=y_train)
+    valid_data = lgb.Dataset(X_valid, label=y_valid, reference=train_data)
+
+    model = lgb.train(params, train_data,
+                      num_boost_round=NUM_BOOST_ROUND,
+                      early_stopping_rounds=EARLY_STOPPING_ROUNDS,
+                      valid_sets=[valid_data], 
+                      valid_names=[<span class="hljs-string">'valid'</span>])
+    
+    score = model.best_score[<span class="hljs-string">'valid'</span>][<span class="hljs-string">'auc'</span>]
+    <span class="hljs-keyword">return</span> score</pre>
+
+
+
+<p>随机搜索(来自hyperopt)作为参考</p>
+
+
+<div class="note">
+    <h3>Optuna和Hyperopt的Parzen估计量搜索策略树</h3>
+    <div class="content">
+                    <div class="wysiwyg_editor">
+                                    <p>来自Hyperopt的自适应TPE</p>
+                            </div>
+                    
+                    
+            </div>
+</div>
+
+
+
+<p>来自Optuna的TPE，带有修剪回调，用于更多运行，但在相同的时间范围内。结果是，有修剪的400次运行与没有修剪的100次运行花费的时间一样多。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+
+N_ROWS=<span class="hljs-number">10000</span>
+TRAIN_PATH = <span class="hljs-string">'/mnt/ml-team/minerva/open-solutions/santander/data/train.csv'</span>
+
+data = pd.read_csv(TRAIN_PATH, nrows=N_ROWS)
+X = data.drop([<span class="hljs-string">'ID_code'</span>, <span class="hljs-string">'target'</span>], axis=<span class="hljs-number">1</span>)
+y = data[<span class="hljs-string">'target'</span>]
+    
+MODEL_PARAMS = {<span class="hljs-string">'boosting'</span>: <span class="hljs-string">'gbdt'</span>,
+                <span class="hljs-string">'objective'</span>:<span class="hljs-string">'binary'</span>,
+                <span class="hljs-string">'metric'</span>: <span class="hljs-string">'auc'</span>,
+                <span class="hljs-string">'num_threads'</span>: <span class="hljs-number">12</span>,
+                <span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.3</span>,
+                }
+
+score = train_evaluate(X, y, MODEL_PARAMS)
+print(<span class="hljs-string">'Validation AUC: {}'</span>.format(score))</pre>
+
+
+
+<p>基于skopt的Optuna随机森林替代模型。取样器</p>
+
+
+
+<p>参见<a href="https://web.archive.org/web/20221007120429/https://ui.neptune.ai/jakub-czakon/blog-hpo/e/BLOG-433/source-code?path=.&amp;file=search_optuna.py" target="_blank" rel="noreferrer noopener">超参数优化脚本</a>示例。</p>
+
+
+<div class="custom-point-list">
+<ul><li>如果你想更详细地探索所有这些实验，你可以简单地进入<a href="https://web.archive.org/web/20221007120429/https://ui.neptune.ai/jakub-czakon/blog-hpo/experiments?viewId=817cbbbb-103e-11ea-9a39-42010a840083" target="_blank" rel="noreferrer noopener">实验仪表板</a>。</li><li><strong>Optuna和Hyperopt都比随机搜索</strong>有所改进，这很好。</li><li>来自<strong> Optuna的TPE实现略好于Hyperopt的</strong>自适应TPE，但好不了多少。另一方面，当运行超参数优化时，这些小的改进正是您想要的。</li><li>有趣的是，HPO和Optuna的TPE实现在这个问题上给出了非常不同的结果。也许好的和坏的参数配置<em> <strong> λ </strong> </em>之间的分界点选择不同，或者采样方法的默认值更适合这个特定的问题。</li><li>此外，<strong>使用修剪减少了4倍的训练时间</strong>。我可以在不修剪的情况下运行100次搜索的时间内运行400次搜索。另一方面，<strong>使用修剪得到了较低的分数。</strong>您的问题可能不同，但在决定是否使用修剪时，考虑这一点很重要。</li></ul>
+</div>
+
+
+<p>对于这一部分，我根据对随机搜索策略的改进来打分。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter"><a href="https://web.archive.org/web/20221007120429/https://ui.neptune.ai/jakub-czakon/blog-hpo/experiments?viewId=817cbbbb-103e-11ea-9a39-42010a840083"><img src="../Images/3bf1e06f372fb230a83c00e65cc7efe9.png" alt="optuna vs hyperopt" data-lazy-src="https://web.archive.org/web/20221007120429/https://i1.wp.com/neptune.ai/wp-content/uploads/optuna_vs_dashboard.png?fit=758%2C445&amp;ssl=1&amp;is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221007120429im_/https://i1.wp.com/neptune.ai/wp-content/uploads/optuna_vs_dashboard.png?fit=758%2C445&amp;ssl=1"/><noscript><img data-lazy-fallback="1" src="../Images/3bf1e06f372fb230a83c00e65cc7efe9.png" alt="optuna vs hyperopt" data-original-src="https://web.archive.org/web/20221007120429im_/https://i1.wp.com/neptune.ai/wp-content/uploads/optuna_vs_dashboard.png?fit=758%2C445&amp;ssl=1"/></noscript></a><figcaption><em>Experiments for Optuna and Hyperopt in different configurations</em></figcaption></figure></div>
+
+
+
+<p><strong>远视</strong>得到(0.850–0.844)* 100 =<strong>6</strong></p>
+
+
+
+<p><strong>Optuna</strong>got(0.854–0.844)* 100 =<strong>10</strong></p>
+
+
+
+<p><strong>实验结果</strong></p>
+
+
+
+<p><span><strong/></span>&gt;远视</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221007120429/https://neptune.ai/blog/optuna-vs-hyperopt#content-list"/></p>
+
+
+
+<p>结论</p>
+
+
+<div class="custom-point-list">
+<ul><li>让我们来看看总体得分:</li><li>即使你大方地看待它，只考虑两个库共有的特性，<strong> Optuna也是一个更好的框架。</strong></li></ul>
+</div>
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>在所有标准上，它都达到或略好于标准，并且:</p><p>它有更好的文档</p><p>它有更好可视化套件</p></blockquote>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+
+
+<h2>它有一些hyperopt不支持的特性，比如修剪、回调和异常处理</h2>
+
+
+
+<p>在做了所有这些研究之后，我确信<strong> Optuna是一个很棒的超参数优化库</strong>。</p>
+
+
+
+
+
+
+
+<p>此外，我认为<strong>如果你在过去使用超远眼镜</strong>,你应该强烈考虑更换。</p>
+
+
+
+<p>雅各布·查肯</p>
+
+
+<div class="custom-point-list">
+<ul><li>大部分是ML的人。构建MLOps工具，编写技术资料，在Neptune进行想法实验。</li><li><strong>阅读下一篇</strong></li><li>如何跟踪机器学习模型的超参数？</li></ul>
+</div>
+
+
+<p>卡米尔·卡什马雷克|发布于2020年7月1日</p>
+
+
+
+<p>Moreover, I think that <strong>you should strongly consider switching from Hyperopt</strong> if you were using that in the past. </p>
+
+
+
+
+
+
+
+<div id="author-box-new-format-block_605d8dd517661" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name"><strong>机器学习算法可通过称为超参数</strong>的多个量规进行调整。最近的深度学习模型可以通过数十个超参数进行调整，这些超参数与数据扩充参数和训练程序参数一起创建了非常复杂的空间。在强化学习领域，您还应该计算环境参数。</h3>
+    
+          <p class="article__authorContent-text">数据科学家要<strong>控制好</strong> <strong>超参数</strong> <strong>空间</strong>，才能<strong>使</strong> <strong>进步</strong>。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-25 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">在这里，我们将向您展示<strong>最近的</strong> <strong>实践</strong>，<strong>提示&amp;技巧，</strong>和<strong>工具</strong>以最小的开销高效地跟踪超参数。你会发现自己掌控了最复杂的深度学习实验！</p>
+
+
+
+<h2>为什么我应该跟踪我的超参数？也就是为什么这很重要？</h2>
+
+
+
+<p class="has-small-font-size">几乎每一个深度学习实验指南，像<a href="https://web.archive.org/web/20221007120429/https://www.deeplearningbook.org/contents/guidelines.html" target="_blank" rel="noreferrer noopener">这本深度学习书籍</a>，都建议你如何调整超参数，使模型按预期工作。在<strong>实验-分析-学习循环</strong>中，数据科学家必须控制正在进行的更改，以便循环的“学习”部分正常工作。</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10">哦，忘了说<strong>随机种子也是一个超参数</strong>(特别是在RL领域:例如检查<a href="https://web.archive.org/web/20221007120429/https://www.reddit.com/r/MachineLearning/comments/76th74/d_why_random_seeds_sometimes_have_quite_large/" target="_blank" rel="noreferrer noopener">这个Reddit </a>)。</p>
+
+
+
+<p>超参数跟踪的当前实践是什么？</p>
+
+
+
+<p>让我们逐一回顾一下管理超参数的常见做法。我们关注于如何构建、保存和传递超参数给你的ML脚本。</p>
+
+
+
+<p>Here, we will show you <strong>recent</strong> <strong>practices</strong>, <strong>tips &amp; tricks,</strong> and <strong>tools</strong> to track hyperparameters efficiently and with minimal overhead. You will find yourself in control of most complex deep learning experiments!</p>
+
+
+
+<h2>Why should I track my hyperparameters? a.k.a. Why is that important?</h2>
+
+
+
+<p>Almost every deep learning experimentation guideline, like <a href="https://web.archive.org/web/20221007120429/https://www.deeplearningbook.org/contents/guidelines.html" target="_blank" rel="noreferrer noopener">this deep learning book</a>, advises you on how to tune hyperparameters to make models work as expected. In the <strong>experiment-analyze-learn loop</strong>, data scientists must control what changes are being made, so that the “learn” part of the loop is working.</p>
+
+
+
+<p>Oh, forgot to say that <strong>random seed is a hyperparameter</strong> as well (especially in the RL domain: check <a href="https://web.archive.org/web/20221007120429/https://www.reddit.com/r/MachineLearning/comments/76th74/d_why_random_seeds_sometimes_have_quite_large/" target="_blank" rel="noreferrer noopener">this Reddit</a> for example).</p>
+
+
+
+<h2>What is current practice in the hyperparameters tracking?</h2>
+
+
+
+<p>Let’s review one-by-one common practices for managing hyperparameters. We focus on how to build, keep and pass hyperparameters to your ML scripts.</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221007120429/https://neptune.ai/blog/how-to-track-hyperparameters" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

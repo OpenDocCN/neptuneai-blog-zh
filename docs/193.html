@@ -1,0 +1,989 @@
+<html>
+<head>
+<title>Anomaly Detection in Time Series </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>时间序列中的异常检测</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/anomaly-detection-in-time-series#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/anomaly-detection-in-time-series#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>时间序列无处不在！网站上的用户行为，或财富500强公司的股票价格，或任何其他与时间相关的例子。时间序列数据在每个行业中都以某种形式存在。</p>
+
+
+
+<p>自然，它也是研究最多的数据类型之一。根据经验，您可以说时间序列是一种基于某种时间相关维度(如年、月或秒)进行采样的数据。</p>
+
+
+
+<blockquote class="wp-block-quote"><p>时间序列是以有序的方式记录的并且在时间上相关的观察结果。</p></blockquote>
+
+
+
+<p>在分析时间序列数据时，我们必须确定异常值，就像我们在静态数据中所做的一样。如果您曾经以任何身份处理过数据，您就会知道异常值会给分析师带来多大的痛苦。这些异常值在时间序列行话中被称为“异常”。</p>
+
+
+
+
+
+
+<h2>时序数据中的异常/异常值和异常类型是什么？</h2>
+
+
+
+<p>从传统的观点来看，离群值/异常值是:</p>
+
+
+
+<blockquote class="wp-block-quote"><p>"一个与其他观测结果相差很大的观测结果，以至于让人怀疑它是由不同的机制产生的。"</p></blockquote>
+
+
+
+<p>因此，您可以将异常值视为不符合预期行为的观察值。</p>
+
+
+
+
+
+
+
+<p>如上图所示，时间序列中的异常值可能有两种不同的含义。它们之间的语义区别主要基于你作为分析师的兴趣，或者特定的场景。</p>
+
+
+
+<p>这些观察结果与噪声、错误或不需要的数据有关，这些数据本身对分析师来说并不有趣。在这些情况下，应删除或纠正异常值以提高数据质量，并生成可由其他数据挖掘算法使用的更清晰的数据集。例如，消除传感器传输误差以获得更准确的预测，因为主要目标是进行预测。</p>
+
+
+
+<p>然而，近年来——特别是在时间序列数据领域——许多研究人员致力于检测和分析不寻常但有趣的现象。<em>欺诈检测</em>就是一个很好的例子——主要目标是检测和分析异常值本身。这些观察结果通常被称为异常。</p>
+
+
+
+<p>时间序列的异常检测问题通常被公式化为<em>识别相对于某种规范或通常信号</em>的异常数据点。看看一些异常类型:</p>
+
+
+
+
+
+
+
+<p>让我们逐一分析一下:</p>
+
+
+
+<h3>点异常值</h3>
+
+
+
+<p>点异常值是在特定时间实例中与时间序列中的其他值(全局异常值)或与其相邻点(局部异常值)相比表现异常的数据。</p>
+
+
+
+<p>例子:你知道Gamestop狂潮吗？许多年轻的散户投资者购买GME股票，以报复大型对冲基金，推动股价大幅上涨。由于不太可能的事件而出现的突然、短暂的峰值是一个<strong>附加(点)异常值。</strong>基于时间的值在短时间内的意外增长(看起来像突然的峰值)属于加性异常值。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img data-attachment-id="42431" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/time-series-point-outlier" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?fit=853%2C522&amp;ssl=1" data-orig-size="853,522" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Time-series-point-outlier" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?fit=300%2C184&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?fit=853%2C522&amp;ssl=1" src="../Images/93a8a7331641f241d3b65f0e5254944c.png" alt="Time series point outlier" class="wp-image-42431 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?resize=640%2C392&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?resize=640%2C392&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42431" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/time-series-point-outlier" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?fit=853%2C522&amp;ssl=1" data-orig-size="853,522" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Time-series-point-outlier" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?fit=300%2C184&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?fit=853%2C522&amp;ssl=1" src="../Images/93a8a7331641f241d3b65f0e5254944c.png" alt="Time series point outlier" class="wp-image-42431" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-point-outlier.png?resize=640%2C392&amp;ssl=1"/></noscript><figcaption><em>Source: Google</em></figcaption></figure></div>
+
+
+
+<p>点异常值可以是<em>单变量</em>或<em>多变量</em>，这取决于它们是否分别影响一个或多个时间相关变量。</p>
+
+
+
+<p>图1a包含两个单变量点异常值O1和O2，而多变量时间序列由图3b中的三个变量组成，并且具有单变量(O3)和多变量(O1和O2)点异常值。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img data-attachment-id="42432" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/point-outliers-in-time-series" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?fit=1000%2C401&amp;ssl=1" data-orig-size="1000,401" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Point-outliers-in-time-series" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?fit=300%2C120&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?fit=1000%2C401&amp;ssl=1" src="../Images/4ba1487f21c636315e063a2c350da188.png" alt="Point outliers in time series" class="wp-image-42432 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?resize=750%2C301&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?resize=750%2C301&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42432" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/point-outliers-in-time-series" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?fit=1000%2C401&amp;ssl=1" data-orig-size="1000,401" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Point-outliers-in-time-series" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?fit=300%2C120&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?fit=1000%2C401&amp;ssl=1" src="../Images/4ba1487f21c636315e063a2c350da188.png" alt="Point outliers in time series" class="wp-image-42432" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Point-outliers-in-time-series.png?resize=750%2C301&amp;ssl=1"/></noscript><figcaption><br/><em>Fig: 1 — Point outliers in time series data. | <a href="https://web.archive.org/web/20220928190227/https://arxiv.org/pdf/2002.04236.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>我们将在异常检测部分更深入地研究单变量点异常值。</p>
+
+
+
+<h3>后续异常值</h3>
+
+
+
+<p>这意味着连续的时间点，其联合行为是不寻常的，尽管每个单独的观察不一定是点异常值。子序列异常值也可以是全局的或局部的，并且可以影响一个(单变量子序列异常值)或多个(多变量子序列异常值)时间相关变量。</p>
+
+
+
+<p>图2提供了单变量(图2a中的O1和O2，以及图2b中的O3)和多变量(图2b中的O1和O2)子序列异常值的示例。注意，后者不一定影响所有变量(例如，图2b中的O2)。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="42433" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/%e2%80%8asubsequence-outliers-in-time-series" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/ Subsequence-outliers-in-time-series.png?fit=1000%2C394&amp;ssl=1" data-orig-size="1000,394" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title=" Subsequence-outliers-in-time-series" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/ Subsequence-outliers-in-time-series.png?fit=300%2C118&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/ Subsequence-outliers-in-time-series.png?fit=1000%2C394&amp;ssl=1" src="../Images/276897424ef680b19ca165bc6b7562ad.png" alt=" Subsequence outliers in time series " class="wp-image-42433 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/ Subsequence-outliers-in-time-series.png?resize=1000%2C394&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/%E2%80%8ASubsequence-outliers-in-time-series.png?resize=1000%2C394&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42433" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/%e2%80%8asubsequence-outliers-in-time-series" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/ Subsequence-outliers-in-time-series.png?fit=1000%2C394&amp;ssl=1" data-orig-size="1000,394" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title=" Subsequence-outliers-in-time-series" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/ Subsequence-outliers-in-time-series.png?fit=300%2C118&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/ Subsequence-outliers-in-time-series.png?fit=1000%2C394&amp;ssl=1" src="../Images/276897424ef680b19ca165bc6b7562ad.png" alt=" Subsequence outliers in time series " class="wp-image-42433" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/%E2%80%8ASubsequence-outliers-in-time-series.png?resize=1000%2C394&amp;ssl=1"/></noscript><figcaption><em>Fig: 2 — Subsequence outliers in time series data. | <a href="https://web.archive.org/web/20220928190227/https://arxiv.org/pdf/2002.04236.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<h2>时间序列数据中的异常检测技术</h2>
+
+
+
+<p>分析师可以用来识别数据中不同异常的技术很少。它从一个基本的统计分解开始，一直到自动编码器。让我们从最基本的开始，理解它如何以及为什么有用。</p>
+
+
+
+<div id="blog-cta-intext-block_61b257895fa23" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">注意</h3>
+  <div class="blog-cta-intext__content"><p><span>📄在这里你可以找到</span> <a href="https://web.archive.org/web/20220928190227/https://app.neptune.ai/theaayushbajaj/Anomaly-Detection/n/49ba1752-fc3a-4abb-b35f-0e2ea4fd4afa/48dc19d8-3c75-4989-a2c0-67839393a093" target="_blank" rel="noopener"> <span>笔记本</span> </a> <span>以及文章中用到的</span> <a href="https://web.archive.org/web/20220928190227/https://drive.google.com/drive/folders/1vsLzhpgNbVPsYvBIFNI_20S3LRZuNYhz?usp=sharing" target="_blank" rel="noopener"> <span>数据</span> </a></p>
+</div>
+  </div>
+
+
+<h3>STL分解</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20220928190227/http://www.wessa.net/download/stl.pdf" target="_blank" rel="noreferrer noopener nofollow"> STL </a>代表基于黄土的季节趋势分解程序。这种技术让你能够将你的时间序列信号分成三个部分:<strong>、季节、趋势和残差</strong>。</p>
+
+
+
+<p>它适用于季节性时间序列，这也是最流行的时间序列数据类型。要生成STL分解图，我们只需使用令人惊叹的<em> statsmodels </em>来完成繁重的工作。</p>
+
+
+
+<pre class="hljs">plt.rc(<span class="hljs-string">'figure'</span>,figsize=(<span class="hljs-number">12</span>,<span class="hljs-number">8</span>))
+plt.rc(<span class="hljs-string">'font'</span>,size=<span class="hljs-number">15</span>)
+result = seasonal_decompose(lim_catfish_sales,model=<span class="hljs-string">'additive'</span>)
+fig = result.plot()</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="42436" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/stl-decomposition" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?fit=845%2C558&amp;ssl=1" data-orig-size="845,558" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="STL-decomposition" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?fit=300%2C198&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?fit=845%2C558&amp;ssl=1" src="../Images/eedb7d13fbcb80cceff424ea8956e633.png" alt="STL decomposition" class="wp-image-42436 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?resize=845%2C558&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?resize=845%2C558&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42436" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/stl-decomposition" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?fit=845%2C558&amp;ssl=1" data-orig-size="845,558" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="STL-decomposition" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?fit=300%2C198&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?fit=845%2C558&amp;ssl=1" src="../Images/eedb7d13fbcb80cceff424ea8956e633.png" alt="STL decomposition" class="wp-image-42436" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/STL-decomposition.png?resize=845%2C558&amp;ssl=1"/></noscript><figcaption><em>This is Catfish sales data from 1996–2000 with an anomaly introduced in Dec-1998</em></figcaption></figure></div>
+
+
+
+<p>如果我们分析<strong>残差</strong>的偏差并为其引入一些阈值，我们将得到一个异常检测算法。为了实现这一点，我们只需要来自分解的剩余数据。</p>
+
+
+
+<pre class="hljs">plt.rc(<span class="hljs-string">'figure'</span>,figsize=(<span class="hljs-number">12</span>,<span class="hljs-number">6</span>))
+plt.rc(<span class="hljs-string">'font'</span>,size=<span class="hljs-number">15</span>)
+fig, ax = plt.subplots()
+x = result.resid.index
+y = result.resid.values
+ax.plot_date(x, y, color=<span class="hljs-string">'black'</span>,linestyle=<span class="hljs-string">'--'</span>)
+ax.annotate(<span class="hljs-string">'Anomaly'</span>, (mdates.date2num(x[<span class="hljs-number">35</span>]), y[<span class="hljs-number">35</span>]), xytext=(<span class="hljs-number">30</span>, <span class="hljs-number">20</span>),
+          textcoords=<span class="hljs-string">'offset points'</span>, color=<span class="hljs-string">'red'</span>,arrowprops=dict(facecolor=<span class="hljs-string">'red'</span>,arrowstyle=<span class="hljs-string">'fancy'</span>))
+fig.autofmt_xdate()
+plt.show()</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="42437" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/residue-from-stl-decomposition" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?fit=724%2C346&amp;ssl=1" data-orig-size="724,346" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Residue-from-STL-decomposition" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?fit=300%2C143&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?fit=724%2C346&amp;ssl=1" src="../Images/9448b99c956331664f2526a1861ee17c.png" alt="Residue from STL decomposition" class="wp-image-42437 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?resize=724%2C346&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?resize=724%2C346&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42437" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/residue-from-stl-decomposition" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?fit=724%2C346&amp;ssl=1" data-orig-size="724,346" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Residue-from-STL-decomposition" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?fit=300%2C143&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?fit=724%2C346&amp;ssl=1" src="../Images/9448b99c956331664f2526a1861ee17c.png" alt="Residue from STL decomposition" class="wp-image-42437" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Residue-from-STL-decomposition.png?resize=724%2C346&amp;ssl=1"/></noscript><figcaption><em>Residue from the above STL decomposition</em></figcaption></figure></div>
+
+
+
+<p><strong> <em>利弊</em> </strong></p>
+
+
+
+<p>它简单，健壮，可以处理很多不同的情况，所有的异常仍然可以被直观的解释。</p>
+
+
+
+<p><strong> <em>缺点</em> </strong></p>
+
+
+
+<p>这种技术最大的缺点是僵硬的调整选项。除了阈值和可能的置信区间之外，你对此无能为力。例如，您正在跟踪网站上的用户，该网站对公众关闭，然后突然开放。在这种情况下，您应该分别跟踪启动期前后发生的异常情况。</p>
+
+
+
+<h3>分类和回归树</h3>
+
+
+
+<p>我们可以利用决策树的能力和健壮性来识别时间序列数据中的异常值/异常。</p>
+
+
+<div class="custom-point-list">
+<ul><li>首先，您可以使用监督学习来教会树对异常和非异常数据点进行分类。为了做到这一点，我们需要标记异常数据点，这在玩具数据集之外是不常见的。</li><li>无人监管才是你需要的！我们可以使用隔离森林算法来预测某个点是否是离群点，而不需要任何标记数据集的帮助。让我们看看怎么做。</li></ul>
+</div>
+
+
+<p>与其他流行的离群点检测方法不同，隔离林的主要思想是显式识别异常，而不是分析正常数据点。像任何树集合方法一样，隔离森林是基于决策树的。</p>
+
+
+
+<p>换句话说，<a href="https://web.archive.org/web/20220928190227/https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html" target="_blank" rel="noreferrer noopener nofollow">隔离林</a>纯粹基于异常是很少且不同的数据点这一事实来检测异常。异常隔离是在不采用任何距离或密度测量的情况下实现的。</p>
+
+
+<div class="custom-point-list">
+<ul><li>当应用一个<a href="https://web.archive.org/web/20220928190227/https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html" target="_blank" rel="noreferrer noopener nofollow"> IsolationForest </a>模型时，我们设置污染=离群值_分数，也就是告诉模型数据中离群值的比例。这是一个试错指标。</li><li>拟合和预测(数据)对数据执行异常值检测，返回1表示正常，-1表示异常。</li><li>最后，我们用时间序列视图可视化异常。</li></ul>
+</div>
+
+
+<p>让我们一步一步来。首先，可视化时间序列数据:</p>
+
+
+
+<pre class="hljs">plt.rc(<span class="hljs-string">'figure'</span>,figsize=(<span class="hljs-number">12</span>,<span class="hljs-number">6</span>))
+plt.rc(<span class="hljs-string">'font'</span>,size=<span class="hljs-number">15</span>)
+catfish_sales.plot()</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="42438" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/time-series-anomalies" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?fit=724%2C374&amp;ssl=1" data-orig-size="724,374" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Time-series-anomalies" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?fit=300%2C155&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?fit=724%2C374&amp;ssl=1" src="../Images/e0faf42a3adbcdb5670ff0baa6da41cc.png" alt="Time series anomalies" class="wp-image-42438 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?resize=724%2C374&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?resize=724%2C374&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42438" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/time-series-anomalies" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?fit=724%2C374&amp;ssl=1" data-orig-size="724,374" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Time-series-anomalies" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?fit=300%2C155&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?fit=724%2C374&amp;ssl=1" src="../Images/e0faf42a3adbcdb5670ff0baa6da41cc.png" alt="Time series anomalies" class="wp-image-42438" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Time-series-anomalies.png?resize=724%2C374&amp;ssl=1"/></noscript><figcaption><em>The same Catfish Sales data but with different (multiple) anomalies introduced</em></figcaption></figure></div>
+
+
+
+<p>接下来，我们需要设置一些参数，如离群分数，并训练我们的IsolationForest模型。我们可以利用超级有用的scikit-learn来实现隔离森林算法。你可以在这里找到包含代码和其他东西<a href="https://web.archive.org/web/20220928190227/https://ui.neptune.ai/theaayushbajaj/Anomaly-Detection/n/Anomaly-Detection-49ba1752-fc3a-4abb-b35f-0e2ea4fd4afa">的完整笔记本。</a></p>
+
+
+
+<div id="blog-cta-intext-block_61b3601faab10" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">稍后阅读</h3>
+  <div class="blog-cta-intext__content"><p>如何使用<a href="https://web.archive.org/web/20220928190227/https://docs.neptune.ai/integrations-and-supported-tools/model-training/sklearn" target="_blank" rel="noreferrer noopener"> Neptune-sklearn集成</a>跟踪您的分类器、回归器和k均值聚类结果</p>
+</div>
+  </div>
+
+
+<pre class="hljs">outliers_fraction = float(<span class="hljs-number">.01</span>)
+scaler = StandardScaler()
+np_scaled = scaler.fit_transform(catfish_sales.values.reshape(<span class="hljs-number">-1</span>, <span class="hljs-number">1</span>))
+data = pd.DataFrame(np_scaled)
+
+model =  IsolationForest(contamination=outliers_fraction)
+model.fit(data)</pre>
+
+
+
+<p>最后，我们需要想象预测是怎样的。</p>
+
+
+
+<pre class="hljs">catfish_sales[<span class="hljs-string">'anomaly'</span>] = model.predict(data)
+
+fig, ax = plt.subplots(figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>))
+a = catfish_sales.loc[catfish_sales[<span class="hljs-string">'anomaly'</span>] == <span class="hljs-number">-1</span>, [<span class="hljs-string">'Total'</span>]] 
+ax.plot(catfish_sales.index, catfish_sales[<span class="hljs-string">'Total'</span>], color=<span class="hljs-string">'black'</span>, label = <span class="hljs-string">'Normal'</span>)
+ax.scatter(a.index,a[<span class="hljs-string">'Total'</span>], color=<span class="hljs-string">'red'</span>, label = <span class="hljs-string">'Anomaly'</span>)
+plt.legend()
+plt.show();</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="42439" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/anomaly-detection-isolation-forest" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?fit=612%2C360&amp;ssl=1" data-orig-size="612,360" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Anomaly-Detection-Isolation-Forest" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?fit=300%2C176&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?fit=612%2C360&amp;ssl=1" src="../Images/518582578754fe93787b03a1298ecc8f.png" alt="Anomaly Detection Isolation Forest" class="wp-image-42439 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?resize=612%2C360&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?resize=612%2C360&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42439" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/anomaly-detection-isolation-forest" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?fit=612%2C360&amp;ssl=1" data-orig-size="612,360" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Anomaly-Detection-Isolation-Forest" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?fit=300%2C176&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?fit=612%2C360&amp;ssl=1" src="../Images/518582578754fe93787b03a1298ecc8f.png" alt="Anomaly Detection Isolation Forest" class="wp-image-42439" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-Detection-Isolation-Forest.png?resize=612%2C360&amp;ssl=1"/></noscript><figcaption><em>Anomaly Detection using Isolation Forest algo</em>rithm</figcaption></figure></div>
+
+
+
+<p>如您所见，该算法在识别我们植入的异常方面做得非常好，但它也在开始时将一些点标记为“异常值”。这是由于两个原因:</p>
+
+
+<div class="custom-point-list">
+<ul><li>一开始，该算法很天真，无法理解什么是异常。它得到的数据越多，它能看到的差异就越多，它会自我调整。</li><li>如果你看到许多真阴性，这意味着你的<strong>污染</strong>参数太高。相反，如果你没有看到红点在它们应该在的地方，那么<strong>污染</strong>参数设置得太低。</li></ul>
+</div>
+
+
+<p><strong> <em>利弊</em> </strong></p>
+
+
+
+<p>这种技术的最大优点是，您可以引入任意多的随机变量或特性来创建更复杂的模型。</p>
+
+
+
+<p><strong> <em>缺点</em> </strong></p>
+
+
+
+<p>缺点是越来越多的特性会很快影响你的计算性能。在这种情况下，您应该仔细选择功能。</p>
+
+
+
+<h3>使用预测的检测</h3>
+
+
+
+<p>使用预测的异常检测基于这样一种方法，即过去的几个点通过添加一些随机变量(通常是白噪声)来生成下一个点的预测。</p>
+
+
+
+<p>可以想象，未来预测的积分会产生新的积分等等。它对预测范围的明显影响——信号变得更加平滑。</p>
+
+
+
+<p>使用这种方法的难点在于，您应该选择差异数、自回归数和预测误差系数。</p>
+
+
+
+<p>每处理一个新信号，你都应该建立一个新的预测模型。</p>
+
+
+
+<p>另一个障碍是差分后你的信号应该是平稳的。简单地说，这意味着你的信号不应该依赖于时间，这是一个重要的限制。</p>
+
+
+
+<p>我们可以利用不同的预测方法，如移动平均线，自回归方法，ARIMA及其不同的变种。用ARIMA检测异常的程序是:</p>
+
+
+<div class="custom-point-list">
+<ul><li>根据过去的数据预测新点，并找出与训练数据中的差值。</li><li>选择一个阈值并基于该差异阈值识别异常。就是这样！</li></ul>
+</div>
+
+
+<p>为了测试这项技术，我们将使用时间序列中一个流行的模块，名为<strong> <em> fbprophet </em> </strong> <em>。</em>该模块专门针对平稳性和季节性，可以使用一些超参数进行调整。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="42440" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/multiple-anomailies" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?fit=724%2C374&amp;ssl=1" data-orig-size="724,374" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Multiple-anomailies" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?fit=300%2C155&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?fit=724%2C374&amp;ssl=1" src="../Images/c661f7d6f697eb92308fd922d0a69769.png" alt="Multiple anomailies" class="wp-image-42440 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?resize=724%2C374&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?resize=724%2C374&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42440" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/multiple-anomailies" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?fit=724%2C374&amp;ssl=1" data-orig-size="724,374" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Multiple-anomailies" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?fit=300%2C155&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?fit=724%2C374&amp;ssl=1" src="../Images/c661f7d6f697eb92308fd922d0a69769.png" alt="Multiple anomailies" class="wp-image-42440" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Multiple-anomailies.png?resize=724%2C374&amp;ssl=1"/></noscript><figcaption><em>The same Catfish Sales data but with different (multiple) anomalies introduced</em></figcaption></figure></div>
+
+
+
+<p>我们将利用与上述相同的异常数据。首先，让我们导入它并为环境做好准备:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> fbprophet <span class="hljs-keyword">import</span> Prophet</pre>
+
+
+
+<p>现在让我们定义预测函数。这里需要注意的一点是<em> fbprophet </em>将添加一些额外的指标作为特性，以便更好地识别异常。例如，预测的时间序列变量(通过模型)、目标时间序列变量的上限和下限以及趋势度量。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fit_predict_model</span><span class="hljs-params">(dataframe, interval_width = <span class="hljs-number">0.99</span>, changepoint_range = <span class="hljs-number">0.8</span>)</span>:</span>
+   m = Prophet(daily_seasonality = <span class="hljs-keyword">False</span>, yearly_seasonality = <span class="hljs-keyword">False</span>, weekly_seasonality = <span class="hljs-keyword">False</span>,
+               seasonality_mode = <span class="hljs-string">'additive'</span>,
+               interval_width = interval_width,
+               changepoint_range = changepoint_range)
+   m = m.fit(dataframe)
+   forecast = m.predict(dataframe)
+   forecast[<span class="hljs-string">'fact'</span>] = dataframe[<span class="hljs-string">'y'</span>].reset_index(drop = <span class="hljs-keyword">True</span>)
+   <span class="hljs-keyword">return</span> forecast
+  
+pred = fit_predict_model(t)</pre>
+
+
+
+<p><strong>我们现在必须将<em>预测</em>变量</strong>推送到另一个函数，该函数将基于时间序列变量中的下限和上限阈值来检测异常。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">detect_anomalies</span><span class="hljs-params">(forecast)</span>:</span>
+   forecasted = forecast[[<span class="hljs-string">'ds'</span>,<span class="hljs-string">'trend'</span>, <span class="hljs-string">'yhat'</span>, <span class="hljs-string">'yhat_lower'</span>, <span class="hljs-string">'yhat_upper'</span>, <span class="hljs-string">'fact'</span>]].copy()
+forecasted[<span class="hljs-string">'anomaly'</span>] = <span class="hljs-number">0</span>
+   forecasted.loc[forecasted[<span class="hljs-string">'fact'</span>] &gt; forecasted[<span class="hljs-string">'yhat_upper'</span>], <span class="hljs-string">'anomaly'</span>] = <span class="hljs-number">1</span>
+   forecasted.loc[forecasted[<span class="hljs-string">'fact'</span>] &lt; forecasted[<span class="hljs-string">'yhat_lower'</span>], <span class="hljs-string">'anomaly'</span>] = <span class="hljs-number">-1</span>
+
+   forecasted[<span class="hljs-string">'importance'</span>] = <span class="hljs-number">0</span>
+   forecasted.loc[forecasted[<span class="hljs-string">'anomaly'</span>] ==<span class="hljs-number">1</span>, <span class="hljs-string">'importance'</span>] = \
+       (forecasted[<span class="hljs-string">'fact'</span>] - forecasted[<span class="hljs-string">'yhat_upper'</span>])/forecast[<span class="hljs-string">'fact'</span>]
+   forecasted.loc[forecasted[<span class="hljs-string">'anomaly'</span>] ==<span class="hljs-number">-1</span>, <span class="hljs-string">'importance'</span>] = \
+       (forecasted[<span class="hljs-string">'yhat_lower'</span>] - forecasted[<span class="hljs-string">'fact'</span>])/forecast[<span class="hljs-string">'fact'</span>]
+  
+   <span class="hljs-keyword">return</span> forecasted
+pred = detect_anomalies(pred)</pre>
+
+
+
+<p>最后，我们只需要绘制上述预测并可视化异常。</p>
+
+
+
+
+
+
+
+<p><strong> <em>利弊</em> </strong></p>
+
+
+
+<p>该算法很好地处理了不同的季节性参数，如每月或每年，并且它对所有时间序列指标都有本地支持。</p>
+
+
+
+<p>如果仔细观察，与隔离林算法相比，该算法可以很好地处理边缘情况。</p>
+
+
+
+<p><strong> <em>缺点</em> </strong></p>
+
+
+
+<p>由于这种技术是基于预测的，它将在有限的数据场景中挣扎。在有限的数据中预测的质量会降低，异常检测的准确性也会降低。</p>
+
+
+
+<h3>基于聚类的异常检测</h3>
+
+
+
+<p>到目前为止，我们已经将IsolationForest算法视为我们的无监督异常检测方法。现在，我们将研究另一种无人监管的技术:聚类！</p>
+
+
+
+<p>这种方法非常简单。落在定义的聚类之外的数据实例可能会被标记为异常。我们将使用k-means聚类，因为为什么不呢！</p>
+
+
+
+<p>为了直观起见，我们将使用一个不同的数据集，该数据集对应于具有一个或多个基于时间的变量的多变量时间序列。数据集将是在这里找到的数据集的子集(列/特征是相同的)。</p>
+
+
+
+<p><em>数据集描述:数据包含购物和购买信息以及价格竞争力信息。</em></p>
+
+
+
+<p>现在为了处理k-means，首先我们需要知道我们将要处理的聚类的数量。<em>肘法</em>在这方面非常有效。</p>
+
+
+
+<p><em>Elbow方法是聚类数与解释的方差/目标/得分的关系图</em></p>
+
+
+
+<p>为了实现这一点，我们将使用scikit-learn的K-means实现。</p>
+
+
+
+<pre class="hljs">data = df[[<span class="hljs-string">'price_usd'</span>, <span class="hljs-string">'srch_booking_window'</span>, <span class="hljs-string">'srch_saturday_night_bool'</span>]]
+n_cluster = range(<span class="hljs-number">1</span>, <span class="hljs-number">20</span>)
+kmeans = [KMeans(n_clusters=i).fit(data) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> n_cluster]
+scores = [kmeans[i].score(data) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(len(kmeans))]
+fig, ax = plt.subplots(figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>))
+ax.plot(n_cluster, scores)
+plt.xlabel(<span class="hljs-string">'Number of Clusters'</span>)
+plt.ylabel(<span class="hljs-string">'Score'</span>)
+plt.title(<span class="hljs-string">'Elbow Curve'</span>)
+plt.show();</pre>
+
+
+
+
+
+
+
+<p>从上面的肘形曲线中，我们看到该图在10个聚类之后变得平稳，这意味着更多聚类的增加并不能解释我们的相关变量中更多的变化；在这种情况下，价格为美元。</p>
+
+
+
+<p>我们设置n_clusters=10，在生成k-means输出时，使用该数据来绘制3D聚类。</p>
+
+
+
+
+
+
+
+<p><strong>现在我们需要找出</strong>要保留的组件(特性)的数量。</p>
+
+
+
+<pre class="hljs">data = df[[<span class="hljs-string">'price_usd'</span>, <span class="hljs-string">'srch_booking_window'</span>, <span class="hljs-string">'srch_saturday_night_bool'</span>]]
+X = data.values
+X_std = StandardScaler().fit_transform(X)
+
+mean_vec = np.mean(X_std, axis=<span class="hljs-number">0</span>)
+cov_mat = np.cov(X_std.T)
+eig_vals, eig_vecs = np.linalg.eig(cov_mat)
+
+eig_pairs = [ (np.abs(eig_vals[i]),eig_vecs[:,i]) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(len(eig_vals))]
+eig_pairs.sort(key = <span class="hljs-keyword">lambda</span> x: x[<span class="hljs-number">0</span>], reverse= <span class="hljs-keyword">True</span>)
+
+tot = sum(eig_vals)
+var_exp = [(i/tot)*<span class="hljs-number">100</span> <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> sorted(eig_vals, reverse=<span class="hljs-keyword">True</span>)] 
+cum_var_exp = np.cumsum(var_exp) 
+plt.figure(figsize=(<span class="hljs-number">10</span>, <span class="hljs-number">5</span>))
+plt.bar(range(len(var_exp)), var_exp, alpha=<span class="hljs-number">0.3</span>, align=<span class="hljs-string">'center'</span>, label=<span class="hljs-string">'individual explained variance'</span>, color = <span class="hljs-string">'y'</span>)
+plt.step(range(len(cum_var_exp)), cum_var_exp, where=<span class="hljs-string">'mid'</span>,label=<span class="hljs-string">'cumulative explained variance'</span>)
+plt.ylabel(<span class="hljs-string">'Explained variance ratio'</span>)
+plt.xlabel(<span class="hljs-string">'Principal components'</span>)
+plt.legend(loc=<span class="hljs-string">'best'</span>)
+plt.show();</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="42444" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/anomaly-detection-components" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?fit=614%2C319&amp;ssl=1" data-orig-size="614,319" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Anomaly-detection-components" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?fit=300%2C156&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?fit=614%2C319&amp;ssl=1" src="../Images/6c3a1e14bfb129399c2de24c61da6e74.png" alt="Anomaly detection components" class="wp-image-42444 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?resize=614%2C319&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?resize=614%2C319&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42444" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/anomaly-detection-components" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?fit=614%2C319&amp;ssl=1" data-orig-size="614,319" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Anomaly-detection-components" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?fit=300%2C156&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?fit=614%2C319&amp;ssl=1" src="../Images/6c3a1e14bfb129399c2de24c61da6e74.png" alt="Anomaly detection components" class="wp-image-42444" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-components.png?resize=614%2C319&amp;ssl=1"/></noscript></figure></div>
+
+
+
+<p>我们看到第一个因素解释了将近50%的差异。第二个成分解释了30%以上。但是，请注意，几乎没有一个组件是真正可以忽略的。前两个组件包含80%以上的信息。因此，我们将设置n_components=2。</p>
+
+
+
+<p>基于聚类的异常检测的基本假设是，如果我们对数据进行聚类，正常数据将属于聚类，而异常将不属于任何聚类，或者属于小聚类。</p>
+
+
+
+<p><strong>我们使用以下步骤来发现并可视化异常:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>计算每个点与其最近质心之间的距离。最大的距离被认为是异常。</li><li>类似于IsolationForest算法，我们使用outliers_fraction向算法提供关于数据集中出现的离群值的比例的信息。这在很大程度上是一个超参数，需要点击/尝试或网格搜索来设置正确-作为一个开始数字，让我们估计，离群值分数=0.1</li><li>使用离群值分数计算离群值的数量。</li><li>将阈值设置为这些异常值的最小距离。</li><li>anomaly1的异常结果包含上述方法簇(0:正常，1:异常)。</li><li>使用集群视图可视化异常。</li><li>用时序视图可视化异常。</li></ul>
+</div>
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getDistanceByPoint</span><span class="hljs-params">(data, model)</span>:</span>
+   distance = pd.Series()
+   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">0</span>,len(data)):
+       Xa = np.array(data.loc[i])
+       Xb = model.cluster_centers_[model.labels_[i]<span class="hljs-number">-1</span>]
+       distance.at[i]=np.linalg.norm(Xa-Xb)
+   <span class="hljs-keyword">return</span> distance
+outliers_fraction = <span class="hljs-number">0.1</span>
+
+distance = getDistanceByPoint(data, kmeans[<span class="hljs-number">9</span>])
+number_of_outliers = int(outliers_fraction*len(distance))
+threshold = distance.nlargest(number_of_outliers).min()
+
+df[<span class="hljs-string">'anomaly1'</span>] = (distance &gt;= threshold).astype(int)
+fig, ax = plt.subplots(figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>))
+colors = {<span class="hljs-number">0</span>:<span class="hljs-string">'blue'</span>, <span class="hljs-number">1</span>:<span class="hljs-string">'red'</span>}
+ax.scatter(df[<span class="hljs-string">'principal_feature1'</span>], df[<span class="hljs-string">'principal_feature2'</span>], c=df[<span class="hljs-string">"anomaly1"</span>].apply(<span class="hljs-keyword">lambda</span> x: colors[x]))
+plt.xlabel(<span class="hljs-string">'principal feature1'</span>)
+plt.ylabel(<span class="hljs-string">'principal feature2'</span>)
+plt.show();</pre>
+
+
+
+
+
+
+
+<p><strong>现在，为了查看现实世界特征的异常</strong>，我们处理上一步创建的数据帧。</p>
+
+
+
+<pre class="hljs">df = df.sort_values(<span class="hljs-string">'date_time'</span>)
+fig, ax = plt.subplots(figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>))
+a = df.loc[df[<span class="hljs-string">'anomaly1'</span>] == <span class="hljs-number">1</span>, [<span class="hljs-string">'date_time'</span>, <span class="hljs-string">'price_usd'</span>]] 
+ax.plot(pd.to_datetime(df[<span class="hljs-string">'date_time'</span>]), df[<span class="hljs-string">'price_usd'</span>], color=<span class="hljs-string">'k'</span>,label=<span class="hljs-string">'Normal'</span>)
+ax.scatter(pd.to_datetime(a[<span class="hljs-string">'date_time'</span>]),a[<span class="hljs-string">'price_usd'</span>], color=<span class="hljs-string">'red'</span>, label=<span class="hljs-string">'Anomaly'</span>)
+ax.xaxis_date()
+plt.xlabel(<span class="hljs-string">'Date Time'</span>)
+plt.ylabel(<span class="hljs-string">'price in USD'</span>)
+plt.legend()
+fig.autofmt_xdate()
+plt.show()</pre>
+
+
+
+
+
+
+
+<p>这种方法能够很好地封装峰，当然也有一些遗漏。这个问题的一部分可能是outlier_fraction没有处理很多值。</p>
+
+
+
+<p><strong> <em>利弊</em> </strong></p>
+
+
+
+<p>这种技术的最大优势类似于其他无监督技术，即您可以引入任意多的随机变量或特征来制作更复杂的模型。</p>
+
+
+
+<p><strong> <em>缺点</em> </strong></p>
+
+
+
+<p>缺点是越来越多的特性会很快影响你的计算性能。除此之外，还有更多的超参数需要调整和获得正确的结果，因此在性能方面总是有很大的模型差异。</p>
+
+
+
+<h3>自动编码器</h3>
+
+
+
+<p>没有深度学习就谈不上数据技术！因此，让我们讨论使用<strong>自动编码器的异常检测。</strong></p>
+
+
+
+<p>自动编码器是一种无监督的技术，它在通过不同的维度提取其特征的同时重新创建输入数据。因此，换句话说，如果我们使用来自自动编码器的数据的潜在表示，它对应于<em>维度缩减</em>。</p>
+
+
+
+
+
+
+
+<h4>为什么我们要应用降维来发现异常值？</h4>
+
+
+
+<p>如果我们降低维度，会不会丢失一些信息，包括离群值？答案是，一旦确定了主要模式，离群值就显现出来了。许多基于距离的技术(例如KNNs)在计算整个特征空间中每个数据点的距离时会遭遇维数灾难。必须减少高维度。</p>
+
+
+
+<p>有趣的是，在降维的过程中，离群值被识别出来。我们可以说离群点检测是降维的副产品。</p>
+
+
+
+<p>自动编码器是一种无监督的发现异常的方法。</p>
+
+
+
+<h4>为什么选择自动编码器？</h4>
+
+
+
+<p>有许多有用的工具，如主成分分析(PCA)，用于检测异常值。为什么我们需要自动编码器？原因是PCA用线性代数来变换。相反，自动编码器技术可以利用其非线性激活功能和多层来执行非线性变换。用自动编码器训练几个层比用PCA训练一个巨大的变换更有效。因此，当数据问题本质上是复杂的和非线性的时，自动编码器技术显示了它们的优点。</p>
+
+
+
+<h4>建立模型</h4>
+
+
+
+<p>我们可以使用Tensorflow或Pytorch等流行的框架来实现自动编码器，但为了简单起见，我们将使用一个名为PyOD的python模块，它使用用户的少量输入在内部构建自动编码器。</p>
+
+
+
+
+
+
+<p>对于数据部分，让我们使用PyOD的实用函数generate_data()来生成25个变量、500个观察值和10%的异常值。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">from</span> pyod.models.auto_encoder <span class="hljs-keyword">import</span> AutoEncoder
+<span class="hljs-keyword">from</span> pyod.utils.data <span class="hljs-keyword">import</span> generate_data
+contamination = <span class="hljs-number">0.1</span>  
+n_train = <span class="hljs-number">500</span>  
+n_test = <span class="hljs-number">500</span>  
+n_features = <span class="hljs-number">25</span> 
+X_train, y_train, X_test, y_test = generate_data(
+   n_train=n_train, n_test=n_test,
+   n_features= n_features,
+   contamination=contamination,random_state=<span class="hljs-number">1234</span>)
+X_train = pd.DataFrame(X_train)
+X_test = pd.DataFrame(X_test)</pre>
+
+
+
+<p>当您进行无监督学习时，标准化预测值总是一个安全的步骤，如下所示:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn.preprocessing <span class="hljs-keyword">import</span> StandardScaler
+X_train = StandardScaler().fit_transform(X_train)
+X_train = pd.DataFrame(X_train)
+X_test = StandardScaler().fit_transform(X_test)
+X_test = pd.DataFrame(X_test)</pre>
+
+
+
+<p>为了更好地理解数据的样子，让我们使用主成分分析法将数据降维，并相应地绘图。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn.decomposition <span class="hljs-keyword">import</span> PCA
+pca = PCA(<span class="hljs-number">2</span>)
+x_pca = pca.fit_transform(X_train)
+x_pca = pd.DataFrame(x_pca)
+x_pca.columns=[<span class="hljs-string">'PC1'</span>,<span class="hljs-string">'PC2'</span>]
+cdict = {<span class="hljs-number">0</span>: <span class="hljs-string">'red'</span>, <span class="hljs-number">1</span>: <span class="hljs-string">'blue'</span>}
+
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+plt.scatter(X_train[<span class="hljs-number">0</span>], X_train[<span class="hljs-number">1</span>], c=y_train, alpha=<span class="hljs-number">1</span>)
+plt.title(<span class="hljs-string">'Scatter plot'</span>)
+plt.xlabel(<span class="hljs-string">'x'</span>)
+plt.ylabel(<span class="hljs-string">'y'</span>)
+plt.show()</pre>
+
+
+
+
+
+
+
+<p>聚集在一起的黑点是典型的观察值，而黄点是异常值。</p>
+
+
+
+<h4>模型设定</h4>
+
+
+<div class="custom-point-list">
+<ul><li>[25, 2, 2, 25].输入层和输出层各有25个神经元。有两个隐藏层，每个都有两个神经元。</li></ul>
+</div>
+
+
+<p><strong>步骤1——构建您的模型</strong></p>
+
+
+
+<pre class="hljs">clf = AutoEncoder(hidden_neurons =[<span class="hljs-number">25</span>, <span class="hljs-number">2</span>, <span class="hljs-number">2</span>, <span class="hljs-number">25</span>])
+clf.fit(X_train)</pre>
+
+
+
+<p><strong>步骤2——确定切割点</strong></p>
+
+
+
+<p>让我们应用训练好的模型<em> Clf </em>来预测测试数据中每个观察值的异常分数。我们如何定义离群值？异常值是指远离其他点的点，因此异常值分数由距离定义。PyOD函数。decision_function()计算每个数据点的距离或异常值。</p>
+
+
+
+<pre class="hljs">
+y_train_scores = clf.decision_scores_
+
+y_test_scores = clf.decision_function(X_test)  
+y_test_scores = pd.Series(y_test_scores)
+
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+plt.hist(y_test_scores, bins=<span class="hljs-string">'auto'</span>) 
+plt.title(<span class="hljs-string">"Histogram for Model Clf1 Anomaly Scores"</span>)
+plt.show()</pre>
+
+
+
+<p>如果我们使用直方图通过异常分数来计算频率，我们会看到高分数对应于低频率——异常值的证据。我们选择4.0作为分界点，那些&gt; =4.0的为异常值。</p>
+
+
+
+
+
+
+
+<p><strong>步骤3 —按集群获取汇总统计数据</strong></p>
+
+
+
+<p>让我们将那些异常分数低于4.0的观察值分配到聚类0，将那些高于4.0的观察值分配到聚类1。同样，让我们使用。groupby()。该模型已经识别了50个异常值(未示出)。</p>
+
+
+
+<pre class="hljs">df_test = X_test.copy()
+df_test[<span class="hljs-string">'score'</span>] = y_test_scores
+df_test[<span class="hljs-string">'cluster'</span>] = np.where(df_test[<span class="hljs-string">'score'</span>]&lt;<span class="hljs-number">4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)
+df_test[<span class="hljs-string">'cluster'</span>].value_counts()
+df_test.groupby(<span class="hljs-string">'cluster'</span>).mean()</pre>
+
+
+
+<p>以下输出显示了每个聚类中的平均变量值。分类“1”(异常分类)的值与分类“0”(正常分类)的值大不相同。“得分”值显示了这些观察到的其他人的平均距离。高“分”意味着观察远离常态。</p>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="42450" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/anomaly-detection-cluster" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?fit=238%2C838&amp;ssl=1" data-orig-size="238,838" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Anomaly-detection-cluster" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?fit=85%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?fit=238%2C838&amp;ssl=1" src="../Images/1775737de6bdfbb797a8a0b9c5ce007b.png" alt="Anomaly detection cluster" class="wp-image-42450 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?resize=238%2C838&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?resize=238%2C838&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="42450" data-permalink="https://web.archive.org/web/20220928190227/https://neptune.ai/blog/anomaly-detection-in-time-series/attachment/anomaly-detection-cluster" data-orig-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?fit=238%2C838&amp;ssl=1" data-orig-size="238,838" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Anomaly-detection-cluster" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?fit=85%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928190227/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?fit=238%2C838&amp;ssl=1" src="../Images/1775737de6bdfbb797a8a0b9c5ce007b.png" alt="Anomaly detection cluster" class="wp-image-42450" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928190227im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Anomaly-detection-cluster.png?resize=238%2C838&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>这样，我们可以很好地区分和标记典型基准面和异常。</p>
+
+
+
+<p><strong> <em>利弊</em> </strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>自动编码器可以轻松处理高维数据。</li><li>由于其非线性行为，它可以在高维数据集中发现复杂的模式。</li></ul>
+</div>
+
+
+<p><strong> <em>缺点</em> </strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>由于这是一种基于深度学习的策略，如果数据较少，它将特别困难。</li><li>如果网络深度增加，在处理大数据时，计算成本将会飙升。</li></ul>
+</div>
+
+
+<p>到目前为止，我们已经看到了如何检测和识别异常。但是真正的问题出现在找到他们之后。现在怎么办？我们该怎么办？</p>
+
+
+
+<p>让我们讨论一些您可以在您的场景中应用的要点。</p>
+
+
+
+<h2>如何处理异常情况？</h2>
+
+
+
+<p>检测之后，一个大问题是如何处理我们识别出的东西。有许多方法来处理新发现的信息。我将根据我的经验列出其中的一些来帮助你解决这个问题。</p>
+
+
+
+<h3>理解业务案例</h3>
+
+
+
+<p>异常几乎总是为你的问题提供新的信息和视角。股票价格突然上涨？这肯定是有原因的，就像我们在Gamestop看到的那样，疫情可能是另一个原因。因此，了解峰值背后的原因可以帮助你以有效的方式解决问题。</p>
+
+
+
+<p>理解业务用例还可以帮助您更好地识别问题。例如，您可能正在进行某种欺诈检测，这意味着您的主要目标确实是了解数据中的异常值。</p>
+
+
+
+<p>如果这些都不是你所关心的，你可以移除或平滑离群值。</p>
+
+
+
+<h3>调整异常值的统计方法</h3>
+
+
+
+<p>统计方法允许您调整异常值以匹配原始分布。让我们来看一个使用均值平滑异常的方法。</p>
+
+
+
+<h4>使用均值平滑异常值</h4>
+
+
+
+<p>这个想法是通过使用前一个日期时间的数据来平滑异常。例如，为了平衡由于您家中发生的事件而导致的突然用电量，您可以取前几年同一个月的平均用电量。</p>
+
+
+
+<p>让我们实现同样的方法来获得一个清晰的图像。我们将使用与之前相同的鲶鱼销售数据。我们可以使用下面的脚本来调整<strong>平均值</strong>。</p>
+
+
+
+<pre class="hljs">adjusted_data = lim_catfish_sales.copy()
+adjusted_data.loc[curr_anomaly] = december_data[(december_data.index != curr_anomaly) &amp; (december_data.index &lt; test_data.index[<span class="hljs-number">0</span>])].mean()</pre>
+
+
+
+<p><strong>绘制调整后的数据</strong>和旧数据将如下所示:</p>
+
+
+
+<pre class="hljs">plt.figure(figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">4</span>))
+plt.plot(lim_catfish_sales, color=<span class="hljs-string">'firebrick'</span>, alpha=<span class="hljs-number">0.4</span>)
+plt.plot(adjusted_data)
+plt.title(<span class="hljs-string">'Catfish Sales in 1000s of Pounds'</span>, fontsize=<span class="hljs-number">20</span>)
+plt.ylabel(<span class="hljs-string">'Sales'</span>, fontsize=<span class="hljs-number">16</span>)
+<span class="hljs-keyword">for</span> year <span class="hljs-keyword">in</span> range(start_date.year,end_date.year):
+   plt.axvline(pd.to_datetime(str(year)+<span class="hljs-string">'-01-01'</span>), color=<span class="hljs-string">'k'</span>, linestyle=<span class="hljs-string">'--'</span>, alpha=<span class="hljs-number">0.2</span>)
+plt.axvline(curr_anomaly, color=<span class="hljs-string">'k'</span>, alpha=<span class="hljs-number">0.7</span>)</pre>
+
+
+
+
+
+
+
+<p>这样，您可以继续应用预测或分析，而不必太担心结果的偏斜。</p>
+
+
+
+<p>有许多方法可以处理非时间序列数据，但不幸的是，由于底层结构的差异，这些方法不能直接用于时间序列。非时间序列处理方法涉及许多基于分布的方法，这些方法不能简单地转化为时间序列数据。如果你想看其中的一些，你可以点击这里的。</p>
+
+
+
+<h3>去除异常值</h3>
+
+
+
+<p>如果以上两个选项都没有在您的解决方案中引发任何争论，那么最后一个选项是消除异常。不建议这样做(因为您基本上是在去除一些潜在的有价值的信息)，除非这是绝对必要的，并且不会损害未来的分析。</p>
+
+
+
+<p>您可以使用。熊猫识别后掉落()特征。它会为你做繁重的工作。</p>
+
+
+
+<h2>你已经到达终点了！</h2>
+
+
+
+<p>恭喜你！现在，您已经了解了异常情况、如何检测异常情况以及如何应对异常情况。少数尾注:</p>
+
+
+<div class="custom-point-list">
+<ul><li>时间序列数据因商业案例的不同而有很大差异，因此最好进行试验并找出可行的方法，而不是仅仅应用您的发现。经验可以创造奇迹！</li><li>除了我们在这个博客上讨论的以外，还有大量的异常检测技术。我鼓励你多阅读研究论文。</li></ul>
+</div>
+
+
+<p>你可以在这里找到完整的笔记本代码和一些额外的东西！</p>
+
+
+
+<p>目前就这些，敬请关注更多！再见！</p>
+
+
+
+<p><em>注:除非另有说明，图片均由作者创作。</em></p>
+
+
+
+
+<div id="author-box-new-format-block_6040bf3b201c4" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">Aayush Bajaj</h3>
+    
+          <p class="article__authorContent-text"><strong>NatWest Group的数据科学家</strong> <br/>一位热爱解决工程或科学数据问题的数据主管。在这里，你会发现很多概念博客以最具说明性的方式和框架相关教程进行了解释。如果你想知道机器将如何接管世界，请继续关注:)！</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>ML实验跟踪:它是什么，为什么重要，以及如何实施</h2>
+
+
+
+<p class="has-small-font-size">10分钟阅读|作者Jakub Czakon |年7月14日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>我来分享一个听了太多次的故事。</p>
+
+
+
+<blockquote class="wp-block-quote has-text-align-left is-style-default"><p><em>“…我们和我的团队正在开发一个ML模型，我们进行了大量的实验，并获得了有希望的结果… </em></p><p><em>…不幸的是，我们无法确切地说出哪种性能最好，因为我们忘记了保存一些模型参数和数据集版本… </em></p><p><em>…几周后，我们甚至不确定我们实际尝试了什么，我们需要重新运行几乎所有的东西"</em></p><p>不幸的ML研究员。</p></blockquote>
+
+
+
+<p>事实是，当你开发ML模型时，你会进行大量的实验。</p>
+
+
+
+<p>这些实验可能:</p>
+
+
+<div class="custom-point-list">
+<ul><li>使用不同的模型和模型超参数</li><li>使用不同的培训或评估数据，</li><li>运行不同的代码(包括您想要快速测试的这个小变化)</li><li>在不同的环境中运行相同的代码(不知道安装的是PyTorch还是Tensorflow版本)</li></ul>
+</div>
+
+
+<p>因此，它们可以产生完全不同的评估指标。</p>
+
+
+
+<p>跟踪所有这些信息会很快变得非常困难。特别是如果你想组织和比较这些实验，并且确信你知道哪个设置产生了最好的结果。</p>
+
+
+
+<p>这就是ML实验跟踪的用武之地。</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20220928190227/https://neptune.ai/blog/ml-experiment-tracking" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

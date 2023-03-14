@@ -1,0 +1,447 @@
+<html>
+<head>
+<title>The Best ML Frameworks &amp; Extensions For TensorFlow </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>TensorFlow的最佳ML框架和扩展</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/extensions-for-tensorflow#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/extensions-for-tensorflow#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>TensorFlow有一个庞大的库和扩展生态系统。如果您是开发人员，您可以轻松地将它们添加到您的ML工作中，而不必构建新的函数。</p>
+
+
+
+<p>在本文中，我们将探索一些可以立即开始使用的TensorFlow扩展。</p>
+
+
+
+<p>首先，让我们从TensorFlow Hub查看特定领域的预训练模型。</p>
+
+
+
+<p>我们开始吧！</p>
+
+
+
+
+
+
+
+<p>TensorFlow Hub是一个存储库，包含数百个经过训练的现成模型。您可以找到以下型号:</p>
+
+
+
+<ul><li>自然语言处理</li><li>目标检测</li><li>图像分类</li><li>风格转移</li><li>视频动作检测</li><li>声音分类</li><li>音高识别</li></ul>
+
+
+
+
+
+
+
+<p>要使用一个模型，首先需要在<a href="https://web.archive.org/web/20221206064514/https://tfhub.dev/" target="_blank" rel="noreferrer noopener nofollow"> tfhub.dev </a>中识别它。你需要检查它的文档。例如，下面是加载这个<a href="https://web.archive.org/web/20221206064514/https://tfhub.dev/google/imagenet/inception_v1/classification/4" target="_blank" rel="noreferrer noopener nofollow"> ImageNet分类模型</a>的说明。</p>
+
+
+
+<pre class="hljs">model = tf.keras.Sequential([
+    hub.KerasLayer(<span class="hljs-string">"https://tfhub.dev/google/imagenet/inception_v1/classification/4"</span>)
+])
+</pre>
+
+
+
+<p>模型可以按原样使用，也可以进行微调。该模型的文档提供了如何做到这一点的说明。</p>
+
+
+
+<p>例如，我们可以通过将' trainable = True '传递给' hub.kerasLayer '来微调上面的模型。</p>
+
+
+
+<pre class="hljs">hub.KerasLayer(<span class="hljs-string">"https://tfhub.dev/google/imagenet/inception_v1/classification/4"</span>,
+               trainable=<span class="hljs-keyword">True</span>, arguments=dict(batch_norm_momentum=<span class="hljs-number">0.997</span>))</pre>
+
+
+
+
+
+
+
+<p>这是一组工具，您可以使用它们来优化模型的执行和部署。</p>
+
+
+
+<p>为什么这很重要？</p>
+
+
+
+<ul><li>它减少了模型在移动设备上的延迟，</li><li>它降低了云的成本，因为模型变得足够小，可以部署边缘设备。</li></ul>
+
+
+
+<p>优化模型可能会导致精确度降低。根据问题的不同，您需要决定一个稍微不太精确的模型是否值得利用模型优化的优势。</p>
+
+
+
+<p>优化可以应用于来自tfhub.dev的预训练模型，以及您自己训练的模型。也可以从tfhub.dev下载优化的模型。</p>
+
+
+
+<p>模型优化的技术之一是修剪。在这种技术中，权重张量中不必要的值被消除。这会产生更小的模型，精度非常接近基线模型。</p>
+
+
+
+<p>修剪模型的第一步是定义修剪参数。</p>
+
+
+
+<p>设置50%的稀疏度意味着50%的权重将被置零。“修剪时间表”负责在训练期间控制<a href="https://web.archive.org/web/20221206064514/https://www.tensorflow.org/model_optimization/api_docs/python/tfmot/sparsity/keras/PruningSchedule" target="_blank" rel="noreferrer noopener nofollow">修剪</a>。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow_model_optimization.sparsity.keras <span class="hljs-keyword">import</span> ConstantSparsity
+pruning_params = {
+    <span class="hljs-string">'pruning_schedule'</span>: ConstantSparsity(<span class="hljs-number">0.5</span>, <span class="hljs-number">0</span>),
+    <span class="hljs-string">'block_size'</span>: (<span class="hljs-number">1</span>, <span class="hljs-number">1</span>),
+    <span class="hljs-string">'block_pooling_type'</span>: <span class="hljs-string">'AVG'</span>
+}
+</pre>
+
+
+
+<p>之后，您可以使用上述参数修剪整个模型。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow_model_optimization.sparsity.keras <span class="hljs-keyword">import</span> prune_low_magnitude
+model_to_prune = prune_low_magnitude(
+    keras.Sequential([
+        tf.keras.layers.Dense(<span class="hljs-number">128</span>, activation=<span class="hljs-string">'relu'</span>, input_shape=(X_train.shape[<span class="hljs-number">1</span>],)),
+        tf.keras.layers.Dense(<span class="hljs-number">1</span>, activation=<span class="hljs-string">'relu'</span>)
+    ]), **pruning_params)</pre>
+
+
+
+<p>一种替代方案是使用量化感知训练，该训练使用较低精度，例如8位而不是32位浮点。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> tensorflow_model_optimization <span class="hljs-keyword">as</span> tfmot
+quantize_model = tfmot.quantization.keras.quantize_model
+q_aware_model = quantize_model(model)
+</pre>
+
+
+
+<p>在这一点上，你将有一个可以感知量化的模型，但是还没有量化。</p>
+
+
+
+<p>编译和定型模型后，可以使用TFLite转换器创建量化模型。</p>
+
+
+
+<pre class="hljs">converter = tf.lite.TFLiteConverter.from_keras_model(q_aware_model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+
+quantized_tflite_model = converter.convert()</pre>
+
+
+
+<p>你也可以量化模型的某些层。</p>
+
+
+
+<p>另一种模型优化策略是<a href="https://web.archive.org/web/20221206064514/https://www.tensorflow.org/model_optimization/guide/clustering/" target="_blank" rel="noreferrer noopener nofollow">权重聚类</a>。在这种技术中，减少了唯一权重值的数量。</p>
+
+
+
+
+
+
+
+<p>TensorFlow推荐器(TFRS)是一个用于构建推荐系统模型的库。</p>
+
+
+
+<p>您可以使用它来准备数据、制定模型、培训、评估和部署。这本<a href="https://web.archive.org/web/20221206064514/https://colab.research.google.com/github/tensorflow/recommenders/blob/main/docs/examples/quickstart.ipynb" target="_blank" rel="noreferrer noopener nofollow">笔记本</a>包含了如何使用TFRS的完整示例。</p>
+
+
+
+
+
+
+
+<p>TensorFlow Federated (TFF)是一个基于分散数据的机器学习开源库。在联合学习中，设备可以从共享模型中协作学习。</p>
+
+
+
+<p>该模型将在服务器上使用代理数据进行训练。然后，每个设备将下载该模型，并使用该设备上的数据对其进行改进。</p>
+
+
+
+<p>这种方法的好处是敏感的用户数据永远不会上传到服务器。一种已经被使用的方法是在<a href="https://web.archive.org/web/20221206064514/https://arxiv.org/abs/1811.03604" target="_blank" rel="noreferrer noopener nofollow">电话键盘</a>中。</p>
+
+
+
+<p>TensorFlow Federated由两层组成:</p>
+
+
+
+<ul><li>联邦学习(FL) API</li><li>联邦核心(FC) API</li></ul>
+
+
+
+<p>使用联邦学习(FL) API，开发人员可以在现有的TensorFlow模型上应用联邦训练和评估。</p>
+
+
+
+<p>联邦核心(FC) API是一个用于编写联邦算法的低级接口系统。</p>
+
+
+
+<p>如果你感兴趣，请查看官方<a href="https://web.archive.org/web/20221206064514/https://www.tensorflow.org/federated/tutorials/federated_learning_for_image_classification" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow联合教程</a>以了解更多信息。</p>
+
+
+
+
+
+
+
+<p>要构建更有效的神经网络架构，您可以插入可区分的图形层。</p>
+
+
+
+<p>对神经网络的几何先验和约束进行建模导致可以更鲁棒和有效地训练的架构。</p>
+
+
+
+<p>计算机图形学和计算机视觉的结合让我们可以在机器学习问题中使用未标记的数据。Tensorflow Graphics提供了一套可区分的图形、几何图层和3D查看器功能。</p>
+
+
+
+<p>这里有一个来自官方文档的代码片段产生的输出的例子。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+<span class="hljs-keyword">import</span> trimesh
+
+<span class="hljs-keyword">import</span> tensorflow_graphics.geometry.transformation <span class="hljs-keyword">as</span> tfg_transformation
+<span class="hljs-keyword">from</span> tensorflow_graphics.notebooks <span class="hljs-keyword">import</span> threejs_visualization
+
+
+!wget https://storage.googleapis.com/tensorflow-graphics/notebooks/index/cow.obj
+
+mesh = trimesh.load(<span class="hljs-string">"cow.obj"</span>)
+mesh = {<span class="hljs-string">"vertices"</span>: mesh.vertices, <span class="hljs-string">"faces"</span>: mesh.faces}
+
+threejs_visualization.triangular_mesh_renderer(mesh, width=<span class="hljs-number">400</span>, height=<span class="hljs-number">400</span>)
+
+axis = np.array((<span class="hljs-number">0.</span>, <span class="hljs-number">1.</span>, <span class="hljs-number">0.</span>))  
+angle = np.array((np.pi / <span class="hljs-number">4.</span>,))  
+
+mesh[<span class="hljs-string">"vertices"</span>] = tfg_transformation.axis_angle.rotate(mesh[<span class="hljs-string">"vertices"</span>], axis,
+                                                        angle).numpy()
+
+threejs_visualization.triangular_mesh_renderer(mesh, width=<span class="hljs-number">400</span>, height=<span class="hljs-number">400</span>)</pre>
+
+
+
+
+
+
+
+
+
+
+
+<p>该库用于训练具有训练数据隐私的机器学习模型。为此提供的一些<a href="https://web.archive.org/web/20221206064514/https://github.com/tensorflow/privacy/tree/master/tutorials" target="_blank" rel="noreferrer noopener nofollow">教程</a>包括:</p>
+
+
+
+<ul><li>训练具有不同隐私的语言模型</li><li>具有差分隐私的MNIST卷积神经网络</li></ul>
+
+
+
+<p>差分隐私使用<a href="https://web.archive.org/web/20221206064514/https://arxiv.org/abs/1908.10530" target="_blank" rel="noreferrer noopener nofollow">ε和δ</a>表示。</p>
+
+
+
+
+
+
+
+<p>这是一个模型和数据集的图书馆，旨在使深度学习更容易获得，并加速机器学习的研究。</p>
+
+
+
+
+
+
+
+<p>根据官方文件:</p>
+
+
+
+<p>" TensorFlow Probability是一个用于TensorFlow中概率推理和统计分析的库"</p>
+
+
+
+<p>您可以使用该库对领域知识进行编码，但是它还具有:</p>
+
+
+
+<ul><li>支持多种概率分布</li><li>构建深度概率模型的工具</li><li>变分推理和马尔可夫链蒙特卡罗</li><li>优化者，如内尔德-米德、BFGS和SGLD</li></ul>
+
+
+
+<p>这是一个基于伯努利分布的示例模型:</p>
+
+
+
+<pre class="hljs">model = tfp.glm.Bernoulli()
+coeffs, linear_response, is_converged, num_iter = tfp.glm.fit(
+    model_matrix=features[:, tf.newaxis],
+    response=tf.cast(labels, dtype=tf.float32),
+    model=model)</pre>
+
+
+
+
+
+
+
+<p>TensorFlow Extended (TFX)是一个平台，您可以使用它将您的机器学习管道投入生产。</p>
+
+
+
+<p>另外，使用<a href="https://web.archive.org/web/20221206064514/https://www.tensorflow.org/tfx/guide/serving" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow的ModelServer </a>可以让您使用RESTful API来访问您的模型。</p>
+
+
+
+<p>假设您已经安装并配置了该服务器，则可以通过运行以下命令来启动它:</p>
+
+
+
+<pre class="hljs">$ tensorflow_model_server -- rest_api_port=<span class="hljs-number">8000</span> --   model_config_file=models.config -- model_config_file_poll_wait_seconds=<span class="hljs-number">300</span></pre>
+
+
+
+<p>该API将在本地主机的端口8000上可用。设置此服务器需要一些服务器管理知识。</p>
+
+
+
+
+
+
+
+<p><a href="/web/20221206064514/https://neptune.ai/blog/tensorboard-tutorial" target="_blank" rel="noreferrer noopener"> TensorBoard </a>是TensorFlow的开源可视化工具包。您可以在您的模型培训中使用它作为回调，以便跟踪该过程。它可用于跟踪各种指标，如日志丢失和准确性。TensorBoard还提供了几个可用于实验的工具。您可以使用它来:</p>
+
+
+
+<ul><li>可视化图像</li><li>检查模型权重和偏差</li><li>可视化模型的架构</li><li>通过性能分析查看应用程序的性能</li></ul>
+
+
+
+<p>仅举几个例子。</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<p><strong>注意:</strong>作为替代，你也可以跟踪和可视化模型训练运行，并在<a href="https://web.archive.org/web/20221206064514/https://neptune.ai/" target="_blank" rel="noreferrer noopener nofollow"> Neptune </a>中对你的模型进行版本化。</p>
+
+
+
+<p>例如，这里是你如何使用Neptune记录你的Keras实验。</p>
+
+
+
+<pre class="hljs">PARAMS = {<span class="hljs-string">'lr'</span>: <span class="hljs-number">0.01</span>, <span class="hljs-string">'epochs'</span>: <span class="hljs-number">10</span>}
+neptune.create_experiment(<span class="hljs-string">'model-training-run'</span>, params=PARAMS)
+
+model.fit(x_train, y_train,
+          epochs=PARAMS[<span class="hljs-string">'epochs'</span>],
+          callbacks=[NeptuneMonitor()])
+
+neptune.log_artifact(<span class="hljs-string">'model.h5'</span>)</pre>
+
+
+
+<p/>
+
+
+
+<p id="separator-block_60255fc621f03" class="block-separator block-separator--10"> </p>
+
+
+
+<section id="blog-intext-cta-block_61a4e1d9f8efe" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>跟踪TensorFlow模型训练的替代选项<a href="https://web.archive.org/web/20221206064514/https://docs.neptune.ai/integrations-and-supported-tools/model-training/tensorflow-keras" target="_blank" rel="noreferrer noopener"> Neptune + TensorFlow/Keras集成</a></p>
+    
+    </section>
+
+
+
+
+
+
+
+<p>这个库可以用于设计、实现和测试强化学习算法。它提供经过广泛测试的模块化组件。组件可以修改和扩展。</p>
+
+
+
+<p>这个<a href="https://web.archive.org/web/20221206064514/https://colab.research.google.com/github/tensorflow/agents/blob/master/docs/tutorials/1_dqn_tutorial.ipynb#scrollTo=cKOCZlhUgXVK" target="_blank" rel="noreferrer noopener nofollow">笔记本</a>展示了如何在Cartpole环境下训练一个<a href="https://web.archive.org/web/20221206064514/https://www.tensorflow.org/agents/tutorials/0_intro_rl" target="_blank" rel="noreferrer noopener nofollow"> DQN(深度Q网络)</a>代理。初始化代码如下所示:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+<span class="hljs-keyword">from</span> tf_agents.networks <span class="hljs-keyword">import</span> q_network
+<span class="hljs-keyword">from</span> tf_agents.agents.dqn <span class="hljs-keyword">import</span> dqn_agent
+
+q_net = q_network.QNetwork(
+  train_env.observation_spec(),
+  train_env.action_spec(),
+  fc_layer_params=(<span class="hljs-number">100</span>,))
+
+agent = dqn_agent.DqnAgent(
+  train_env.time_step_spec(),
+  train_env.action_spec(),
+  q_network=q_net,
+  optimizer=optimizer,
+  td_errors_loss_fn=common.element_wise_squared_loss,
+  train_step_counter=tf.Variable(<span class="hljs-number">0</span>))
+
+agent.initialize()</pre>
+
+
+
+<h2 id="h-final-thoughts">最后的想法</h2>
+
+
+
+<p>在本文中，我们探索了几个可用于扩展TensorFlow功能的库。尝试使用我提供的代码片段来熟悉这些工具。</p>
+
+
+
+<p>我们讨论了:</p>
+
+
+
+<ul><li>使用TensorFlow Hub的预训练模型，</li><li>使用TensorFlow模型优化工具包优化您的模型，</li><li>使用TensorFlow推荐器构建推荐器，</li><li>使用TensorFlow Federated的分散数据训练模型，</li><li>使用TensorFlow Privacy在私人模式下训练。</li></ul>
+
+
+
+<p>这是相当多的，所以选择其中的一个开始，并浏览列表，看看是否有任何工具适合你的机器学习工作流程。</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

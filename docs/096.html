@@ -1,0 +1,664 @@
+<html>
+<head>
+<title>Debug and Visualize Your TensorFlow/Keras Model: Hands-on Guide </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>调试和可视化TensorFlow/Keras模型:实践指南</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/debug-and-visualize-tensorflow-keras-model#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/debug-and-visualize-tensorflow-keras-model#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p><a href="/web/20221206081625/https://neptune.ai/blog/model-debugging-strategies-machine-learning" target="_blank" rel="noreferrer noopener">调试</a>在机器学习开发周期中起着很大的作用。一般来说，调试是所有类型的软件开发中的一个关键阶段——通常也是痛苦和耗时的。</p>
+
+
+
+<p>有一种方法可以减轻痛苦。您可以尽早开始实现调试策略，不断测试您的组件，这将有可能产生一个高生产率的环境。</p>
+
+
+
+<p>模型创建始于数据探索。接下来，我们为我们的模型和基线算法选择特征。最后，我们使用各种算法和调整参数来提高基线性能…</p>
+
+
+
+<p>…这就是调试发挥作用的地方，以确保我们的基线模型做它们应该做的事情。从技术上来说，基线模型满足充分的标准，使其适合生产发布。</p>
+
+
+
+<p>这可能看起来有点让人不知所措，构建和维护调试框架和策略可能会很昂贵和困难。幸运的是，您可以使用一个平台来完成这项工作。跟踪元数据、记录不同的研究模型、比较性能以及改进模型的功能和特征。</p>
+
+
+
+<p>在本文中，我们将讨论模型调试策略，并使用Neptune及其API进行实际实现。</p>
+
+
+
+
+
+
+
+<h2 id="h-model-debugging-basics">模型调试基础</h2>
+
+
+
+<p>机器学习中模型性能差可能由多种因素造成。这使得调试非常耗时。如果模型没有预测能力或具有次优值，则它们的表现很差。因此，我们调试我们的模型来确定问题的根源。模型性能差的一些常见原因包括:</p>
+
+
+
+<ul>
+<li>模型特征缺乏足够的预测能力；</li>
+
+
+
+<li>超参数被设置为次优值；</li>
+
+
+
+<li>训练数据集具有通过模型过滤的缺陷和异常；</li>
+
+
+
+<li>特征工程代码有bug。</li>
+</ul>
+
+
+
+<p>要记住的一个关键思想是，ML模型一直被部署在越来越大的任务和数据集上。规模越大，调试你的模型就越重要。要做到这一点，你需要一个计划和一系列的步骤。这是:</p>
+
+
+
+<h3>模型调试的一般步骤</h3>
+
+
+
+<p>以下是机器学习中最有影响力的人常用的调试模式。</p>
+
+
+
+<h4>1.检查模型是否正确预测标签</h4>
+
+
+
+<p>检查您的特征是否充分编码了预测信号。模型的准确性与单个特征对预测性的编码程度有很大关系。一种简单而有效的测量方法是使用相关矩阵来评估单个特征和标签之间的线性相关性。</p>
+
+
+
+<p>另一方面，要素和标注之间的非线性相关性不会被相关矩阵检测到。相反，从数据集中选择一些模型可以轻松学习的示例。或者，使用容易学习的合成数据。</p>
+
+
+
+<h4>2.建立模型基线</h4>
+
+
+
+<p>对你的模型质量的一个快速测试是将它与一个<strong><em/></strong>基线进行比较。一个<strong> <em>模型基线</em> </strong>是一个简单的模型，它在一项任务中产生合理的结果，并不难建立。当创建一个新模型时，通过用你能想到的最简单的启发式模型预测标签来创建基线。如果你训练的模型超过了基线，你必须改进它。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" src="../Images/cf6c0e97d8c0d9747f1ad6a70b304c2d.png" alt="Baseline model Keras" class="wp-image-52259" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206081625im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Baseline-model-Keras.jpg?resize=770%2C433&amp;ssl=1"/><figcaption class="wp-element-caption"><em>“Good” results can be misleading if we compare against a weak baseline | Image source: <a href="https://web.archive.org/web/20221206081625/https://blog.ml.cmu.edu/2020/08/31/3-baselines/" target="_blank" rel="noreferrer noopener nofollow">MLCMU</a> </em></figcaption></figure></div>
+
+
+<p>基线模型的例子有:</p>
+
+
+
+<ul>
+<li>使用仅在数据集的最具预测性特征上训练的线性模型版本；</li>
+
+
+
+<li>只关注预测最常见标签的分类模型；</li>
+
+
+
+<li>预测平均值的回归模型。</li>
+</ul>
+
+
+
+<h4>3.调整超参数值</h4>
+
+
+
+<p>通常，工程师首先调整的最有针对性的超参数是:</p>
+
+
+
+<ul>
+<li><strong> <em>学习率</em> </strong>:学习率由ML库自动设定。例如，在TensorFlow中，大多数TF估计器都使用AdagradOptimizer，它将学习速率设置为0.05，然后在训练期间自适应地修改该速率。或者，如果您的模型不收敛，您可以手动设置这些值，并选择0.0001到1.0之间的值。</li>
+
+
+
+<li><strong> <em>正则化惩罚</em> </strong>:如果你需要减少你的线性模型的大小，使用L1正则化。如果你想要更多的模型稳定性，使用L2正则化。增加模型的稳定性会使模型训练更具重现性。</li>
+
+
+
+<li><strong> <em>批量</em> </strong>:一个小批量一般有10到1000个批量。SGD的批量大小为一。最大批量由机器内存中可以容纳的数据量决定。批量限制由您的数据和算法决定。</li>
+
+
+
+<li><strong> <em>网络层数深度</em> </strong>:一个神经网络的深度是指层数，而宽度是指每层的神经元数。随着相应问题的复杂性增加，深度和宽度也应该增加。常见的做法是将层的宽度设置为等于或小于前一层的宽度。稍后调整这些值有助于优化模型性能。</li>
+</ul>
+
+
+
+<h2 id="h-test-and-debug-your-tensorflow-keras-model">测试和调试您的TensorFlow/Keras模型</h2>
+
+
+
+<p>让我们解决事情的实际方面，并实际获得实施我们上面提到的要点的实践经验。我们将构建、训练和调试一个TensorFlow模型，执行简单的音频识别。我们将使用Neptune，因为它是Keras/TensorFlow模型的完全可操作的扩展，我们将探索一些有趣的特性来管理和跟踪我们模型的开发。</p>
+
+
+
+<h3>从语音命令数据集开始</h3>
+
+
+
+<p>这个数据集包括超过105，000个WAV音频文件，内容是人们说的30个不同的单词。谷歌收集了这些信息，并通过许可在CC下提供。用谷歌的话说:</p>
+
+
+
+<p>该数据集旨在帮助训练和评估关键词识别系统。它的主要目标是提供一种开发和测试小型模型的方法，这些模型可以检测何时从一组10个目标单词中说出一个单词，并尽可能减少由于背景噪声或无关语音造成的假阳性”。</p>
+
+
+
+<p>链接到数据集的官方研究论文:<a href="https://web.archive.org/web/20221206081625/https://arxiv.org/pdf/1804.03209.pdf" target="_blank" rel="noreferrer noopener nofollow">语音命令:有限词汇语音识别的数据集</a>。</p>
+
+
+
+<p>我们将使用整个数据集的较小版本，并使用TensorFlow.data API下载它。</p>
+
+
+
+<pre class="hljs">data_dir = pathlib.Path(<span class="hljs-string">'Documents/SpeechRecognition/data/mini_speech_commands'</span>)
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> data_dir.exists():
+  tf.keras.utils.get_file(
+      <span class="hljs-string">'mini_speech_commands.zip'</span>,
+      origin=<span class="hljs-string">"http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip"</span>,
+      extract=<span class="hljs-keyword">True</span>,
+      cache_dir=<span class="hljs-string">'.'</span>, cache_subdir=<span class="hljs-string">'data'</span>)</pre>
+
+
+
+<p>开始你的海王星实验:</p>
+
+
+
+<pre class="hljs">run = neptune.init(project=<span class="hljs-string">'aymane.hachcham/Speech-Recognition-TF'</span>,
+                   api_token=<span class="hljs-string">'YOUR_API_TOKEN'</span>) </pre>
+
+
+
+<p>将所有相关元数据记录到您的Neptune仪表盘:</p>
+
+
+
+<pre class="hljs">run[<span class="hljs-string">'config/dataset/path'</span>] = <span class="hljs-string">'Documents/SpeechRecognition/data/mini_speech_commands'</span>
+run[<span class="hljs-string">'config/dataset/size'</span>] = <span class="hljs-number">105000</span>
+run[<span class="hljs-string">'config/dataset/total_examples'</span>] = <span class="hljs-number">8000</span>
+run[<span class="hljs-string">'config/dataset/examples_per_label'</span>] = <span class="hljs-number">1000</span>
+run[<span class="hljs-string">'config/dataset/list_commands'</span>] = [<span class="hljs-string">'down'</span>, <span class="hljs-string">'go'</span>, <span class="hljs-string">'left'</span>, <span class="hljs-string">'no'</span>, <span class="hljs-string">'right'</span>, <span class="hljs-string">'stop'</span>, <span class="hljs-string">'up'</span>, <span class="hljs-string">'yes'</span>]</pre>
+
+
+
+
+
+<p>您还可以将音频样本记录到您的Neptune dashboard，以便将所有元数据放在一起。目前，Neptune支持MP3、MA4、OGA和WAVE音频格式。</p>
+
+
+
+<pre class="hljs">run[<span class="hljs-string">'config/audio'</span>] = neptune.types.File(<span class="hljs-string">'/content/data/right_commad_Sample.wav'</span>)</pre>
+
+
+
+<p>在这里你可以检查数据集的一个音频样本:<a href="https://web.archive.org/web/20221206081625/https://app.neptune.ai/aymane.hachcham/Speech-Recognition-TF/e/SPREC-6/all?path=config&amp;attribute=audio" target="_blank" rel="noreferrer noopener nofollow">一个右命令样本</a>。</p>
+
+
+
+<p>现在我们需要将所有的音频文件提取到一个列表中，并对其进行洗牌。然后，我们将把数据分割和隔离成训练集、测试集和验证集。</p>
+
+
+
+<pre class="hljs">
+train_samples = list_samples[:<span class="hljs-number">6400</span>]
+val_samples = list_samples[<span class="hljs-number">6400</span>: <span class="hljs-number">6400</span> + <span class="hljs-number">800</span>]
+test_samples = list_samples[<span class="hljs-number">-800</span>:]
+
+print(<span class="hljs-string">'Training set size'</span>, len(train_samples))
+print(<span class="hljs-string">'Validation set size'</span>, len(val_samples))
+print(<span class="hljs-string">'Test set size'</span>, len(test_samples))</pre>
+
+
+
+<h3>调查数据</h3>
+
+
+
+<p>由于数据中的音频文件被格式化为二进制文件，您必须将其转换为数值张量。为此，我们将使用TensorFlow Audio API，它包含许多方便的函数，如decode_wav，可以根据采样率将wav文件解码为Tensors。</p>
+
+
+
+<p>采样率是指整个音频文件中每秒编码的样本数。每个样本代表特定时间音频信号的幅度。例如，16kHz采样速率表示16位系统，其值范围为-32768至32767。</p>
+
+
+
+<p>让我们解码音频文件，得到相应的标签和波形。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">decode_audio</span><span class="hljs-params">(audio_binary)</span>:</span>
+  
+  audio, _ = tf.audio.decode_wav(audio_binary)
+  <span class="hljs-keyword">return</span> tf.squeeze(audio, axis=<span class="hljs-number">-1</span>)
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_label</span><span class="hljs-params">(file_path)</span>:</span>
+  
+  parts = tf.strings.split(file_path, os.path.sep)
+  <span class="hljs-keyword">return</span> parts[<span class="hljs-number">-2</span>]
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">audio_waveform</span><span class="hljs-params">(file_path)</span>:</span>
+  label = get_label(file_path)
+  audio_binary = tf.io.read_file(file_path)
+  waveform = decode_audio(audio_binary)
+  <span class="hljs-keyword">return</span> waveform, label</pre>
+
+
+
+<p>一旦我们的函数设置好了，我们将使用它们来处理训练数据，以便获得所有样本的波形和相应的标签。</p>
+
+
+
+<pre class="hljs">AUTOTUNE = tf.data.AUTOTUNE  
+files_ds = tf.data.Dataset.from_tensor_slices(train_samples)
+waveform_data = files_ds.map(audio_waveform, num_parallel_calls=AUTOTUNE)</pre>
+
+
+
+<p>绘制6个音频命令样本的waveform_data:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/458df9d6e84ae9999abfb54488d516c7.png" alt="Waveforms from the Dataset Keras" class="wp-image-52251" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206081625im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Waveforms-from-the-Dataset-Keras.png?resize=668%2C768&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Waveforms and command labels from the training data</em></figcaption></figure></div>
+
+
+<p>您会注意到，即使对于相同的命令，波形也可能大不相同。这与声音的音高、音调和其他相关特征有关，这些特征使每个声音都很特别，几乎不可复制。</p>
+
+
+
+<h3>检查声音频谱图</h3>
+
+
+
+<p>频谱图显示了每个波形的频率随时间的变化，它们可以表示为2D图像。这是通过使用短时<a href="https://web.archive.org/web/20221206081625/https://en.wikipedia.org/wiki/Short-time_Fourier_transform" target="_blank" rel="noreferrer noopener nofollow">傅立叶变换(STFT) </a>将音频转换到时间-频率域来完成的。</p>
+
+
+
+<p>STFT将信号划分为时间窗口，并在每个窗口上执行傅立叶变换，保留一些时间信息并返回可以在其上执行标准卷积的2D张量。</p>
+
+
+
+<p>幸运的是，TF为我们提供了一个完美处理这项工作的stft函数:tf.signal.stft</p>
+
+
+
+<p>我们需要设置先验参数来使用该函数。首先，设置帧长度和帧步长参数，使生成的谱图“图像”接近正方形。此外，我们希望各个波形与频谱图具有相同的长度，这样当我们将波形转换为频谱图时，结果将有望具有相同的维度。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_spectrogram</span><span class="hljs-params">(waveform_sample)</span>:</span>
+  
+  zero_pad = tf.zeros([<span class="hljs-number">16000</span>] - tf.shape(waveform_sample), dtype=tf.float32)
+
+  
+  
+  waveform = tf.cast(waveform_sample, tf.float32)
+  equal_length = tf.concat([waveform, zero_pad], <span class="hljs-number">0</span>)
+  spectrogram = tf.signal.stft(
+      equal_length, frame_length=<span class="hljs-number">255</span>, frame_step=<span class="hljs-number">128</span>)
+
+  spectrogram = tf.abs(spectrogram)
+
+  
+  <span class="hljs-keyword">return</span> spectrogram</pre>
+
+
+
+<p>并排绘制频谱图及其相应的波形:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">for</span> waveform, label <span class="hljs-keyword">in</span> waveform_data.take(<span class="hljs-number">1</span>):
+  label = label.numpy().decode(<span class="hljs-string">'utf-8'</span>)
+  spectrogram = get_spectrogram(waveform)
+
+  fig, axes = plt.subplots(<span class="hljs-number">2</span>, figsize=(<span class="hljs-number">12</span>, <span class="hljs-number">8</span>))
+  timescale = np.arange(waveform.shape[<span class="hljs-number">0</span>])
+  axes[<span class="hljs-number">0</span>].plot(timescale, waveform.numpy())
+  axes[<span class="hljs-number">0</span>].set_title(<span class="hljs-string">'Waveform'</span>)
+  axes[<span class="hljs-number">0</span>].set_xlim([<span class="hljs-number">0</span>, <span class="hljs-number">16000</span>])
+  plot_spectrogram(spectrogram.numpy(), axes[<span class="hljs-number">1</span>])
+  axes[<span class="hljs-number">1</span>].set_title(<span class="hljs-string">'Spectrogram'</span>)
+  plt.show()</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/6025d822aa5493a00f01bb9c4805f54f.png" alt="Waveform_Spectrogram Keras" class="wp-image-52252" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206081625im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Waveform_Spectrogram-Keras.png?resize=768%2C515&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Waveform and corresponding spectrogram side-by-side</em></figcaption></figure></div>
+
+
+<p><em>我有一篇文章深入解释了spectrograms和Mel spectrograms背后的所有理论，以及如何应用它来训练一个用于TTS和STT </em>  <em> taks的</em> <a href="/web/20221206081625/https://neptune.ai/blog/conversational-ai-nvidia-tools-guide" target="_blank" rel="noreferrer noopener"> <em>对话式智能机器人:工具指南</em> </a></p>
+
+
+
+<h3>基线分类器</h3>
+
+
+
+<p>在开始训练CNN网络之前，我们会尝试用简单的基线分类器来测试我们复杂模型的准确性和性能。这样，我们将确信我们的CNN确实抓住了它，并且完美地匹配了任务的复杂性。</p>
+
+
+
+<p>我们应该记住基线的两个主要特征:</p>
+
+
+
+<ol>
+<li>基线模型应该非常简单。简单模型不容易过度拟合。如果您的基线过拟合，这通常表明您在使用任何更复杂的分类器之前关注了您的数据。</li>
+
+
+
+<li>基线模型是可以解释的。基线模型有助于您理解数据，为特征工程提供方向。</li>
+</ol>
+
+
+
+<p>在我们的例子中，我们将使用scikit learn提供的DummyClassifier模块。这是相当简单的，并有所有的要求，以弥补一个完美的候选人。</p>
+
+
+
+<pre class="hljs">
+train_audio = []
+train_labels = []
+
+<span class="hljs-keyword">for</span> audio, label <span class="hljs-keyword">in</span> train_ds:
+  train_audio.append(audio.numpy())
+  train_labels.append(label.numpy())
+
+train_audio = np.array(train_audio)
+train_labels = np.array(train_labels)
+
+
+<span class="hljs-keyword">from</span> sklearn.dummy <span class="hljs-keyword">import</span> DummyClassifier
+<span class="hljs-keyword">from</span> sklearn.metrics <span class="hljs-keyword">import</span> accuracy_score
+
+dummy_clf = DummyClassifier(strategy=<span class="hljs-string">"most_frequent"</span>)
+dummy_clf.fit(train_audio, train_labels)
+
+Then get predictions <span class="hljs-keyword">and</span> assess the accuracy score of our dummy classifier:
+dummy_pred = dummy_clf.predict(test_audio)
+dummy_true = test_labels
+
+accuracy_score(dummy_true, dummy_pred)</pre>
+
+
+
+<p>我们的虚拟分类器的准确度得分为<strong> 0.16 </strong>。这与神经网络所能达到的相比是非常低的。一旦我们训练了我们的模型，我们将认识到基线结果清楚地表明我们的模型表现得非常好，并且确实超过了简单的ML分类器的能力。</p>
+
+
+
+<h2 id="h-build-and-train-your-model">构建并训练您的模型</h2>
+
+
+
+<p>既然我们已经构建了基线模型，并且一旦我们的所有数据都准备好用于训练，我们就需要构建我们的架构。一个简单的CNN就可以了，因为该模型将在光谱图上进行训练。因此，模型将学习通过仅与声谱图相关来识别每个声音的特性。</p>
+
+
+
+<p>我们将使用一批64个数据加载器。</p>
+
+
+
+<pre class="hljs">batch_size = <span class="hljs-number">64</span>
+train_samples = train_samples.batch(batch_size)
+val_samples = val_samples.batch(batch_size)</pre>
+
+
+
+<h3>建筑</h3>
+
+
+
+<p>该模型还有一些额外的处理层，如:</p>
+
+
+
+<ul>
+<li>一个<strong> <em>调整大小层</em> </strong>对输入进行下采样，从而训练得更快。</li>
+
+
+
+<li>一个<strong> <em>归一化层</em> </strong>，用于在将每个输入图像馈送到模型之前对其应用均值和标准差归一化。</li>
+</ul>
+
+
+
+<p>如果我们使用Pytorch，我们通常会首先应用数据转换，通常包括调整大小、规范化、裁剪等。但是，在TensorFlow中，这可以通过专门设计的模块轻松实现。</p>
+
+
+
+<pre class="hljs">normalization_layer = preprocessing.Normalization()
+normalization_layer.adapt(spectrogram_ds.map(<span class="hljs-keyword">lambda</span> x, _: x))
+
+sound_model = models.Sequential([
+    layers.Input(shape=input_shape),
+    preprocessing.Resizing(<span class="hljs-number">32</span>, <span class="hljs-number">32</span>),
+    norm_layer,
+    layers.Conv2D(<span class="hljs-number">32</span>, <span class="hljs-number">3</span>, activation=<span class="hljs-string">'relu'</span>),
+    layers.Conv2D(<span class="hljs-number">64</span>, <span class="hljs-number">3</span>, activation=<span class="hljs-string">'relu'</span>),
+    layers.MaxPooling2D(),
+    layers.Dropout(<span class="hljs-number">0.25</span>),
+    layers.Flatten(),
+    layers.Dense(<span class="hljs-number">128</span>, activation=<span class="hljs-string">'relu'</span>),
+    layers.Dropout(<span class="hljs-number">0.5</span>),
+    layers.Dense(num_labels),
+])</pre>
+
+
+
+<p>我们还可以在Neptune中记录架构，以保存它供以后运行。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">from</span> contextlib <span class="hljs-keyword">import</span> redirect_stdout
+
+<span class="hljs-keyword">with</span> open(f<span class="hljs-string">'./{model_name}_arch.txt'</span>, <span class="hljs-string">'w'</span>) <span class="hljs-keyword">as</span> f:
+    <span class="hljs-keyword">with</span> redirect_stdout(f):
+        model.summary()
+
+
+run[f<span class="hljs-string">"io_files/artifacts/{model_name}_arch"</span>].upload(f<span class="hljs-string">"./{model_name}_arch.txt"</span>)</pre>
+
+
+
+
+
+<p>建立架构后，我们来编译模型。我们最终将使用Adam优化器和稀疏分类交叉熵损失度量来严格评估模型随时间的准确性。</p>
+
+
+
+<pre class="hljs">hparams = {
+    <span class="hljs-string">'batch_size'</span>: <span class="hljs-number">64</span>,
+    <span class="hljs-string">'image_size'</span>: <span class="hljs-number">120</span>,
+    <span class="hljs-string">'num_epochs'</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.0001</span>,
+    <span class="hljs-string">'beta_rate_optimizer'</span>: <span class="hljs-number">0.5</span>,
+    <span class="hljs-string">'loss_function'</span>: tf.keras.losses.SparseCategoricalCrossentropy,
+    <span class="hljs-string">'optimizer'</span>: tf.keras.optimizers.Adam
+}
+
+run[<span class="hljs-string">"params"</span>] = hparams</pre>
+
+
+
+<p>跟踪我们模型训练进度最好的方法就是<a href="https://web.archive.org/web/20221206081625/https://docs.neptune.ai/api-reference/integrations/tensorflow-keras" target="_blank" rel="noreferrer noopener"> <em>海王TF/Keras扩展</em> </a>。它作为一个回调函数，同时实时记录我们三个集合的值:训练、测试和验证。</p>
+
+
+
+<pre class="hljs">sound_model.compile(
+    optimizer=tf.keras.optimizers.Adam(),
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=<span class="hljs-keyword">True</span>),
+    metrics=[<span class="hljs-string">'accuracy'</span>],
+)
+
+<span class="hljs-keyword">from</span> neptune.new.integrations.tensorflow_keras <span class="hljs-keyword">import</span> NeptuneCallback
+neptune_callback = NeptuneCallback(run=run, base_namespace=<span class="hljs-string">"Sound Recognition"</span>)
+
+history = model.fit(
+    train_ds,
+    validation_data=val_ds,
+    epochs=hparams[<span class="hljs-string">"num_epochs"</span>],
+    callbacks=[neptune_callback],
+)</pre>
+
+
+
+<p>下面是三组中每一组的损失和精确度的结果。</p>
+
+
+
+
+
+
+
+
+
+<p>调试和断言我们的训练的效率的一种方法是多训练几次，并在损失和准确性方面比较结果。</p>
+
+
+
+<h4>调试模型</h4>
+
+
+
+<p>调整模型超参数(时期数和学习率)向我们展示了模型的进展，以及这些参数是否对性能有任何严重影响。</p>
+
+
+
+<p>调整模型超参数(时期数和学习率)向我们展示了模型的进展，以及这些参数是否对性能有任何严重影响。</p>
+
+
+
+
+
+<p>如你所见，差别很小。这意味着整个训练碰巧非常相似，模型参数的变化既不能被认为是模型改进的转折点，也不能被认为是模型性能的转折点。</p>
+
+
+
+<p>我们还可以显示混淆矩阵，以检查模型在测试集的每个命令上的表现。它显示了模型在预测每个命令时的准确性，并显示了模型是否对每个命令之间的差异有大致的了解。</p>
+
+
+
+<pre class="hljs">y_pred = np.argmax(model.predict(test_audio), axis=<span class="hljs-number">1</span>) 
+y_true = test_labels 
+
+
+confusion_mtx = tf.math.confusion_matrix(y_true, y_pred)
+plt.figure(figsize=(<span class="hljs-number">10</span>, <span class="hljs-number">8</span>))
+sns.heatmap(confusion_mtx, xticklabels=commands, yticklabels=commands,
+            annot=<span class="hljs-keyword">True</span>, fmt=<span class="hljs-string">'g'</span>)
+plt.xlabel(<span class="hljs-string">'Prediction'</span>)
+plt.ylabel(<span class="hljs-string">'Label'</span>)
+plt.show()</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/dfc26cf29b09f0f3e9323724bde58ba9.png" alt="Consfuion matrix Keras" class="wp-image-52258" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206081625im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Consfuion-matrix-Keras.png?resize=512%2C463&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Confusion matrix</em></figcaption></figure></div>
+
+
+<p>你可以看到我们的模型做得很好。</p>
+
+
+
+<h3>模型细化</h3>
+
+
+
+<p>随着模型变得越来越复杂，对其进行迭代调试。<a href="/web/20221206081625/https://neptune.ai/blog/deep-dive-into-error-analysis-and-model-debugging-in-machine-learning-and-deep-learning" target="_blank" rel="noreferrer noopener">需要进行误差分析</a>来找出模型失效的地方。跟踪模型性能如何随着用于训练的数据量的增加而扩展。</p>
+
+
+
+<p>在您成功地为您的问题建立了一个模型之后，您应该尝试从模型中获得最佳性能。始终遵循以下基本规则来跟踪大多数潜在错误:</p>
+
+
+
+<ul>
+<li><strong> <em>避免任何不必要的偏见</em> </strong></li>
+
+
+
+<li><strong> <em>记住总会有不可约的误差</em> </strong></li>
+
+
+
+<li><strong> <em>永远不要混淆测试错误</em>验证错误</strong></li>
+</ul>
+
+
+
+<h2 id="h-interesting-debugging-strategies-to-implement">要实现的有趣的调试策略</h2>
+
+
+
+<h3>灵敏度分析</h3>
+
+
+
+<p>敏感性分析是一种统计技术，用于确定模型、参数或其他量对输入参数相对于其标称值的变化有多敏感。这种分析展示了模型如何对未知数据做出反应，以及它根据给定数据预测什么。这通常被开发人员称为“假设”分析。</p>
+
+
+
+<p>请看这里的例子:<a href="https://web.archive.org/web/20221206081625/https://www.tensorflow.org/api_docs/python/tf/keras/metrics/SpecificityAtSensitivity" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow关于模型特异性和敏感性的教程</a></p>
+
+
+
+<h3>模型基准</h3>
+
+
+
+<p>基准模型实现起来很简单，不需要太多时间。使用任何标准算法找到合适的基准模型，然后简单地将结果与模型预测进行比较。如果标准算法和ML算法之间有许多相似之处，简单的回归可能已经揭示了算法的潜在问题。</p>
+
+
+
+<p>在这里看一个例子:<a href="https://web.archive.org/web/20221206081625/https://medium.com/apache-mxnet/a-way-to-benchmark-your-deep-learning-framework-on-premise-4f7a0f475726" target="_blank" rel="noreferrer noopener nofollow">一种测试你的深度学习框架的方法</a></p>
+
+
+
+<h2 id="h-final-thoughts">最后的想法</h2>
+
+
+
+<p>我们已经探索了调试机制和策略，这些机制和策略对于机器学习模型的实验非常有用，并且我们做了一个实际的例子来说明如何使用Neptune来分析和跟踪模型性能。</p>
+
+
+
+<p>我给你留下一些额外的资源。不要忘记查看我的其他文章，如果有任何问题，请随时联系我。</p>
+
+
+
+<p>别忘了在Colab笔记本上查看这篇文章的所有代码:<a href="https://web.archive.org/web/20221206081625/https://colab.research.google.com/drive/1AEjXrQ4o4Ot7iqp6hU0PNg0QwiI1TtpP?usp=sharing" target="_blank" rel="noreferrer noopener nofollow">简单的声音识别</a></p>
+
+
+
+<p><strong>资源:</strong></p>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

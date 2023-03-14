@@ -1,0 +1,1315 @@
+<html>
+<head>
+<title>How to Implement Customer Churn Prediction [Machine Learning Guide for Programmers] </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何实现客户流失预测【程序员机器学习指南】</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/how-to-implement-customer-churn-prediction#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/how-to-implement-customer-churn-prediction#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>当谈到机器学习的有用商业应用时，没有比<a href="https://web.archive.org/web/20230227045312/https://www.kdnuggets.com/2019/05/churn-prediction-machine-learning.html" target="_blank" rel="noreferrer noopener nofollow">客户流失预测</a>更好的了。这是一个你通常有大量高质量、新鲜的数据要处理的问题，它相对简单，解决它可以是增加利润的一个很好的方法。</p>
+
+
+
+<p>流失率是衡量客户满意度的关键指标。低流失率意味着快乐的顾客；高流失率意味着客户会离开你。随着时间的推移，每月/每季度的客户流失率会有所下降。1%的月流失率很快就转化为近12%的年流失率。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20230227045312/https://www.forbes.com/sites/jiawertz/2018/09/12/dont-spend-5-times-more-attracting-new-customers-nurture-the-existing-ones/?sh=badf6205a8e0" target="_blank" rel="noreferrer noopener nofollow">据福布斯</a>报道，获得新客户比保持现有客户需要更多的钱(最多五倍)。客户流失告诉你有多少现有客户正在离开你的企业，因此降低客户流失对你的收入流有很大的积极影响。</p>
+
+
+
+<p>客户流失是增长潜力的一个很好的指标。流失率跟踪失去的客户，增长率跟踪新客户—比较和分析这两个指标可以准确地告诉您随着时间的推移，您的业务增长了多少。如果增长率高于流失率，你可以说你的业务在增长。如果流失率高于增长率，你的企业就越来越小。</p>
+
+
+
+<p>在本文中，我们将深入探讨客户流失率，并实现一个机器学习客户流失率预测系统的示例。</p>
+
+
+
+<h2 id="definition">流失率是多少？</h2>
+
+
+
+<p>维基百科称,“流失率”(也称为损耗率)衡量的是在特定时期内从一个集体群体中移出的个人或物品的数量。它适用于许多情况，但对流失率的主流理解与停止从你这里购买的客户的业务案例有关。</p>
+
+
+
+<p>软件即服务(SaaS)凭借其基于订阅的业务模式和基于会员制的业务，处于创新型客户维系战略的前沿。分析这一领域的增长可能涉及跟踪指标(如收入、新客户比率等。)，进行客户细分分析，预测终身价值。流失率是客户终身价值建模的一个输入，指导对与客户的整个未来关系贡献的净利润的估计。独立地，它计算在给定的时间框架内客户对服务或产品的订阅的不连续性的百分比。</p>
+
+
+
+<p>这转化为因客户取消而造成的收入损失。市场饱和在SaaS市场相当明显，任何SaaS产品总是有大量的替代品。研究流失率有助于了解你的客户(KYC)和订阅驱动型企业的有效保留和营销策略。</p>
+
+
+
+<p>杰夫·贝索斯曾经说过:“<em>我们把顾客视为聚会的客人，而我们是主人。我们每天的工作就是让客户体验的每个重要方面都变得更好</em>。提高客户保持率是一个持续的过程，了解流失率是朝着正确方向迈出的第一步。</p>
+
+
+
+<p>您可以将客户流失分为:</p>
+
+
+
+<ol>
+<li><strong>客户和收入流失</strong></li>
+
+
+
+<li><strong>自愿和非自愿流失</strong></li>
+</ol>
+
+
+
+<p><strong>客户和收入流失:</strong>客户流失就是客户取消订阅的比率。也称为用户流失或徽标流失，其价值以百分比表示。另一方面，收入流失是月初你每月经常性收入(MRR)的损失。客户流失和收入流失并不总是一样的。你可能没有客户流失，但如果客户降级订阅，仍然有收入流失。负流失率是一种理想情况，仅适用于收入流失率。来自现有客户的新收入(通过交叉销售、追加销售和新注册)比你因取消和降级而损失的收入要多。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/e35beb400ac6c846c017e1b45a6fafbd.png" alt="" class="wp-image-50657" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230227045312im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Customer-churn-equation.png?ssl=1"/></figure></div>
+
+
+<p id="separator-block_032dfa8088855c26757d7b2834cb9072" class="block-separator block-separator--15"> </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/7c978552f2b08e722d688c33572044c2.png" alt="" class="wp-image-50658" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230227045312im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Revenue-equation.png?ssl=1"/></figure></div>
+
+
+<p><strong>自愿和非自愿流失:</strong>自愿流失是指客户决定取消并采取必要措施退出服务。这可能是因为不满意，或者没有得到他们期望的价值。非自愿流失的发生是由于诸如付款细节过期、服务器错误、资金不足和其他不可预测的困境等情况。</p>
+
+
+
+<p>客户满意度、幸福感和忠诚度可以在一定程度上实现，但客户流失将永远是业务的一部分。客户流失可能是因为:</p>
+
+
+
+<ul>
+<li>糟糕的客户服务(服务质量、回复率或整体客户体验差)，</li>
+
+
+
+<li>财务问题(费用和费率)，</li>
+
+
+
+<li>客户需求变化，</li>
+
+
+
+<li>不满意(你的服务没有达到预期)，</li>
+
+
+
+<li>顾客看不到价值，</li>
+
+
+
+<li>客户转向竞争对手，</li>
+
+
+
+<li>长期客户不会感到被欣赏。</li>
+</ul>
+
+
+
+<p>0%的流失率是不可能的。诀窍是始终保持尽可能低的流失率。</p>
+
+
+
+<h2 id="importance">客户流失预测的重要性</h2>
+
+
+
+<p>流失率的影响显而易见，因此我们需要降低流失率的策略。预测客户流失是针对即将流失的客户开展主动营销活动的好方法。</p>
+
+
+
+<p>多亏了大数据，在机器学习的帮助下预测客户流失成为可能。机器学习和数据分析是识别和预测客户流失的强大方法。在客户流失预测过程中，您还会:</p>
+
+
+
+<ul>
+<li>识别有风险的客户，</li>
+
+
+
+<li>识别客户的棘手问题，</li>
+
+
+
+<li>确定降低客户流失率和增加客户保持率的策略/方法。</li>
+</ul>
+
+
+
+<h2 id="challenges">构建有效客户流失模型的挑战</h2>
+
+
+
+<p>以下是可能使您难以建立有效客户流失模型的主要挑战:</p>
+
+
+
+<ul>
+<li>不准确或混乱的客户数据，</li>
+
+
+
+<li>弱摩擦探索性分析，</li>
+
+
+
+<li>缺乏信息和领域知识，</li>
+
+
+
+<li>缺乏对合适的流失建模方法的一致选择，</li>
+
+
+
+<li>选择验证流失模型性能的指标，</li>
+
+
+
+<li>服务或产品的业务线(LoB ),</li>
+
+
+
+<li>搅动事件审查，</li>
+
+
+
+<li>基于驱动客户流失的客户行为模式变化的概念漂移，</li>
+
+
+
+<li>不平衡数据(阶级不平衡问题)。</li>
+</ul>
+
+
+
+
+
+
+
+<h2 id="use-cases">流失预测用例</h2>
+
+
+
+<p>基于公司的业务线(LoB)、运营工作流程和数据架构，客户流失预测是不同的。预测模型和应用程序必须适合公司的需求、目标和期望。流失预测的一些使用案例包括:</p>
+
+
+
+<ul>
+<li>电信(有线或无线网段)，</li>
+
+
+
+<li>软件即服务提供商(SaaS)，</li>
+
+
+
+<li>零售市场，</li>
+
+
+
+<li>基于订阅的业务(媒体、音乐和视频流服务等。),</li>
+
+
+
+<li>金融机构(银行、保险公司、抵押公司等。),</li>
+
+
+
+<li>营销，</li>
+
+
+
+<li>人力资源管理(员工流动)。</li>
+</ul>
+
+
+
+<h2 id="workflow">设计流失预测工作流程</h2>
+
+
+
+<p>构建ML驱动的应用程序以预测客户流失的总体范围是标准化ML项目结构的一般范围，包括以下步骤:</p>
+
+
+
+<ol>
+<li><strong>定义问题和目标</strong>:了解你需要从分析和预测中获得什么样的洞察力是至关重要的。理解问题并收集需求、涉众的痛点和期望。</li>
+
+
+
+<li><strong>建立数据源:</strong>接下来，指定建模阶段所需的数据源。一些流行的客户流失数据来源是CRM系统、分析服务和客户反馈。</li>
+
+
+
+<li><strong>数据准备、探索和预处理:</strong>用于解决问题和建立预测模型的原始历史数据需要转换成适合机器学习算法的格式。这一步骤还可以通过提高数据质量来改善总体结果。</li>
+
+
+
+<li><strong>建模和测试:</strong>这涵盖了使用各种机器学习算法的客户流失预测模型的开发和性能验证。</li>
+
+
+
+<li><strong>部署和监控:</strong>这是应用机器学习进行流失率预测的最后阶段。在这里，最合适的模型被投入生产。它既可以集成到现有软件中，也可以成为新构建的应用程序的核心。</li>
+</ol>
+
+
+
+
+
+
+
+<h2 id="example">深度挖掘:电信客户流失预测系统用例</h2>
+
+
+
+<p>流失率在电信行业(无线和有线服务提供商、卫星电视提供商、互联网提供商等)非常重要。此用例中的流失率提供了业务质量的清晰度，显示了客户对产品或服务的满意度，并允许与竞争对手进行比较，以衡量可接受的流失率水平。</p>
+
+
+
+<h3 id="dataset">关于数据集</h3>
+
+
+
+<p>示例数据跟踪一个虚构的电信公司Telco。这是来自IBM开发者平台的客户流失数据，在这里可以得到。它包括一个目标标签，指示客户是否在上个月离开，以及其他相关功能，包括人口统计、每个客户已注册的服务和客户帐户信息。它有7043个客户的数据，有20个特征。</p>
+
+
+
+<p><strong> <em>你可以在我的Github </em> </strong>  <strong> <em>上找到这个整个项目</em> </strong> <a href="https://web.archive.org/web/20230227045312/https://github.com/codebrain001/customer-churn-prediction" target="_blank" rel="noreferrer noopener nofollow"> <strong> <em>。</em>T13】</strong></a></p>
+
+
+
+<h3 id="eda">探索性数据分析</h3>
+
+
+
+<p>让我们批判性地探索数据，以发现模式并可视化特征如何与标签交互(是否流失)。</p>
+
+
+
+
+
+
+
+<p>让我们首先为EDA导入库，加载数据，并打印前五行:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np 
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd 
+pd.set_option(<span class="hljs-string">'display.max_columns'</span>, <span class="hljs-keyword">None</span>)
+
+<span class="hljs-keyword">import</span> plotly.express <span class="hljs-keyword">as</span> px 
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt 
+
+
+data_df = pd.read_csv(<span class="hljs-string">"../data/churn.csv"</span>)
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dataoveriew</span><span class="hljs-params">(df, message)</span>:</span>
+    print(f<span class="hljs-string">'{message}:n'</span>)
+    print(<span class="hljs-string">'Number of rows: '</span>, df.shape[<span class="hljs-number">0</span>])
+    print(<span class="hljs-string">"nNumber of features:"</span>, df.shape[<span class="hljs-number">1</span>])
+    print(<span class="hljs-string">"nData Features:"</span>)
+    print(df.columns.tolist())
+    print(<span class="hljs-string">"nMissing values:"</span>, df.isnull().sum().values.sum())
+    print(<span class="hljs-string">"nUnique values:"</span>)
+    print(df.nunique())
+
+dataoveriew(data_df, <span class="hljs-string">'Overview of the dataset'</span>)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/5b9f80408fb926d3e5c569cc6f47cb27.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/213Z3JSF0BWc_7L3TYUR_7uhqr4qTMRySNlEtv7yB78ZYKK6YMQcVOynzj03lfG7CmdQYBzYcUCDufQ3SHdSRQBzdIWrmUs5SqOv1GCWlrFNDlIhIUJ1yqvfnJSmvfY05Rt0HuHj"/></figure>
+
+
+
+<p>数据集有7043行和21列。</p>
+
+
+
+<p>有17个分类特征:</p>
+
+
+
+<ul>
+<li>CustomerID:每个客户的唯一客户ID</li>
+
+
+
+<li>性别:顾客是男性还是女性</li>
+
+
+
+<li>老年人:客户是否是老年人(1，0)</li>
+
+
+
+<li>合作伙伴:客户是否有合作伙伴(是，否)</li>
+
+
+
+<li>受抚养人:客户是否有受抚养人(是，否)</li>
+
+
+
+<li>电话服务:客户是否有电话服务(是，否)</li>
+
+
+
+<li>多线路:客户是否有多条线路(是，否，无电话服务)</li>
+
+
+
+<li>互联网服务:客户的互联网服务提供商(DSL、光纤、否)</li>
+
+
+
+<li>在线安全:客户是否有在线安全(是，否，没有互联网服务)</li>
+
+
+
+<li>OnlineBackup:客户是否有在线备份(是，否，无互联网服务)</li>
+
+
+
+<li>设备保护:客户是否有设备保护(是，否，无互联网服务)</li>
+
+
+
+<li>技术支持:客户是否有技术支持(是，否，无互联网服务)</li>
+
+
+
+<li>流媒体电视:客户是否有流媒体电视(是，否，无互联网服务)</li>
+
+
+
+<li>流媒体电影:客户是否有流媒体电影(是，否，无互联网服务)</li>
+
+
+
+<li>合同:客户的合同期限(逐月、一年、两年)</li>
+
+
+
+<li>无纸账单:客户的合同期限(逐月、一年、两年)</li>
+
+
+
+<li>付款方式:客户的付款方式(电子支票、邮寄支票、银行转帐(自动)、信用卡(自动))</li>
+</ul>
+
+
+
+<p>接下来，有3个数字特征:</p>
+
+
+
+<ul>
+<li>任期:客户在公司工作的月数</li>
+
+
+
+<li>每月费用:每月向客户收取的金额</li>
+
+
+
+<li>总费用:向客户收取的总额</li>
+</ul>
+
+
+
+<p>最后，还有一个预测功能:</p>
+
+
+
+<ul>
+<li>客户流失:客户是否流失(是或否)</li>
+</ul>
+
+
+
+<p>这些功能还可以细分为:</p>
+
+
+
+<ul>
+<li>人口统计客户信息:<ul>
+<li>性别、老年人、伴侣、受抚养人</li>
+</ul>
+</li>
+
+
+
+<li>每位客户已注册的服务:<ul>
+<li>电话服务，多线路，互联网服务，在线安全，在线备份，设备保护，技术支持，流媒体电视，流媒体电影，</li>
+</ul>
+</li>
+
+
+
+<li>客户账户信息:<ul>
+<li>任期，合同，无纸账单，付款方式，月费，总费用</li>
+</ul>
+</li>
+</ul>
+
+
+
+<p><strong>让我们探索一下目标变量。</strong></p>
+
+
+
+<pre class="hljs">target_instance = data_df[<span class="hljs-string">"Churn"</span>].value_counts().to_frame()
+target_instance = target_instance.reset_index()
+target_instance = target_instance.rename(columns={<span class="hljs-string">'index'</span>: <span class="hljs-string">'Category'</span>})
+fig = px.pie(target_instance, values=<span class="hljs-string">'Churn'</span>, names=<span class="hljs-string">'Category'</span>, color_discrete_sequence=[<span class="hljs-string">"green"</span>, <span class="hljs-string">"red"</span>],
+             title=<span class="hljs-string">'Distribution of Churn'</span>)
+fig.show()
+</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/8238f8429b93769107eee5bdd108af37.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/kxvTBQO9o3ObaWsh36gmpDh0trr2QXGBEoE1zHSI2Q_wuL4NKqC_FkcgWAW8NbXbAcwLTy8NBDduR6Pf3a2-LYp-RASJCpdDCYAEBjYZlw_Z4zQsvtXwO7Pl3V9bBjvPhFu1iUN3"/><figcaption class="wp-element-caption"><em>Output plot of distribution of churn rate</em></figcaption></figure></div>
+
+
+<p>我们试图预测上个月离开公司的用户。这是一个目标不平衡的二元分类问题。</p>
+
+
+
+<ul>
+<li>流失率:否–73.5%</li>
+
+
+
+<li>客户流失率:是–26.5%</li>
+</ul>
+
+
+
+<p>让我们探索分类特征。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">bar</span><span class="hljs-params">(feature, df=data_df )</span>:</span>
+    
+    temp_df = df.groupby([feature, <span class="hljs-string">'Churn'</span>]).size().reset_index()
+    temp_df = temp_df.rename(columns={<span class="hljs-number">0</span>:<span class="hljs-string">'Count'</span>})
+    
+    value_counts_df = df[feature].value_counts().to_frame().reset_index()
+    categories = [cat[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>] <span class="hljs-keyword">for</span> cat <span class="hljs-keyword">in</span> value_counts_df.iterrows()]
+    
+    num_list = [num[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>] <span class="hljs-keyword">for</span> num <span class="hljs-keyword">in</span> value_counts_df.iterrows()]
+    div_list = [element / sum(num_list) <span class="hljs-keyword">for</span> element <span class="hljs-keyword">in</span> num_list]
+    percentage = [round(element * <span class="hljs-number">100</span>,<span class="hljs-number">1</span>) <span class="hljs-keyword">for</span> element <span class="hljs-keyword">in</span> div_list]
+    
+    
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">num_format</span><span class="hljs-params">(list_instance)</span>:</span>
+        formatted_str = <span class="hljs-string">''</span>
+        <span class="hljs-keyword">for</span> index,num <span class="hljs-keyword">in</span> enumerate(list_instance):
+            <span class="hljs-keyword">if</span> index &lt; len(list_instance)<span class="hljs-number">-2</span>:
+                formatted_str=formatted_str+f<span class="hljs-string">'{num}%, '</span> 
+            <span class="hljs-keyword">elif</span> index == len(list_instance)<span class="hljs-number">-2</span>:
+                formatted_str=formatted_str+f<span class="hljs-string">'{num}% &amp; '</span>
+            <span class="hljs-keyword">else</span>:
+                formatted_str=formatted_str+f<span class="hljs-string">'{num}%'</span>
+        <span class="hljs-keyword">return</span> formatted_str
+    
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">str_format</span><span class="hljs-params">(list_instance)</span>:</span>
+        formatted_str = <span class="hljs-string">''</span>
+        <span class="hljs-keyword">for</span> index, cat <span class="hljs-keyword">in</span> enumerate(list_instance):
+            <span class="hljs-keyword">if</span> index &lt; len(list_instance)<span class="hljs-number">-2</span>:
+                formatted_str=formatted_str+f<span class="hljs-string">'{cat}, '</span>
+            <span class="hljs-keyword">elif</span> index == len(list_instance)<span class="hljs-number">-2</span>:
+                formatted_str=formatted_str+f<span class="hljs-string">'{cat} &amp; '</span>
+            <span class="hljs-keyword">else</span>:
+                formatted_str=formatted_str+f<span class="hljs-string">'{cat}'</span>
+        <span class="hljs-keyword">return</span> formatted_str
+    
+    num_str = num_format(percentage)
+    cat_str = str_format(categories)
+
+    
+    fig = px.bar(temp_df, x=feature, y=<span class="hljs-string">'Count'</span>, color=<span class="hljs-string">'Churn'</span>, title=f<span class="hljs-string">'Churn rate by {feature}'</span>, barmode=<span class="hljs-string">"group"</span>, color_discrete_sequence=[<span class="hljs-string">"green"</span>, <span class="hljs-string">"red"</span>])
+    fig.add_annotation(
+                text=f<span class="hljs-string">'Value count of distribution of {cat_str} are&lt;br&gt;{num_str} percentage respectively.'</span>,
+                align=<span class="hljs-string">'left'</span>,
+                showarrow=<span class="hljs-keyword">False</span>,
+                xref=<span class="hljs-string">'paper'</span>,
+                yref=<span class="hljs-string">'paper'</span>,
+                x=<span class="hljs-number">1.4</span>,
+                y=<span class="hljs-number">1.3</span>,
+                bordercolor=<span class="hljs-string">'black'</span>,
+                borderwidth=<span class="hljs-number">1</span>)
+    fig.update_layout(
+        
+        margin=dict(r=<span class="hljs-number">400</span>),
+    )
+
+    <span class="hljs-keyword">return</span> fig.show()
+</pre>
+
+
+
+<p>现在，让我们画出人口统计特征。</p>
+
+
+
+<pre class="hljs">
+bar(<span class="hljs-string">'gender'</span>)
+
+data_df.loc[data_df.SeniorCitizen==<span class="hljs-number">0</span>,<span class="hljs-string">'SeniorCitizen'</span>] = <span class="hljs-string">"No"</span>   
+data_df.loc[data_df.SeniorCitizen==<span class="hljs-number">1</span>,<span class="hljs-string">'SeniorCitizen'</span>] = <span class="hljs-string">"Yes"</span>  
+bar(<span class="hljs-string">'SeniorCitizen'</span>)
+
+bar(<span class="hljs-string">'Partner'</span>)
+
+bar(<span class="hljs-string">'Dependents'</span>)
+</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/b84f104338920fc50c0d53d530833ca0.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh4.googleusercontent.com/gYOYYG2721D8L1ZLqqm5MJOb15crn-OeDL3yTKybaDljlSvB_87XtEDKjuLl0xOa9WjQ1gjs7UMnbQ7ZqaGkp8zouBBr8tsoWrFdvSyaf_Hx4cAWTaBdSfWy1Ey1Jyja6yout1H3"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by gender</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/7317395e1b79682eecd7da40193380c5.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/Hvk3sJCVZTvAWtIOQIAZR1hB8uqYF0bbtR9kmfYALJ48_MRZp7JC69yXf9DI61xtDkPvLxMfYV8iXk6WBE_p1v8tHqOlExHD0SeuiTL9MymjDEtemPBfynlvCc5NQUIj6BpZBpL9"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by senior citizen</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img decoding="async" loading="lazy" src="../Images/6923f81fa4469d34dc56cc0e96f83cd8.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/A5xDLQBRXJHP5iXYimUXJERdpELK1EGxfxR55_VbT8aG2G7iiRT9PxDIj209H0InlHU0U5wYHg5aUsusI5Nd_2WSxL2m5cgcoDb0p1mB_aJY_wwbePCIBLhi0y-YHc_E0gh0BXPD"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by partner</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/ad67ddb278275cf8a8835fcd2deaa057.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/jJ1ccv4sBfK6simNR4yQPffTBbkvogpLfwkbPNsFUyidO7Gqrs8wuE_ScpkFCuVtb6w9nVR2D60AK8CJUG8JhHSjRZQ_krr8gvJDPeWosq5n7QZKYMPDe9ksItAEf8RaERdasT8T"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by dependents</em></figcaption></figure></div>
+
+
+<p><strong>人口统计分析洞察:</strong>性别和伴侣以大致的百分比值均匀分布。女性客户流失的差异略高，但这种微小的差异可以忽略不计。年轻客户(老年人=否)、没有伴侣的客户和没有家属的客户的流失率更高。数据的人口统计部分强调了没有伴侣和受抚养人的30岁以上的老年人是可能流失的特定客户群.</p>
+
+
+
+<p>接下来，我们来了解一下每位客户已经注册的服务。</p>
+
+
+
+<pre class="hljs">bar(<span class="hljs-string">'PhoneService'</span>)
+bar(<span class="hljs-string">'MultipleLines'</span>)
+bar(<span class="hljs-string">'InternetService'</span>)
+bar(<span class="hljs-string">'OnlineSecurity'</span>)
+bar(<span class="hljs-string">'OnlineBackup'</span>)
+bar(<span class="hljs-string">'DeviceProtection'</span>)
+bar(<span class="hljs-string">'TechSupport'</span>)
+bar(<span class="hljs-string">'StreamingTV'</span>)
+bar(<span class="hljs-string">'StreamingMovies'</span>)
+</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/59dc49d957f5a7dac3b9847adfe566f2.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/S6RI4jOjvKHgmxwKJE_Q7JNgm9bDzxI30bwmNojNjdspDsT80CbEOG7HY117PFJ0BZ9J-yNl4iH6v6rLO9kuzHFAETOVM8h83FJXWSpSiqusdz7cpdrkNeBac138oGG1NVmXFFm8"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by phone service</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/1d51b2bca51d458a4fd8fa133755e7d9.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/Y-AjH8aa4WcDA4kQ8wez5nWSwJzVXUfXM4SdO4rqbicM93FKW-L2wJ-xII8JAysiCJS5Qcame7NnpincSOtI7NgLsIBN00xdkbpkGgeRZbu9cMebeK-NRITHaxXWcShq2t2i18Gz"/><figcaption class="wp-element-caption">Output plot of the distribution churn rate by multiple lines</figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/7965c9d243d2cc6703ac9e711593cf82.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/c_yopqybcRsKLWrX6Zm61vDgCuKZHtWSh0ZUgk9LMBZpahv_GucxEQ1Z9mQY_QerO_V6FLv1Nsae2cVzQPNZztk5RxhocBDks8K1fFIUQiYETV6XQF9EMgsEBTpHCRkPvy7h6q-F"/><figcaption class="wp-element-caption"><em>Output plot of the distribution churn rate by internet service</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/86996d28440616a1acc4e5d80787e050.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/6SdD_Ap6OqecMFuWVyWrLErAWT1XZEMIDRVK5itpHbTt3nqt68kWSku4JPv1-iSIYJJ1LbSncXaMM85zcsHktkCk8oBsYQ2gIeHRQNrVTgQ3sK5BETj6Weyb-gRZ8yYhOoc2J16k"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by online security service</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/4af98aeca506a08af1ce056fbe66e4a6.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/cu-3AAnuG1sEA4C1qIJRWWTBPEUjmDefhU6dcKGyZndIOgMoChByGydenCRvweidN3Efengoc1hNLRMqTkBr9PwT_7WAbVhi0lLBSbTMKFaAcnBwSKqKfWY9pN2NfgxaUWaONg-F"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by online backup service</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/4b868416d59e3e9ba76893ae55fe907a.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/JK5mNnEzAwfi070YleKtQzjZhYIEKk_lISbx0AsCu9yxXwGTvATgJNmUaL6aJS4yiURnfo8O8aSuVgKXNupkeOr6XFx7KkKxaohr-UvodJj_wDyeiTrjHmVY02vDEiEy-Fal6zPi"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by device protection service</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/afb7d46c5aaaa8b9e9ba949366e633f5.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/vVXJljS99JgrkVocZi8GyyLTSxZwvvzPWCGqjsrSVYh2Vn9epM63h34bWO6_-td2XgNJMe-j8YWuC_DWzsbt_K9PVk4Z19i9FW3F6woOH8Rcu73Zv3uDlHc9X0IarB7F3P2WDmwL"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by technology support service</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/33461e4d97245808d6d5793fa36501f3.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/5gAZJrOtJIjqA9_qyUAS7jHY27GOFLkWTSNz3Vo-Y6Uz_4IO5LHtmnue8tYMvuATY3V3F2KzeLLcO-FZ7SgF2XVJLx1Hqg8YhIl3MUR7L7VSVa2Y0KzFYecA7FDqAExGJIo7VYb8"/><figcaption class="wp-element-caption">Output plot of the distribution of churn rate by streaming TV service</figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/2a095efa775d814e5aad9923582d9342.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/5eOixiOdzbpfVhq3ZevFFviLdN0orcwxI30gmUfxDZxIG1dtU7PTLV_MlENgd-XCoFJFhGnReiI9z9dEm0pAlL7AHjx6H2-hj4RW6dZ-TTTdID8qP64O-AZHlxo4ujnk4j-zvC0V"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by streaming movies </em></figcaption></figure></div>
+
+
+<p><strong>每位客户已签约insight的服务:</strong>这些特性显示了他们价值观的显著差异。如果客户没有电话服务，他们就不能有多条线路。约90.3%的客户拥有电话服务，客户流失率较高。将光纤作为互联网服务的客户更有可能流失。这可能是由于高价格、竞争、客户服务和许多其他原因造成的。光纤服务比DSL贵很多，这可能是客户流失的原因之一。拥有在线安全、在线备份、设备保护和技术支持的客户更不可能流失。流媒体服务无法预测客户流失，因为它平均分布在是和否选项中。</p>
+
+
+
+<p>是时候探索支付功能了。</p>
+
+
+
+<pre class="hljs">bar(<span class="hljs-string">'Contract'</span>)
+bar(<span class="hljs-string">'PaperlessBilling'</span>)
+bar(<span class="hljs-string">'PaymentMethod'</span>)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/751ba10a8e55760f1f39896f411e9a6c.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh4.googleusercontent.com/6L-t-__2HECqIiDeZD-kSxVIYN95jvGnGhY7yTbNiaTFgEVIMrLjW67egWwr3X0wDFjqzhpT5JDC1Gy1nv2xXn0NLXufPnfhO9Ity0DfzJ2zZDyD_f5UcMr_rW0-FAWW4KzAO48T"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by contract</em></figcaption></figure>
+
+
+
+<p> </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img decoding="async" loading="lazy" src="../Images/38fbb01e26f7017bcd3011b3bae56b49.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/WDbL5Y__tVxNWEDwdziKOEzT9QcSBeJ7RqJxnhqukFNrbflXURd2Oa3_vgDzmBpYRCOQUfh2aQW-H-QL9gVVv4GxV4XizCVC634utin-SZ0dK8LkP6tdT9PMeVOsgBi_H7Fk9_y-"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by paperless billing</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/14d90b123981a47ac98148d8f7e2c454.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/CARtXcetc0F5hI3rzEVHcry6VArRkCi9mHiPb_THY2XF-IUj3fbJUxVmB8lOY_2APkOIBGxC4pyFppNGv4xoVyzGvdiy4ANNWj7VTt8OyEDw8vH3kkLzGNdWX6s28JVdVy21ZpFN"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by payment methods</em></figcaption></figure></div>
+
+
+<p><strong>支付洞察:</strong>合同越短，流失率越高。那些有更多延期计划的人在提前取消时会面临额外的障碍。这清楚地解释了公司与其客户建立长期关系的动机。选择无纸化计费的客户流失率更高。约59.2%的客户使用无纸化计费。使用电子支票支付的客户更容易流失，这种支付方式比其他支付类型更常见。</p>
+
+
+
+<p>现在，让我们探索数字特征。</p>
+
+
+
+<pre class="hljs">Data_df.dtypes
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/b68a671d9d4b0df5ce4efc7882841366.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/FWgA-ij1nalnKDgXRcElqqwB3bNaIqCJsNyaizB59eWYJk6i18NF4SUd5MahEl--y3kpuPKGWRMjuw2DH0kUDxRpopFwA_65s_-KWBlxf9gMdoS1RuUwquMV_j_llbQnSeEg6tG_"/></figure>
+
+
+
+<p><strong>可以观察到</strong>total charges具有对象数据类型，这意味着它包含字符串组件。我们来换算一下。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">try</span>:
+    data_df[<span class="hljs-string">'TotalCharges'</span>] = data_df[<span class="hljs-string">'TotalCharges'</span>].astype(float)
+<span class="hljs-keyword">except</span> ValueError <span class="hljs-keyword">as</span> ve:
+    <span class="hljs-keyword">print</span> (ve)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/2394490251b7715b4e194bfeb61e2690.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/dErhniqh_YWOVXlpWHh5d6iEyK-EG-RmvLPk8qx-RXfa6USLKBu2tJg6xpymO-usi6s-K0HNhEtrFIk4wArC9wGe-38gmCjNeg2zzlUemqP_vbkf1lVl5d6VMYSFSTB9QrQnmcn8"/></figure>
+
+
+
+<p><strong>这表示一些</strong>空值被存储为空白。让我们将该特征转换为数字格式，同时将这些空字符串空间等同为NaN，如下所示:</p>
+
+
+
+<pre class="hljs">data_df[<span class="hljs-string">'TotalCharges'</span>] = pd.to_numeric(data_df[<span class="hljs-string">'TotalCharges'</span>],errors=<span class="hljs-string">'coerce'</span>)
+
+data_df[<span class="hljs-string">'TotalCharges'</span>] = data_df[<span class="hljs-string">'TotalCharges'</span>].fillna(data_df[<span class="hljs-string">'TotalCharges'</span>].median())
+</pre>
+
+
+
+<p><strong>接下来，让我们绘制所有数字特征的直方图</strong>来了解分布情况。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">hist</span><span class="hljs-params">(feature)</span>:</span>
+    group_df = data_df.groupby([feature, <span class="hljs-string">'Churn'</span>]).size().reset_index()
+    group_df = group_df.rename(columns={<span class="hljs-number">0</span>: <span class="hljs-string">'Count'</span>})
+    fig = px.histogram(group_df, x=feature, y=<span class="hljs-string">'Count'</span>, color=<span class="hljs-string">'Churn'</span>, marginal=<span class="hljs-string">'box'</span>, title=f<span class="hljs-string">'Churn rate frequency to {feature} distribution'</span>, color_discrete_sequence=[<span class="hljs-string">"green"</span>, <span class="hljs-string">"red"</span>])
+    fig.show()
+</pre>
+
+
+
+<p><strong>对数字特征运行功能</strong>,如下所示:</p>
+
+
+
+<pre class="hljs">hist(<span class="hljs-string">'tenure'</span>)
+hist(<span class="hljs-string">'MonthlyCharges'</span>)
+hist(<span class="hljs-string">'TotalCharges'</span>)
+</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/519120f124519a7b342a433da5e4a1d5.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/UkVCVgokousNcTn5-DfIxfDR8xx8uECiyDTQEY1MNj3zupLFrxCzOARMw1UyLJ71sZWF-6tpBwBVPVRMiZdB5wW1UpMVgwVA-BGaCwSWeU8DJLZW9nEbXZuIhhrBtk7Axcbb8JUq"/><figcaption class="wp-element-caption"><em>Output plot of the histogram on tenure with respect to churn rate</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/5bbd95416965cdcfc0f2a5107b8be9d9.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/RS-AGGxy4zYEOkbsVihUC6RxJqanJUN6sOSSqAytkQj-jjjMECAGMr9WORrYlDUwL3V-9jrfFBW5S2BqKvb2Zw89PBJUtj0CSA_u0x_5J4zN0K3z2sHMxDjfg1nGaJM56Mx_3QtO"/><figcaption class="wp-element-caption"><em>Output plot of the histogram on monthly charges with respect to churn rate</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/1aa9d178417ac497e144ca33b4ce06dd.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/xv5QxQ01v5D6b3uK4RxXSzK58alu0URW1Ytg0HwfWNtz_MqrNimhcvyGgiNVK2b6RS9PkOIZQ4VkImpoDey-nlJf1KdLvjG5RKBtdL2TDrtKZyBd3iuuQgB17oHdHNG0EQdisM_a"/><figcaption class="wp-element-caption"><em>Output plot of the histogram on total charges with respect to churn rate</em></figcaption></figure></div>
+
+
+<p><strong>客户账户信息洞察:</strong>任期直方图是正确倾斜的，显示大多数客户只在最初几个月(0-9个月)与电信公司合作。流失率最高的也是最初几个月(0-9个月)。75%最终离开电信公司的客户都是在头30个月内离开的。月费柱状图显示月费越高的客户流失率越高。这表明折扣和促销可能是吸引顾客留下来的一个原因。</p>
+
+
+
+<p>让我们根据分位数将数字特征分成三个部分(低、中和高，以便从中获得更多信息)。</p>
+
+
+
+<pre class="hljs">
+bin_df = pd.DataFrame()
+
+
+bin_df[<span class="hljs-string">'tenure_bins'</span>] =  pd.qcut(data_df[<span class="hljs-string">'tenure'</span>], q=<span class="hljs-number">3</span>, labels= [<span class="hljs-string">'low'</span>, <span class="hljs-string">'medium'</span>, <span class="hljs-string">'high'</span>])
+bin_df[<span class="hljs-string">'MonthlyCharges_bins'</span>] =  pd.qcut(data_df[<span class="hljs-string">'MonthlyCharges'</span>], q=<span class="hljs-number">3</span>, labels= [<span class="hljs-string">'low'</span>, <span class="hljs-string">'medium'</span>, <span class="hljs-string">'high'</span>])
+bin_df[<span class="hljs-string">'TotalCharges_bins'</span>] =  pd.qcut(data_df[<span class="hljs-string">'TotalCharges'</span>], q=<span class="hljs-number">3</span>, labels= [<span class="hljs-string">'low'</span>, <span class="hljs-string">'medium'</span>, <span class="hljs-string">'high'</span>])
+bin_df[<span class="hljs-string">'Churn'</span>] = data_df[<span class="hljs-string">'Churn'</span>]
+
+
+bar(<span class="hljs-string">'tenure_bins'</span>, bin_df)
+bar(<span class="hljs-string">'MonthlyCharges_bins'</span>, bin_df)
+bar(<span class="hljs-string">'TotalCharges_bins'</span>, bin_df)
+</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/c09bc5ed9277bdadbaca8f09e95b2cb8.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh4.googleusercontent.com/hueDX74Jz6Ejusmh_E-9gk7zaYTjyzvCUVIjLR1vBgM57XvISPf-MBcMwsTLNwSI1LmHzral1xYhz8urvyisGMR9bOR53cTViGsW4jKneWykibMNFhDjZnNED_J9IQqib0x_ONEn"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by binned tenure</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter is-resized"><img decoding="async" loading="lazy" src="../Images/d51ced91ad5c93c19c7d060d452533c3.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/9zIUwsmaC93Z6UX_PvWFWFIwLo0QRAN6HRY4aL7z4xNrHOdE_x7B142tg1Cq9OBhZ5IwNPlH4S6YeUjOyxIuBB5gew5kmRLkyxOX5u4iihggA58zfrpETgfSwLg9-k1BWGnk9iqa"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by binned monthly charges</em></figcaption></figure></div>
+
+<div class="wp-block-image">
+<figure class="aligncenter"><img decoding="async" src="../Images/8741d2251dcafe8eec8d3ef19579aac9.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/Y5ylhsJvkPeGZTH2z1QtRFiY-kGYHMeT1c0PznF1oiTOAqjpc8DHh45gBjCr2FkrLWHMmPGx6_CUiudoqexcQ2-o8D8awOYlVoEmnLkWSrtrWYK9lyptCzw30s1moQpxNcbLv2qk"/><figcaption class="wp-element-caption"><em>Output plot of the distribution of churn rate by binned total charges</em></figcaption></figure></div>
+
+
+<p>根据宁滨，低任期和高每月收费箱有更高的流失率，正如前面的分析所支持的。同时，总费用低的仓位流失率较高。</p>
+
+
+
+<h3 id="data-preprocessing">数据预处理</h3>
+
+
+
+<p>在本节中，我们将获得更多见解，并将数据转换为适合各种机器学习算法的数据表示。</p>
+
+
+
+<pre class="hljs">
+data_df.drop([<span class="hljs-string">"customerID"</span>],axis=<span class="hljs-number">1</span>,inplace = <span class="hljs-keyword">True</span>)
+
+
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">binary_map</span><span class="hljs-params">(feature)</span>:</span>
+    <span class="hljs-keyword">return</span> feature.map({<span class="hljs-string">'Yes'</span>:<span class="hljs-number">1</span>, <span class="hljs-string">'No'</span>:<span class="hljs-number">0</span>})
+
+
+data_df[<span class="hljs-string">'Churn'</span>] = data_df[[<span class="hljs-string">'Churn'</span>]].apply(binary_map)
+
+
+data_df[<span class="hljs-string">'gender'</span>] = data_df[<span class="hljs-string">'gender'</span>].map({<span class="hljs-string">'Male'</span>:<span class="hljs-number">1</span>, <span class="hljs-string">'Female'</span>:<span class="hljs-number">0</span>})
+
+
+binary_list = [<span class="hljs-string">'SeniorCitizen'</span>, <span class="hljs-string">'Partner'</span>, <span class="hljs-string">'Dependents'</span>, <span class="hljs-string">'PhoneService'</span>, <span class="hljs-string">'PaperlessBilling'</span>]
+data_df[binary_list] = data_df[binary_list].apply(binary_map)
+
+
+data_df = pd.get_dummies(data_df, drop_first=<span class="hljs-keyword">True</span>)
+</pre>
+
+
+
+
+
+
+
+<p><strong>我们来看看数值之间的相关性</strong>。</p>
+
+
+
+<pre class="hljs">
+corr = data_df.corr()
+
+fig = px.imshow(corr,width=<span class="hljs-number">1000</span>, height=<span class="hljs-number">1000</span>)
+fig.show()
+</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><a href="https://web.archive.org/web/20230227045312/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Customer-churn-correlation.png?ssl=1"><img decoding="async" loading="lazy" src="../Images/6369eddd438e239ef5ccf3aca3c83b6f.png" alt="Customer churn correlation" class="wp-image-50675" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230227045312im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Customer-churn-correlation.png?resize=750%2C750&amp;ssl=1"/></a><figcaption class="wp-element-caption"><em>Output plot of the correlation matrix of numeric features</em></figcaption></figure></div>
+
+
+<p>相关性衡量两个变量之间的线性关系。相关性高的特征更具线性相关性，对因变量的影响几乎相同。所以，当两个特征高度相关时，我们可以去掉其中一个。在我们的情况下，我们可以放弃高度相关的功能，如多线、在线安全、在线备份、设备保护、技术支持、流媒体电视和流媒体电影。</p>
+
+
+
+<p>客户流失预测是一个二元分类问题，因为在给定的时间段内，客户要么流失，要么被保留。需要回答两个问题来指导模型的建立:</p>
+
+
+
+<ol>
+<li>哪些特性让客户流失或保留？</li>
+
+
+
+<li>培养一个高性能的模型最重要的特征是什么？</li>
+</ol>
+
+
+
+<p>让我们使用广义线性模型(GLM)来获得目标各自特征的一些统计数据。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> statsmodels.api <span class="hljs-keyword">as</span> sm
+<span class="hljs-keyword">import</span> statsmodels.formula.api <span class="hljs-keyword">as</span> smf
+
+
+all_columns = [column.replace(<span class="hljs-string">" "</span>, <span class="hljs-string">"_"</span>).replace(<span class="hljs-string">"("</span>, <span class="hljs-string">"_"</span>).replace(<span class="hljs-string">")"</span>, <span class="hljs-string">"_"</span>).replace(<span class="hljs-string">"-"</span>, <span class="hljs-string">"_"</span>) <span class="hljs-keyword">for</span> column <span class="hljs-keyword">in</span> data_df.columns]
+
+
+data_df.columns = all_columns
+
+
+glm_columns = [e <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> all_columns <span class="hljs-keyword">if</span> e <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> [<span class="hljs-string">'customerID'</span>, <span class="hljs-string">'Churn'</span>]]
+glm_columns = <span class="hljs-string">' + '</span>.join(map(str, glm_columns))
+
+
+glm_model = smf.glm(formula=f<span class="hljs-string">'Churn ~ {glm_columns}'</span>, data=data_df, family=sm.families.Binomial())
+res = glm_model.fit()
+print(res.summary())
+</pre>
+
+
+
+<figure class="wp-block-image is-resized"><a href="https://web.archive.org/web/20230227045312/https://lh4.googleusercontent.com/8POzHCVHRyFB6vWkTYQoNOKpFn_uTXG3DT0q5DlGXyDYNwQRhD57X6QHWAXRO-OK719xkkwPHuMOcGxhaBzSq0TbTGnapidBuE9IZA392HfWqQsn-d4UJ8xz4W977qWTraeG3dpS"><img decoding="async" loading="lazy" src="../Images/e08444b2ef6a45a55da8f693fda32441.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh4.googleusercontent.com/8POzHCVHRyFB6vWkTYQoNOKpFn_uTXG3DT0q5DlGXyDYNwQRhD57X6QHWAXRO-OK719xkkwPHuMOcGxhaBzSq0TbTGnapidBuE9IZA392HfWqQsn-d4UJ8xz4W977qWTraeG3dpS"/></a></figure>
+
+
+
+<p>对于第一个问题，您应该查看(P&gt;|z|)列。如果绝对<strong> p值</strong>小于0.05，则意味着该特性以统计显著的方式影响客户流失。例如:</p>
+
+
+
+<ul>
+<li>老年人</li>
+
+
+
+<li>任期</li>
+
+
+
+<li>合同</li>
+
+
+
+<li>无纸账单等。</li>
+</ul>
+
+
+
+<p>关于特征重要性的第二个问题可以通过查看指数系数值来回答。指数系数通过一个单位的变化来估计给定特征的预期流失变化。</p>
+
+
+
+<pre class="hljs">np.exp(res.params)</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/4c3bdd2b53982e89c8b2510fc2f3631b.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/qDAjJl1nuZk5zPXunHkV1Vbjsq3AZrkKxD7HJTrh_VtapnMygtBbKpGwoCmNLKtlAauosnl0_VJH0Rp4V1ZufDe0eZO_uBidBVxFYsCTjtu1f5zDh45MKQ4FiVgLtwlwGKHDBjgB"/></figure>
+
+
+
+<p>这将输出奇数比率。大于1的值表示流失增加。小于1的值表示客户流失较少。</p>
+
+
+
+<p>所有要素的范围应进行归一化，以便每个要素对最终距离的贡献大致成比例，因此我们进行要素缩放。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">from</span> sklearn.preprocessing <span class="hljs-keyword">import</span> MinMaxScaler
+sc = MinMaxScaler()
+data_df[<span class="hljs-string">'tenure'</span>] = sc.fit_transform(data_df[[<span class="hljs-string">'tenure'</span>]])
+data_df[<span class="hljs-string">'MonthlyCharges'</span>] = sc.fit_transform(data_df[[<span class="hljs-string">'MonthlyCharges'</span>]])
+data_df[<span class="hljs-string">'TotalCharges'</span>] = sc.fit_transform(data_df[[<span class="hljs-string">'TotalCharges'</span>]])
+</pre>
+
+
+
+<p>让我们开始用逻辑回归算法创建一个基线模型，然后用其他机器学习模型进行预测，如支持向量分类器(SVC)、随机森林分类器、决策树分类器和朴素贝叶斯分类器。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">from</span> sklearn.linear_model <span class="hljs-keyword">import</span> LogisticRegression
+<span class="hljs-keyword">from</span> sklearn.svm <span class="hljs-keyword">import</span> SVC
+<span class="hljs-keyword">from</span> sklearn.ensemble <span class="hljs-keyword">import</span> RandomForestClassifier
+<span class="hljs-keyword">from</span> sklearn.tree <span class="hljs-keyword">import</span> DecisionTreeClassifier
+<span class="hljs-keyword">from</span> sklearn.naive_bayes <span class="hljs-keyword">import</span> GaussianNB
+
+
+<span class="hljs-keyword">from</span> sklearn.metrics <span class="hljs-keyword">import</span> accuracy_score, precision_score, recall_score, f1_score
+
+
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+X = data_df.drop(<span class="hljs-string">'Churn'</span>, axis=<span class="hljs-number">1</span>)
+y = data_df[<span class="hljs-string">'Churn'</span>]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="hljs-number">0.3</span>, random_state=<span class="hljs-number">50</span>)
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">modeling</span><span class="hljs-params">(alg, alg_name, params={})</span>:</span>
+    model = alg(**params) 
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">print_scores</span><span class="hljs-params">(alg, y_true, y_pred)</span>:</span>
+        print(alg_name)
+        acc_score = accuracy_score(y_true, y_pred)
+        print(<span class="hljs-string">"accuracy: "</span>,acc_score)
+        pre_score = precision_score(y_true, y_pred)
+        print(<span class="hljs-string">"precision: "</span>,pre_score)
+        rec_score = recall_score(y_true, y_pred)
+        print(<span class="hljs-string">"recall: "</span>,rec_score)
+        f_score = f1_score(y_true, y_pred, average=<span class="hljs-string">'weighted'</span>)
+        print(<span class="hljs-string">"f1_score: "</span>,f_score)
+
+    print_scores(alg, y_test, y_pred)
+    <span class="hljs-keyword">return</span> model
+
+
+log_model = modeling(LogisticRegression, <span class="hljs-string">'Logistic Regression'</span>)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/b60fb8813a13d8491835945865e71025.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/37P9dhDOPyqF0_9rGLglRtCDn-fdDtPyIF1kKPRfGPDIgWfAaHj9tTIl58kwE34tFbz5HBmRe7FwjM_KTxlaZ1lBdJeakWAhK4gcALuf4dHsmwTvNtt1-rpAcC_HwEY8j_eQReiy"/></figure>
+
+
+
+<p><strong>接下来，我们进行特征选择</strong>以使机器学习算法能够更快地训练，降低模型复杂性，增加可解释性，并且如果选择了正确的特征子集，则提高模型准确性。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">from</span> sklearn.feature_selection <span class="hljs-keyword">import</span> RFECV
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> StratifiedKFold
+log = LogisticRegression()
+rfecv = RFECV(estimator=log, cv=StratifiedKFold(<span class="hljs-number">10</span>, random_state=<span class="hljs-number">50</span>, shuffle=<span class="hljs-keyword">True</span>), scoring=<span class="hljs-string">"accuracy"</span>)
+rfecv.fit(X, y)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/7ec08799fe1384f9243c5ece55871076.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/SliRds9iYna0nV8kZwPnhL-01stQ9RzeFjW0rOlwxN_UmxHlWIpzxEa3adnG961deVDDoDaGT5BmFoG9PxV_MF1NaujT2DOfKfvXtNBGFKg1AVJWLCOLahkGmrmQcHP9ZSdoYMLx"/></figure>
+
+
+
+<pre class="hljs">plt.figure(figsize=(<span class="hljs-number">8</span>, <span class="hljs-number">6</span>))
+plt.plot(range(<span class="hljs-number">1</span>, len(rfecv.grid_scores_)+<span class="hljs-number">1</span>), rfecv.grid_scores_)
+plt.grid()
+plt.xticks(range(<span class="hljs-number">1</span>, X.shape[<span class="hljs-number">1</span>]+<span class="hljs-number">1</span>))
+plt.xlabel(<span class="hljs-string">"Number of Selected Features"</span>)
+plt.ylabel(<span class="hljs-string">"CV Score"</span>)
+plt.title(<span class="hljs-string">"Recursive Feature Elimination (RFE)"</span>)
+plt.show()
+
+print(<span class="hljs-string">"The optimal number of features: {}"</span>.format(rfecv.n_features_))
+</pre>
+
+
+
+
+
+<pre class="hljs">
+X_rfe = X.iloc[:, rfecv.support_]
+
+
+print(<span class="hljs-string">""X" dimension: {}"</span>.format(X.shape))
+print(<span class="hljs-string">""X" column list:"</span>, X.columns.tolist())
+print(<span class="hljs-string">""X_rfe" dimension: {}"</span>.format(X_rfe.shape))
+print(<span class="hljs-string">""X_rfe" column list:"</span>, X_rfe.columns.tolist())
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/e6f6614e7daa66aa00cbdcee408911b2.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/KbhHn7KHxtyTGW3c8OIKIpjnHFPV5Ybi6aMZnHdet3y9d4zONFngLxrrQlcSFgm6qxpAXyR0_RzDszVW43-fwlBXm6op2L8LFxVcDNyUMc40cOBPwHqmrPzeyYXV46LbTLUs4fex"/></figure>
+
+
+
+<pre class="hljs">&lt;pre <span class="hljs-class"><span class="hljs-keyword">class</span>="<span class="hljs-title">hljs</span>" <span class="hljs-title">style</span>="<span class="hljs-title">display</span>:</span> block; overflow-x: auto; padding: <span class="hljs-number">0.5</span>em; color: rgb(<span class="hljs-number">51</span>, <span class="hljs-number">51</span>, <span class="hljs-number">51</span>); background: rgb(<span class="hljs-number">248</span>, <span class="hljs-number">248</span>, <span class="hljs-number">248</span>);<span class="hljs-string">"&gt;&lt;span class="</span>hljs-comment<span class="hljs-string">" style="</span>color: rgb(<span class="hljs-number">153</span>, <span class="hljs-number">153</span>, <span class="hljs-number">136</span>); font-style: italic;<span class="hljs-string">"&gt;# Splitting data with optimal features&lt;/span&gt;
+X_train, X_test, y_train, y_test = train_test_split(X_rfe, y, test_size=&lt;span class="</span>hljs-numbe<span class="hljs-string">r" style="</span>color: teal;<span class="hljs-string">"&gt;0.3&lt;/span&gt;, random_state=&lt;span class="</span>hljs-numbe<span class="hljs-string">r" style="</span>color: teal;<span class="hljs-string">"&gt;50&lt;/span&gt;)
+
+&lt;span class="</span>hljs-comment<span class="hljs-string">" style="</span>color: rgb(<span class="hljs-number">153</span>, <span class="hljs-number">153</span>, <span class="hljs-number">136</span>); font-style: italic;<span class="hljs-string">"&gt;# Running logistic regression model&lt;/span&gt;
+log_model = modeling(LogisticRegression, &lt;span class="</span>hljs-string<span class="hljs-string">" style="</span>color: rgb(<span class="hljs-number">221</span>, <span class="hljs-number">17</span>, <span class="hljs-number">68</span>);<span class="hljs-string">"&gt;'Logistic Regression Classification'&lt;/span&gt;)
+&lt;/pre&gt;</span></pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/42f501062309caf82c53de830b974e5c.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/Bt6zUNvAb2zY1QTa9xt8EvNXU6ozZYHnEBjBVEMD72pY4Vos-eM_ruateP9FzpeF8aikWqSnK14Iv5JqbPeTuh_dwABgaDqCxUAQv4n-8pKjvvV02vJGKDL-GbeTP6-g4MqsbGhf"/></figure>
+
+
+
+<pre class="hljs">
+svc_model = modeling(SVC, <span class="hljs-string">'SVC Classification'</span>)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/2df16d9dd49a8db58da151f9c72ffa64.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh5.googleusercontent.com/XfsrLdwTZaO4quZWwoenK-fl3-FEMAOIA3fBZQRbyAEApHbMMKgnPhZFy2bAGlRT9PPKAy_W9vZFeUXqzUfKO4pMV08Xkn5b8rI6WXETSbz-A7JvDamBvc8xFhU1-oX-0DpGC7Uu"/></figure>
+
+
+
+<pre class="hljs">
+rf_model = modeling(RandomForestClassifier, <span class="hljs-string">"Random Forest Classification"</span>)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/e7b89daa24f46b694ef7c1e69570bd09.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/vyPIOnWEn3q3GQdu2_OzjJBqpBnbCsh2LsOeOqBWAoE8Sv0CQjA8ifJUeA3IbBseMa7LmaAIM_hGNXwYEFkX9vocgG5urYJoPnXDxK8A_mZa9MfUcWZElyycqCcO64rTCFLxd63R"/></figure>
+
+
+
+<pre class="hljs">
+dt_model = modeling(DecisionTreeClassifier, <span class="hljs-string">"Decision Tree Classification"</span>)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/0f3d870abac22860d7305695fa88a0d9.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh4.googleusercontent.com/x_zbF9Jov30oKQGcmGkiTCuiVlnUHD67p8k63bAqaaYsLQjNOwNHREEYV-0Pg-_vrVS6SA2Q1mRPbAyF1-osc6NrVBRQnfCBeZbZVan89y_s9jc3_9LhZ0d1w37OCv3K2wg4iHT2"/></figure>
+
+
+
+<pre class="hljs">
+nb_model = modeling(GaussianNB, <span class="hljs-string">"Naive Bayes Classification"</span>)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/59c3c6d3559978b1e89fe8a88456bb82.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh3.googleusercontent.com/FboxIxXTHiyfudZDoD2514eMCtu-zUPwB1pznOqgx8y3KhYh5uCK6aWxhkIq7-cJ_40pUsbhoSp-yM7bCB02Jom2c99aCNFNSHidX3myFwDf1H9DQqW078hDbl9kRbb7TlQ0RfbJ"/></figure>
+
+
+
+<p><strong>在选定的绩效指标中，</strong>逻辑回归算法在所有选定的指标中得分最高。它可以通过各种技术来改进，但是我们将通过超参数调整(随机搜索)来快速改进它。</p>
+
+
+
+<pre class="hljs">
+
+model = LogisticRegression()
+
+
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> RepeatedStratifiedKFold
+cv = RepeatedStratifiedKFold(n_splits=<span class="hljs-number">10</span>, n_repeats=<span class="hljs-number">3</span>, random_state=<span class="hljs-number">1</span>)
+
+
+<span class="hljs-keyword">from</span> scipy.stats <span class="hljs-keyword">import</span> loguniform
+space = dict()
+space[<span class="hljs-string">'solver'</span>] = [<span class="hljs-string">'newton-cg'</span>, <span class="hljs-string">'lbfgs'</span>, <span class="hljs-string">'liblinear'</span>]
+space[<span class="hljs-string">'penalty'</span>] = [<span class="hljs-string">'none'</span>, <span class="hljs-string">'l1'</span>, <span class="hljs-string">'l2'</span>, <span class="hljs-string">'elasticnet'</span>]
+space[<span class="hljs-string">'C'</span>] = loguniform(<span class="hljs-number">1e-5</span>, <span class="hljs-number">1000</span>)
+
+
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> RandomizedSearchCV
+search = RandomizedSearchCV(model, space, n_iter=<span class="hljs-number">500</span>, scoring=<span class="hljs-string">'accuracy'</span>, n_jobs=<span class="hljs-number">-1</span>, cv=cv, random_state=<span class="hljs-number">1</span>)
+
+
+result = search.fit(X_rfe, y)
+
+
+
+params = result.best_params_
+
+
+log_model = modeling(LogisticRegression, <span class="hljs-string">'Logistic Regression Classification'</span>, params=params)
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/12dfae888b40629db4183a660abdfe39.png" alt="" data-original-src="https://web.archive.org/web/20230227045312im_/https://lh6.googleusercontent.com/CHN3gEusZ9AGEjTh906VucNKequqhWj1oHg2gqtWR9Lp52MJU1Tc3XYnJbh-yyX-2vjumIjswOYL3n7CGGf5eXLiSYLnpTTrZrbq4WYc3DZb11Ys9C_nS26VDg8SA9KmFoFU3VD_"/></figure>
+
+
+
+<p>模型略有改进。让我们保存这个模型，并使用这个模型开始部署我们的客户流失预测应用程序。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> joblib
+
+filename = <span class="hljs-string">'model.sav'</span>
+joblib.dump(log_model, filename)
+</pre>
+
+
+
+<h3 id="deployment">部署</h3>
+
+
+
+<p>重要的是部署你的模型，以便可以从其他人(无论是用户、管理人员还是其他系统)可以使用的经过训练的ML模型中做出预测。在本节中，我们将使用<a href="https://web.archive.org/web/20230227045312/https://docs.streamlit.io/en/stable/#:~:text=Streamlit%20is%20an%20open%2Dsource,Python%203.6%20%2D%20Python%203.8%20installed." target="_blank" rel="noreferrer noopener nofollow"> Streamlit </a>。这是<strong>，一个开源的Python库</strong>，它使得为机器学习和数据科学创建和分享漂亮的、定制的web应用变得容易。</p>
+
+
+
+
+
+
+
+<p>要部署的应用程序将通过操作用例运行:</p>
+
+
+
+<ol>
+<li><strong>在线预测</strong>:这个用例为每个数据点(在本文中是一个客户)逐个生成预测。</li>
+
+
+
+<li><strong>批量预测</strong>:该用途用于即时生成一组观察值的预测。</li>
+</ol>
+
+
+
+<p>部署脚本如下所示:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> streamlit <span class="hljs-keyword">as</span> st
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image
+
+
+<span class="hljs-keyword">import</span> joblib
+model = joblib.load(<span class="hljs-string">r"./notebook/model.sav"</span>)
+
+
+<span class="hljs-keyword">from</span> preprocessing <span class="hljs-keyword">import</span> preprocess
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span><span class="hljs-params">()</span>:</span>
+    
+    st.title(<span class="hljs-string">'Telco Customer Churn Prediction App'</span>)
+
+      
+    st.markdown(<span class="hljs-string">"""
+     :dart:  This Streamlit app is made to predict customer churn in a ficitional telecommunication use case.
+    The application is functional for both online prediction and batch data prediction. n
+    """</span>)
+    st.markdown(<span class="hljs-string">"&lt;h3&gt;&lt;/h3&gt;"</span>, unsafe_allow_html=<span class="hljs-keyword">True</span>)
+
+    
+    image = Image.open(<span class="hljs-string">'App.jpg'</span>)
+    add_selectbox = st.sidebar.selectbox(
+    <span class="hljs-string">"How would you like to predict?"</span>, (<span class="hljs-string">"Online"</span>, <span class="hljs-string">"Batch"</span>))
+    st.sidebar.info(<span class="hljs-string">'This app is created to predict Customer Churn'</span>)
+    st.sidebar.image(image)
+
+    <span class="hljs-keyword">if</span> add_selectbox == <span class="hljs-string">"Online"</span>:
+        st.info(<span class="hljs-string">"Input data below"</span>)
+        
+        st.subheader(<span class="hljs-string">"Demographic data"</span>)
+        seniorcitizen = st.selectbox(<span class="hljs-string">'Senior Citizen:'</span>, (<span class="hljs-string">'Yes'</span>, <span class="hljs-string">'No'</span>))
+        dependents = st.selectbox(<span class="hljs-string">'Dependent:'</span>, (<span class="hljs-string">'Yes'</span>, <span class="hljs-string">'No'</span>))
+        st.subheader(<span class="hljs-string">"Payment data"</span>)
+        tenure = st.slider(<span class="hljs-string">'Number of months the customer has stayed with the company'</span>, min_value=<span class="hljs-number">0</span>, max_value=<span class="hljs-number">72</span>, value=<span class="hljs-number">0</span>)
+        contract = st.selectbox(<span class="hljs-string">'Contract'</span>, (<span class="hljs-string">'Month-to-month'</span>, <span class="hljs-string">'One year'</span>, <span class="hljs-string">'Two year'</span>))
+        paperlessbilling = st.selectbox(<span class="hljs-string">'Paperless Billing'</span>, (<span class="hljs-string">'Yes'</span>, <span class="hljs-string">'No'</span>))
+        PaymentMethod = st.selectbox(<span class="hljs-string">'PaymentMethod'</span>,(<span class="hljs-string">'Electronic check'</span>, <span class="hljs-string">'Mailed check'</span>, <span class="hljs-string">'Bank transfer (automatic)'</span>,<span class="hljs-string">'Credit card (automatic)'</span>))
+        monthlycharges = st.number_input(<span class="hljs-string">'The amount charged to the customer monthly'</span>, min_value=<span class="hljs-number">0</span>, max_value=<span class="hljs-number">150</span>, value=<span class="hljs-number">0</span>)
+        totalcharges = st.number_input(<span class="hljs-string">'The total amount charged to the customer'</span>,min_value=<span class="hljs-number">0</span>, max_value=<span class="hljs-number">10000</span>, value=<span class="hljs-number">0</span>)
+
+        st.subheader(<span class="hljs-string">"Services signed up for"</span>)
+        mutliplelines = st.selectbox(<span class="hljs-string">"Does the customer have multiple lines"</span>,(<span class="hljs-string">'Yes'</span>,<span class="hljs-string">'No'</span>,<span class="hljs-string">'No phone service'</span>))
+        phoneservice = st.selectbox(<span class="hljs-string">'Phone Service:'</span>, (<span class="hljs-string">'Yes'</span>, <span class="hljs-string">'No'</span>))
+        internetservice = st.selectbox(<span class="hljs-string">"Does the customer have internet service"</span>, (<span class="hljs-string">'DSL'</span>, <span class="hljs-string">'Fiber optic'</span>, <span class="hljs-string">'No'</span>))
+        onlinesecurity = st.selectbox(<span class="hljs-string">"Does the customer have online security"</span>,(<span class="hljs-string">'Yes'</span>,<span class="hljs-string">'No'</span>,<span class="hljs-string">'No internet service'</span>))
+        onlinebackup = st.selectbox(<span class="hljs-string">"Does the customer have online backup"</span>,(<span class="hljs-string">'Yes'</span>,<span class="hljs-string">'No'</span>,<span class="hljs-string">'No internet service'</span>))
+        techsupport = st.selectbox(<span class="hljs-string">"Does the customer have technology support"</span>, (<span class="hljs-string">'Yes'</span>,<span class="hljs-string">'No'</span>,<span class="hljs-string">'No internet service'</span>))
+        streamingtv = st.selectbox(<span class="hljs-string">"Does the customer stream TV"</span>, (<span class="hljs-string">'Yes'</span>,<span class="hljs-string">'No'</span>,<span class="hljs-string">'No internet service'</span>))
+        streamingmovies = st.selectbox(<span class="hljs-string">"Does the customer stream movies"</span>, (<span class="hljs-string">'Yes'</span>,<span class="hljs-string">'No'</span>,<span class="hljs-string">'No internet service'</span>))
+
+        data = {
+                <span class="hljs-string">'SeniorCitizen'</span>: seniorcitizen,
+                <span class="hljs-string">'Dependents'</span>: dependents,
+                <span class="hljs-string">'tenure'</span>:tenure,
+                <span class="hljs-string">'PhoneService'</span>: phoneservice,
+                <span class="hljs-string">'MultipleLines'</span>: mutliplelines,
+                <span class="hljs-string">'InternetService'</span>: internetservice,
+                <span class="hljs-string">'OnlineSecurity'</span>: onlinesecurity,
+                <span class="hljs-string">'OnlineBackup'</span>: onlinebackup,
+                <span class="hljs-string">'TechSupport'</span>: techsupport,
+                <span class="hljs-string">'StreamingTV'</span>: streamingtv,
+                <span class="hljs-string">'StreamingMovies'</span>: streamingmovies,
+                <span class="hljs-string">'Contract'</span>: contract,
+                <span class="hljs-string">'PaperlessBilling'</span>: paperlessbilling,
+                <span class="hljs-string">'PaymentMethod'</span>:PaymentMethod,
+                <span class="hljs-string">'MonthlyCharges'</span>: monthlycharges,
+                <span class="hljs-string">'TotalCharges'</span>: totalcharges
+                }
+        features_df = pd.DataFrame.from_dict([data])
+        st.markdown(<span class="hljs-string">"&lt;h3&gt;&lt;/h3&gt;"</span>, unsafe_allow_html=<span class="hljs-keyword">True</span>)
+        st.write(<span class="hljs-string">'Overview of input is shown below'</span>)
+        st.markdown(<span class="hljs-string">"&lt;h3&gt;&lt;/h3&gt;"</span>, unsafe_allow_html=<span class="hljs-keyword">True</span>)
+        st.dataframe(features_df)
+        
+        preprocess_df = preprocess(features_df, <span class="hljs-string">'Online'</span>)
+
+        prediction = model.predict(preprocess_df)
+
+        <span class="hljs-keyword">if</span> st.button(<span class="hljs-string">'Predict'</span>):
+            <span class="hljs-keyword">if</span> prediction == <span class="hljs-number">1</span>:
+                st.warning(<span class="hljs-string">'Yes, the customer will terminate the service.'</span>)
+            <span class="hljs-keyword">else</span>:
+                st.success(<span class="hljs-string">'No, the customer is happy with Telco Services.'</span>)
+
+
+    <span class="hljs-keyword">else</span>:
+        st.subheader(<span class="hljs-string">"Dataset upload"</span>)
+        uploaded_file = st.file_uploader(<span class="hljs-string">"Choose a file"</span>)
+        <span class="hljs-keyword">if</span> uploaded_file <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">None</span>:
+            data = pd.read_csv(uploaded_file)
+            
+            st.write(data.head())
+            st.markdown(<span class="hljs-string">"&lt;h3&gt;&lt;/h3&gt;"</span>, unsafe_allow_html=<span class="hljs-keyword">True</span>)
+            
+            preprocess_df = preprocess(data, <span class="hljs-string">"Batch"</span>)
+            <span class="hljs-keyword">if</span> st.button(<span class="hljs-string">'Predict'</span>):
+                
+                prediction = model.predict(preprocess_df)
+                prediction_df = pd.DataFrame(prediction, columns=[<span class="hljs-string">"Predictions"</span>])
+                prediction_df = prediction_df.replace({<span class="hljs-number">1</span>:<span class="hljs-string">'Yes, the customer will terminate the service.'</span>,
+                                                    <span class="hljs-number">0</span>:<span class="hljs-string">'No, the customer is happy with Telco Services.'</span>})
+
+                st.markdown(<span class="hljs-string">"&lt;h3&gt;&lt;/h3&gt;"</span>, unsafe_allow_html=<span class="hljs-keyword">True</span>)
+                st.subheader(<span class="hljs-string">'Prediction'</span>)
+                st.write(prediction_df)
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:
+        main()
+</pre>
+
+
+
+<p><strong>导入到应用脚本中的预处理脚本</strong>可以在<a href="https://web.archive.org/web/20230227045312/https://github.com/codebrain001/customer-churn-prediction/blob/main/preprocessing.py">这里</a>的项目报告中找到。</p>
+
+
+
+<h2 id="demo">演示</h2>
+
+
+
+<figure class="wp-block-video"><video controls="" src="https://web.archive.org/web/20230227045312im_/https://neptune.ai/wp-content/uploads/Customer-churn-prediction-demo.mp4"/></figure>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>流失率是订阅型公司的一个重要指标。识别不满意的客户可以帮助经理识别产品或定价计划的弱点、运营问题以及客户的偏好和期望。当你知道了所有这些，就更容易引入主动减少流失的方法。</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

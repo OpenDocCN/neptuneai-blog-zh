@@ -1,0 +1,817 @@
+<html>
+<head>
+<title>MLOps vs AIOps – What's the Difference? </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>MLOps与AIOps–有什么区别？</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/mlops-vs-aiops-differences#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/mlops-vs-aiops-differences#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>当我们作为一个团队来构建一个产品或服务时，我们需要遵循<a href="https://web.archive.org/web/20221206065704/https://www.coderskitchen.com/how-to-develop-high-quality-software/" target="_blank" rel="noreferrer noopener nofollow">特定的步骤，以一种系统的、有组织的、有成本效益的方式来生产高质量的软件</a>。许多框架可以帮助我们做到这一点，通常有相似的阶段(从需求引出到产品中的维护)。</p>
+
+
+
+<p>一些框架是为独立工作的多个团队设计的，这会增加风险和延迟。为了跟上不断增长的需求并避免延误，我们希望摆脱封闭的孤岛。在<a href="https://web.archive.org/web/20221206065704/https://www.synopsys.com/glossary/what-is-devops.html"> DevOps模型</a>下，我们可以合并两个或更多的团队，专注于持续集成和部署，使沟通更好，部署更快，并且安全——牢不可破。如果你使用的是<a href="https://web.archive.org/web/20221206065704/https://www.agilealliance.org/agile101/" target="_blank" rel="noreferrer noopener nofollow">敏捷软件开发</a>，DevOps是免费的。</p>
+
+
+
+
+
+<p>我们现在已经在常规软件开发中使用DevOps有一段时间了，但我们也可以将它用于机器学习和人工智能。</p>
+
+
+
+<p>我们为什么需要DevOps？在DevOps之上分层机器学习和人工智能背后的原因是什么？ML Ops和AI Ops有什么区别？请继续阅读，寻找答案。</p>
+
+
+
+<h2 id="h-what-is-mlops">什么是MLOps？</h2>
+
+
+
+<p>许多行业将机器学习系统集成到他们现有的产品和服务中，因为ML对底线有好处，它可以增强你的竞争优势。</p>
+
+
+
+<p>问题是机器学习过程很复杂，通常需要大量的时间和资源。为了避免超支，公司需要一个框架来统一ML系统的开发和部署。MLOps就是这个框架。它标准化并简化了ML模型到产品的连续交付。</p>
+
+
+
+<p>在探讨为什么需要使用MLOps之前，我们先来看看机器学习建模生命周期，了解一下重点是什么。</p>
+
+
+
+
+
+
+
+<h3>机器学习模型的生命周期</h3>
+
+
+
+<p>ML项目从定义业务用例开始。一旦定义了用例，就采取以下步骤来将机器学习解决方案部署到生产中:</p>
+
+
+
+<ol>
+<li><strong>数据提取</strong>–整合各种来源的数据</li>
+
+
+
+<li><strong>探索性数据分析</strong>–了解底层数据及其属性</li>
+
+
+
+<li><strong>数据准备</strong>–为成功执行ML解决方案管理数据</li>
+
+
+
+<li><strong>创建ML模型/解决方案</strong>–使用ML算法创建和训练ML模型</li>
+
+
+
+<li><strong>模型评估和验证</strong>–根据测试数据集计算模型并验证性能</li>
+
+
+
+<li><strong>模型部署</strong>–在生产中部署ML模型</li>
+</ol>
+
+
+
+<p>构建和处理ML系统是一个手工过程，大规模管理这样的系统并不容易。许多团队都在为部署和管理ML解决方案的传统手动方式而奋斗。</p>
+
+
+
+
+
+
+
+<h3>基于DevOps的ML分层–克服挑战</h3>
+
+
+
+<p>为了解决机器学习系统的手动实现和部署问题，团队需要采用现代实践，以便更容易高效地创建和部署企业应用程序。</p>
+
+
+
+<p>MLOps利用了与DevOps相同的原理，但是多了一层ML模型/系统。</p>
+
+
+
+
+
+<blockquote class="wp-block-quote">
+<p>建模代码、依赖性和任何其他运行时需求可以被打包以实现可再现的ML。可重现的ML将有助于降低打包和维护模型版本的成本(给你权力来回答任何模型在其历史中的状态问题)。此外，由于它已经打包，大规模部署将容易得多。这一再现性步骤是MLOps旅程中的几个关键步骤之一。–<a href="https://web.archive.org/web/20221206065704/https://nealanalytics.com/blog/what-is-mlops/" target="_blank" rel="noreferrer noopener nofollow">尼尔分析</a></p>
+</blockquote>
+
+
+
+<p>交付ML系统的传统方式在许多企业中很常见，尤其是当他们刚刚开始使用ML时。当模型很少改变时，手工实现和部署就足够了。模型在应用于现实世界数据时可能会失败，因为它无法适应环境或数据的变化。</p>
+
+
+
+<h3>MLOps工具集</h3>
+
+
+
+<p>MLOps框架提供了部署、管理和监控所有模型的单一位置。总的来说，这些工具简化了复杂的过程，节省了大量时间。市场上有几种工具可以提供相对相似的服务:</p>
+
+
+
+<ol>
+<li><strong> <a href="/web/20221206065704/https://neptune.ai/blog/best-7-data-version-control-tools-that-improve-your-workflow-with-machine-learning-projects" target="_blank" rel="noreferrer noopener">版本控制</a>–</strong>跟踪数据集、特性及其转换中的任何变化。</li>
+
+
+
+<li><strong> <a href="/web/20221206065704/https://neptune.ai/blog/best-ml-experiment-tracking-tools" target="_blank" rel="noreferrer noopener">跟踪模特训练</a>–</strong>监控模特在训练中的表现</li>
+
+
+
+<li><strong> <a href="/web/20221206065704/https://neptune.ai/blog/best-tools-for-model-tuning-and-hyperparameter-optimization" target="_blank" rel="noreferrer noopener">超参数整定</a>–</strong>列车模型自动使用一组最优超参数<strong> </strong>。</li>
+
+
+
+<li><strong> <a href="/web/20221206065704/https://neptune.ai/blog/best-8-machine-learning-model-deployment-tools" target="_blank" rel="noreferrer noopener">模型部署</a>–</strong>将机器学习模型部署到生产中。支票</li>
+
+
+
+<li><strong> <a href="/web/20221206065704/https://neptune.ai/blog/ml-model-monitoring-best-tools" target="_blank" rel="noreferrer noopener">模型监控</a>–</strong>跟踪和管理部署到生产中的机器学习模型</li>
+</ol>
+
+
+
+
+
+
+
+<p>在选择任何MLOps工具时，以上特性都值得在选择前考虑。企业也可能对允许免费试用的提供商感兴趣。让我们来看看几个MLOps工具:</p>
+
+
+
+<ul>
+<li><strong> <a href="https://web.archive.org/web/20221206065704/https://aws.amazon.com/sagemaker/" target="_blank" rel="noreferrer noopener nofollow">亚马逊Sage Maker</a></strong>–】<em>亚马逊Sage Maker通过汇集一系列专门为机器学习构建的功能，帮助数据科学家和开发人员快速准备、构建、训练和部署高质量的机器学习(ML)模型</em></li>
+</ul>
+
+
+
+<p>它通过提供自动驾驶仪来加速部署过程，自动驾驶仪可以为预测选择最佳算法，并可以自动构建、训练和调整模型。</p>
+
+
+
+
+
+<ul>
+<li><strong><a href="/web/20221206065704/https://neptune.ai/" target="_blank" rel="noreferrer noopener">Neptune</a></strong>–】<em>Neptune帮助在一个地方维护模型构建元数据。记录、存储、显示、组织、比较和查询您所有的MLOps元数据。它专注于为运行大量实验的研究和生产团队构建的电子实验跟踪和模型注册。”</em></li>
+</ul>
+
+
+
+<p>Neptune专注于ML元数据的日志记录和存储，这使得查询数据以便以后分析变得更加容易。</p>
+
+
+
+
+
+<p>Neptune将ML元数据分为三个不同的领域:</p>
+
+
+
+<ol>
+<li><strong>实验和模型训练数据—</strong>这允许用户记录不同的指标、超参数、学习曲线、预测、诊断图表等。</li>
+
+
+
+<li><strong>工件元数据–</strong>这包含关于数据的信息，例如数据集的路径、特征细节、大小、最后更新的时间戳、数据集预览等。</li>
+
+
+
+<li><strong>模型元数据—</strong>模型元数据包含诸如谁创建或训练了模型、作为建模一部分的训练和实验的链接、多个数据集细节等信息。</li>
+</ol>
+
+
+
+<p>以上捕获的数据稍后可用于:</p>
+
+
+
+<ol>
+<li><a href="/web/20221206065704/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener"> <strong>实验追踪</strong></a><strong>–</strong>使用Neptune，团队可以对不同团队成员运行的ML实验有一个整体的看法。团队可以轻松维护和显示各种指标，帮助他们比较不同的ML实验性能。</li>
+
+
+
+<li><a href="/web/20221206065704/https://neptune.ai/product/model-registry" target="_blank" rel="noreferrer noopener"> <strong>模型注册表</strong></a><strong>–</strong>模型注册表帮助用户了解ML包的结构，以及模型的创建者和创建时间等细节。团队可以轻松跟踪源、数据集和配置等方面的任何变化。Neptune允许您对模型构建过程中产生的大部分元数据进行版本化、显示和查询。</li>
+</ol>
+
+
+
+<p>Neptune提供了一个易于使用的仪表板显示，用户可以轻松地对数据进行排序、过滤和查询。它让开发人员专注于模型构建，并负责所有的簿记工作。</p>
+
+
+
+<p>点击此处查看<a href="https://web.archive.org/web/20221206065704/https://app.neptune.ai/common/example-project-tensorflow-keras/experiments?split=tbl&amp;dash=charts&amp;viewId=44675986-88f9-4182-843f-49b9cfa48599" target="_blank" rel="noreferrer noopener">仪表板示例。</a></p>
+
+
+
+<ul>
+<li><strong><a href="https://web.archive.org/web/20221206065704/https://www.datarobot.com/platform/mlops/" target="_blank" rel="noreferrer noopener nofollow">data robot</a>–</strong><em>“data robot MLOps为你的生产AI提供了一个卓越的中心。这为您提供了一个单一的位置来部署、监控、管理和治理您生产中的所有模型，而不管它们是如何创建的或者是何时何地部署的。”</em></li>
+</ul>
+
+
+
+<p>在DataRobot中，用户可以导入使用不同语言和在其他可用的ML平台上构建的模型。然后在领先的ML执行环境中测试和部署模型。DataRobot使用报告和警报系统监控服务运行状况、数据漂移和准确性。</p>
+
+
+
+
+
+<ul>
+<li><a href="https://web.archive.org/web/20221206065704/https://mlflow.org/" target="_blank" rel="noreferrer noopener nofollow"><strong>ML flow</strong></a>–】<em>ML flow是一个管理ML生命周期的开源平台，包括实验、可复制性、部署和中央模型注册。</em></li>
+</ul>
+
+
+
+<p>MLflow有四个主要组件:</p>
+
+
+
+<ol>
+<li><strong>ML流跟踪—</strong>ML流跟踪组件是围绕代码执行的概念组织的。每个执行记录都包含信息，比如代码版本、开始和结束时间、代码源、输入参数、性能指标和输出文件工件。</li>
+
+
+
+<li><strong> MLflow项目—</strong>ml flow项目提供了一种打包机器学习代码的便捷方式。每个项目都是一个简单的存储库，包含运行项目的多个文件和属性，例如项目名称、入口点和环境、库依赖项等。</li>
+
+
+
+<li><strong>ml flow models–</strong>ml flow format定义了一种标准格式，允许您以不同的风格保存模型，如python-function、PyTorch、sklearn，它可以在不同的平台上使用，没有任何麻烦。</li>
+
+
+
+<li><strong>MLflow Registry—</strong>ml flow模型注册表是一个集中的位置，用于协作管理ml flow模型的生命周期。<strong> </strong>它有一套API和UI来注册模型，监控版本和阶段转换。开发人员可以通过提供对团队有用的描述和任何相关信息来轻松地注释这些模型。</li>
+</ol>
+
+
+
+<p>在这些组件的帮助下，团队可以跟踪实验，并遵循标准的方式来打包和部署模型。这使得生成可重用的代码变得容易。MLflow提供了一个集中的地方来管理模型的整个生命周期。</p>
+
+
+
+
+
+<ul>
+<li><a href="https://web.archive.org/web/20221206065704/https://www.kubeflow.org/#overview" target="_blank" rel="noreferrer noopener nofollow"><strong>kube flow</strong></a>–<em>“kube flow项目致力于使在Kubernetes上部署机器学习(ML)工作流变得简单、可移植和可扩展。我们的目标不是重新创建其他服务，而是提供一种简单的方法来将ML的最佳开源系统部署到不同的基础设施上。无论你在哪里运行Kubernetes，你都应该能够运行Kubeflow。”</em></li>
+</ul>
+
+
+
+<p>Kubeflow是一个帮助在Kubernetes上分层ML组件的平台。</p>
+
+
+
+
+
+<p>Kubeflow提供了许多组件，这些组件可以作为独立的服务使用，也可以组合使用</p>
+
+
+
+<ol>
+<li><strong>笔记本服务器—</strong>kube flow笔记本有助于轻松与其他组件集成，并且易于共享，因为用户可以直接在集群中创建笔记本容器或单元。</li>
+
+
+
+<li><strong>管道—</strong>kube flow管道平台由一个用户界面组成，用于管理和跟踪实验。在管道的帮助下，用户可以安排多步ML工作流和Python支持来操作管道和工作流。</li>
+
+
+
+<li>KFServing–KFServing在Kubernetes上提供无服务器推理，并通过自动处理来自用户的复杂流程来封装它们。</li>
+
+
+
+<li><strong>Katib–</strong>Katib有助于优化用任何编程语言编写的应用程序的超参数。这是一个自动化的过程，在每次调优中会运行几个培训任务。支持PyTorch、XGBoost、TensorFlow等ML框架。</li>
+
+
+
+<li><strong>训练操作员—</strong>kube flow支持使用TensorFlow、PyTorch、MXNet、MPI等不同框架对机器学习模型进行分布式训练。</li>
+
+
+
+<li><strong>多租户–</strong>kube flow支持不同团队共享资源池，同时保证他们个人工作的安全。</li>
+</ol>
+
+
+
+<ul>
+<li><a href="https://web.archive.org/web/20221206065704/https://azure.microsoft.com/en-us/services/machine-learning/" target="_blank" rel="noreferrer noopener nofollow"><strong>Azure</strong><strong>ML</strong></a>–<em>“通过业界领先的MLOps(机器学习操作，即机器学习的DevOps)加快上市时间。在一个安全可信的平台上创新，专为负责任的机器学习而设计。”</em></li>
+</ul>
+
+
+
+
+
+<p>Azure ML是一个基于云的服务，用于创建和管理机器学习模型流。Azure ML结合Azure DevOps有助于实现持续集成(CI)、持续交付(CD)和人工智能应用的再培训管道。</p>
+
+
+
+<p>一个典型的Azure MLOps架构可以组合Azure ML、Azure pipelines、容器注册表、容器实例、Kubernetes或应用性能洞察等组件。</p>
+
+
+
+
+
+<h2 id="h-aiops">AIOps</h2>
+
+
+
+<p>根据Gartner的调查，一般企业IT基础架构每年生成的IT运营数据要多2到3倍。传统的IT管理解决方案无法处理如此大的数据量，也无法妥善解决问题。</p>
+
+
+
+<p>企业需要一种自动化的解决方案，能够在出现重大风险时提醒IT人员。一个系统可以告诉他们哪里出了问题，并自行解决重复性问题，而不是由员工手动监控流程。</p>
+
+
+
+<blockquote class="wp-block-quote">
+<p><em>“</em><a href="https://web.archive.org/web/20221206065704/https://www.gartner.com/en/information-technology/glossary/aiops-artificial-intelligence-operations"><em>ai ops</em></a><em>结合大数据和机器学习来自动化IT运营流程，包括事件关联、异常检测和因果关系确定。”</em></p>
+</blockquote>
+
+
+
+<p>在AIOps的帮助下，企业可以设计一个能够跨不同环境关联数据的解决方案。一个能够为IT运营团队提供实时洞察和预测分析的解决方案，帮助IT团队高效地应对问题并满足用户期望。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206065704/https://www.gartner.com/document/3971186" target="_blank" rel="noreferrer noopener nofollow"> Gartner </a>预测，对于大型企业来说，专门使用AIOps和数字体验监控工具来监控应用和<a href="https://web.archive.org/web/20221206065704/https://www.gartner.com/smarterwithgartner/its-time-for-infrastructure-and-operations-to-get-versatile/" target="_blank" rel="noreferrer noopener nofollow">基础设施</a>的比例将从2018年的5%上升到2023年的30%。</p>
+
+
+
+<h3>AIOps的核心要素</h3>
+
+
+
+<p>AIOps的定义是动态的，因为每个企业都有不同的需求，并相应地实施AIOps解决方案。人工智能解决方案的重点是有效地发现实时问题并做出反应。AIOps的一些核心元素可以帮助企业在IT运营中实现AI解决方案。</p>
+
+
+
+
+
+<ol>
+<li><strong>机器学习-</strong>ai ops或IT分析是关于寻找模式的。在机器学习的帮助下，我们可以应用机器的计算能力来发现IT数据中的这些模式。</li>
+
+
+
+<li><strong>异常检测–</strong>正常系统行为的任何变化都可能导致停机、系统无响应以及糟糕的客户体验。使用AIOps，可以检测任何类型的异常行为或活动。</li>
+
+
+
+<li><strong>预测性洞察–</strong>ai ops为IT运营带来了可预测性。它可以帮助It人员在问题发生前主动捕捉问题，并最终减少服务台票证的数量。</li>
+
+
+
+<li><strong>自动化根本原因分析—</strong>仅仅推动洞察是不够的。企业或IT团队也应该能够采取行动。在传统的管理环境中，IT人员会监控系统，并在需要时采取措施。由于IT基础架构问题越来越多，员工很难按时管理和解决问题。当涉及多个系统时，需要花费大量时间来分析根本原因。有了AIOps，根本原因可以在后台自动完成。</li>
+</ol>
+
+
+
+<h3>AI在DevOps上分层</h3>
+
+
+
+<p><em>"</em><a href="https://web.archive.org/web/20221206065704/https://www.appdynamics.com/blog/news/aiops-platforms-transform-performance-monitoring/" target="_blank" rel="noreferrer noopener nofollow"><em>AppDynamics</em></a><em>就应用性能监控和AIOps调查了6000名全球IT领导者。"</em></p>
+
+
+
+<p>IT运营和开发运营的人工智能是两个独立的功能，但当它们结合在一起时，可以帮助增强系统的功能。管理DevOps环境可能很复杂。想象一下，通过大量数据来搜索触发事件的原因。团队最终会投入数小时。许多问题可能是已知的，有些可能是新的或与以前的事件相关。这种事件可以被自动识别和解决。</p>
+
+
+
+<p>DevOps是一种向客户/市场提供服务和产品的商业方法，人工智能可以帮助精确高效地简化测试、编码、发布和监控产品。</p>
+
+
+
+
+
+<p><em>“IDC预测，定制应用开发服务的全球市场预计将从2018年的470亿美元增长到2023年的610亿美元以上，五年内实现5.3%的复合年增长率(CAGR)。”</em>随着这些不断增长的需求，传统的it运营或开发管理将无法满足这些需求。</p>
+
+
+
+<p>通过提高准确性、质量和可靠性，基于DevOps的人工智能将把传统的开发管理提升到另一个层次。据福布斯<a href="https://web.archive.org/web/20221206065704/https://www.forbes.com/sites/louiscolumbus/2020/07/31/10-ways-ai-is-accelerating-devops/?sh=37ec73346a50" target="_blank" rel="noreferrer noopener nofollow">报道，“<em>自动建议代码段，通过自动化测试改进软件质量保证技术，以及简化需求管理是AI今天为DevOps提供价值的核心领域。</em></a></p>
+
+
+
+<h3>AIOps工具集</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221206065704/https://www.instana.com/blog/top-aiops-tools-domain-agnostic-and-domain-centric/" target="_blank" rel="noreferrer noopener nofollow"> AIOps工具</a>消费来自各种服务的数据。他们收集应用程序日志，测量系统运行状况或性能，最终打破孤立的IT信息问题，并弥合软件、硬件和云之间的问题。</p>
+
+
+
+<ul>
+<li><strong><a href="https://web.archive.org/web/20221206065704/https://www.dynatrace.com/platform/aiops/" target="_blank" rel="noreferrer noopener nofollow">dyna trace</a></strong>–<em>“dyna trace ai ops平台重新定义了绩效监控，让您的团队专注于主动行动、创新和更好的业务成果。”</em></li>
+</ul>
+
+
+
+<p>Dynatrace通过根本原因分析、事件关联和映射到云环境等应用程序来帮助IT运营，以支持持续自动化。动态跟踪函数可分为以下几类:</p>
+
+
+
+<ol>
+<li><strong>智能可观察性—</strong>使用上下文信息、人工智能和自动化的高级可观察性。了解问题的全部背景，并在精确的根本原因分析后提供可行的答案。</li>
+
+
+
+<li><strong>持续自动化–</strong>部署、配置和管理的人工努力不值得。Dynatrace主动识别问题，并根据对用户和业务的影响确定问题的严重性。它帮助团队实现持续的发现、轻松的部署和自动的依赖映射。</li>
+
+
+
+<li><strong>AI-assistance—</strong>执行无故障分析，进行根本原因分析。分析精确且可重复。人工智能引擎是Dynatrace各个方面的一部分。</li>
+</ol>
+
+
+
+<ul>
+<li><a href="https://web.archive.org/web/20221206065704/https://www.appdynamics.com/" target="_blank" rel="noreferrer noopener nofollow"><strong>app dynamics</strong></a>–】<em>app dynamics有助于优先考虑对您的业务和员工最重要的事情，以便您可以实时查看、分享和采取行动。通过更深入地了解用户和应用行为，将性能转化为利润。”</em></li>
+</ul>
+
+
+
+<p>它有不同的性能度量类别，有助于将不同类别的这些指标关联起来，以便在问题影响业务之前解决问题。它用于人工智能驱动的应用程序性能管理。</p>
+
+
+
+
+
+<ol>
+<li><strong>用户—</strong>监控任何设备、浏览器或第三方服务的关键指标，以主动识别最终用户问题。</li>
+
+
+
+<li><strong>应用–</strong>通过将影响业务关键绩效指标的代码的端到端可观察性联系起来，统一IT团队和业务。</li>
+
+
+
+<li><strong>基础设施–</strong>它有助于您关注底线。通过混合基础架构更智能地扩展，并创建主动基础架构。</li>
+
+
+
+<li><strong>网络—</strong>监控任何网络上的数字体验。用户可以将应用程序性能与网络相关联，以确定由网络中断引起的应用程序问题。</li>
+</ol>
+
+
+
+<ul>
+<li><a href="https://web.archive.org/web/20221206065704/https://www.bmc.com/it-solutions/aiops.html" target="_blank" rel="noreferrer noopener nofollow"><strong>BMC Helix</strong></a>–】<em>BMC解决方案将机器学习和高级分析部署为整体监控、事件管理、容量和自动化解决方案的一部分，以交付AIOps用例，帮助IT运营以数字业务要求的速度运行</em></li>
+</ul>
+
+
+
+<p>BMC Helix是用于运营管理的BMC产品。它帮助团队主动提高系统的可用性和性能。Helix专注于服务监控、事件管理和可能原因分析。</p>
+
+
+
+
+
+<p>BMC产品可以帮助协调事件补救、智能票据解决、自动化变更和事件管理等工作流程。</p>
+
+
+
+<ul>
+<li><strong><a href="https://web.archive.org/web/20221206065704/https://www.servicenow.com/now-platform.html" target="_blank" rel="noreferrer noopener nofollow">service Now–Now平台</a></strong>–<em>“Now平台提供跨企业的数字化工作流，将人员、职能和系统连接起来，以加速创新、提高灵活性和生产力。”</em></li>
+</ul>
+
+
+
+
+
+<p>它通过释放人工智能的力量，帮助团队更快、更智能地工作。Now平台支持高效数字化工作流程的核心功能包括:</p>
+
+
+
+<ol>
+<li><strong>流程优化—</strong>Now platform通过提供每个系统如何相互连接以及如何影响其他系统的清晰画面，最大限度地提高了整个企业的效率。<strong> </strong>一旦确定了问题，就有助于改进流程并对其进行监控。</li>
+
+
+
+<li><strong>性能分析—</strong>观察趋势，在瓶颈出现之前发现瓶颈，并根据需要提高性能。</li>
+
+
+
+<li><strong>预测智能–</strong>虽然现在平台使用机器学习来自动化日常任务并更快地解决问题，但团队可以专注于更有意义的工作。使用ML对事件进行分类，推荐解决方案，并主动标记任何关键问题。</li>
+
+
+
+<li><strong>integration hub—</strong>integration hub允许用户将Now平台与其他ServiceNow服务以及现成的辐条相集成。它有助于降低集成成本，提高团队的生产力。</li>
+
+
+
+<li><strong>虚拟代理–</strong>Now平台提供了一个人工智能驱动的对话聊天机器人，以帮助团队和最终用户更快地解决问题。</li>
+
+
+
+<li><strong> AI搜索—</strong>利用语义搜索能力，提供精准、个性化的答案。</li>
+
+
+
+<li><strong>配置管理数据库—</strong>提供对您IT环境的可见性，以便做出更好的决策。在整个数字生命周期中连接产品，帮助团队了解影响和风险。</li>
+</ol>
+
+
+
+<ul>
+<li><strong><a href="https://web.archive.org/web/20221206065704/https://www.ibm.com/cloud/cloud-pak-for-watson-aiops?cm_sp=Scheduler-_-CopyChng2-_-V" target="_blank" rel="noreferrer noopener nofollow">IBM Watson AIOps</a></strong>–<em>“Watson AI ops是一款AI ops解决方案，它在ITOps工具链中部署了先进的、可解释的人工智能，因此您可以自信地评估、诊断和解决任务关键型工作负载中的事件。”</em></li>
+</ul>
+
+
+
+<p>Watson AIOps经过训练，能够实时连接数据源和常见IT行业工具之间的点。这有助于快速检测和识别问题，并通过AIOps和ChatOps转变IT运营。</p>
+
+
+
+
+
+<p>Watson AIOps采用一组指标、日志和事故相关数据来训练和构建无人监管的模型。这是一个ChatOps模型需要不断训练，以提高解决问题的准确性。</p>
+
+
+
+<ul>
+<li><a href="https://web.archive.org/web/20221206065704/https://www.splunk.com/en_us/it/aiops.html" target="_blank" rel="noreferrer noopener"><strong>Splunk</strong></a>–"<em>Splunk是唯一一款跨混合云环境提供端到端服务监控、预测性管理和全栈可见性的AIOps平台</em></li>
+</ul>
+
+
+
+<p>Splunk可以通过以下方式帮助您实现IT现代化:使用预测分析防止停机、简化事件解决方案，以及关联不同服务的指标以确定根本原因。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206065704/https://www.splunk.com/en_us/pdfs/resources/solution-guide/splunk-maximize-resiliency-and-productivity-with-aiops.pdf" target="_blank" rel="noreferrer noopener nofollow"> <em> Splunk的</em> </a> <em>在与领域无关、以服务为中心的AIOps方面的创新为运营团队中的每个人提供了扩展能力和工作效率，以实现更快的补救时间。</em></p>
+
+
+
+<h2 id="h-mlops-vs-aiops">MLOps vs AIOps</h2>
+
+
+
+<p>从上面的解释中，可以清楚地看到这是两个不同的领域，彼此并不重叠。但是，人们经常混淆MLOps和AIOps。困惑时，请记住:</p>
+
+
+
+<ul>
+<li>AIOps是借助ML和大数据实现系统自动化的一种方式，</li>
+
+
+
+<li>MLOps是一种标准化部署ML系统和填补团队之间的差距的方法，使所有项目利益相关者更加清晰。</li>
+</ul>
+
+
+
+<p>在详细讨论差异之前，我们先来看一下MLOps和AIOps之间的比较:</p>
+
+
+
+<p id="separator-block_3fd50ff84684f82b6350ba33b047f6b7" class="block-separator block-separator--10"> </p>
+
+
+
+<div id="medium-table-block_3114b34778330ec3341caa5dc84e673a" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">MLOps</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">AIOps</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>规范ML系统开发流程</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>自动化IT运营和系统</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>提高团队的效率和生产力</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>自动化根本原因分析和解决</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>精简不同团队之间的协作</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>高效处理和管理大量数据</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>这是以可重复的方式大规模部署人工智能和数据科学的关键部分</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>它利用革命性的人工智能技术解决It挑战</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p>–多源数据消耗rn–源代码控制rn–部署和测试服务–使用元数据跟踪ML模型rn–自动化ML实验rn–降低模型验证中的风险和偏差</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p>–应用监控–自动化手动或重复流程rn–异常检测rn–预测性维护rn–事件管理</p> </div></td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_3201d843c9e52e2597296346c46b0201" class="block-separator block-separator--20"> </p>
+
+
+
+<p><em> AI Ops，或者说“IT运营的人工智能”在一个方面与MLOps相反——它是ML对DevOps的应用，而不是</em> <a href="https://web.archive.org/web/20221206065704/https://damianbrady.com.au/2020/10/22/what-is-aiops/" target="_blank" rel="noreferrer noopener nofollow"> <em> DevOps对ML </em> </a> <em>的应用。</em></p>
+
+
+
+<p>现在让我们看看不同的用例以及实现MLOps和AIOps的好处。</p>
+
+
+
+<h3>MLOps的优势</h3>
+
+
+
+<p>如上所述，MLOps专注于创建可扩展的ML系统。让我们讨论一下它与开发ML系统的传统方式有何不同，以及为什么MLOps很重要。</p>
+
+
+
+<p><strong> 1。多个管道的协调</strong></p>
+
+
+
+<p>机器学习模型开发是不同管道的组合(预处理、特征工程模型、模型验证等)。MLOps可以帮助您编排这些管道来自动更新模型。</p>
+
+
+
+<p><strong> 2。管理ML生命周期</strong></p>
+
+
+
+<p>模型开发有不同的步骤，使用传统的DevOps进行管理和维护可能会很有挑战性。MLOps提供了在生产中快速优化和部署ML模型的优势。</p>
+
+
+
+<p><strong> 3。扩展ML应用程序</strong></p>
+
+
+
+<p>当数据和使用增加时，真正的问题出现了，这会导致ML应用程序失败。借助MLOps，当需求增加时，可以扩展ML应用。</p>
+
+
+
+<p><strong> 4。监控ML系统</strong></p>
+
+
+
+<p>部署机器学习模型后，监控系统的性能至关重要。MLOps通过启用模型和数据漂移的检测来提供方法。</p>
+
+
+
+<p><strong> 5。持续集成和部署</strong></p>
+
+
+
+<p>DevOps在软件开发中使用持续集成和部署，但是在ML系统的开发中使用同样的方法是困难的。MLOps已经引入了不同的工具和技术，在这些工具和技术中，可以利用CI和CD来成功地部署机器学习系统。</p>
+
+
+
+<h3>MLOps的真实使用案例</h3>
+
+
+
+<ol>
+<li>网络分析——美国电话电报公司比特币基地</li>
+
+
+
+<li>推荐系统——OTT和电子商务平台——这是一种基于用户行为并影响这些行为的推荐系统。在这种情况下，监控预测对于避免连锁反应至关重要。</li>
+
+
+
+<li>彭博股票市场分析</li>
+
+
+
+<li>体育分析——ESPN，天空体育</li>
+</ol>
+
+
+
+<h3>AIOps的优势</h3>
+
+
+
+<p>AIOps与MLOps有不同的使用案例和优势，因为它利用机器学习技术来改善it运营。</p>
+
+
+
+<p><strong> 1。前瞻性IT运营</strong></p>
+
+
+
+<p>在竞争环境中，产品和服务的成功取决于客户的满意度。对一个问题做出反应是不够的，但是预测是否会发生失败也是至关重要的。It运营必须能够预测和修复应用程序、系统和基础架构的问题。</p>
+
+
+
+<p><strong> 2。数据驱动的决策制定</strong></p>
+
+
+
+<p>AIOps在IT运营中使用ML技术，如模式匹配、历史数据分析和预测分析。使用这些ML技术，决策将完全由数据驱动，并将减少人为错误。这种自动响应将使IT运营专注于解决问题，而不是检测根本原因。</p>
+
+
+
+<p><strong> 3。检测异常和偏离基线</strong></p>
+
+
+
+<p>使用像聚类这样的ML技术，IT运营可以检测异常行为。AIOps帮助构建这些监控技术，这些技术可用于网络流量的异常检测，并自动修改防火墙规则。</p>
+
+
+
+
+
+
+
+<ol>
+<li>预测警报:Place Park技术和TDC网络设计</li>
+
+
+
+<li>避免服务中断:舍弗勒集团</li>
+
+
+
+<li>正确监控系统:Enablis</li>
+
+
+
+<li>事件的蓝图和分类:PostNord AB</li>
+</ol>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>在本文中，我们了解了什么是MLOps和AIOps，以及公司如何使用它们来创建有效的、可伸缩的和可持续的系统。我希望你现在明白这两者之间的区别，以及它们可以用在哪里。</p>
+
+
+
+<blockquote class="wp-block-quote">
+<p>虽然AIOps主要用于实时处理应用数据，但MLOps工具可以监控类似的数据，以构建机器学习模型。这些工具可以同时用于需要这两种功能集的企业。”–<a href="https://web.archive.org/web/20221206065704/https://www.trustradius.com/aiops" target="_blank" rel="noreferrer noopener nofollow"><em>信任半径</em> </a></p>
+</blockquote>
+
+
+
+<p>感谢阅读！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

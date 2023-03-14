@@ -1,0 +1,533 @@
+<html>
+<head>
+<title>Applications of AI in Drone Technology: Building Machine Learning Models That Work on Drones (With TensorFlow/Keras) </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>人工智能在无人机技术中的应用:建立适用于无人机的机器学习模型(使用TensorFlow/Keras)</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/applications-of-ai-in-drone-technology-machine-learning-models-with-tensorflow-keras#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/applications-of-ai-in-drone-technology-machine-learning-models-with-tensorflow-keras#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>欢迎回到利用无人机技术和深度学习构建面罩监控系统的第二部分。<a href="/web/20221206051524/https://neptune.ai/blog/building-a-facemask-surveillance-system-with-drone-technology" target="_blank" rel="noreferrer noopener">在第一部分</a>中，我们介绍了无人机技术、各种分类、本项目使用的无人机架构，以及使用python设置无人机编程环境。</p>
+
+
+
+<p>如果你不熟悉第1部分，<a href="/web/20221206051524/https://neptune.ai/blog/building-a-facemask-surveillance-system-with-drone-technology" target="_blank" rel="noreferrer noopener">你可以在我们的博客</a>上找到它。</p>
+
+
+
+<p>在这一部分中，我们将下载并预处理人脸面具数据集，使用Tensorflow/Keras建立人脸面具检测模型，运行训练并保存深度学习模型以供进一步实施。</p>
+
+
+
+<h2 id="h-prerequisites">先决条件</h2>
+
+
+
+<p>为了完全理解本教程，假设您:</p>
+
+
+
+
+
+
+
+<p>以下是一些帮助您开始的链接:</p>
+
+
+
+
+
+
+
+
+
+
+
+<p>现在，让我们继续建立我们的监视系统。在本节中，我们构建深度学习模型来检测两个类别，即:</p>
+
+
+
+<ol>
+<li>戴面具的人</li>
+
+
+
+<li>没有面具的人</li>
+</ol>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" src="../Images/8bf398fa8f1ab9ccb7ed48a5ba15942f.png" alt="Mask detection" class="wp-image-32735" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206051524im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Mask-detection.jpg?resize=771%2C433&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Face mask classification</em></figcaption></figure></div>
+
+
+<p>为了进行这种分类，我们将利用一种称为<a href="/web/20221206051524/https://neptune.ai/blog/graph-neural-network-and-some-of-gnn-applications" target="_blank" rel="noreferrer noopener nofollow"> <strong>卷积神经网络(CNN)</strong>的深度神经网络，它通常用于分析视觉图像</a>。</p>
+
+
+
+<h2 id="h-downloading-and-pre-processing-the-datasets">下载和预处理数据集</h2>
+
+
+
+<p>数据是任何ML/AI算法的核心。对于这个项目，数据集是从<a href="https://web.archive.org/web/20221206051524/https://www.kaggle.com/wobotintelligence/face-mask-detection-dataset" target="_blank" rel="noreferrer noopener nofollow"> Kaggle </a>和<a href="https://web.archive.org/web/20221206051524/https://github.com/X-zhangyang/Real-World-Masked-Face-Dataset" target="_blank" rel="noreferrer noopener nofollow"> RMFD数据集</a>下载的。数据集由属于两类的<strong> 3835幅图像</strong>组成:</p>
+
+
+
+<ol>
+<li>with_mask: 1916个图像</li>
+
+
+
+<li>不带_mask: 1919张图片。</li>
+</ol>
+
+
+
+<p>为了开始构建这些模型，我们需要导入必要的库，包括用于预处理、模型构建、模型评估、可视化和文件管理的模块。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow.keras.preprocessing.image <span class="hljs-keyword">import</span> ImageDataGenerator
+<span class="hljs-keyword">from</span> tensorflow.keras.applications <span class="hljs-keyword">import</span> MobileNetV2
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> AveragePooling2D
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Dropout
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Flatten
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Dense
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Input
+<span class="hljs-keyword">from</span> tensorflow.keras.models <span class="hljs-keyword">import</span> Model
+<span class="hljs-keyword">from</span> tensorflow.keras.optimizers <span class="hljs-keyword">import</span> Adam
+<span class="hljs-keyword">from</span> tensorflow.keras.applications.mobilenet_v2 <span class="hljs-keyword">import</span> preprocess_input
+<span class="hljs-keyword">from</span> tensorflow.keras.preprocessing.image <span class="hljs-keyword">import</span> img_to_array
+<span class="hljs-keyword">from</span> tensorflow.keras.preprocessing.image <span class="hljs-keyword">import</span> load_img
+<span class="hljs-keyword">from</span> tensorflow.keras.utils <span class="hljs-keyword">import</span> to_categorical
+<span class="hljs-keyword">from</span> sklearn.preprocessing <span class="hljs-keyword">import</span> LabelBinarizer
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+<span class="hljs-keyword">from</span> sklearn.metrics <span class="hljs-keyword">import</span> classification_report
+<span class="hljs-keyword">from</span> imutils <span class="hljs-keyword">import</span> paths
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> argparse
+<span class="hljs-keyword">import</span> os
+</pre>
+
+
+
+<p>同样为了帮助TensorBoard记录，<a href="https://web.archive.org/web/20221206051524/https://docs.neptune.ai/integrations-and-supported-tools/experiment-tracking/tensorboard" target="_blank" rel="noreferrer noopener"> Neptune AI与两个平台进行了巧妙的集成</a>。为了利用该服务，我们导入了以下库:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> random
+<span class="hljs-keyword">import</span> psutil
+<span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">import</span> neptune_tensorboard <span class="hljs-keyword">as</span> neptune_tb
+</pre>
+
+
+
+<p>接下来，我们将使用dot_env模块从<code>.env</code>加载我们的Neptune API凭证。需要这个API令牌来授权您的训练脚本和Neptune之间的通信。为了使我们的API令牌保密，因为它就像是我们应用程序的密码，我们将利用环境变量通过<code>dot_env</code>库来加载值。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> dotenv <span class="hljs-keyword">import</span> load_dotenv
+load_dotenv()
+
+API_SECRET = os.getenv(<span class="hljs-string">"NEPTUNE_API_TOKEN"</span>)
+</pre>
+
+
+
+<p>接下来，我们将启动项目并自动记录TensorBoard指标:</p>
+
+
+
+<pre class="hljs">&lt;pre <span class="hljs-class"><span class="hljs-keyword">class</span>="<span class="hljs-title">hljs</span>" <span class="hljs-title">style</span>="<span class="hljs-title">display</span>:</span> block; overflow-x: auto; padding: <span class="hljs-number">0.5</span>em; color: rgb(<span class="hljs-number">51</span>, <span class="hljs-number">51</span>, <span class="hljs-number">51</span>); background: rgb(<span class="hljs-number">248</span>, <span class="hljs-number">248</span>, <span class="hljs-number">248</span>);<span class="hljs-string">"&gt;neptune.init(project_qualified_name=&lt;span class="</span>hljs-string<span class="hljs-string">" style="</span>color: rgb(<span class="hljs-number">221</span>, <span class="hljs-number">17</span>, <span class="hljs-number">68</span>);<span class="hljs-string">"&gt;'codebrain/Drone'&lt;/span&gt;,
+         	api_token=API_SECRET,
+         	)
+neptune_tb.integrate_with_tensorflow()
+&lt;/pre&gt;</span></pre>
+
+
+
+<p>有了这些，我们可以开始设置用于训练我们的人脸面具检测模型的环境，我们将初始化初始学习率、训练的时期数和批量大小，并设置实验日志目录。</p>
+
+
+
+<pre class="hljs">PARAMS = {
+	<span class="hljs-string">'EPOCHS'</span>: <span class="hljs-number">20</span>,
+	<span class="hljs-string">'BS'</span>: <span class="hljs-number">32</span>,
+	<span class="hljs-string">'INIT_LR'</span>: <span class="hljs-number">1e-4</span>,
+}
+RUN_NAME = <span class="hljs-string">'run_{}'</span>.format(random.getrandbits(<span class="hljs-number">64</span>))
+EXPERIMENT_LOG_DIR = <span class="hljs-string">'logs/{}'</span>.format(RUN_NAME)
+</pre>
+
+
+
+<p>接下来，我们将构建参数解析器，使编写用户友好的命令行界面与数据集、绘图和模型进行交互变得容易。</p>
+
+
+
+<pre class="hljs">ap = argparse.ArgumentParser()
+ap.add_argument(<span class="hljs-string">"-d"</span>, <span class="hljs-string">"--dataset"</span>, required=<span class="hljs-keyword">True</span>,
+            	help=<span class="hljs-string">"path to input dataset"</span>)
+ap.add_argument(<span class="hljs-string">"-p"</span>, <span class="hljs-string">"--plot"</span>, type=str, default=<span class="hljs-string">"plot.png"</span>,
+            	help=<span class="hljs-string">"path to output loss/accuracy plot"</span>)
+ap.add_argument(<span class="hljs-string">"-m"</span>, <span class="hljs-string">"--model"</span>, type=str,
+            	default=<span class="hljs-string">"mask_detector.model"</span>,
+            	help=<span class="hljs-string">"path to output face mask detector model"</span>)
+args = vars(ap.parse_args())
+</pre>
+
+
+
+<p>接下来，我们将从数据集目录中获取图像列表，然后初始化数据和类/标签列表。</p>
+
+
+
+<pre class="hljs">print(<span class="hljs-string">"[INFO] loading images..."</span>)
+imagePaths = list(paths.list_images(args[<span class="hljs-string">"dataset"</span>]))
+data = []
+labels = []
+</pre>
+
+
+
+<p>我们将循环遍历图像路径，从文件名中提取类别标签，并每次将图像预处理为224×224像素，然后输入到神经网络中。此外，我们将这些图像转换为数组，并将输入图像传递给<code>preprocess_input</code>函数，这意味着将您的图像充分转换为模型所需的格式(您保证您加载的图像与preprocess_input兼容)。最后将数据和标签转换成NumPy数组，以便进一步处理。对标签执行一次热编码，将分类数据转换为数字数据<strong>。</strong></p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">for</span> imagePath <span class="hljs-keyword">in</span> imagePaths:
+	label = imagePath.split(os.path.sep)[<span class="hljs-number">-2</span>]
+
+		image = load_img(imagePath, target_size=(<span class="hljs-number">224</span>, <span class="hljs-number">224</span>))
+	image = img_to_array(image)
+	image = preprocess_input(image)
+
+	
+	data.append(image)
+	labels.append(label)
+
+
+data = np.array(data, dtype=<span class="hljs-string">"float32"</span>)
+labels = np.array(labels)
+
+
+lb = LabelBinarizer()
+labels = lb.fit_transform(labels)
+labels = to_categorical(labels)
+</pre>
+
+
+
+<p>接下来，我们告诉海王星创造一个实验。给它命名并记录<a href="/web/20221206051524/https://neptune.ai/blog/hyperparameter-tuning-in-python-a-complete-guide-2020" target="_blank" rel="noreferrer noopener">超参数</a>。如果可能的话，建议将所有内容都放在with语句中，以便在实验完成后执行自动清理。在训练模型之前，我们需要将数据分为训练和测试数据，其中80%的数据用于训练，其余20%用于测试。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">with</span> neptune.create_experiment(name=RUN_NAME, params=PARAMS):
+
+	
+	
+	(trainX, testX, trainY, testY) = train_test_split(data, labels,
+                                                  	test_size=<span class="hljs-number">0.20</span>, stratify=labels, random_state=<span class="hljs-number">42</span>)
+</pre>
+
+
+
+<p>构建训练图像生成器，以通过创建图像的修改版本来人为地扩大训练数据集的大小。这种数据扩充将有助于模型更好地概括。</p>
+
+
+
+<pre class="hljs">aug = ImageDataGenerator(
+	rotation_range=<span class="hljs-number">20</span>,
+	zoom_range=<span class="hljs-number">0.15</span>,
+	width_shift_range=<span class="hljs-number">0.2</span>,
+	height_shift_range=<span class="hljs-number">0.2</span>,
+	shear_range=<span class="hljs-number">0.15</span>,
+	horizontal_flip=<span class="hljs-keyword">True</span>,
+	fill_mode=<span class="hljs-string">"nearest"</span>)
+</pre>
+
+
+
+<h2 id="h-model-building">模型结构</h2>
+
+
+
+<p>在对数据集进行预处理并正确标记后，下一步是训练一个模型来准确地对图像进行分类。有两种方法可以做到这一点，要么你从头开始建立一个分类器，要么使用一个预先训练好的模型。我选择了后者，并采用了<a href="https://web.archive.org/web/20221206051524/https://www.tensorflow.org/api_docs/python/tf/keras/applications/mobilenet_v2" target="_blank" rel="noreferrer noopener nofollow"> mobilenet_v2 </a>这是一个53层深的卷积神经网络。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/49d58e2fa5d38c52946e37e922c3f410.png" alt="mobile net" class="wp-image-32743" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206051524im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/mobile-net.png?ssl=1"/><figcaption class="wp-element-caption"><em>MobileNet V2 Architecture </em></figcaption></figure></div>
+
+
+<p><strong>注:</strong>使用预训练模型时，仔细阅读正在使用的模型非常重要，它可以用来解决手头的问题。此外，为了能够处理预处理过的数据集。由于MobilenetV2在对象检测、降低的复杂性以及对计算、图形处理和存储的限制方面具有最先进的性能，因此对其进行了调整。</p>
+
+
+
+<p>调整模型包括用预训练的权重图像网加载模型，并向模型添加更多的结构。卷积层之后是激活函数ReLU(增加非线性)和最大池(减少特征图)。添加辍学是为了防止神经网络过度拟合。然后，在末尾添加完全连接的层。最后，我们将我们的模型编译成损失函数、优化器和指标<strong>。</strong><strong>损失函数</strong>用于查找学习过程中的错误或偏差。<a href="/web/20221206051524/https://neptune.ai/blog/keras-loss-functions" target="_blank" rel="noreferrer noopener nofollow"> Keras在模型编译过程中需要损失函数</a>。<strong>优化</strong>是通过比较预测和损失函数来优化输入权重的重要过程，并且<a href="/web/20221206051524/https://neptune.ai/blog/keras-metrics" target="_blank" rel="noreferrer noopener"> <strong>指标</strong>用于评估您的模型</a>的性能。模型被序列化并保存在我的本地磁盘上。</p>
+
+
+
+<p><strong>注意:</strong>头模型将被放置在基础模型之上，这将成为我们将要训练的实际模型。</p>
+
+
+
+<pre class="hljs">baseModel = MobileNetV2(weights=<span class="hljs-string">"imagenet"</span>, include_top=<span class="hljs-keyword">False</span>,
+                    	input_tensor=Input(shape=(<span class="hljs-number">224</span>, <span class="hljs-number">224</span>, <span class="hljs-number">3</span>)))
+
+headModel = baseModel.output
+headModel = AveragePooling2D(pool_size=(<span class="hljs-number">7</span>, <span class="hljs-number">7</span>))(headModel)
+headModel = Flatten(name=<span class="hljs-string">"flatten"</span>)(headModel)
+headModel = Dense(<span class="hljs-number">128</span>, activation=<span class="hljs-string">"relu"</span>)(headModel)
+headModel = Dropout(<span class="hljs-number">0.5</span>)(headModel)
+headModel = Dense(<span class="hljs-number">2</span>, activation=<span class="hljs-string">"softmax"</span>)(headModel)
+model = Model(inputs=baseModel.input, outputs=headModel)
+
+
+
+<span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> baseModel.layers:
+	layer.trainable = <span class="hljs-keyword">False</span>
+
+
+print(<span class="hljs-string">"[INFO] compiling model..."</span>)
+opt = Adam(lr=PARAMS[<span class="hljs-string">'INIT_LR'</span>],
+           decay=PARAMS[<span class="hljs-string">'INIT_LR'</span>] / PARAMS[<span class="hljs-string">'EPOCHS'</span>])
+model.compile(loss=<span class="hljs-string">"binary_crossentropy"</span>, optimizer=opt,
+              metrics=[<span class="hljs-string">"accuracy"</span>])
+
+
+print(<span class="hljs-string">"[INFO] training head..."</span>)
+tensorboard=tf.keras.callbacks.TensorBoard(log_dir=EXPERIMENT_LOG_DIR)
+H = model.fit(
+    	aug.flow(trainX, trainY, batch_size=PARAMS[<span class="hljs-string">'BS'</span>]),
+    	steps_per_epoch=len(trainX) // PARAMS[<span class="hljs-string">'BS'</span>],
+    	validation_data=(testX, testY),
+    	validation_steps=len(testX) // PARAMS[<span class="hljs-string">'BS'</span>],
+    	epochs=PARAMS[<span class="hljs-string">'EPOCHS'</span>],
+    	callbacks=[tensorboard]
+	)
+</pre>
+
+
+
+<p>下一步是通过预测测试数据标签来评估模型的性能。</p>
+
+
+
+<pre class="hljs">print(<span class="hljs-string">"[INFO] evaluating network..."</span>)
+predIdxs = model.predict(testX, batch_size=PARAMS[<span class="hljs-string">'BS'</span>])
+
+
+
+predIdxs = np.argmax(predIdxs, axis=<span class="hljs-number">1</span>)
+
+
+print(classification_report(testY.argmax(axis=<span class="hljs-number">1</span>), predIdxs,
+                            target_names=lb.classes_))
+
+
+print(<span class="hljs-string">"[INFO] saving mask detector model..."</span>)
+model.save(args[<span class="hljs-string">"model"</span>], save_format=<span class="hljs-string">"h5"</span>)
+</pre>
+
+
+
+<p>最后，我们需要从我们的海王星实验仪表板可视化训练损失和准确性。</p>
+
+
+
+
+
+<p>在这里可以看到仪表板。</p>
+
+
+
+<p>我们可以从Neptune实验仪表板<a href="https://web.archive.org/web/20221206051524/https://docs.neptune.ai/you-should-know/logging-metadata#hardware-consumption-and-console-logs" target="_blank" rel="noreferrer noopener">监控硬件消耗</a>。</p>
+
+
+
+
+
+<p>仪表盘可以在这里看到<a href="https://web.archive.org/web/20221206051524/https://ui.neptune.ai/codebrain/Drone/e/DRONE-13/monitoring" target="_blank" rel="noreferrer noopener"/>。</p>
+
+
+
+<h2 id="h-implementing-the-model-on-the-video-stream">在视频流上实现模型</h2>
+
+
+
+<p>这是一个新的脚本，它将从之前的会话中加载保存的模型。为了开始实现，我们需要导入一些必要的库。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow.keras.applications.mobilenet_v2 <span class="hljs-keyword">import</span> preprocess_input
+<span class="hljs-keyword">from</span> tensorflow.keras.preprocessing.image <span class="hljs-keyword">import</span> img_to_array
+<span class="hljs-keyword">from</span> tensorflow.keras.models <span class="hljs-keyword">import</span> load_model
+<span class="hljs-keyword">from</span> imutils.video <span class="hljs-keyword">import</span> VideoStream
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> argparse
+<span class="hljs-keyword">import</span> imutils
+<span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">import</span> cv2
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> time
+</pre>
+
+
+
+<p>接下来，我们将创建两个函数<code>get_facenet_masknet</code>和<code>detect_and_predict_mask</code>。<code>get_facenet_masknet</code>功能将读入之前序列化的训练模型和相应的权重。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_facenet_masknet</span><span class="hljs-params">()</span>:</span>
+	
+	ap = argparse.ArgumentParser()
+	ap.add_argument(<span class="hljs-string">"-f"</span>, <span class="hljs-string">"--face"</span>, type=str,
+                	default=<span class="hljs-string">"face_detector"</span>,
+                	help=<span class="hljs-string">"path to face detector model directory"</span>)
+	ap.add_argument(<span class="hljs-string">"-m"</span>, <span class="hljs-string">"--model"</span>, type=str,
+                	default=<span class="hljs-string">"mask_detector.model"</span>,
+                	help=<span class="hljs-string">"path to trained face mask detector model"</span>)
+	ap.add_argument(<span class="hljs-string">"-c"</span>, <span class="hljs-string">"--confidence"</span>, type=float, default=<span class="hljs-number">0.5</span>,
+                	help=<span class="hljs-string">"minimum probability to filter weak detections"</span>)
+	args = vars(ap.parse_args())
+
+	
+	print(<span class="hljs-string">"[INFO] loading face detector model..."</span>)
+	
+	prototxtPath = (
+    	<span class="hljs-string">'/Users/USER/Documents/DroneProjects/facemaskdetection/face_detector/deploy.prototxt'</span>)
+	
+	
+	weightsPath = (
+    	<span class="hljs-string">'/Users/USER/Documents/DroneProjects/facemaskdetection/face_detector/res10_300x300_ssd_iter_140000.caffemodel'</span>)
+	faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
+
+	
+	print(<span class="hljs-string">"[INFO] loading face mask detector model..."</span>)
+	maskNet = load_model(
+    	<span class="hljs-string">'/Users/USER/Documents/DroneProjects/facemaskdetection/mask_detector.model'</span>)
+	<span class="hljs-keyword">return</span>(faceNet, maskNet, args)
+</pre>
+
+
+
+<p>在适当的位置，<code>detect_and_predict_mask</code>将抓取框架的尺寸，并从中构造一个斑点。斑点将通过网络来检测面部。</p>
+
+
+
+<p>我们将抓住维度:</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">detect_and_predict_mask</span><span class="hljs-params">(frame, faceNet, maskNet, args)</span>:</span>
+(h, w) = frame.shape[:<span class="hljs-number">2</span>]
+	blob = cv2.dnn.blobFromImage(frame, <span class="hljs-number">1.0</span>, (<span class="hljs-number">300</span>, <span class="hljs-number">300</span>),
+                             	(<span class="hljs-number">104.0</span>, <span class="hljs-number">177.0</span>, <span class="hljs-number">123.0</span>))
+
+	faceNet.setInput(blob)
+	detections = faceNet.forward()
+</pre>
+
+
+
+<p>接下来，我们将初始化我们的人脸列表及其相应的位置，以及来自我们的人脸面具网络的预测列表。</p>
+
+
+
+<pre class="hljs">	faces = []
+	locs = []
+	preds = []
+</pre>
+
+
+
+<p>我们将循环检测以提取与检测相关的置信度(即概率)。</p>
+
+
+
+<pre class="hljs">	<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">0</span>, detections.shape[<span class="hljs-number">2</span>]):
+    		confidence = detections[<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, i, <span class="hljs-number">2</span>]
+</pre>
+
+
+
+<p>接下来，我们将通过确保置信度大于最小置信度来过滤掉弱检测。</p>
+
+
+
+<pre class="hljs">   	<span class="hljs-keyword">if</span> confidence &gt; args[<span class="hljs-string">"confidence"</span>]:
+        	
+        	
+        	box = detections[<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, i, <span class="hljs-number">3</span>:<span class="hljs-number">7</span>] * np.array([w, h, w, h])
+        	(startX, startY, endX, endY) = box.astype(<span class="hljs-string">"int"</span>)
+</pre>
+
+
+
+<p>我们还必须确保边界框落在框架的尺寸范围内。</p>
+
+
+
+<pre class="hljs">        	(startX, startY) = (max(<span class="hljs-number">0</span>, startX), max(<span class="hljs-number">0</span>, startY))
+        	(endX, endY) = (min(w - <span class="hljs-number">1</span>, endX), min(h - <span class="hljs-number">1</span>, endY))
+</pre>
+
+
+
+<p>我们将做一些预处理步骤，包括提取面部ROI，然后将其从BGR转换到RGB通道排序。然后继续将帧的大小调整为224×224像素，并将其转换为数组。</p>
+
+
+
+<pre class="hljs">        	face = frame[startY:endY, startX:endX]
+        	face = cv2.cvtColor(face, cv2.COLOR_BGR2RGB)
+        	face = cv2.resize(face, (<span class="hljs-number">224</span>, <span class="hljs-number">224</span>))
+        	face = img_to_array(face)
+        	face = preprocess_input(face)
+</pre>
+
+
+
+<p>我们必须确保将面和边界框添加到它们各自的列表中。</p>
+
+
+
+<pre class="hljs">         	faces.append(face)
+        	locs.append((startX, startY, endX, endY))
+</pre>
+
+
+
+<p>如果至少检测到一个面，将进行预测，然后同时对所有面进行批量预测，而不是逐个预测。</p>
+
+
+
+<pre class="hljs">	<span class="hljs-keyword">if</span> len(faces) &gt; <span class="hljs-number">0</span>:
+    	faces = np.array(faces, dtype=<span class="hljs-string">"float32"</span>)
+    	preds = maskNet.predict(faces, batch_size=<span class="hljs-number">32</span>)
+</pre>
+
+
+
+<p>最后，我们将返回一个脸部位置及其对应位置的二元组。</p>
+
+
+
+<pre class="hljs">	<span class="hljs-keyword">return</span> (locs, preds)
+</pre>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>在本教程中，您了解了如何预处理和加载面罩数据集，以及如何使用Tensorflow Mobilenet V2和Python来训练面罩检测模型。经过训练的模型进一步适用于视频流实现。最后，该模型被序列化为项目的下一阶段，包括在flask应用程序上部署该监视系统。</p>
+
+
+
+<p>利用从第1部分和第2部分获得的知识，我们已经完全构建了监控系统的框架，下一部分将介绍该系统的部署。阅读愉快，敬请关注。</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

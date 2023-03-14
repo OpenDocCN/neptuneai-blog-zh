@@ -1,0 +1,1096 @@
+<html>
+<head>
+<title>Packaging ML Models: Web Frameworks and MLOps </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>打包ML模型:Web框架和MLOps</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/packaging-ml-models#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/packaging-ml-models#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>在本文中，我们将了解<strong>顶级打包工具——基于网络的框架和MLOps</strong>——数据科学和ML项目的内容、原因和方式。数据科学家和机器学习工程师需要特定的工具来端到端地构建、部署和监控这些项目。</p>
+
+
+
+<p>我们将详细介绍几种工具，以及它们的关键组件和特性。不需要介绍，我们走吧！</p>
+
+
+
+<div id="blog-cta-intext-block_60bf3a2c5cec7" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">可能有用</h3>
+  <div class="blog-cta-intext__content"><p>找到最适合您的使用情形的MLOps工具👉<a href="https://web.archive.org/web/20221007164322/https://mlops.neptune.ai/" target="_blank" rel="noopener" data-rich-text-format-boundary="true"> MLOps工具景观</a></p>
+</div>
+  </div>
+
+
+
+
+<h2 id="ml-lifecycle">机器学习开发生命周期</h2>
+
+
+
+<p>我们处理的所有ML项目都有许多迭代步骤，需要同步执行才能获得最佳结果。当ML模型和数据不断增长时，数据科学团队手动管理这些步骤变得很乏味。</p>
+
+
+
+<p>这就产生了操作整个机器学习开发生命周期的想法。但是最好的方法是什么呢？理想情况下，我们需要在关键利益相关者之间划分ML项目工作，并且每个团队成员需要以高度协作的方式工作，以使项目成功。</p>
+
+
+
+
+
+<h2 id="ml-stakeholders">机器学习和数据科学生命周期的利益相关者</h2>
+
+
+
+<p>为了了解如何以迭代和自动化的方式处理任何机器学习项目，我们需要首先了解平均机器学习和数据科学生命周期的所有利益相关者。中小企业、数据科学家和数据工程师是最受欢迎的角色，但每个利益相关者在ML项目的成功中都扮演着重要的角色。让我们看看不同的团队成员通常负责什么。</p>
+
+
+
+<p><strong>主题专家(SME) </strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>专注于非常重要的业务问题。</li><li>确保模型性能满足业务需求/目标。</li><li>分析业务需求和目标。</li></ul>
+</div>
+
+
+<p><strong>数据分析师/业务分析师</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>处理数据分析和EDA。</li><li>协助开发数据功能。</li><li>为ML流程(ETL)优化和构建数据提取。</li></ul>
+</div>
+
+
+<p><strong>数据工程师</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>分析和组织数据。</li><li>构建重要的数据管道。</li><li>在项目上与SME、数据分析师、数据科学家和数据架构师合作。</li></ul>
+</div>
+
+
+<p><strong>数据科学家</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>开发模型来回答中小企业提出的问题。</li><li>应用预测分析和统计。</li><li>审查模型结果、准确性并重新培训模型。</li></ul>
+</div>
+
+
+<p><strong> ML工程师</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>测试模型，并将它们交付到生产中，以产生商业价值。</li><li>根据客户要求设计和开发机器学习应用程序。</li><li>扩展和丰富了用于深度学习和机器学习的现有框架和库</li></ul>
+</div>
+
+
+<p><strong>软件工程师</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>开发使用ML模型的API或应用程序。</li><li>使用各种工具验证机器学习模型是否正确运行。</li><li>使用API将ML应用集成为Web应用。</li></ul>
+</div>
+
+
+<p><strong>机器学习架构师</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>作为生产部署的一部分，优化机器学习模型的架构。</li><li>支持在生产中部署模型的扩展。</li><li>与数据科学团队的每个成员合作，并指导ML项目。</li></ul>
+</div>
+
+
+<p>开发工程师</p>
+
+
+<div class="custom-point-list">
+<ul><li>为所有环境中的模型处理持续集成和持续部署管道。</li><li>处理支持模型的体系结构的安全性、集成和性能。</li></ul>
+</div>
+
+
+<p><strong> BI(商业智能)开发人员</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>开发、部署和维护界面，如数据可视化、查询工具和业务仪表板。</li><li>将业务需求转化为技术需求。设定BI工具的业务需求。</li></ul>
+</div>
+
+
+
+
+
+<p>涉众通常被隔离在不同的小组和团队中。有了ML打包工具，利益相关者可以作为一个合作团体来计算和避免公司的风险。将模型从开发转移到生产和扩展是伴随ML项目的常见挑战。它们会导致实现和部署模型的交付时间延长。</p>
+
+
+
+<p>ML打包工具是为了优化数据科学和ML生命周期而创建的。多亏了这些工具，沟通和实施流程得以简化。您可以避免突然有太多的涉众无法跟踪谁做了什么的情况，因为工具可以为您跟踪这一点。请记住，这些角色和职责在不同的公司会有所不同。</p>
+
+
+
+<h2 id="problems">数据科学和ML项目面临的五大问题</h2>
+
+
+
+<p>在数据科学项目中，我们可能会遇到以下五个挑战:</p>
+
+
+
+<p><strong> 1。围绕</strong>的大肆宣传带来了很高的期望</p>
+
+
+<div class="custom-point-list">
+<ul><li>围绕机器学习的炒作如此之多，人们的期望值通常都定得太高了。数据科学和ML需要根据它们的局限性来解释，而不仅仅是潜在的好处。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>营销人员和媒体往往无法解决这种情况的全部现实，所以他们描绘了一幅强大的技术自动解决问题的美好画面。但是人工智能和人工智能是复杂的技术，任何公司都需要时间来实施和充分利用。他们消耗大量资源来实现投资回报。ML生命周期中的利益相关者需要从一开始就管理期望。</li></ul>
+</div>
+
+
+<p><strong> 2。模特不喜欢匆忙的时间线</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>创建一个好的机器学习模型需要大量的工作，数据科学家并不总是能够预见准确的开发和实施时间。数据科学项目不应该有严格的里程碑和截止日期。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>数据科学团队可能在比预期更短或更长的时间内取得成功。企业需要表现出耐心，并继续为团队提供他们需要的资源。</li></ul>
+</div>
+
+
+<p><strong> 3。模型应该面向未来，无需维护</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>在数据科学团队在构建和测试模型上投入了如此多的辛勤工作之后，经常会出现这样的问题:他们的模型是否已经了解了他们所需要的一切。</li><li>机器学习模型需要不断训练和维护，以适应未来。团队和企业应该确保他们在开始一个ML项目时考虑到这样做的成本。</li></ul>
+</div>
+
+
+<p><strong> 4。数据收集消耗一半以上的时间</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>数据在任何数据科学用例中都扮演着至关重要的角色。数据科学团队60%的工作在于收集数据。对于尝试机器学习的初学者来说，他们可以很容易地找到各种托管公开可用数据的网站。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>为了实现真实世界的场景，您需要通过web抓取、通过API收集数据，或者(为了解决业务问题)<strong>从客户端收集数据</strong>(在这种情况下，数据科学家或ML工程师需要与主题专家协调和合作来收集数据)。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>数据一旦被收集，在数据库中可能具有非结构化的格式。正确格式化数据需要数据工程知识。</li></ul>
+</div>
+
+
+<p><strong> 5。模型和应用部署</strong></p>
+
+
+
+<p>数据科学生命周期遵循构建应用程序的7个步骤:</p>
+
+
+
+<p>1)数据收集，</p>
+
+
+
+<p>2)数据清洗，</p>
+
+
+
+<p>3)特征工程，</p>
+
+
+
+<p>4)分析模式，</p>
+
+
+
+<p>5)模型训练和优化，</p>
+
+
+
+<p>6)验证模型，</p>
+
+
+
+<p>7)模型测试、部署和维护。</p>
+
+
+
+<p>啊，部署！研究人员和开发人员通常可以执行所有的构建步骤，但是有时<strong>缺乏部署</strong>的技能。由于缺乏实践和依赖性问题，对业务的底层模型理解不足，以及模型不稳定，将他们的应用程序投入生产已经成为最大的挑战之一<strong> </strong>。这是DevOps工程师、ML工程师可以参与进来将您的模型部署到生产中的地方。</p>
+
+
+
+
+
+
+<p>通常，许多开发人员从网站上收集数据，并开始训练他们的模型，但在现实世界中，需要获取动态的数据收集源。离线学习或批量学习不能用于这种类型的可变数据。该系统经过培训，然后投入生产，无需学习即可运行。数据和模型可能会漂移，因为它们可能会经常改变。</p>
+
+
+
+
+
+
+
+<p>我们需要一个打包工具，比如基于web的框架或MLOps工具，来避免或减轻项目涉众所面临的挑战。</p>
+
+
+
+<p>将机器学习解决方案构建为一个端到端的系统，并随着时间的推移不断改进，这是在数据科学项目中实现商业价值的主要障碍。打包工具对此有所帮助。</p>
+
+
+
+<h2 id="challenges">ML项目中的挑战</h2>
+
+
+
+<p>ML项目的两大挑战是:</p>
+
+
+<div class="custom-point-list">
+<ol><li><strong>将ML模型投入生产，只有47%的模型完全部署！</strong>(来源:<a href="https://web.archive.org/web/20221007164322/https://www.gartner.com/en/newsroom/press-releases/2018-10-16-gartner-survey-of-more-than-3000-cios-reveals-that-enterprises-are-entering-the-third-era-of-it" target="_blank" rel="noreferrer noopener nofollow"> Gartner，2019 </a>)</li></ol>
+</div>
+
+
+<p>创建的模型数量和实际投入生产的模型数量之间的差距是企业机器学习成功的巨大障碍。一旦组织能够超越这一点，组织将能够从他们的机器学习投资中获得更大的价值。</p>
+
+
+<div class="custom-point-list">
+<ol start="2"><li><strong>部署机器学习和深度学习模型的时间非常长。</strong>(来源:<a href="https://web.archive.org/web/20221007164322/https://info.algorithmia.com/hubfs/2019/Whitepapers/The-State-of-Enterprise-ML-2020/Algorithmia_2020_State_of_Enterprise_ML.pdf" target="_blank" rel="noreferrer noopener nofollow"> Algorithmia，2020 </a>)</li></ol>
+</div>
+
+
+<p>一项调查显示，将ML &amp; DL模型投入生产部署——最终开始增加商业价值——平均需要从 <strong> <em> 8到90天</em> </strong>的<strong>时间。更糟糕的是，高达75%的ML项目从未超过实验阶段。T9】</strong></p>
+
+
+
+<p>以下是几个使项目难以进入生产的额外挑战:</p>
+
+
+<div class="custom-point-list">
+<ul><li>数据和模型的可扩展性问题，</li><li>开源试点，不是生产级的，</li><li>难以部署到业务应用程序和流程中，</li><li>缺乏开发和集成技能，</li><li>缺乏资金和合适的工具，</li><li>数据质量和完整性问题，</li><li>输入和输出的数据治理和安全性。</li></ul>
+</div>
+
+
+<h2 id="emerging-roles">数据科学中的新兴角色</h2>
+
+
+
+<p>传统的商业智能和趋势人工智能都在出现，因为它们都使用数据建模(商业智能使用统计技术来分析过去，人工智能进行预测)。</p>
+
+
+
+<p>数据科学资源的整体缺乏将导致越来越多的软件开发人员参与创建和管理机器学习模型。(<a href="https://web.archive.org/web/20221007164322/https://www.gartner.com/en/newsroom/press-releases/2018-10-16-gartner-survey-of-more-than-3000-cios-reveals-that-enterprises-are-entering-the-third-era-of-it" target="_blank" rel="noreferrer noopener nofollow"> Gartner首席信息官调查</a>)</p>
+
+
+
+<p>同样类型的工作将会出现更多的角色名称和职位名称。为此，我们看到数据科学领域涌现出大量热门职位，例如:</p>
+
+
+<div class="custom-point-list">
+<ul><li>机器学习工程师，</li><li>ML显影剂，</li><li>ML架构师，</li><li>数据工程师，</li><li>深度学习专家，</li><li>NLP工程师，</li><li>计算机视觉工程师，</li><li>机器学习操作(MLOps)，</li><li>人工智能行动。</li></ul>
+</div>
+
+
+<p>行业扩张，公司试图将他们自己和他们的才能与众不同。</p>
+
+
+
+<p>作为将机器学习模型投入生产的挑战和问题的合理解决方案，<strong> <a href="https://web.archive.org/web/20221007164322/https://neptune.ai/blog/mlops-what-it-is-why-it-matters-and-how-to-implement-it-from-a-data-scientist-perspective" target="_blank" rel="noreferrer noopener nofollow"> MLOps </a>是伴随着现有的web和移动开发框架打包方式而出现的新趋势</strong>。</p>
+
+
+
+<h2 id="how-to-package">如何打包ML项目</h2>
+
+
+
+<p>重要的是将ML项目管道(或数据科学生命周期，如下图所示)打包到一个端到端系统中，以实现良好的ROI。</p>
+
+
+
+
+
+<p>有两种方法可以打包ds和ML项目:</p>
+
+
+<div class="custom-point-list">
+<ol><li>基于网络的框架</li><li>MLOps</li></ol>
+</div>
+
+
+<h2 id="web-based-frameworks">1.用基于网络的框架打包ML项目</h2>
+
+
+
+<p>基于web的框架是一个代码库，它通过为构建可靠、可伸缩和可维护的web应用程序提供通用模式，使web开发更快、更有效、更容易。大多数时候，专业的web开发项目总是使用现有的web框架，如Flask、FastAPI、Django或Pyramid。</p>
+
+
+
+<h3>框架的优势</h3>
+
+
+<div class="custom-point-list">
+<ol><li>开源的，</li><li>良好的文档和社区，</li><li>高效，</li><li>安全，</li><li>轻松集成。</li></ol>
+</div>
+
+
+<h3>为什么基于web的框架有用？</h3>
+
+
+
+<p>基于Web的框架使得非常常见的HTTP操作的代码可重用性变得容易&amp;构建项目，使得任何具有框架知识的人都可以快速地构建、维护和支持应用程序。</p>
+
+
+
+<h4>常见的基于web的框架的功能</h4>
+
+
+
+<p>框架提供了执行常见操作的功能，包括:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>输入表单处理和验证</strong>–这个想法是验证数据，然后保存表单，如果它需要一些输入，</li><li><strong> URL路由</strong>–路由机制用于将URL直接映射到最终创建网页的代码。</li><li><strong>使用模板引擎输出格式</strong>–使用模板引擎生成任何广泛使用的内容类型，如HTML、XML和JSON。</li><li><strong>数据库连接</strong>–通过对象关系映射(ORM)进行持久数据操作和数据库连接配置。</li><li><strong> Web安全</strong>–框架为Web提供安全保护，防止跨站点脚本(XSS)、跨站点请求伪造(CSRF)、SQL注入和其他恶意攻击。</li><li><strong>会话存储和检索</strong>–无论何时页面会话结束，存储在会话存储器中的数据都会被清除。</li></ul>
+</div>
+
+
+<h4>全栈框架</h4>
+
+
+
+<p>全栈框架是一个一体化的地方，其中的库被配置为彼此无缝协作。它可以帮助您构建后端服务、数据库和前端。全栈框架提供了软件开发者构建应用所需的一切。</p>
+
+
+
+<h4>微观框架</h4>
+
+
+
+<p>微框架没有全栈框架的大部分功能，比如web模板引擎、帐户、授权、认证或输入验证。微框架只提供应用程序所需的组件集。</p>
+
+
+
+<h3>4个令人惊叹的Python基于web的框架</h3>
+
+
+
+<h4>1.烧瓶(微框架)</h4>
+
+
+
+<p><a href="https://web.archive.org/web/20221007164322/https://flask.palletsprojects.com/en/2.0.x/" target="_blank" rel="noreferrer noopener nofollow"> <strong> Flask </strong> </a>是一个著名且广泛使用的Python web框架。这是一个第三方Python库，用于开发基于web的应用程序。Flask依赖于Werkzeug WSGI工具箱和Jinja2模板。最终目的是帮助开发一个强大的web应用程序基础。</p>
+
+
+
+<p><strong>烧瓶的主要特征:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>内置的开发服务器和快速调试器。</li><li>RESTful用于分派请求。</li><li>HTTP的请求处理。</li><li>集成单元测试支持(代码质量)。</li><li>即插即用任意对象关系映射(ORM)。</li><li>使用Jinja2模板(标签、过滤器、宏等等)。</li><li>基于Unicode。</li><li>100%符合WSGI 1.0。</li><li>社区提供的多个扩展简化了新功能的集成。</li><li>安全cookies支持。</li></ul>
+</div>
+
+
+
+
+<h4>2.FastAPI(微框架)</h4>
+
+
+
+<p><a href="https://web.archive.org/web/20221007164322/https://fastapi.tiangolo.com/" target="_blank" rel="noreferrer noopener nofollow"> <strong> FastAPI </strong> </a>是一个现代的基于web的API构建框架，使用Python 3.6+版本，基于标准Python类型，提供高性能。</p>
+
+
+
+<p><strong>FastAPI的主要特性:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>非常好的性能，接近NodeJS和Go，因为它使用了Starlette和Pydantic。目前最快的Python框架之一。</li><li>健壮:获取生产就绪代码。令人惊讶的交互式文档。</li><li>代码速度:提高开发特性组件的速度，接近300%*</li><li>基于标准:完全兼容API、OpenAPI和JSON模式的开放标准。</li><li>较小的错误:减少大约40%的开发人员引起的错误。*</li><li>轻松学习使用耗时更少的文档。</li><li>简短:来自每个参数声明的多个特性。</li><li>直观:强大的编辑器支持，无处不在的完成，更少的调试时间。</li></ul>
+</div>
+
+
+
+
+<h4>3.Django(全栈框架)</h4>
+
+
+
+<p><a href="https://web.archive.org/web/20221007164322/https://www.djangoproject.com/" target="_blank" rel="noreferrer noopener nofollow"> <strong> Django </strong> </a>是一个基于Web的Python框架，它是一个高级的框架，可以快速开发安全且可维护的网站。Django消除了web开发的大部分问题，因此编写应用程序变得非常容易，而不必重新发明轮子。</p>
+
+
+
+<p><strong>Django的主要特点:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li><em>快得不可思议的</em>–帮助所有开发人员尽可能快地完成他们基于网络的应用程序的构思。</li><li><em>满载的</em>–开箱即可处理内容管理、用户认证、站点地图、RSS订阅源以及更多任务。</li><li>极度可伸缩性–Django快速灵活扩展的能力是一个了不起的特性。</li><li>为了避免许多常见的安全错误，Django认真对待安全性并帮助开发人员。</li><li>不可思议的多功能——公司和政府已经使用Django建立了各种各样的东西，从内容管理系统，通过社交网络，到科学计算网站。</li><li>帮助你在应用程序中定义URL的模式。</li><li>最终内置的认证系统。</li><li>简单而强大的URL系统和路由。</li><li>缓存框架、模板引擎、数据库模式迁移和ORM。</li></ul>
+</div>
+
+
+
+
+<h4>4.金字塔(介于全栈和微框架之间)</h4>
+
+
+
+<p><a href="https://web.archive.org/web/20221007164322/https://trypyramid.com/" target="_blank" rel="noreferrer noopener nofollow"> <strong>金字塔</strong> </a>是一个开源的轻量级Python web框架，专注于将小应用程序变成大应用程序。金字塔基于模型-视图-控制器(MVC)架构模式，这是一个WSGI web框架。Pyramid有一个座右铭——从小处开始，大处结束，坚持完成构建的框架在全栈和微框架之间架起了一座桥梁。</p>
+
+
+
+<p><strong>金字塔的主要特征:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>包罗万象的模板和资产细节。</li><li>能够很好地运行小型和大型应用。</li><li>认证和批准的灵活性。</li><li>2种不同的方式–web helpers和URL dispatch可用于基于路由配置的URL映射。</li><li>测试、支持和综合数据文档。</li><li>HTML结构的验证和生成。</li></ul>
+</div>
+
+
+
+
+<h3>基于web的框架之间的差异</h3>
+
+
+<div class="custom-point-list">
+<ul><li>从烧瓶转移到FastAPI:<a href="https://web.archive.org/web/20221007164322/https://testdriven.io/blog/moving-from-flask-to-fastapi/" target="_blank" rel="noreferrer noopener nofollow">https://testdriven.io/blog/moving-from-flask-to-fastapi</a></li><li>姜戈vs弗拉斯克vs金字塔:<a href="https://web.archive.org/web/20221007164322/https://www.airpair.com/python/posts/django-flask-pyramid" target="_blank" rel="noreferrer noopener nofollow">https://www.airpair.com/python/posts/django-flask-pyramid</a></li><li>Django的ORM无法在非关系(NoSQL)数据库(如MongoDB或Cassandra)上工作，而Django的ORM层允许开发人员用Python代码编写关系数据库读、写、查询和删除操作，而不是用SQL。</li><li>Web框架，如Pyramid &amp; Flask，通过使用少量Python库，更容易与非关系数据库一起使用。</li></ul>
+</div>
+
+
+<p>现在，进入第二种打包ML项目的方法——mlop。</p>
+
+
+
+<h2 id="mlops-frameworks">2.用MLOps(机器学习操作)打包ML项目</h2>
+
+
+
+<p>“人工智能运营是三个不同但合作的领域的交汇点——机器学习，DevOps &amp;数据工程，用于操作你的人工智能模型。”</p>
+
+
+
+
+
+<p>MLOps是人工智能模型交付的学科。MLOps使您和您的公司能够在生产环境中扩展生产能力，以提供更快、更高效的结果，产生巨大的价值。</p>
+
+
+
+<p>DataOps通过将DevOps的概念扩展到数据世界，提供了一种令人惊叹的方法来运营您的数据和AI平台。作为DevOps的扩展，DataOps构建在一个相当简单的CI/CD框架上:持续集成、持续交付和持续部署。</p>
+
+
+
+<p>当数据科学和机器学习项目缺乏坚实的框架和架构来支持模型构建、部署、治理和监控时，它们就会失败。为了取得成功，您需要数据科学团队成员(如数据科学家、DevOps工程师、数据分析师、数据架构师和数据工程师)之间的协作，将ML算法产品化，并将其大规模交付到生产中。当您将这个简单但有效的框架进一步扩展到数据市场时，您会得到一个坚实的框架，这就是MLOps。</p>
+
+
+
+<h3>MLOps的4个核心原则</h3>
+
+
+<div class="custom-point-list">
+<ol><li><strong>持续集成(CI)–</strong>代码、数据和模型的持续测试和验证。</li><li><strong>连续交付(CD)–</strong>交付自动部署另一个ML模型预测服务的ML培训管道。</li><li><strong>连续训练(CT)–</strong>自动重新训练ML模型以进行重新部署。</li><li><strong>持续监控(CM)–</strong>监控生产数据和模型性能指标。</li></ol>
+</div>
+
+
+<h3>MLOps的优势以及我们为什么需要它？</h3>
+
+
+
+<p><strong> 1。加速实现价值的时间</strong></p>
+
+
+
+<p>务实地优化ML模式的部署，以缩短从培训到生产的时间——从几个月到几分钟。因此，它会不断改进和优化，以便高效地扩展。</p>
+
+
+
+<p><strong> 2。优化团队的生产力</strong></p>
+
+
+
+<p>与现有框架、工作流和工具集成，以提供透明的角色并优化瓶颈。定期监控和报告所有项目，以便做出适当的决策。</p>
+
+
+
+<p><strong> 3。管理基础设施</strong></p>
+
+
+
+<p>系统地控制模型上的计算资源，以符合业务成果和性价比要求，从而大幅降低价格。部署在您想要的任何地方，本地、云或混合环境。</p>
+
+
+
+<p><strong> 4。保护您的业务</strong></p>
+
+
+
+<p>跨用户、数据、ML模型和资源建立企业级基于角色的访问和安全控制，以确保您的业务通过持续交付而发展。</p>
+
+
+
+
+
+<h3>MLOps解决什么问题？</h3>
+
+
+
+<p>数据必须始终有一个主要的业务焦点。可操作化有助于在获得洞察力和将有价值的洞察力转化为可操作的价值之间形成闭环。简单的想法，然而执行起来一点也不简单。</p>
+
+
+
+<p><strong>建立一个机器学习运营战略可以在很多方面让你的公司或团队受益:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>复杂的黑盒ML算法带来的障碍减少了，运营和数据团队的专业知识和协作得到了更好的分配。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>随着机器学习成为主流，运营的监管前沿是一项关键职能。ML Operations将您的运营团队置于新规则和最佳实践的前沿。他们可以掌控监管流程，而您的数据团队则专注于部署令人惊叹的模型。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>您的运营团队拥有行业知识，而您的DS团队了解数据。MLOps结合了双方的专业知识，实现了利用双方经验的有效ML。</li></ul>
+</div>
+
+
+<h3>每个MLOps工具的特定功能的比较表</h3>
+
+
+<p id="block_61af6079721c3" class="separator separator-10"/>
+
+
+<div class="medium-table">
+        <div class="mt-row heading">
+            <p class="mt-col">MLOps功能</p>
+            <p class="mt-col">MLFlow</p>
+            <p class="mt-col">Google Kubeflow</p>
+            <p class="mt-col">TensorFlow Lite &amp; TensorFlow Extended</p>
+            <p class="mt-col">Azure机器学习</p>
+            <p class="mt-col">aws pagemaker</p>
+        </div>
+    
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p>数据和管道版本控制</p>
+                                    </div>
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p>模型和实验版本化</p>
+                                    </div>
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>使用机器学习元数据(MLMD)</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p>超参数调整/优化</p>
+                                    </div>
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>有限的</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p>生产/实验跟踪中的模型部署和监控</p>
+                                    </div>
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            
+                    </div>
+    </div>
+
+
+<p id="block_61af60cc721cb" class="separator separator-20">MLOps功能</p>
+
+
+<p id="block_60bf5f4926beb" class="separator separator-20">MLFlow</p>
+
+
+<div class="medium-table">
+        <div class="mt-row heading">
+            <p class="mt-col">Google Kubeflow</p>
+            <p class="mt-col">TensorFlow Lite &amp; TensorFlow Extended</p>
+            <p class="mt-col">Azure机器学习</p>
+            <p class="mt-col">aws pagemaker</p>
+            <p class="mt-col">开放源码</p>
+            <p class="mt-col">开放源码</p>
+        </div>
+    
+            <div class="mt-row">
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Google Kubeflow:
+                    </span>
+                                                                <p>云</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>不</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>当地的</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>云</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>可扩展用于大量实验</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>不</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p>是</p>
+                                    </div>
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>是</p>
+                                    </div>
+                            
+                    </div>
+            <div class="mt-row">
+                            
+                            
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        TensorFlow Lite &amp; TensorFlow Extended:
+                    </span>
+                                                                <p>Yes</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Azure Machine Learning:
+                    </span>
+                                                                <p>5 MLOps工具</p>
+                                    </div>
+                            
+                    </div>
+    </div>
+
+
+<p id="block_60bf5f7726bec" class="separator separator-15">1.MLflow</p>
+
+
+
+<h3>Databricks的<a href="https://web.archive.org/web/20221007164322/https://mlflow.org/" target="_blank" rel="noreferrer noopener nofollow"> <strong> MLflow </strong> </a>是一个开源的ML生命周期管理平台。它拥有在训练和运行过程中监控ML模型的工具，以及存储模型、在生产代码中加载模型和构建管道的能力。MLflow适合个人和各种规模的团队。这个神奇的工具是库不可知的。你可以把它和任何你想要的ML库和编程语言一起使用。</h3>
+
+
+
+<h4><strong>关键部件:</strong></h4>
+
+
+
+<p><strong>ml flow Tracking—</strong>记录和查询实验:数据、配置、代码&amp;结果。对于查询，它提供了一个web界面。</p>
+
+
+
+<p><strong> MLflow项目—</strong>将ML代码捆绑成一种格式，以便在任何平台上重现运行。它总是以一种可重用和可复制的方式提供一种打包DS代码的格式。除此之外，API和命令行工具包含在项目组件中，用于运行ML项目，这使得将项目链接到工作流中成为一种可取的方式。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong> MLflow模型–</strong>在几种辅助环境中，可以部署ML模型。对于包装机器学习模型，它使用一种标准格式，可以在下游工具的混合中使用。例如，通过Apache Spark或REST API上的批处理推理进行实时服务。该格式定义了一个协议，允许您以各种“风格”保存机器学习模型，这些风格可以被各种下游工具理解。</li><li><strong>模型注册–</strong>在一个中央存储库中，您可以存储、发现、管理&amp;注释ML模型。</li><li>2. TensorFlow Lite &amp; Tensorflow Extended</li><li><a href="https://web.archive.org/web/20221007164322/https://www.tensorflow.org/lite/guide" target="_blank" rel="noreferrer noopener nofollow"> <strong> TensorFlow Lite </strong> </a>是一个基于深度学习的框架，应用于设备上的推理。这是一个开源框架，提供了一套工具来实现设备上的ML，并帮助开发人员在移动、物联网&amp;嵌入式设备上运行他们的模型。</li></ul>
+</div>
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img data-attachment-id="47566" data-permalink="https://web.archive.org/web/20221007164322/https://neptune.ai/blog/packaging-ml-models/attachment/mlflow-top-packaging-tool" data-orig-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?fit=1600%2C718&amp;ssl=1" data-orig-size="1600,718" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="MLflow-top-packaging-tool" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?fit=300%2C135&amp;ssl=1" data-large-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?fit=1024%2C460&amp;ssl=1" src="../Images/93f90bcb5ed253d153144f363cac86ec.png" alt="MLflow - top packaging tool" class="wp-image-47566 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?resize=1024%2C460&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221007164322im_/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?resize=1024%2C460&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="47566" data-permalink="https://web.archive.org/web/20221007164322/https://neptune.ai/blog/packaging-ml-models/attachment/mlflow-top-packaging-tool" data-orig-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?fit=1600%2C718&amp;ssl=1" data-orig-size="1600,718" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="MLflow-top-packaging-tool" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?fit=300%2C135&amp;ssl=1" data-large-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?fit=1024%2C460&amp;ssl=1" src="../Images/93f90bcb5ed253d153144f363cac86ec.png" alt="MLflow - top packaging tool" class="wp-image-47566" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221007164322im_/https://i0.wp.com/neptune.ai/wp-content/uploads/MLflow-top-packaging-tool.png?resize=1024%2C460&amp;ssl=1"/></noscript></figure></div>
+
+
+
+
+
+<h4><strong/><strong>tensor flow Lite的主要特性:</strong></h4>
+
+
+
+<p><strong>设备上的ML优化</strong>–处理五个重要约束:隐私、功耗、连接性、尺寸和延迟。</p>
+
+
+
+<p><strong>支持多种平台</strong>–Android&amp;iOS设备、微控制器、嵌入式Linux。</p>
+
+
+<div class="custom-point-list">
+<ol><li><strong>支持多种语言</strong>–Python、Objective-C、Java、C++和Swift。</li><li><strong>性能</strong> <strong>造高</strong>——靠硬件加速&amp;优化机型。</li><li><strong>说明性的例子是端到端的</strong>——几乎所有常见的人工智能任务，如各种平台上的问答、物体检测、姿态估计、图像分类&amp;文本分类。</li><li><a href="https://web.archive.org/web/20221007164322/https://www.tensorflow.org/tfx" target="_blank" rel="noreferrer noopener nofollow"><strong>【tensor flow Extended(TFX)</strong></a>是一个端到端的机器学习平台，用于在生产中部署模型和数据管道，由Google实现。它是通用的，由TensorFlow演化而来。要将您的模型从研究阶段转移到生产阶段，您可以使用TFX轻松创建和管理ML生产管道。</li><li><strong>关键部件:</strong></li></ol>
+</div>
+
+
+
+
+<p><strong> TensorFlow数据验证—</strong>探索&amp;验证用于机器学习的数据。</p>
+
+
+
+<p><strong> TensorFlow变换–</strong>创建变换图，这些图在训练和对可用数据进行全通分析阶段的过程中始终如一地应用。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong> TensorFlow模型分析—</strong>在海量数据集上计算全通&amp;切片模型指标，并使用库和可视化元素进行分析。</li><li><strong> TensorFlow服务—</strong>TF服务专为生产环境而设计。这是一个灵活、高性能的机器学习模型服务系统。</li><li>3.Azure ML和Azure管道</li><li><a href="https://web.archive.org/web/20221007164322/https://docs.microsoft.com/en-us/azure/machine-learning/concept-model-management-and-deployment" target="_blank" rel="noreferrer noopener nofollow"> <strong> Azure ML </strong> </a> <strong> </strong>提供以下MLOps功能:</li></ul>
+</div>
+
+
+
+
+
+
+
+<h4><strong>帮助创建可复制的ML管道。</strong> ML管道允许您为数据准备定义可重复使用的&amp;可重复步骤，轻松培训&amp;模型评估技术。</h4>
+
+
+
+<p><strong>创建可重用的软件环境</strong>用于训练&amp;部署机器学习模型。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img data-attachment-id="47572" data-permalink="https://web.archive.org/web/20221007164322/https://neptune.ai/blog/packaging-ml-models/attachment/azure-ml-top-packaging-tool" data-orig-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?fit=1600%2C464&amp;ssl=1" data-orig-size="1600,464" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Azure-ML-top-packaging-tool" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?fit=300%2C87&amp;ssl=1" data-large-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?fit=1024%2C297&amp;ssl=1" src="../Images/bd4dceb9b9d15e50b643540c06019879.png" alt="Azure ML - top packaging tool" class="wp-image-47572 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?resize=1024%2C297&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221007164322im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?resize=1024%2C297&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="47572" data-permalink="https://web.archive.org/web/20221007164322/https://neptune.ai/blog/packaging-ml-models/attachment/azure-ml-top-packaging-tool" data-orig-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?fit=1600%2C464&amp;ssl=1" data-orig-size="1600,464" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Azure-ML-top-packaging-tool" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?fit=300%2C87&amp;ssl=1" data-large-file="https://web.archive.org/web/20221007164322/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?fit=1024%2C297&amp;ssl=1" src="../Images/bd4dceb9b9d15e50b643540c06019879.png" alt="Azure ML - top packaging tool" class="wp-image-47572" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221007164322im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Azure-ML-top-packaging-tool.png?resize=1024%2C297&amp;ssl=1"/></noscript></figure></div>
+
+<div class="custom-point-list">
+<ul><li>您可以从任何地方注册、打包和部署模型。您还可以遵循使用ML模型所需的关联元数据。</li><li><strong>治理数据</strong> <strong>可以被</strong> <strong>捕获</strong>为端到端的ML生命周期。记录的信息包括为什么进行了更改，当ML模型被用于生产时，谁最终发布了模型&amp;。</li><li><strong>通知机器学习生命周期中的事件完成。</strong>示例:模型注册、数据漂移检测、模型部署&amp;实验完成。</li><li><strong>可以对机器学习应用进行监控</strong>以发现与ML相关的&amp;操作问题，例如通过监控来提供关于您的ML基础架构指标的警报&amp;。</li><li>使用Azure ML &amp; Azure Pipelines等工具自动化数据科学和机器学习生命周期。使用管道有助于您定期更新机器学习模型，测试新模型，并与您的其他应用程序服务一起不断推出新模型&amp;。</li><li>4. Kubeflow</li><li><a href="https://web.archive.org/web/20221007164322/https://www.kubeflow.org/#overview" target="_blank" rel="noreferrer noopener nofollow"> <strong> Kubeflow </strong> </a>是一个终极的ML平台，旨在使用ML管道来编排在Kubernetes上运行的复杂工作流。Kubeflow最初是基于谷歌内部部署TensorFlow模型的方式，名为(TFX)TensorFlow Extended。</li></ul>
+</div>
+
+
+
+
+<h4>Kubeflow项目致力于使机器学习工作流在Kubernetes上的部署变得简单、可扩展和可移植。他们的目标是提供一种简单的方法，将机器学习开源的最佳系统部署到不同的基础设施中。</h4>
+
+
+
+<p><strong>kube flow的主要特性:</strong></p>
+
+
+
+<p>为了管理和跟踪实验、运行和作业，Kubeflow提供了一个良好的用户界面。</p>
+
+
+
+<p>多框架集成&amp; SDK使用笔记本电脑与系统进行交互。</p>
+
+
+<div class="custom-point-list">
+<ul><li>为了快速构建端到端解决方案，您可以重用所有提供的组件和管道。</li><li>Kubeflow中的管道既可以是Kubeflow的核心组件，也可以是独立安装。</li><li>完美适合每一个Kubernetes用户。无论你在哪里运行Kubernetes，你都可以运行Kubeflow。</li><li>5.AWS Sagemaker</li><li><a href="https://web.archive.org/web/20221007164322/https://aws.amazon.com/sagemaker/" target="_blank" rel="noreferrer noopener nofollow"> <strong>亚马逊SageMaker </strong> </a>是一个完整的MLOps生态系统，支持数据科学团队快速构建、培训、&amp;部署任意规模的ML和DL模型。AWS SageMaker整合了一些模块，这些模块可以共同或独立地用于训练、构建&amp;部署您的AI &amp; ML模型。它有一个工作室环境，将Jupyter笔记本与实验跟踪&amp;管理、批量转换、模型监视器、具有弹性推理的部署、针对天真用户的Auto ML的“自动驾驶仪”以及模型调试器混合在一起。</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<h4><strong>AWS Sagemaker的主要亮点:</strong></h4>
+
+
+
+<p><strong>亚马逊网络服务(AWS)是2021年Gartner魔力象限</strong>中的一个远见者。在评估AWS产品时，对大多数支持AWS组件&amp;的服务进行了仔细分析。其中包括亚马逊EMR(包括S3)、AWS Glue、AWS CloudWatch、SageMaker Ground Truth、Amazon Clarify、Data Wrangler、SageMaker Studio IDE、SageMaker Pipelines、AWS CloudTrail、SageMaker Neo &amp;等等。</p>
+
+
+
+<p>AWS基于地理位置而多样化，其客户群横跨多个行业和业务部门。</p>
+
+
+<div class="custom-point-list">
+<ul><li>亚马逊SageMaker仍然是市场牵引力中的一个强大参与者，拥有可观的资源和强大的生态系统。</li></ul>
+</div>
+
+
+
+<div class="custom-point-list">
+<ul><li>实验跟踪——如何让模型包装更顺畅</li><li>在一个中心位置跟踪你的机器学习实验(使用像<a href="/web/20221007164322/https://neptune.ai/product" target="_blank" rel="noreferrer noopener"> Neptune </a>这样的工具)很有帮助。Neptune是MLOps的一个元数据库，为研究和生产团队开发，用于运行大量的实验(以百万计)。它为记录、存储、组织、显示、查询和比较整个ML生命周期中生成的所有元数据提供了一个主要位置。</li></ul>
+</div>
+
+
+
+
+
+
+
+<h2 id="experiment-tracking">用于MLOps的Neptune元数据存储=客户端库+元数据数据库+仪表板/UI(用于过滤、排序和比较实验)。</h2>
+
+
+
+<p>Neptune提供了一个开源的Python库，允许用户记录任何实验。该工具旨在提供一种易于使用和快速学习的方法来保持所有实验的跟踪。它还集成了近30个针对ML、DL和RL的Python库。</p>
+
+
+
+<p><strong>海王星存在的3种主要元素:</strong></p>
+
+
+
+<p>数据版本化——有了助手，数据位置和数据散列可以记录到Neptune。</p>
+
+
+
+<p>实验跟踪——比较实验和模型(优化、经典ML、深度学习、强化学习等)，完全不需要额外的努力。</p>
+
+
+<div class="custom-point-list">
+<ol><li>模型注册——跟踪模型血统和版本。</li><li>这三个主要元素使海王星成为MLOps生命周期几个部分之间的桥梁。</li><li>结论</li></ol>
+</div>
+
+
+<p>就是这样——现在就在您的项目中挑选和使用的10 ML打包工具。在选择适合您特定需求的平台时，请确保寻找组件、功能和相关因素。这样你就能从工作中获得最大收益。</p>
+
+
+
+
+
+
+<h2 id="conclusion">在生产中开发和部署机器学习模型一直是数据科学和ML生命周期的重要元素。在过去，它需要所有ML生命周期利益相关者的大量努力，正如我们在本文开头所看到的。打包工具有限，而且该过程是手动的，非常耗时。多亏了这些打包工具，这种情况再也不会发生了。</h2>
+
+
+
+<p>希望这篇文章能帮助你为你的项目选择合适的ML打包工具，这将使你的工作更加愉快和高效。快乐探索和学习！</p>
+
+
+
+<p>参考</p>
+
+
+
+<p>Vetrivel PS</p>
+
+
+
+<h3>他是机器学习顾问，也是AI领域的获奖博主。Kaggle专家，热衷于参加黑客马拉松比赛，撰写技术笔记和博客。他喜欢分享知识&amp;帮助初学者和数据科学爱好者成功过渡到数据科学和机器学习这一有趣的领域。</h3>
+
+
+
+
+
+
+<div id="author-box-new-format-block_60bf459fcd328" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name"><strong>阅读下一篇</strong></h3>
+    
+          <p class="article__authorContent-text">机器学习模型管理:它是什么，为什么你应该关心，以及如何实现它</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">13分钟阅读|作者卡努马王子| 2021年7月13日更新</p>
+
+
+
+<h2>Machine Learning Model Management: What It Is, Why You Should Care, and How to Implement It</h2>
+
+
+
+<p class="has-small-font-size">机器学习正在兴起。因此，新的问题不断涌现，ML开发者和技术公司一起不断构建新的工具来解决这些问题。</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10">如果我们以一种非常基本的方式来看待ML，我们可以说ML在概念上是一种增加了一点智能的软件，但与传统软件不同，ML本质上是实验性的。与传统的软件开发相比，它有一些新的组成部分，例如:健壮的数据、模型架构、模型代码、超参数、特性等等。因此，自然地，工具和开发周期也不同。软件有DevOps，机器学习有MLOps。</p>
+
+
+
+<p>如果听起来不熟悉，下面是DevOps和MLOps的简短概述:</p>
+
+
+
+<p>DevOps是一套开发、测试、部署和操作大规模软件系统的实践。有了DevOps，开发周期变得更短，部署速度加快，系统发布变得可审计和可靠。</p>
+
+
+
+<p>MLOps是数据科学家和运营专业人员之间进行协作和沟通的一套实践。应用这些实践可以提高最终质量，简化管理流程，并在大规模生产环境中自动部署机器学习和深度学习模型。这使得模型更容易与业务需求和法规要求保持一致。</p>
+
+
+
+<p>MLOps的关键阶段是:</p>
+
+
+
+<p>数据采集</p>
+
+
+
+
+
+
+
+<p>数据分析</p>
+
+
+<div class="custom-point-list">
+<ul><li>数据转换/准备</li><li>模型开发</li><li>模特培训</li><li>模型验证</li><li>模型服务</li><li>模型监控</li><li>模型再训练</li><li>我们将深入研究这一过程，所以拿起一杯你最喜欢的饮料，我们走吧！</li><li>Model re-training</li></ul>
+</div>
+
+
+<p>We’re going to do a deep dive into this process, so grab a cup of your favorite drink and let’s go!</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221007164322/https://neptune.ai/blog/machine-learning-model-management" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

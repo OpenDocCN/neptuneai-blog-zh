@@ -1,0 +1,1220 @@
+<html>
+<head>
+<title>Recurrent Neural Network Guide: a Deep Dive in RNN </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>递归神经网络指南:RNN的深度探索</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/recurrent-neural-network-guide#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/recurrent-neural-network-guide#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p><a href="https://web.archive.org/web/20220928182040/https://towardsdatascience.com/introduction-to-sequence-modeling-problems-665817b7e583" target="_blank" rel="noreferrer noopener nofollow">序列建模是对序列数据</a>进行建模的任务。建模序列数据是指创建一个数学概念来理解和研究序列数据，并使用这些理解来为特定应用程序生成、预测或分类序列数据。</p>
+
+
+
+<p>顺序数据有三个属性:</p>
+
+
+<div class="custom-point-list">
+<ol><li>序列中的元素可以重复</li><li>它遵循顺序(上下文安排)</li><li>数据长度变化(可能是无限的)</li></ol>
+</div>
+
+
+<p>顺序数据例子有:</p>
+
+
+<div class="custom-point-list">
+<ol><li>文本和句子</li><li>音频(如语音和音乐)</li><li>电影或视频</li><li>时间序列数据(如股票市场数据)</li><li>DNA序列，蛋白质结构</li><li>材料成分</li><li>决策</li></ol>
+</div>
+
+
+<p>序列数据因其属性而难以建模，需要不同的方法。例如，如果顺序数据通过前馈网络输入，它可能无法很好地建模，因为<strong>顺序数据具有可变长度</strong>。前馈网络对于固定大小的输入工作良好，并且没有很好地考虑结构。</p>
+
+
+
+<p>另一方面，卷积神经网络是为了处理结构或数据网格(如图像)而创建的。他们可以处理长的数据序列，但是受限于<strong>他们不能正确排序序列</strong>。</p>
+
+
+
+<p>那么，<strong>我们如何建立可以对序列数据建模的深度学习模型呢？</strong>对顺序数据建模并不是一件容易的事情。</p>
+
+
+
+<p>例如，当对监督学习任务建模时，我们的方法是向神经网络提供一对输入(x)和输出(y)。在训练期间，模型通过逼近一个更接近原始值的值来学习将输入与输出进行映射。</p>
+
+
+
+<p><em>和【f】<sub>θ</sub>(x)</em></p>
+
+
+
+
+
+
+
+<p>在每次迭代期间，该模型试图通过损失函数来校正近似输出，即，通过获取原始或基本真实值与预测值的差，并同时通过优化过程来更新模型的参数。这样，可以确保它们之间的差异减小，近似值尽可能接近原始值。</p>
+
+
+
+<p>当我们处理序列数据时，我们试图对输入序列进行建模。与监督学习任务不同，在监督学习任务中，我们将输入与输出进行映射，在序列建模中，我们尝试对序列的<strong>概率</strong>进行建模。</p>
+
+
+
+
+
+
+
+<p>这使得机器学习或深度学习模型能够生成令人喜欢的序列，或者能够估计序列的可能性。计算损失函数和优化的其余过程保持不变。</p>
+
+
+
+<h2>如何对序列建模</h2>
+
+
+
+<p>让我们用一个例子来理解如何对序列建模。</p>
+
+
+
+<p>在下面的例子中，我们将使用英语单词(句子)序列进行建模，因为它们继承了我们前面讨论过的相同属性。</p>
+
+
+
+<h3>建模p(x)</h3>
+
+
+
+<p>假设一个句子中的单词相互独立，我们可以使用一个语料库来告诉我们每个单词在英语中出现的概率。</p>
+
+
+
+
+
+
+
+<p>一旦我们知道了每个单词的概率(从语料库中)，我们就可以通过将单个单词彼此相乘来找到整个句子的概率。</p>
+
+
+
+<p>例如，如果我们对句子“<em>加密货币是下一件大事</em>”进行建模，那么它看起来会像这样:</p>
+
+
+
+<p>p(" <em>加密货币</em> ")p(" <em>是</em> ")p(" <em>的</em> ")p(" <em>下一个</em> ")p(" <em>大的</em> ")p(" <em>事</em>")</p>
+
+
+
+<p>上述模型可以用一个公式来描述:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="41698" data-permalink="https://web.archive.org/web/20220928182040/https://neptune.ai/blog/recurrent-neural-network-guide/attachment/gnn-equation" data-orig-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?fit=574%2C286&amp;ssl=1" data-orig-size="574,286" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GNN-equation" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?fit=300%2C149&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?fit=574%2C286&amp;ssl=1" src="../Images/0ab823521923fa5e5347649d9dd04ce3.png" alt="" class="wp-image-41698 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?resize=191%2C95&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928182040im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?resize=191%2C95&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41698" data-permalink="https://web.archive.org/web/20220928182040/https://neptune.ai/blog/recurrent-neural-network-guide/attachment/gnn-equation" data-orig-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?fit=574%2C286&amp;ssl=1" data-orig-size="574,286" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GNN-equation" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?fit=300%2C149&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?fit=574%2C286&amp;ssl=1" src="../Images/0ab823521923fa5e5347649d9dd04ce3.png" alt="" class="wp-image-41698" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928182040im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation.png?resize=191%2C95&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>每个单词都有一个时间戳:t，t-1，t-2，t-n，它描述了单个单词的位置。</p>
+
+
+
+<p>但是，事实证明，上述模型并没有真正捕捉到序列的结构。为什么？</p>
+
+
+
+<p>因为任何特定单词的概率都可能高于单词的其余部分。在我们的示例中，单词“<strong><em/></strong><em>”</em>的概率比任何其他单词都高，因此得到的序列将是“<em>The The The The "</em>。</p>
+
+
+
+<h3>建模p(x |上下文)</h3>
+
+
+
+<p>虽然我们仍然可以通过引入<strong> <a href="https://web.archive.org/web/20220928182040/https://www.statisticshowto.com/probability-and-statistics/statistics-definitions/conditional-probability-definition-examples/#:~:text=Conditional%20probability%20is%20the%20probability,probability%20of%200.5%20(50%25)." target="_blank" rel="noreferrer noopener nofollow">条件概率</a> </strong>来修改相同的模型，但假设每个单词现在都依赖于其他每个单词，而不是独立的，我们现在可以按照以下方式对序列建模:p(x<sub>T</sub>)= p(x<sub>T</sub>| x<sub>1</sub>…。，x <sub> T-1 </sub>)。</p>
+
+
+
+<p>同一句话“<em>加密货币是下一个大_ _ _ _ _ _ _ _</em>”现在可以有一系列选项可供选择。例如:</p>
+
+
+<p id="block_61b350106fcf4" class="separator separator-10"/>
+
+
+
+
+
+<p id="block_604f6c2219366" class="separator separator-20"/>
+
+
+
+<p><strong> <em>本质上，条件概率描述的是下一个词会是什么。</em>T3】</strong></p>
+
+
+
+<p>但是上面的例子可以一次预测一个单词；为了预测单词序列，我们需要根据条件句计算<strong>联合概率。</strong></p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="41699" data-permalink="https://web.archive.org/web/20220928182040/https://neptune.ai/blog/recurrent-neural-network-guide/attachment/gnn-equation-2" data-orig-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?fit=624%2C198&amp;ssl=1" data-orig-size="624,198" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GNN-equation-2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?fit=300%2C95&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?fit=624%2C198&amp;ssl=1" src="../Images/7c9321a6bb69dd12e9497248a06cb723.png" alt="GNN equation" class="wp-image-41699 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?resize=312%2C99&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928182040im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?resize=312%2C99&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41699" data-permalink="https://web.archive.org/web/20220928182040/https://neptune.ai/blog/recurrent-neural-network-guide/attachment/gnn-equation-2" data-orig-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?fit=624%2C198&amp;ssl=1" data-orig-size="624,198" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GNN-equation-2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?fit=300%2C95&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?fit=624%2C198&amp;ssl=1" src="../Images/7c9321a6bb69dd12e9497248a06cb723.png" alt="GNN equation" class="wp-image-41699" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928182040im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GNN-equation-2.png?resize=312%2C99&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>举个例子，</p>
+
+
+<p id="block_61b3508a6fd01" class="separator separator-10"/>
+
+
+<div class="medium-table">
+        
+    
+            
+            
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context):
+                    </span>
+                                                                <p>p(x3|x2，x1)</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p><em>加密货币是下一个的<strong>T3】</strong></em></p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context):
+                    </span>
+                                                                <p>p(x4|x3，x2，x1)</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p><em>加密货币是下一个<strong>大</strong>T3】</em></p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context):
+                    </span>
+                                                                <p>p(x5|x4，x3，x2，x1)</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p><em>加密货币是下一个大<strong>的东西</strong>T3】</em></p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context):
+                    </span>
+                                                                <p>p(x6|x5，x4，x3，x2，x1)</p>
+                                    </div>
+                    </div>
+    </div>
+
+
+<p id="block_61b350986fd02" class="separator separator-5"><em>*预测的单词以粗体书写</em></p>
+
+
+
+<p class="has-text-align-center"><em>*the predicted words are written in bold</em></p>
+
+
+<p id="block_604f731e19369" class="separator separator-20">到目前为止，我们了解了如何使用单词语料库(包含概率值)对句子序列进行建模，然后计算句子中每个单词的<strong>联合</strong>和<strong>条件</strong>概率，我们可以从语料库中选择适当的单词，并预测句子中的下一个单词。</p>
+
+
+
+<p>这种类型的方法很适合一些句子，并且<strong>很好地捕捉了数据的结构</strong>。但是当我们处理段落时，我们必须处理<strong>可伸缩性</strong>。当这种模型被引入大句时，处理能力增加，效率降低。</p>
+
+
+
+<p>N-grams</p>
+
+
+
+<h3>为了应对可扩展性问题，NLP(自然语言处理)研究人员引入了<strong> <a href="https://web.archive.org/web/20220928182040/https://kavita-ganesan.com/what-are-n-grams/#.YEyLImhKiUk" target="_blank" rel="noreferrer noopener nofollow"> N元语法</a> </strong>的概念，其中考虑了“N”个单词的条件和联合概率。例如，如果n等于2，那么只有句子的前两个单词将用于计算联合概率，而不是整个句子。</h3>
+
+
+
+<p>目标</p>
+
+
+<p id="block_61b351636fd18" class="separator separator-10">p(x |上下文)和n=2</p>
+
+
+<div class="medium-table">
+        <div class="mt-row heading">
+            <p class="mt-col">p(x1)</p>
+            <p class="mt-col">p(x2|x1)</p>
+        </div>
+    
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context) and n=2:
+                    </span>
+                                                                <p>p(x3|x2，x1)</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context) and n=2:
+                    </span>
+                                                                <p><em> <span>加密货币</span>就是下一个的<strong>T5】</strong></em></p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context) and n=2:
+                    </span>
+                                                                <p>p(x4|x3，x2)</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p><em> <span>加密货币</span>是下一个<strong>大</strong>T5】</em></p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context) and n=2:
+                    </span>
+                                                                <p>p(x5|x4，x3)</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p><em> <span>加密货币</span>是下一个大<strong>的东西</strong> </em></p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context) and n=2:
+                    </span>
+                                                                <p>p(x6|x5，x4)</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            <div class="mt-col">
+                                                                <p><em>*预测的单词以粗体书写</em></p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        p(x|context) and n=2:
+                    </span>
+                                                                <p>p(x6|x5,x4)</p>
+                                    </div>
+                    </div>
+    </div>
+
+
+<p id="block_61b3517d6fd1a" class="separator separator-5">这种方法减少了可伸缩性问题，但不是完全减少。</p>
+
+
+
+<p class="has-text-align-center">N元语法的缺点是:</p>
+
+
+<p id="block_604f81711936e" class="separator separator-20">如果句子很长，句子的上下文就会丢失。</p>
+
+
+
+<p>小规模减少可伸缩性问题</p>
+
+
+
+<p>上下文矢量化</p>
+
+
+<div class="custom-point-list">
+<ol><li>上下文矢量化是一种方法，其中输入序列被概括为向量，使得该向量然后被用于预测下一个单词可能是什么。</li><li>f h</li></ol>
+</div>
+
+
+<h3>f <em> <sub> θ </sub> </em>这样总结h中的上下文:</h3>
+
+
+
+<p>p(x <sub> t </sub> |x <sub> 1 </sub>，…，x<sub>t-1</sub>)≈p(x<sub>t</sub>| h)</p>
+
+
+
+<p>一旦我们找到上下文向量<strong> h </strong>，我们就可以使用<strong>第二函数</strong> g，它产生<strong>概率分布</strong>。</p>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="41701" data-permalink="https://web.archive.org/web/20220928182040/https://neptune.ai/blog/recurrent-neural-network-guide/attachment/context-vectorizing" data-orig-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?fit=317%2C108&amp;ssl=1" data-orig-size="317,108" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Context-vectorizing" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?fit=300%2C102&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?fit=317%2C108&amp;ssl=1" src="../Images/c952190b9c658d5c23232844b710fb3d.png" alt="" class="wp-image-41701 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?resize=317%2C108&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928182040im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?resize=317%2C108&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41701" data-permalink="https://web.archive.org/web/20220928182040/https://neptune.ai/blog/recurrent-neural-network-guide/attachment/context-vectorizing" data-orig-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?fit=317%2C108&amp;ssl=1" data-orig-size="317,108" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Context-vectorizing" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?fit=300%2C102&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?fit=317%2C108&amp;ssl=1" src="../Images/c952190b9c658d5c23232844b710fb3d.png" alt="" class="wp-image-41701" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928182040im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing.png?resize=317%2C108&amp;ssl=1"/></noscript></figure>
+
+
+
+<p><em>h g<sub>θ</sub>T3】</em></p>
+
+
+
+<p>上下文矢量化的优点是:</p>
+
+
+
+<p>秩序得以维持</p>
+
+
+
+<p>可以在可变长度的序列中操作</p>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="41702" data-permalink="https://web.archive.org/web/20220928182040/https://neptune.ai/blog/recurrent-neural-network-guide/attachment/context-vectorizing-2" data-orig-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?fit=274%2C66&amp;ssl=1" data-orig-size="274,66" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Context-vectorizing-2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?fit=274%2C66&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?fit=274%2C66&amp;ssl=1" src="../Images/6b4e8b6b45ba823318b16c606d4ea180.png" alt="Context vectorizing" class="wp-image-41702 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?resize=274%2C66&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220928182040im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?resize=274%2C66&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41702" data-permalink="https://web.archive.org/web/20220928182040/https://neptune.ai/blog/recurrent-neural-network-guide/attachment/context-vectorizing-2" data-orig-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?fit=274%2C66&amp;ssl=1" data-orig-size="274,66" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Context-vectorizing-2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?fit=274%2C66&amp;ssl=1" data-large-file="https://web.archive.org/web/20220928182040/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?fit=274%2C66&amp;ssl=1" src="../Images/6b4e8b6b45ba823318b16c606d4ea180.png" alt="Context vectorizing" class="wp-image-41702" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220928182040im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Context-vectorizing-2.png?resize=274%2C66&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>它可以学习微分(反向传播)</p>
+
+
+<div class="custom-point-list">
+<ol><li>上下文保存在短句或序列中。</li><li>到目前为止，我们已经了解了什么是顺序数据以及如何对其建模。在下一节中，我们将了解rnn以及它们如何使用上下文矢量化来预测下一个单词。</li><li>什么是递归神经网络？</li><li><a href="https://web.archive.org/web/20220928182040/https://towardsdatascience.com/recurrent-neural-networks-d4642c9bc7ce" target="_blank" rel="noreferrer noopener nofollow">递归神经网络</a>用于用时间步长索引t对序列数据建模，并结合了上下文矢量化技术。</li></ol>
+</div>
+
+
+<p>上下文矢量化充当“存储器”,它捕获关于到目前为止已经计算的信息，并使rnn能够记住过去的信息，其中它们能够保存长的和可变的序列的信息。因此，RNNs可以接受一个或多个输入向量，并产生一个或多个输出向量。</p>
+
+
+
+<h2>通过设计，rnn类似于深度神经网络。它们有输入向量、权重向量、隐藏状态和输出向量。隐藏状态将序列的模式或上下文捕获到一个摘要向量中。输出不仅受应用于输入的权重(如常规神经网络)的影响，还受表示基于先前输入的上下文信息的“隐藏”状态向量的影响，使得相同的输入可以根据序列中输入的上下文产生不同的输出。</h2>
+
+
+
+<p>RNN是如何工作的？</p>
+
+
+
+<p>如上所述，rnn有四个主要组成部分:</p>
+
+
+
+<p>投入</p>
+
+
+
+<h2>隐藏状态</h2>
+
+
+
+<p>重量或参数</p>
+
+
+<div class="custom-point-list">
+<ol><li>输出</li><li>为了更好地理解RNN，我们需要看看多层感知器如何处理序列数据。</li><li>多层感知器</li><li>在<a href="https://web.archive.org/web/20220928182040/https://machinelearningmastery.com/neural-networks-crash-course/" target="_blank" rel="noreferrer noopener nofollow">多层感知器(MLP) </a>中，我们有一个输入层、一个隐藏层和一个输出层。输入层接收输入，通过应用激活的隐藏层传递输入，然后返回输出。</li></ol>
+</div>
+
+
+<p>当存在多个隐藏层时，激活被应用到第一个隐藏层的每个节点，然后被发送到下一个隐藏层，依此类推，直到它到达最后一个层以产生输出。每个隐藏层都有自己的权重和偏差，使它们相互独立。</p>
+
+
+
+<h3>但是这两者之间的关系是无法建立的，除非我们把这些隐藏的层结合在一起，因为我们处理的是序列。<strong>如果隐藏层相互独立，那么结构和顺序将会丢失</strong>。因此，为了将这些隐藏层组合在一起，我们应该为每个隐藏层设置相同的权重和偏差。</h3>
+
+
+
+<p>为了实现输入和输出之间的这种连续和结构化的关系，我们需要将输入句子一个字一个字地输入到序列中的所有隐藏层，同时将前一个神经元的输出输入到下一个神经元。</p>
+
+
+
+<p>这种方法使整个过程结构化和有关联。</p>
+
+
+
+
+
+
+
+<p>这是递归神经网络的开端，其中先前的输入与当前的输入相结合，从而保持当前输入(x2)与先前输入(x1)的某种关系。</p>
+
+
+
+<p>本质上，rnn是MLP的一个修改版本，其中数据被输入到每个隐藏层。</p>
+
+
+
+
+
+
+
+<p>递归神经网络</p>
+
+
+
+<p>在RNNs中，x(t)在时间步长t时作为网络的输入。RNN中的时间步长t表示单词在句子或序列中出现的顺序。隐藏状态h(t)表示在时间t的<strong>上下文向量</strong>，并且充当网络的<strong>存储器</strong>。基于当前输入和前一时间步的隐藏状态计算上下文向量h(t)。</p>
+
+
+
+<p>例如，以句子“<em>加密货币是下一件大事”为例。</em>在时间T1“加密货币”将被馈送到网络中，在时间t2“是”被馈送到网络中，在时间t3“是”被馈送到网络中，等等。</p>
+
+
+
+<h3>我们用这个公式来表示隐藏状态:</h3>
+
+
+
+<p><em>h<sub>t</sub>= tanh(W<sub>h</sub>h<sub>t-1</sub>+W<sub>x</sub>x<sub>t</sub>)</em></p>
+
+
+
+<p>当t = 1时，</p>
+
+
+
+<p><em>h<sub>1</sub>= tanh(W<sub>h</sub>h<sub>0</sub>+W<sub>x</sub>x<sub>1</sub>)</em>，其中x <sub> 1 </sub>为“加密货币”，h<strong>0初始化为零</strong></p>
+
+
+
+<p>当t = 2时，</p>
+
+
+
+<p><em>h<sub>2</sub>= tanh(W<sub>h</sub>h<sub>1</sub>+W<sub>x</sub>x<sub>2</sub>)</em>，其中x <sub> 1 </sub>为‘是’。</p>
+
+
+
+<p>当t = 3时，</p>
+
+
+
+<p><em>h<sub>3</sub>= tanh(W<sub>h</sub>h<sub>2</sub>+W<sub>x</sub>x<sub>3</sub>)</em>，其中x <sub> 2 </sub>为‘the’。</p>
+
+
+
+<p>隐藏状态和输入的权重参数都是可学习的，这意味着在训练期间，它将使用反向传播来更新自身。</p>
+
+
+
+<p>如果你注意到上面的公式，你会发现参数={Wh，Wx，Wy}在每个输入中都保持不变。这被称为<strong>参数共享</strong>。参数共享使RNNs能够构建和保留上下文信息，即使句子的长度是可变的。当我们想要对一个数据经常重复出现的序列建模时，这种共享是很重要的。<strong>rnn在几个时间步长上共享相同的权重。</strong></p>
+
+
+
+<p>rnn预测来自最后一个隐藏状态的输出以及输出参数Wy。预测更像是一项分类任务，其中使用了一个<strong> softmax </strong>函数来确保英语句子中所有可能单词的概率。</p>
+
+
+
+<p>培训注册护士</p>
+
+
+
+
+
+
+
+<p>计算梯度:通过时间反向传播</p>
+
+
+
+
+
+
+
+<p>到目前为止，我们已经了解了前馈在RNNs中的工作原理，即输入进入网络并向前移动，同时在每个时间步长内共享相同的参数。在反向传播过程中，它必须返回时间步长以更新参数。</p>
+
+
+
+<h2>那么它是如何发生的呢？</h2>
+
+
+
+<h3>如前所述，预测RNN的产量是一项分类任务，因此我们使用<strong>交叉熵</strong>来计算损失。</h3>
+
+
+
+<p><em> L <sub> θ </sub> (y，y’)<sub>t</sub>=-y<sub>t</sub>logy<sub>t</sub>’</em></p>
+
+
+
+<p>其中<em> θ={W <sub> h </sub>，W <sub> x </sub>，W <sub> y </sub> } </em></p>
+
+
+
+<p>我们知道参数是可共享的，正是RNNs的这种能力使网络变得不同；很难区分。为了解决这个问题，网络需要扩展，或者说<strong>展开</strong>，这样参数就可以根据时间步长在整个网络中进行区分——这就是术语“时间反向传播”(BPTT)。</p>
+
+
+
+<p>从上图中，你可以看到一个展开的循环网络是什么样子。</p>
+
+
+
+<p>由于神经网络一次只处理一个单词，因此损失是基于每个单词计算的。整个过程如下所示:</p>
+
+
+
+<p>你可以看到公式是如何展开的。</p>
+
+
+
+
+
+
+
+<p>对于Wy的区分，程序应该如下所示:</p>
+
+
+
+<p>所以，让我们总结一下反向传播:</p>
+
+
+
+
+
+
+
+<p>使用当前输出计算损耗，使用交叉熵损耗计算实际输出</p>
+
+
+
+<p>网络是展开的或扩展的，因此反向传播可以通过隐藏层和时间发生</p>
+
+
+
+
+
+
+
+<p>为递归神经元(即隐藏状态)和密集层更新权重参数</p>
+
+
+<div class="custom-point-list">
+<ol><li>渐变的问题</li><li>在顺序数据的反向传播期间出现的两个常见问题是消失和爆炸梯度。</li><li>消失渐变</li></ol>
+</div>
+
+
+
+
+
+
+<h3>当微分向量以指数方式快速变为零时，这反过来使网络难以学习一些长周期相关性，问题是<strong>消失梯度</strong>。</h3>
+
+
+
+<p>回到RNNs中的反向传播，我们看到网络中的每一个神经元都参与了关于成本函数的输出计算。正因为如此，<strong>我们必须确保每个神经元的参数都得到更新，以最小化误差，并且这可以及时返回到所有神经元。</strong>所以，你必须通过时间一路传播回这些神经元。</p>
+
+
+
+<h4>我们还知道，<strong>上下文向量，或隐藏状态</strong> <strong>参数</strong>，在整个网络中共享，以保持顺序和连续性。在初始化期间，参数被赋予一个接近于零的随机数，当隐藏状态在时间上向前移动时</h4>
+
+
+
+<p>在不同的时间步长上相乘，使得梯度Wh越来越小，基本上为零，直到消失。</p>
+
+
+
+<p><strong>梯度越低，网络越难更新权重，如果梯度为零，则权重不会更新。</strong></p>
+
+
+
+<p>爆炸渐变</p>
+
+
+
+<p>当由于不稳定的过程而累积大的梯度时，会发生爆炸梯度，并导致参数的非常大的更新。</p>
+
+
+
+<p>在RNNs中，爆炸梯度可能发生在反向传播期间，并导致非常大的梯度，实质上对网络参数进行大的更新。在极端情况下，权重值可能会变得很大，以至于变成NaN值。</p>
+
+
+
+<h4>克服梯度问题</h4>
+
+
+
+<p>rnn中的梯度问题可以通过以下方法解决:</p>
+
+
+
+<p>渐变剪辑</p>
+
+
+
+<h3>门控网络</h3>
+
+
+
+<p>渐变剪辑</p>
+
+
+<div class="custom-point-list">
+<ol><li>渐变裁剪是一种用于避免渐变爆炸的技术。假设rnn以近似线性方式运行是合理的，这使得梯度不稳定。</li><li>为了控制渐变，它被修剪或整形为较小的值。裁剪渐变有两种方法:</li></ol>
+</div>
+
+
+<h4>就在参数更新之前，从小批量中裁剪渐变</h4>
+
+
+
+<p>使用测量范数||g||的超参数C，其中g是梯度。如果||g|| &gt; C那么gg。C/||g||</p>
+
+
+
+<p><strong> <span> <sup>阅读<br/> </sup> </span> </strong> <a href="/web/20220928182040/https://neptune.ai/blog/understanding-gradient-clipping-and-how-it-can-fix-exploding-gradients-problem" target="_blank" rel="noreferrer noopener">了解渐变裁剪(以及如何修复爆炸渐变问题)</a></p>
+
+
+<div class="custom-point-list">
+<ol><li>门控网络</li><li>为了解决渐变消失的问题，您可以使用具有门控机制的新架构。像长短期记忆和门控循环网络这样的结构已经被证明可以解决消失梯度。我们将在下一节深入探讨它们。</li></ol>
+</div>
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<p class="blog-cta-intext has-background">RNN摘要(至今):</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h4>序列的顺序被保留</h4>
+
+
+
+<p>能够映射:</p>
+
+
+
+<h2>将变量序列输入到固定大小的向量中</h2>
+
+
+<div class="custom-point-list">
+<ol><li>将固定大小的向量序列输入到序列中</li><li>输入序列转换为相同长度的输出序列。<ol><li>它是差分的(所以它可以学习)</li><li>由于梯度问题，当处理长序列时，序列的上下文丢失</li><li>RNN的类型</li></ol></li><li>到目前为止，我们已经了解了:</li><li>序列建模</li></ol>
+</div>
+
+
+<h2>这是什么？</h2>
+
+
+
+<p>我们如何对序列建模？</p>
+
+
+<div class="custom-point-list">
+<ol><li>上下文矢量化<ol><li>递归神经网络</li><li>它们是什么？</li><li>它们是如何工作的？</li></ol></li><li>穿越时间的反向传播<ol><li>教师强迫</li><li>训练时的RNNs问题</li><li>克服梯度问题</li><li>现在，我们将继续讨论不同类型的rnn，同时阐明普通rnn的局限性。我们将讨论五种类型的RNN:</li><li>双向RNN</li><li>编码器-解码器序列到序列架构</li></ol></li></ol>
+</div>
+
+
+<p>LSTM</p>
+
+
+<div class="custom-point-list">
+<ol><li>苏军总参谋部情报总局</li><li>卷积递归神经网络</li><li>双向RNN</li><li>在序列建模中，到目前为止，我们假设我们的目标是给定一个特定的句子序列，对下一个输出进行建模。在NLP任务中，可能会出现上下文依赖于未来句子的情况。</li><li>例如:</li></ol>
+</div>
+
+
+<h3>我是__。</h3>
+
+
+
+<p>我饿了。</p>
+
+
+
+<p>我饿了，我能吃掉整个馅饼。</p>
+
+
+<div class="custom-point-list">
+<ul><li>在上面的例子中，答案可以分别是‘饿’，‘不’，‘非常’。但是为了理解上下文，特别是当整体上下文依赖于未来单词时，我们需要设计一个将未来单词考虑在内的模型。</li><li>RNNs的一个缺点是它们及时考虑了过去和现在的单词，而不是未来的单词。这使得RNNs成为一个<strong>单向顺序网络</strong>，其中信息单向流动，通常是正向流动。</li><li>为了解决这个问题，我们必须引入一种机制，在这种机制中:</li></ul>
+</div>
+
+
+<p>序列的信息反向传播</p>
+
+
+
+<p>神经网络考虑了过去、现在和未来这三个时间步，并在此基础上预测输出。</p>
+
+
+
+<p>双向RNN是解决这个问题的一种网络。这是一种将两个独立的rnn放在一起的架构。一个以传统方式工作，即向前工作，另一个向后工作。</p>
+
+
+<div class="custom-point-list">
+<ol><li>从上图可以看出，两个网络在每个时间步都根据<strong>过去-现在</strong>(正向RNNs)信息和<strong>未来-现在</strong>(反向RNNs)信息输出各自的输出。</li><li>编码器-解码器序列到序列架构</li></ol>
+</div>
+
+
+<p>在顺序建模中使用RNNs的优势在于它可以:</p>
+
+
+
+
+
+
+
+<p>将输入序列映射到固定大小的向量</p>
+
+
+
+<h3>将固定大小向量映射到序列</h3>
+
+
+
+<p>将输入序列映射到相同长度的输出序列。</p>
+
+
+<div class="custom-point-list">
+<ol><li>但是假设我们想训练一个RNN来映射一个输入序列到一个输出序列，不一定是相同的长度。特别是当我们想把一种语言翻译成另一种语言时，这种情况就会出现。</li><li>编码器-解码器序列到序列是一种处理这类问题的架构。顾名思义，它有两种类型的架构:编码器和解码器。</li><li>编码器RNN接收可变长度的输入序列，并对其进行处理以返回一个向量或向量序列，称为“上下文”向量<em> C </em>。</li></ol>
+</div>
+
+
+<p>解码器RNN以固定长度的向量为条件来产生输出序列。同样，编码器的最后隐藏状态是解码器的初始隐藏状态。</p>
+
+
+
+<p>长短期记忆(LSTM)</p>
+
+
+
+<p>建立长短期记忆是为了<strong>保存RNN缺乏的序列的长期上下文信息</strong>。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20220928182040/https://towardsdatascience.com/understanding-rnn-and-lstm-f7cdf6dfc14e" target="_blank" rel="noreferrer noopener nofollow"> LSTM </a>的核心思想是确保梯度长时间流动，不会消失或爆炸。</p>
+
+
+
+
+
+
+
+<h3>正如我们前面看到的，RNNs有一个标准的体系结构，其中隐藏状态形成了某种循环机制来保存和共享每个时间步长的信息。嗯，LSTM也有一个循环机制。不是只有一个神经网络层，而是有四个神经网络，以某种方式相互作用，以保存和共享长的上下文信息。</h3>
+
+
+
+<p>让我们一步步了解LSTM网络的工作原理:</p>
+
+
+
+<p><strong>细胞状态</strong>:长时记忆<strong>通常称为细胞状态，用Ct-1表示，自然界中有<strong>递归</strong>。小区状态允许以前的信息存储在LSTM网络中。它由内部门调制，即:遗忘门和输入门。</strong></p>
+
+
+
+<p><strong>遗忘门</strong>:单元格状态与遗忘门相连，遗忘门指示哪些信息要保留，哪些信息要遗忘。它通过一个sigmoid函数来实现这一点。它查看ht-1和xt的初始状态，并为每个单元状态Ct-1输出一个介于0和1之间的数字。如果遗忘门返回的信息为1，则存储该信息，如果返回0，则删除该信息。</p>
+
+
+
+
+
+
+
+<p><strong>输入门</strong>:输入门从相同的初始状态ht-1取相同的输入XT，并通过两个非线性激活函数:sigmoid(返回0和1之间的值)和tanh(返回-1和1之间的值)，分别是<strong>输入门</strong>it和<strong>候选存储器</strong><strong>C</strong><strong>`</strong><strong>t</strong>。这有助于单元状态保存新信息，同时将单元状态从Ct-1更新为Ct。输入门的想法是在单元状态中存储新的信息，以及从遗忘门删除的记忆。</p>
+
+
+<div class="custom-point-list">
+<ol><li><strong>输出门</strong>:输出将基于单元状态Ct、初始隐藏状态ht-1和输入xt。隐藏状态和输入将通过一个sigmoid传递，因此值在0和1之间。同时，我们通过tanh传递单元状态CT以获得1和-1之间的值，并将其乘以sigmoid门的输出，以便我们只输出与上下文相关的内容。</li></ol>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ol start="2"><li>总而言之:</li></ol>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ol start="3"><li>第一个<strong> sigmoid激活</strong>功能是遗忘门，它确保应该从先前的单元状态(Ct-1)中遗忘什么信息。</li></ol>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ol start="4"><li>第二个<strong> sigmoid </strong>和第一个<strong> tanh </strong>激活函数用于输入门，确保什么信息应该与先前修剪的信息一起保存到单元状态。</li></ol>
+</div>
+
+
+
+
+
+
+<p>最后一个sigmoid是单元的输出门和tanh，它突出显示哪些信息应该进入下一个隐藏状态。</p>
+
+
+<div class="custom-point-list">
+<ol><li>门控循环单元(GRU)</li><li><a href="https://web.archive.org/web/20220928182040/https://towardsdatascience.com/understanding-gru-networks-2ef37df6c9be" target="_blank" rel="noreferrer noopener nofollow"> GRU </a>是新一代的递归神经网络，它是LSTM的修改版，但复杂度更低。gru使用隐藏状态而不是单元状态来传递信息。它也只有两个门，一个复位门和更新门。</li><li><strong>更新门:</strong>更新门选择需要添加和/或忽略的信息。它类似于LSTM输入门。</li></ol>
+</div>
+
+
+<h3><strong>重置门:</strong>重置门用于决定忘记多少过去的信息。</h3>
+
+
+
+<p>由于gru的运行规模较小，因此比LSTM网络更快。LSTMs和gru成功的原因是因为它们的门控机制:</p>
+
+
+
+
+
+
+
+<p>保留上下文信息和长期序列。</p>
+
+
+
+<p>避免梯度问题。</p>
+
+
+
+<p>选通函数允许网络调整梯度消失的程度，因为它被复制了四次，所以在每个时间步长取不同的值。它们采用的值是当前输入和隐藏状态的学习函数。</p>
+
+
+<div class="custom-point-list">
+<ol><li>卷积递归神经网络</li><li><a href="https://web.archive.org/web/20220928182040/https://towardsdatascience.com/an-approach-towards-convolutional-recurrent-neural-networks-a2e6ce722b19" target="_blank" rel="noreferrer noopener nofollow">卷积递归神经网络</a>是两种神经网络的组合:卷积神经网络和递归神经网络。两者都有自己独特的属性，这有助于他们在工作中脱颖而出。</li></ol>
+</div>
+
+
+<p>由于类似网格的操作，CNN非常善于从任何给定的数据中提取特征和表示。另一方面，rnn非常适合顺序数据建模，这反过来又保留了顺序、结构和上下文。</p>
+
+
+
+<h3>CRNN架构通常用于产生更好/最佳的音频信号处理结果。由于像音乐这样的音频信号非常复杂(大量噪声聚集在一起)，提取低维模式和表示变得相当困难。为什么我们需要低维模式？</h3>
+
+
+
+<p>因为高维模式不能提供对数据结构的更好理解。使用CNN，我们可以更深入地挖掘高维序列结构，这样它就给我们低维表示，然后可以馈入RNN，甚至LSTM，这可以用来生成/预测另一个序列。</p>
+
+
+
+<p>CRNN也用于图像序列应用示例图像字幕，也可用于从句子生成图像，也称为序列到图像。</p>
+
+
+
+
+
+
+
+<p>RNN在Keras / Tensorflow和Python中的实现</p>
+
+
+
+<p>让我们看看如何用keras 为<strong>字符文本预测</strong>实现<a href="https://web.archive.org/web/20220928182040/https://www.tensorflow.org/guide/keras/rnn" target="_blank" rel="noreferrer noopener nofollow"> RNN。</a></p>
+
+
+
+<p>我们将使用两个库:numpy和tensorflow-keras。</p>
+
+
+
+<h2>你可以在这里下载数据集<a href="https://web.archive.org/web/20220928182040/https://github.com/dakrone/corpus/blob/master/data/alice-in-wonderland.txt" target="_blank" rel="noreferrer noopener nofollow">。</a></h2>
+
+
+
+<p>数据预处理</p>
+
+
+
+<p>数据预处理是必要的，因为数据包含ASCII字符，这可能会干扰我们的建模过程并给出不正确的结果。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+
+<span class="hljs-keyword">from</span> tensorflow.keras.layers.recurrent <span class="hljs-keyword">import</span> SimpleRNN
+<span class="hljs-keyword">from</span> tensorflow.keras.models <span class="hljs-keyword">import</span> Sequential
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Dense, Activation</pre>
+
+
+
+<p>清理完数据后，我们可以创建一个查找表。查找表基本上从数据中创建唯一字符的表。该表将把文本中的字符转换成数字，然后将数字输入到RNNs中。</p>
+
+
+
+<pre class="hljs">INPUT_FILE = <span class="hljs-string">"data/wonderland.txt"</span></pre>
+
+
+
+<h3>现在，我们将创建输入和标签。重要的是要理解，在序列建模中，输入将从索引0开始，而标签将从索引1开始。</h3>
+
+
+
+<p>例如，如果我们输入“加密货币是下一件大事”，那么:</p>
+
+
+
+<pre class="hljs">print(<span class="hljs-string">"Extracting text from input"</span>)
+file = open(INPUT_FILE, <span class="hljs-string">'rb'</span>)
+lines = []
+<span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> file:
+    line = line.strip().lower()
+    line = line.decode(<span class="hljs-string">"ascii"</span>, <span class="hljs-string">"ignore"</span>)
+    <span class="hljs-keyword">if</span> len(line) == <span class="hljs-number">0</span>:
+        <span class="hljs-keyword">continue</span>
+    lines.append(line)
+file.close()
+text = <span class="hljs-string">" "</span>.join(lines)</pre>
+
+
+
+<p>After the data is cleaned, we can create a look-up table. The look-up table basically creates a table of unique characters from the data. This table will convert the characters in the text to numbers, which will then be fed into the RNNs. </p>
+
+
+
+<pre class="hljs">chars = set([c <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> text])
+nb_chars = len(chars)
+char2index = dict((c, i) <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> enumerate(chars))
+index2char = dict((i, c) <span class="hljs-keyword">for</span> i, c <span class="hljs-keyword">in</span> enumerate(chars))
+
+print(index2char)</pre>
+
+
+
+<pre class="hljs">{<span class="hljs-number">0</span>: <span class="hljs-string">'!'</span>,
+ <span class="hljs-number">1</span>: <span class="hljs-string">'s'</span>,
+ <span class="hljs-number">2</span>: <span class="hljs-string">'7'</span>,
+ <span class="hljs-number">3</span>: <span class="hljs-string">'p'</span>,
+ <span class="hljs-number">4</span>: <span class="hljs-string">'x'</span>,
+ <span class="hljs-number">5</span>: <span class="hljs-string">'.'</span>,
+ <span class="hljs-number">6</span>: <span class="hljs-string">']'</span>,
+ <span class="hljs-number">7</span>: <span class="hljs-string">'3'</span>,
+ <span class="hljs-number">8</span>: <span class="hljs-string">'a'</span>,
+ <span class="hljs-number">9</span>: <span class="hljs-string">'z'</span>,
+ <span class="hljs-number">10</span>: <span class="hljs-string">'9'</span>,
+ <span class="hljs-number">11</span>: <span class="hljs-string">'5'</span>,
+ <span class="hljs-number">12</span>: <span class="hljs-string">'6'</span>,
+ <span class="hljs-number">13</span>: <span class="hljs-string">'h'</span>,
+ <span class="hljs-number">14</span>: <span class="hljs-string">','</span>,
+ <span class="hljs-number">15</span>: <span class="hljs-string">'c'</span>,
+ <span class="hljs-number">16</span>: <span class="hljs-string">'r'</span>,
+ <span class="hljs-number">17</span>: <span class="hljs-string">'@'</span>,
+ <span class="hljs-number">18</span>: <span class="hljs-string">'k'</span>,
+ <span class="hljs-number">19</span>: <span class="hljs-string">'w'</span>,
+ <span class="hljs-number">20</span>: <span class="hljs-string">'d'</span>,
+ <span class="hljs-number">21</span>: <span class="hljs-string">'('</span>,
+ <span class="hljs-number">22</span>: <span class="hljs-string">'o'</span>,
+ <span class="hljs-number">23</span>: <span class="hljs-string">'f'</span>,.....}</pre>
+
+
+
+<p>Now, we’ll create inputs and labels. It’s important to understand that in sequence modeling, the input will start from index 0, where the label will start from index 1. </p>
+
+
+
+<p>* <em>值得一提的是，这是一个角色级别的RNN，所以你将与角色</em>一起工作，而不是文字</p>
+
+
+<p id="block_61b352d66fd2f" class="separator separator-10">一次热编码</p>
+
+
+
+
+
+<p id="block_61b352e36fd31" class="separator separator-5">将序列转换为一位热编码向量。</p>
+
+
+
+<p class="has-text-align-center">模拟RNN</p>
+
+
+<p id="block_604f6dea19368" class="separator separator-20">定义模型:</p>
+
+
+
+<pre class="hljs">print(<span class="hljs-string">"Creating input and label"</span>)
+SEQ_LEN = <span class="hljs-number">10</span> 
+STEP = <span class="hljs-number">1</span>
+print(<span class="hljs-string">"The table is ready"</span>)</pre>
+
+
+
+<pre class="hljs">input_chars = []
+label_chars = []
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">0</span>, len(text) - SEQ_LEN, STEP):
+    input_chars.append(text[i:i + SEQ_LEN])
+    label_chars.append(text[i + SEQ_LEN])
+
+print(input_chars)</pre>
+
+
+
+<pre class="hljs">[<span class="hljs-string">'project gu'</span>,
+ <span class="hljs-string">'roject gut'</span>,
+ <span class="hljs-string">'oject gute'</span>,
+ <span class="hljs-string">'ject guten'</span>,
+ <span class="hljs-string">'ect gutenb'</span>,
+ <span class="hljs-string">'ct gutenbe'</span>,
+ <span class="hljs-string">'t gutenber'</span>,
+ <span class="hljs-string">' gutenberg'</span>,
+ <span class="hljs-string">'gutenbergs'</span>,...]</pre>
+
+
+
+<h3>RNN将包含128个隐藏的州</h3>
+
+
+
+<p>永远记住，密集层应该等于文本中唯一字符的数量</p>
+
+
+
+<pre class="hljs">print(<span class="hljs-string">"Vectorizing input and label text..."</span>)
+X = np.zeros((len(input_chars), SEQ_LEN, nb_chars), dtype=np.bool)
+y = np.zeros((len(input_chars), nb_chars), dtype=np.bool)
+<span class="hljs-keyword">for</span> i, input_char <span class="hljs-keyword">in</span> enumerate(input_chars):
+    <span class="hljs-keyword">for</span> j, ch <span class="hljs-keyword">in</span> enumerate(input_char):
+        X[i, j, char2index[ch]] = <span class="hljs-number">1</span>
+    y[i, char2index[label_chars[i]]] = <span class="hljs-number">1</span></pre>
+
+
+
+<h3>训练模型</h3>
+
+
+
+<p>结论</p>
+
+
+<div class="custom-point-list">
+<ol><li>在本文中，我们讨论了:</li><li>如何有效地模拟序列以捕捉结构和上下文。</li></ol>
+</div>
+
+
+<pre class="hljs">HIDDEN_SIZE = <span class="hljs-number">128</span>
+BATCH_SIZE = <span class="hljs-number">128</span>
+NUM_ITERATIONS = <span class="hljs-number">25</span>
+NUM_EPOCHS_PER_ITERATION = <span class="hljs-number">1</span>
+NUM_PREDS_PER_EPOCH = <span class="hljs-number">100</span>
+
+model = Sequential()
+model.add(SimpleRNN(HIDDEN_SIZE, return_sequences=<span class="hljs-keyword">False</span>,
+                    input_shape=(SEQ_LEN, nb_chars),
+                    unroll=<span class="hljs-keyword">True</span>))
+model.add(Dense(nb_chars))
+model.add(Activation(<span class="hljs-string">"softmax"</span>))
+
+model.compile(loss=<span class="hljs-string">"categorical_crossentropy"</span>, optimizer=<span class="hljs-string">"rmsprop"</span>)</pre>
+
+
+
+<h3>上下文向量如何提供一种有效的方法来概括一个序列</h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">for</span> iteration <span class="hljs-keyword">in</span> range(NUM_ITERATIONS):
+    print(<span class="hljs-string">"="</span> * <span class="hljs-number">50</span>)
+    print(<span class="hljs-string">"Iteration #: %d"</span> % (iteration))
+    model.fit(X, y, batch_size=BATCH_SIZE, epochs=NUM_EPOCHS_PER_ITERATION)
+    
+    
+    
+    
+    test_idx = np.random.randint(len(input_chars))
+    test_chars = input_chars[test_idx]
+    print(<span class="hljs-string">"Generating from seed: %s"</span> % (test_chars))
+    print(test_chars, end=<span class="hljs-string">""</span>)
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(NUM_PREDS_PER_EPOCH):
+        Xtest = np.zeros((<span class="hljs-number">1</span>, SEQ_LEN, nb_chars))
+        <span class="hljs-keyword">for</span> i, ch <span class="hljs-keyword">in</span> enumerate(test_chars):
+            Xtest[<span class="hljs-number">0</span>, i, char2index[ch]] = <span class="hljs-number">1</span>
+        pred = model.predict(Xtest, verbose=<span class="hljs-number">0</span>)[<span class="hljs-number">0</span>]
+        ypred = index2char[np.argmax(pred)]
+        print(ypred, end=<span class="hljs-string">""</span>)
+        
+        test_chars = test_chars[<span class="hljs-number">1</span>:] + ypred
+    print()</pre>
+
+
+
+<h2>如何将多层感知器转换为RNN，方法是在给定的时间步长将输入直接顺序输入隐藏层。</h2>
+
+
+
+<p>参数共享如何将一个独立的神经网络转化为一个连续的神经网络，该神经网络可以被微分并保持序列的完整性。</p>
+
+
+<div class="custom-point-list">
+<ol><li>梯度的问题以及如何纠正。</li><li>不同类型的无线网络:</li><li>双向RNNs:它考虑了基于上下文的学习的未来顺序。</li><li>编码器-解码器RNNs:它使用两种架构来将输入序列映射到可变长度的输出序列，这是普通的RNN无法做到的。</li><li>LSTMs:它通过引入门控机制纠正了消失梯度的问题，并且还保留了长期依赖性或长期上下文。</li><li>GRU:和LSTM一样，但建筑更简单。<ol><li>CRNN:使用CNN和RNN的组合架构，更好地将高维特征提取为低维特征，并分别对提取的低维进行序列建模。</li><li>内容很多，所以如果你能坚持到最后——感谢你的阅读！我希望这个指南是有帮助的。</li><li>资源:</li><li>尼尔什·巴拉</li><li>我是最近一家初创公司perceptronai.net的创始人，该公司旨在通过我们的深度学习算法提供医疗和材料科学方面的解决方案。我也阅读和思考了很多。有时我把它们以绘画或音乐的形式表现出来。当我需要喘口气时，我会去跑步。</li></ol></li></ol>
+</div>
+
+
+<p><strong>阅读下一篇</strong></p>
+
+
+
+<h3>如何组织深度学习项目——最佳实践范例</h3>
+
+
+
+
+
+
+<div id="author-box-new-format-block_604218f9077b8" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">13分钟阅读|作者Nilesh Barla |年5月31日更新</h3>
+    
+          <p class="article__authorContent-text">I am the founder of a recent startup perceptronai.net which aims to provide solutions in medical and material science through our deep learning algorithms. I also read and think a lot. And sometimes I put them in a form of a painting or a piece of music. And when I need to catch a breath I go for a run.</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">一个成功的深度学习项目，你需要很多迭代，很多时间，很多努力。为了让这个过程不那么痛苦，你应该尽量利用你的资源。</p>
+
+
+
+<h2>一个好的循序渐进的工作流程将帮助你做到这一点。有了它，你的项目变得<strong>高效、可复制、</strong>和<strong>可理解</strong>。</h2>
+
+
+
+<p class="has-small-font-size">在本文中，您将看到如何构建深度学习项目的工作——从开始到部署，监控部署的模型，以及中间的一切。</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10">在这个过程中，我们将使用Neptune来运行、监控和分析您的实验。Neptune是提高ML项目生产率的一个很酷的工具。</p>
+
+
+
+<p>在本文中，您将了解到:</p>
+
+
+
+<p>关于项目的生命周期。</p>
+
+
+
+<p>定义项目目标的重要性。</p>
+
+
+
+<p>根据项目需求收集数据。</p>
+
+
+
+<p>模型训练和结果探索，包括:</p>
+
+
+<div class="custom-point-list">
+<ol><li>为更好的结果建立基线。</li><li>采用现有的开源最新模型研究论文和代码库中的技术和方法。</li><li>实验跟踪和管理</li><li>避免欠拟合和过拟合的模型优化技术，例如:<ol><li>控制超参数</li><li>规范化</li><li>修剪</li></ol></li><li>在部署之前测试和评估您的项目。<ol><li>模型部署</li><li>项目维护</li><li>Pruning</li></ol></li><li>Testing and evaluating your project before deployment.</li><li>Model deployment</li><li>Project maintenance</li></ol>
+</div>
+
+<a class="button continous-post blue-filled" href="/web/20220928182040/https://neptune.ai/blog/how-to-organize-deep-learning-projects-best-practices" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

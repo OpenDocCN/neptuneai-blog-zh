@@ -1,0 +1,776 @@
+<html>
+<head>
+<title>Explainable and Reproducible Machine Learning Model Development With DALEX and Neptune </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>用DALEX和Neptune开发可解释和可再现的机器学习模型</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/explainable-and-reproducible-machine-learning-with-dalex-and-neptune#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/explainable-and-reproducible-machine-learning-with-dalex-and-neptune#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>机器学习模型开发很难，尤其是在现实世界中。</p>
+
+
+
+<p>通常，您需要:</p>
+
+
+<div class="custom-point-list">
+<ul><li>了解业务问题，</li><li>收集数据，</li><li>探索它，</li><li>建立适当的验证方案，</li><li>实现模型和调整参数，</li><li>以对业务有意义的方式部署它们，</li><li>检查模型结果只是为了找出你必须处理的新问题。</li></ul>
+</div>
+
+
+<p>这还不是全部。</p>
+
+
+
+<p>你应该有你运行的<strong>实验</strong>和你训练的<strong>模型</strong>版本<strong>版本</strong>，以防你或其他任何人将来需要检查它们或重现结果。从我的经验来看，这一时刻会在你最意想不到的时候到来，“我希望我以前就想到了”的感觉是如此的真实(和痛苦)。</p>
+
+
+
+<p>但是还有更多。</p>
+
+
+
+<p>随着ML模型服务于真实的人，错误分类的案例(这是使用ML的自然结果)正在影响人们的生活，有时会非常不公平地对待他们。这使得解释你的模型预测的能力成为一种需求，而不仅仅是一种美好。</p>
+
+
+
+<p>那么你能做些什么呢？</p>
+
+
+
+<p>幸运的是，今天有工具可以解决这两个问题。</p>
+
+
+
+<p>最好的部分是你可以把它们结合起来<strong>让你的模型版本化，可复制，可解释</strong>。</p>
+
+
+
+<p><strong> <span>继续阅读了解:</span> </strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>用<strong> DALEX </strong>讲解器讲解机器学习模型</li><li>使用<strong> Neptune </strong>让您的模型版本化，实验可重复</li><li>使用<strong> Neptune + DALEX集成</strong>自动保存每次训练运行的模型讲解器和交互式讲解图表</li><li>用<strong>版本化解释器</strong>比较、调试和审计你构建的每一个模型</li></ul>
+</div>
+
+
+<p>让我们开始吧。</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-background">请注意，由于最近的<a href="/web/20221031152438/https://neptune.ai/blog/neptune-new" target="_blank" rel="noreferrer noopener"> API更新</a>，这篇文章也需要一些改变——我们正在努力！与此同时，请检查<a href="https://web.archive.org/web/20221031152438/https://docs.neptune.ai/" target="_blank" rel="noreferrer noopener">海王星文档</a>，那里的一切都是最新的！🥳</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2>用DALEX进行可解释的机器学习</h2>
+
+
+<div class="multiple-author-box-another-format">
+    <div class="left">
+
+    <div class="single-line">
+            <div class="left">
+                
+                <p class="author-data"><span class="name">亚当·赖德莱克</span> <span class="author-desc">军情二处数据实验室的研究工程师，华沙理工大学数据科学专业的学生</span></p>
+            </div>
+    </div>
+
+    <div class="single-line">
+            <div class="left">
+                
+                <p class="author-data"><span class="name">przemysaw bie cek</span><span class="author-desc">mi2 datalab创始人，三星研发中心首席数据科学家&amp;波兰</span></p>
+            </div>
+    </div>
+    </div>
+        
+</div>
+
+
+
+
+
+<p>如今，在测试集上获得高分的模型通常是不够的。这就是为什么人们对可解释的人工智能(<strong> XAI </strong>)越来越感兴趣，这是一套让你理解模型行为的方法和技术。</p>
+
+
+
+<p>在多种编程语言中有许多可用的XAI方法。机器学习中最常用的一些是<em>石灰</em>、<em> SHAP、</em>或<em> PDP </em>，但还有更多。</p>
+
+
+
+<p>人们很容易迷失在大量的技术中，这就是<strong>可解释的人工智能金字塔</strong>派上用场的地方。它将与模型探索相关的需求收集到一个可扩展的下钻图中。左边是与单个实例相关的需求，右边是与整个模型相关的需求。连续层挖掘关于模型行为(局部或全局)的越来越多的细节问题。</p>
+
+
+
+<p/>
+
+
+
+
+
+
+
+<p>DALEX(在R和Python中可用)是一个工具，<strong>帮助你理解</strong>复杂模型是如何工作的。它目前只适用于表格数据(但将来会有文本和图像)。</p>
+
+
+
+<p>它与大多数用于构建机器学习模型的流行框架相集成，如<em> keras、sklearn、xgboost、lightgbm、H2O </em>等等！</p>
+
+
+
+<p><strong> DALEX </strong>中的核心对象是一个<strong>讲解者</strong>。它将训练或评估数据与已训练的模型联系起来，并提取解释这些数据所需的所有信息。</p>
+
+
+
+<p>一旦有了它，您就可以创建可视化，显示模型参数，并深入了解其他与模型相关的信息。您可以与您的团队共享它，或者保存它供以后使用。</p>
+
+
+
+<p>为任何模型创建一个解释器真的很容易，正如你在这个例子中看到的使用<em> sklearn </em>！</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> dalex <span class="hljs-keyword">as</span> dx
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">from</span> sklearn.ensemble <span class="hljs-keyword">import</span> RandomForestClassifier
+<span class="hljs-keyword">from</span> sklearn.preprocessing <span class="hljs-keyword">import</span> LabelEncoder
+
+data = dx.datasets.load_titanic()
+le = preprocessing.LabelEncoder()
+<span class="hljs-keyword">for</span> feature <span class="hljs-keyword">in</span> [<span class="hljs-string">'gender'</span>, <span class="hljs-string">'class'</span>, <span class="hljs-string">'embarked'</span>]:
+	data[feature] = le.fit_transform(data[feature])
+
+X = data.drop(columns=<span class="hljs-string">'survived'</span>)
+y = data.survived
+
+classifier = RandomForestClassifier()
+classifier.fit(X, y)
+
+exp = dx.Explainer(classifier, X, y, label = <span class="hljs-string">"Titanic Random Forest"</span>)</pre>
+
+
+
+<h3><strong>观测值的模型解释(局部解释)</strong></h3>
+
+
+
+<p>当你想理解<strong>为什么你的模型做出了一个特定的预测</strong>时，本地解释是你最好的朋友。</p>
+
+
+
+<p>这一切都从预测开始，沿着金字塔的左半部分往下，你可以探索和了解发生了什么。</p>
+
+
+
+<p>DALEX为您提供了一系列方法来显示每个变量的局部影响:</p>
+
+
+<div class="custom-point-list">
+<ul><li><a href="https://web.archive.org/web/20221031152438/https://github.com/slundberg/shap" target="_blank" rel="noreferrer noopener nofollow"> SHAP </a>:使用经典的Shapley值计算特征对模型预测的贡献</li><li><a href="https://web.archive.org/web/20221031152438/https://pbiecek.github.io/breakDown/" target="_blank" rel="noreferrer noopener nofollow">分解</a>:用所谓的“贪婪解释”将预测分解成可归因于每个变量的部分</li><li><a href="https://web.archive.org/web/20221031152438/https://pbiecek.github.io/breakDown/reference/break_down.html" target="_blank" rel="noreferrer noopener nofollow">分解交互</a>:扩展“贪婪解释”来解释功能交互</li></ul>
+</div>
+
+
+<p>沿着金字塔往下走，局部解释的下一个关键部分是<strong>理解模型</strong>对特征值变化的敏感性。</p>
+
+
+
+<p>在DALEX中有一种简单的方法来绘制这些信息:</p>
+
+
+<div class="custom-point-list">
+<ul><li><a href="https://web.archive.org/web/20221031152438/https://github.com/pbiecek/ceterisParibus" target="_blank" rel="noreferrer noopener nofollow">其他条件不变</a>:显示模型预测的变化，仅允许单个变量存在差异，同时保持所有其他变量不变</li></ul>
+</div>
+
+
+<p>按照我们在Titanic数据集上创建的示例随机森林模型，我们可以很容易地创建上面提到的图。</p>
+
+
+
+<pre class="hljs">observation = pd.DataFrame({<span class="hljs-string">'gender'</span>: [<span class="hljs-string">'male'</span>],
+                   	    <span class="hljs-string">'age'</span>: [<span class="hljs-number">25</span>],
+                   	    <span class="hljs-string">'class'</span>: [<span class="hljs-string">'1st'</span>],
+                   	    <span class="hljs-string">'embarked'</span>: [<span class="hljs-string">'Southampton'</span>],
+                       	    <span class="hljs-string">'fare'</span>: [<span class="hljs-number">72</span>],
+                   	    <span class="hljs-string">'sibsp'</span>: [<span class="hljs-number">0</span>],
+                   	    <span class="hljs-string">'parch'</span>: <span class="hljs-number">0</span>},
+                  	    index = [<span class="hljs-string">'John'</span>])
+
+
+bd = exp.predict_parts(observation , type=<span class="hljs-string">'break_down'</span>)
+bd_inter = exp.predict_parts(observation, type=<span class="hljs-string">'break_down_interactions'</span>)
+bd.plot(bd_inter)
+
+shap = exp.predict_parts(observation, type = <span class="hljs-string">'shap'</span>, B = <span class="hljs-number">10</span>)
+shap.plot(max_vars=<span class="hljs-number">5</span>)
+
+
+cp = exp.predict_profile(observation)
+cp.plot(variable_type = <span class="hljs-string">"numerical"</span>)
+cp.plot(variable_type = <span class="hljs-string">"categorical"</span>)</pre>
+
+
+
+
+
+
+
+<h3><strong>模型理解(全局解释)</strong></h3>
+
+
+
+<p>当你想了解<strong>哪些特性对你的模型</strong>通常是重要的，当它做决定时，你应该寻找全局的解释。</p>
+
+
+
+<p>为了在全球层面上理解该模型，DALEX为您提供了变量重要性图。变量重要性图，特别是<a href="https://web.archive.org/web/20221031152438/https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer noopener nofollow">排列特征重要性</a>，使用户能够从整体上理解每个变量对模型的影响，并区分最重要的变量。</p>
+
+
+
+<p>这种可视化可以被视为SHAP的全球等价物，并分解描绘单次观察的相似信息的图。</p>
+
+
+
+<p>沿着金字塔向下移动，在数据集层面上，有一些技术，如部分相关性分布图和累积局部相关性，使您能够<strong>将模型的反应方式可视化为所选变量的函数。</strong></p>
+
+
+
+<p>现在让我们为我们的例子创建一些全局解释。</p>
+
+
+
+<pre class="hljs">
+
+vi = exp.model_parts()
+vi.plot(max_vars=<span class="hljs-number">5</span>)
+
+
+
+pdp_num = exp.model_profile(type = <span class="hljs-string">'partial'</span>)
+ale_num = exp.model_profile(type = <span class="hljs-string">'accumulated'</span>)
+
+pdp_num.plot(ale_num)
+
+pdp_cat = exp.model_profile(type = <span class="hljs-string">'partial'</span>, 
+variable_type=<span class="hljs-string">'categorical'</span>,
+variables = [<span class="hljs-string">"gender"</span>,<span class="hljs-string">"class"</span>])
+ale_cat = exp.model_profile(type = <span class="hljs-string">'accumulated'</span>,
+          variable_type=<span class="hljs-string">'categorical'</span>,
+          variables = [<span class="hljs-string">"gender"</span>,<span class="hljs-string">"class"</span>])
+
+ale_cat.plot(pdp_cat)</pre>
+
+
+
+
+
+
+
+<h3><strong>可重用和有组织的解释对象</strong></h3>
+
+
+
+<p>一个干净的，结构化的，易于使用的XAI可视化集合是伟大的，但有更多的DALEX。</p>
+
+
+
+<p>在<strong> DALEX explainers </strong>中打包你的模型给你一个<strong>可重用的和有组织的方式来存储和版本化</strong>你用机器学习<strong>模型</strong>做的任何工作。</p>
+
+
+
+<p>使用DALEX创建的explainer对象包含:</p>
+
+
+<div class="custom-point-list">
+<ul><li>要解释的模型，</li><li>型号名称和类别，</li><li>任务类型，</li><li>将用于计算解释的数据，</li><li>对这些数据进行模型预测，</li><li>预测功能，</li><li>模型残差，</li><li>观察值的抽样权重，</li><li>其他型号信息(包、版本等。)</li></ul>
+</div>
+
+
+<p>将所有这些信息存储在一个对象中使得创建局部和全局解释变得容易(正如我们之前看到的)。</p>
+
+
+
+<p>它还使得在模型开发的每个阶段审查、共享和比较模型和解释成为可能。</p>
+
+
+
+<h2>使用Neptune进行实验和模型版本控制</h2>
+
+
+
+<a href="https://web.archive.org/web/20221031152438/https://www.linkedin.com/in/jakub-czakon-2b797b69" class="author-box-another-format">
+    <div class="left">
+        
+        <p class="author-data"><span class="name">雅各布·查孔</span> <span class="author-desc">资深数据科学家</span></p>
+    </div>
+    
+</a>
+
+
+
+<p>在完美的世界里，你所有的机器学习模型和实验都是以和你给软件项目版本化一样的方式来版本化的。</p>
+
+
+
+<p>不幸的是，要跟踪您的ML项目，您需要做的不仅仅是将代码提交给Github。</p>
+
+
+
+<p>简而言之，为了正确地<strong>版本化机器学习模型</strong>你应该跟踪:</p>
+
+
+<div class="custom-point-list">
+<ul><li>代码、笔记本和配置文件</li><li>环境</li><li>因素</li><li>数据集</li><li>模型文件</li><li>评估指标、性能图表或预测等结果</li></ul>
+</div>
+
+
+<p>其中一些东西可以很好地配合。git(代码、环境配置),但其他的就没那么多了。</p>
+
+
+
+<p>海王星通过让你记录你觉得重要的每件事和任何事情，让你很容易跟踪所有这些。</p>
+
+
+
+<p>您只需在脚本中添加几行代码:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">from</span> neptunecontrib.api <span class="hljs-keyword">import</span> *
+<span class="hljs-keyword">from</span> neptunecontrib.versioning.data <span class="hljs-keyword">import</span> *
+
+neptune.init(<span class="hljs-string">'YOU/YOUR_PROJECT'</span>)
+
+neptune.create_experiment(
+          params={<span class="hljs-string">'lr'</span>: <span class="hljs-number">0.01</span>, <span class="hljs-string">'depth'</span>: <span class="hljs-number">30</span>, <span class="hljs-string">'epoch_nr'</span>: <span class="hljs-number">10</span>}, 
+          upload_source_files=[<span class="hljs-string">'**/*.py'</span>, 
+                               <span class="hljs-string">'requirements.yaml'</span>]) 
+log_data_version(<span class="hljs-string">'/path/to/dataset'</span>) 
+
+
+
+neptune.log_metric(<span class="hljs-string">'test_auc'</span>, <span class="hljs-number">0.82</span>) 
+log_chart(<span class="hljs-string">'ROC curve'</span>, fig) 
+log_pickle(<span class="hljs-string">'model.pkl'</span>, clf) 
+</pre>
+
+
+
+<p>您运行的每个实验或模型训练都有版本，并在Neptune应用程序(和数据库)中等待您🙂 ).</p>
+
+
+
+
+
+
+
+<p class="has-text-align-center"><a href="https://web.archive.org/web/20221031152438/https://ui.neptune.ai/o/shared/org/dalex-integration/e/DAL-79/details" target="_blank" rel="noreferrer noopener"> <strong>见海王星</strong> </a></p>
+
+
+
+<p>您的团队可以访问所有的实验和模型，比较结果，并快速找到信息。</p>
+
+
+
+<p>您可能会想:“好极了，所以我有我的模型版本，但是”:</p>
+
+
+<div class="custom-point-list">
+<ul><li>如果我想在模型被训练后几周或几个月调试模型，该怎么办？</li><li>如果我想看到每次实验运行的预测解释或变量重要性，该怎么办？</li><li>如果有人让我检查这个模型是否有不公平的偏见，而我没有训练它的代码或数据，该怎么办？</li></ul>
+</div>
+
+
+<p>我听到了，这就是DALEX集成的用武之地！</p>
+
+
+
+<h2>DALEX + Neptune =版本化和可解释的模型</h2>
+
+
+
+<p>为什么不让你的DALEX <strong>解释器为每个实验</strong>进行记录和版本化，并在一个漂亮的用户界面中呈现交互式解释图表，易于与你想要的任何人分享。</p>
+
+
+
+<p>没错，为什么不呢！</p>
+
+
+
+<p>通过Neptune-DALEX集成，您可以获得所有这些，只需增加3条线路。</p>
+
+
+
+<p>此外，这也带来了一些实实在在的好处:</p>
+
+
+<div class="custom-point-list">
+<ul><li>你可以<strong>查看其他人创建的模型</strong>并轻松分享你的模型</li><li>您可以<strong>比较</strong>任何已创建模型的行为</li><li>你可以<strong>追踪和审计每个模型</strong>不必要的偏差和其他问题</li><li>您可以<strong>调试</strong>并比较缺少训练数据、代码或参数的模型</li></ul>
+</div>
+
+
+<p>好吧，这听起来很酷，但它实际上是如何工作的呢？</p>
+
+
+
+<p>我们现在开始吧。</p>
+
+
+
+<h3><strong>版本本地说明</strong></h3>
+
+
+
+<p>要记录本地模型说明，您只需:</p>
+
+
+<div class="custom-point-list">
+<ul><li>创建一个观察向量</li><li>创建您的DALEX解释器对象</li><li>将它们从<code>neptunecontrib</code>传递给<code>log_local_explanations</code>函数</li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> neptunecontrib.api <span class="hljs-keyword">import</span> log_local_explanations
+
+observation = pd.DataFrame({<span class="hljs-string">'gender'</span>: [<span class="hljs-string">'male'</span>],
+                   	    <span class="hljs-string">'age'</span>: [<span class="hljs-number">25</span>],
+                   	    <span class="hljs-string">'class'</span>: [<span class="hljs-string">'1st'</span>],
+                   	    <span class="hljs-string">'embarked'</span>: [<span class="hljs-string">'Southampton'</span>],
+                       	    <span class="hljs-string">'fare'</span>: [<span class="hljs-number">72</span>],
+                   	    <span class="hljs-string">'sibsp'</span>: [<span class="hljs-number">0</span>],
+                   	    <span class="hljs-string">'parch'</span>: <span class="hljs-number">0</span>},
+                  	    index = [<span class="hljs-string">'John'</span>])
+
+log_local_explanations(expl, observation)
+</pre>
+
+
+
+<p>互动解释图表将在海王星应用程序的“文物”部分等着你:</p>
+
+
+
+
+
+
+
+<p class="has-text-align-center"><a href="https://web.archive.org/web/20221031152438/https://ui.neptune.ai/shared/dalex-integration/e/DAL-78/artifacts?path=charts%2F&amp;file=SHAP.html" target="_blank" rel="noreferrer noopener"> <strong>见海王星</strong> </a></p>
+
+
+
+<p>将创建以下地块:</p>
+
+
+<div class="custom-point-list">
+<ul><li>可变重要性</li><li>部分相关(如果指定了数字特征)</li><li>累积相关性(如果指定了分类特征)</li></ul>
+</div>
+
+
+<h3><strong>版本全球解说</strong></h3>
+
+
+
+<p>有了全球模型解释，就更简单了:</p>
+
+
+<div class="custom-point-list">
+<ul><li>创建您的DALEX解释器对象</li><li>从<code>neptunecontrib</code>传递给<code>log_global_explanations</code>函数</li><li>(可选)指定要绘制的分类特征</li></ul>
+</div>
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> neptunecontrib.api <span class="hljs-keyword">import</span> log_global_explanations
+
+log_global_explanations(expl, categorical_features=[<span class="hljs-string">"gender"</span>, <span class="hljs-string">"class"</span>])</pre>
+
+
+
+<p>就是这样。现在，您可以转到“工件”部分，找到您当地的解释图表:</p>
+
+
+
+
+
+
+
+<p class="has-text-align-center"><a href="https://web.archive.org/web/20221031152438/https://ui.neptune.ai/o/shared/org/dalex-integration/e/DAL-78/artifacts?path=charts%2F&amp;file=Variable%20Importance.html" target="_blank" rel="noreferrer noopener"> <strong>见海王星</strong> </a></p>
+
+
+
+<p>将创建以下地块:</p>
+
+
+<div class="custom-point-list">
+<ul><li>崩溃，</li><li>在互动中崩溃，</li><li>shap，</li><li>对于数值变量，其他条件不变，</li><li>分类变量的其他条件不变</li></ul>
+</div>
+
+
+<h3><strong>版本讲解器对象</strong></h3>
+
+
+
+<p>但是如果你真的想要版本化你的解释，你应该<strong>版本化解释对象</strong>本身。</p>
+
+
+
+<p>保存它的好处？：</p>
+
+
+<div class="custom-point-list">
+<ul><li>您可以在以后创建它的可视化表示</li><li>您可以用表格的形式深入了解细节</li><li>你可以随心所欲地使用它(即使你现在不知道如何使用)🙂)</li></ul>
+</div>
+
+
+<p>这非常简单:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> neptunecontrib.api <span class="hljs-keyword">import</span> log_explainer
+
+log_explainer(<span class="hljs-string">'explainer.pkl'</span>, expl)</pre>
+
+
+
+<p>你可能会想:“我还能怎么使用解释器对象呢？”</p>
+
+
+
+<p>让我在接下来的部分向您展示。</p>
+
+
+
+<h3><strong>获取并分析训练模型的解释</strong></h3>
+
+
+
+<p>首先，如果你把你的解释器登录到Neptune，你可以直接把它提取到你的脚本或者笔记本中:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">from</span> neptunecontrib.api <span class="hljs-keyword">import</span> get_pickle
+
+project = neptune.init(api_token=<span class="hljs-string">'ANONYMOUS'</span>,
+                       project_qualified_name=<span class="hljs-string">'shared/dalex-integration'</span>)
+experiment = project.get_experiments(id=<span class="hljs-string">'DAL-68'</span>)[<span class="hljs-number">0</span>]
+explainer = get_pickle(filename=<span class="hljs-string">'explainer.pkl'</span>, experiment=experiment)</pre>
+
+
+
+<p>现在您已经有了模型解释，您可以调试您的模型了。</p>
+
+
+
+<p>一种可能的情况是，你有一个观察结果，而你的模型悲惨地失败了。</p>
+
+
+
+<p>你想找出原因。</p>
+
+
+
+<p>如果保存了DALEX解释器对象，您可以:</p>
+
+
+<div class="custom-point-list">
+<ul><li>创建本地解释，看看发生了什么。</li><li>检查更改要素对结果的影响。</li></ul>
+</div>
+
+
+
+
+
+
+<p class="has-text-align-center"><a href="https://web.archive.org/web/20221031152438/https://ui.neptune.ai/shared/dalex-integration/n/6b9d8213-9d1c-4a7d-a448-d2d9e29f7878/66389c83-b397-4ec6-a1fc-8b5847980fe5" target="_blank" rel="noreferrer noopener"> <strong>见海王星</strong> </a></p>
+
+
+
+<p>当然，你可以做得更多，特别是如果你想比较模型和解释。</p>
+
+
+
+<p>让我们现在就开始吧！</p>
+
+
+
+<h3><strong>比较模型和解释</strong></h3>
+
+
+
+<p>如果您想:</p>
+
+
+<div class="custom-point-list">
+<ul><li>将当前的模型想法与生产中运行的模型进行比较？</li><li>看看去年的实验想法是否能在新收集的数据上发挥更好的作用？</li></ul>
+</div>
+
+
+<p>实验和模型有一个清晰的结构，并且有一个存放它们的地方，这真的很容易做到。</p>
+
+
+
+<p>您可以在Neptune UI中基于参数、数据版本或指标来比较实验:</p>
+
+
+
+
+
+
+
+<p class="has-text-align-center"><a href="https://web.archive.org/web/20221031152438/https://ui.neptune.ai/o/shared/org/dalex-integration/compare?shortId=%5B%22DAL-78%22%2C%22DAL-77%22%2C%22DAL-76%22%2C%22DAL-75%22%2C%22DAL-72%22%5D&amp;viewId=495b4a41-3424-4d01-9064-70be82716196" target="_blank" rel="noreferrer noopener"> <strong>见海王星</strong> </a></p>
+
+
+
+<p>您<strong>可以通过两次点击</strong>看到不同之处，并可以通过一两次点击深入查看您需要的任何信息。</p>
+
+
+
+<p>好吧，当涉及到比较超参数和度量时，这确实很有用，但是解释者呢？</p>
+
+
+
+<p>你可以进入每个实验，并<a href="https://web.archive.org/web/20221031152438/https://ui.neptune.ai/o/shared/org/dalex-integration/e/DAL-78/artifacts?path=charts%2F&amp;file=Break%20Down%20Interactions.html" target="_blank" rel="noreferrer noopener">查看交互式解释图表</a>，看看你的模型是否有可疑之处。</p>
+
+
+
+<p>更好的是，Neptune允许您访问您以编程方式记录的所有信息，包括模型解释器。<br/>你可以<strong>获取每个实验的讲解对象并进行比较</strong>。只需使用<code>neptunecontrib</code>中的<code>get_pickle</code>函数，然后用DALEX <code>.plot</code>可视化多个解释器:</p>
+
+
+
+<pre class="hljs">experiments =project.get_experiments(id=[<span class="hljs-string">'DAL-68'</span>,<span class="hljs-string">'DAL-69'</span>,<span class="hljs-string">'DAL-70'</span>,<span class="hljs-string">'DAL-71'</span>])
+
+shaps = []
+<span class="hljs-keyword">for</span> exp <span class="hljs-keyword">in</span> experiments:
+	auc_score = exp.get_numeric_channels_values(<span class="hljs-string">'auc'</span>)[<span class="hljs-string">'auc'</span>].tolist()[<span class="hljs-number">0</span>]
+	label = f<span class="hljs-string">'{exp.id} | AUC: {auc_score:.3f}'</span>
+
+	explainer_ = get_pickle(filename=<span class="hljs-string">'explainer.pkl'</span>, experiment=exp)
+    
+	sh = explainer_.predict_parts(new_observation, type=<span class="hljs-string">'shap'</span>, B = <span class="hljs-number">10</span>)
+	sh.result.label = label
+	shaps.append(sh)
+
+shaps[<span class="hljs-number">0</span>].plot(shaps[<span class="hljs-number">1</span>:])
+</pre>
+
+
+
+
+
+
+
+<p class="has-text-align-center"><a href="https://web.archive.org/web/20221031152438/https://ui.neptune.ai/o/shared/org/dalex-integration/n/comparison-6b9d8213-9d1c-4a7d-a448-d2d9e29f7878/4bf30571-1ef1-4c63-9241-6d3b2cab65a7" target="_blank" rel="noreferrer noopener"> <strong>见海王星</strong> </a></p>
+
+
+
+<p>这就是DALEX情节的美妙之处。你可以通过多个解释者，他们会变魔术。</p>
+
+
+
+<p>当然，您可以将之前训练过的模型与您当前正在研究的模型进行比较，以确定您的方向是否正确。只需将它添加到解释器列表中，并传递给<code>.plot</code>方法。</p>
+
+
+
+<h2><strong>最终想法</strong></h2>
+
+
+
+<p>好了，总结一下。</p>
+
+
+
+<p>在本文中，您了解了:</p>
+
+
+<div class="custom-point-list">
+<ul><li>各种模型解释技术以及如何用DALEX解释器打包这些解释</li><li>如何用Neptune对机器学习模型和实验进行版本化</li><li>如何通过Neptune + DALEX集成为您运行的每个培训版本化模型解释器和交互式解释图表</li><li>如何比较和调试你用解释器训练的模型</li></ul>
+</div>
+
+
+<p>有了这些信息，我希望您的模型开发过程现在会更有组织性、可再现性和可解释性。</p>
+
+
+
+<p>快乐训练！</p>
+
+
+
+
+<div id="author-box-new-format-block_605d8dd517661" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">雅各布·查孔</h3>
+    
+          <p class="article__authorContent-text">大部分是ML的人。构建MLOps工具，编写技术资料，在Neptune进行想法实验。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-2 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator has-css-opacity"/>
+
+
+
+<p class="has-text-color"><strong>接下来的步骤</strong></p>
+
+
+
+<h2>如何在5分钟内上手海王星</h2>
+
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<h5>1.创建一个免费帐户</h5>
+
+
+<p id="block_602b91ab7ed8a" class="separator separator-15">2.安装Neptune客户端库</p>
+
+
+<a class="button continous-post green-filled" href="/web/20221031152438/https://neptune.ai/register" target="_blank">
+    Sign up</a>
+
+
+<p id="block_602b915a7ed89" class="separator separator-20">3.将日志记录添加到脚本中</p>
+
+
+
+<h5>2. Install Neptune client library</h5>
+
+
+
+<pre class="hljs">pip install neptune-client
+</pre>
+
+
+
+<h5>3. Add logging to your script</h5>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+
+run = neptune.init_run(<span class="hljs-string">"Me/MyProject"</span>)
+run[<span class="hljs-string">"parameters"</span>] = {<span class="hljs-string">"lr"</span>:<span class="hljs-number">0.1</span>, <span class="hljs-string">"dropout"</span>:<span class="hljs-number">0.4</span>}
+run[<span class="hljs-string">"test_accuracy"</span>] = <span class="hljs-number">0.84</span></pre>
+
+
+<a class="button continous-post blue-not-filled" href="https://web.archive.org/web/20221031152438/https://colab.research.google.com/github/neptune-ai/examples/blob/master/how-to-guides/how-it-works/notebooks/Neptune_API_Tour.ipynb" target="_blank">
+    Try live notebook</a>
+</div></div>
+
+
+
+<hr class="wp-block-separator has-css-opacity"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

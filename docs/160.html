@@ -1,0 +1,730 @@
+<html>
+<head>
+<title>How to Build a Lightweight Image Classifier in TensorFlow / Keras </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何在TensorFlow / Keras中构建轻量级图像分类器</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/how-to-build-a-light-weight-image-classifier-in-tensorflow-keras#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/how-to-build-a-light-weight-image-classifier-in-tensorflow-keras#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>计算机视觉是一个快速发展的领域，正在取得巨大的进步，但仍然有许多挑战需要计算机视觉工程师来解决。</p>
+
+
+
+<p>首先，他们的终端模型需要健壮和准确。</p>
+
+
+
+<p>其次，最终的解决方案应该足够快，并且在理想情况下，达到接近实时的性能。</p>
+
+
+
+<p>最后，模型应该占用尽可能少的计算和内存资源。</p>
+
+
+
+<p>幸运的是，有许多最先进的算法可供选择。有些在精确度方面是最好的，有些是最快的，有些是难以置信的紧凑。军火库确实很丰富，计算机视觉工程师有很多选项可以考虑。</p>
+
+
+
+<h2 id="h-tasks-that-computer-vision-solves">计算机视觉解决的任务</h2>
+
+
+
+<h3>图像分类</h3>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" src="../Images/af0dad6b52173e4fd4493c218ffac563.png" alt="Image Classifier" class="wp-image-45217" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161302im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Image-Classifier-1.jpg?resize=501%2C336&amp;ssl=1"/><figcaption><em><a href="https://web.archive.org/web/20221201161302/https://machinelearningmastery.com/applications-of-deep-learning-for-computer-vision/" target="_blank" rel="noreferrer noopener nofollow">Source</a>: 9 Applications of Deep Learning for Computer Vision by Jason Brownlee</em></figcaption></figure></div>
+
+
+
+<p>在本文中，我们将着重于创建图像分类器。图像分类是一项基本任务，但仍然是计算机视觉工程师能够处理的最重要的任务之一。</p>
+
+
+
+<p>对图像进行分类意味着确定类别。类别的数量受限于您想要区分的图像类型的数量。例如，您可能希望根据车辆类型对图像进行分类。类别的可能选项有:自行车、汽车、公共汽车和卡车。</p>
+
+
+
+<p>或者，您可能想要一个更详细的集合，并将高级类分解成低级子类。用这种方法，你的类列表可能包括运动自行车，直升机，踏板车，和全地形自行车。汽车类别将进一步分为掀背车，皮卡，紧凑型车，运动跑车，跨界车和面包车。对于公共汽车和卡车也可以进行类似的分解。</p>
+
+
+
+<p>最终的类别集由计算机视觉工程师确定，该工程师非常了解问题领域，并且熟悉数据集和可用的注释。</p>
+
+
+
+
+
+
+
+<h3>目标检测</h3>
+
+
+
+
+
+
+
+<p>如果您处理的图像有多个关联的类，该怎么办？继续我们之前的例子，一张图片可能包含一辆公共汽车和一辆摩托车。你肯定不想错过任何一个对象，想两个都抓住。这里，对象检测开始发挥作用。</p>
+
+
+
+<p>在计算机视觉中，检测一个对象意味着定位它并给它分配一个类别。简单来说，我们希望在图像上找到一个对象并识别它。如您所见，对象检测包含图像分类部分，因为我们在对象被定位后进行分类。它强调了一个事实，即图像分类是计算机视觉的核心，因此需要认真学习。</p>
+
+
+
+
+
+
+
+<h3>语义分割</h3>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/3000a559687570ade55af892c9e91a18.png" alt="Semantic segmentation" class="wp-image-45219" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161302im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Semantic-segmentation.png?resize=765%2C390&amp;ssl=1"/><figcaption><em><a href="https://web.archive.org/web/20221201161302/https://www.analyticsvidhya.com/blog/2019/04/introduction-image-segmentation-techniques-python/">Source</a>: Computer Vision Tutorial: A Step-by-Step Introduction to Image Segmentation Techniques (Part 1) by PULKIT SHARMA</em></figcaption></figure></div>
+
+
+
+<p>最后，让我们简单讨论一下语义分割，对图像的每个像素进行分类。如果一个像素属于一个特定的对象，那么这个像素对于这个对象被分类为阳性。通过将该对象的每个像素分类为阳性来分割该对象。这再次强调了分类的重要性。</p>
+
+
+
+<p>当然，计算机视觉中还有很多其他的任务我们今天不会去碰，但是相信我，图像分类是最核心的一个。</p>
+
+
+
+
+
+
+
+<h2 id="h-what-makes-image-classification-possible">什么使得图像分类成为可能</h2>
+
+
+
+<p>在我们继续学习如何创建轻量级分类器的实用指南之前，我决定暂时停下来，回到问题的理论部分。</p>
+
+
+
+<p>这个决定是经过深思熟虑的，来自我的日常观察，越来越多的计算机视觉工程师倾向于在非常高的水平上处理问题。通常，这意味着一个简单的预训练模型导入，将准确性设置为一个度量，并启动训练作业。由于在创建最常见的机器学习框架(scikit-learn、PyTorch或Tensorflow)方面所做的大量工作，如今这已经成为可能。</p>
+
+
+
+<p>这些框架中的这些进步是否意味着没有必要深究算法背后的数学？绝对不行！了解使图像分类成为可能的基础知识是一种超能力，你可以，而且肯定应该得到。</p>
+
+
+
+
+
+
+
+<p>当一切顺利时，您可能会觉得没有必要超越基本的模型导入。但是，每当你面临困难的时候，理解算法就会很好地为你服务。</p>
+
+
+
+<p>也不需要成为策划人。对于深度学习，你需要掌握的只是卷积神经网络的概念。一旦你学会了这一点，你就可以解决在训练机器学习模型时可能遇到的任何问题。相信我，如果你在机器学习的职业道路上，会有很多这样的情况。</p>
+
+
+
+<p><strong> <em>注</em> </strong> <em>:在这篇文章里我就不细说CNN了，我想说明一下其他的事情。但是，我会分享一些我在网上找到的资源，我认为它们对理解CNN非常有用。您可以在参考资料部分找到它们。</em></p>
+
+
+
+<h2 id="h-overview-of-the-best-convolutional-neural-nets">最佳卷积神经网络综述</h2>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/1aac57e362a5d10e930853c1b815d5e4.png" alt="Convolutional Neural Network" class="wp-image-45223" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161302im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Convolutional-Neural-Network.png?ssl=1"/><figcaption><em><a href="https://web.archive.org/web/20221201161302/https://developersbreach.com/convolution-neural-network-deep-learning/" target="_blank" rel="noreferrer noopener nofollow">Source</a>: Convolutional Neural Network | Deep Learning by Swapna K E</em></figcaption></figure></div>
+
+
+
+<p>当CNN的概念清晰时，你可能会想知道现在哪种CNN表现最好。这就是我们在这一节要讨论的内容。</p>
+
+
+
+<p>尽管第一个CNN是在20世纪80年代推出的，但真正的突破发生在21世纪初，图形处理单元(GPU)的出现。</p>
+
+
+
+<p>为了了解进展有多快，有必要看一下在一年一度的名为ImageNet大规模视觉识别挑战赛(ILSVRC)的比赛中取得的错误率统计数据。以下是错误率的历史变化情况:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/08b5d00fe4362cd21be16c911256fd5e.png" alt="Error rate history" class="wp-image-45224" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161302im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Error-rate-history.png?resize=400%2C489&amp;ssl=1"/><figcaption><em>Error rate history on ImageNet (showing best results per team and up to 10 entries per year) | <a href="https://web.archive.org/web/20221201161302/https://en.wikipedia.org/wiki/ImageNet#ImageNet_Challenge" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>从2016年到现在，关于CNN已经有了很多进展。</p>
+
+
+
+<p>今天值得我们关注的一个架构是由谷歌人工智能的研究人员在2019年5月推出的。谷歌人工智能博客上发布了一篇名为“<a href="https://web.archive.org/web/20221201161302/https://ai.googleblog.com/2019/05/efficientnet-improving-accuracy-and.html" target="_blank" rel="noreferrer noopener nofollow"> EfficientNet:通过AutoML和模型缩放提高准确性和效率</a>”的文章。研究小组发明了一种全新的CNN架构，称为EfficientNet，这让每个计算机视觉工程师都大吃一惊。</p>
+
+
+
+<p>结果证明它非常好，在所有方面都超过了以前所有最先进的架构:准确性、速度和净尺寸。相当令人印象深刻！</p>
+
+
+
+<p>今天，我想向您展示利用Google的最新发明是多么简单，并以一种简单的方式将其应用于您的分类问题，只要您在Tensorflow / Keras框架中工作。</p>
+
+
+
+
+
+
+
+<h2 id="h-tensorflow-keras-frameworks-in-machine-learning">机器学习中的TensorFlow和Keras框架</h2>
+
+
+
+
+
+
+
+<p>框架在每个信息技术领域都是必不可少的。机器学习也不例外。在ML市场上有几个成熟的玩家帮助我们简化整体的编程体验。PyTorch、scikit-learn、TensorFlow/Keras、MXNet和Caffe只是值得一提的几个。</p>
+
+
+
+<p>今天，我想重点谈谈TensorFlow/Keras。毫不奇怪，这两个是机器学习领域中最受欢迎的框架。这主要是因为TensorFlow和Keras都提供了丰富的开发能力。两个框架非常相似。无需深究细节，您应该知道的关键要点是，前者(Keras)只是TensorFlow框架的包装器。</p>
+
+
+
+<p>关于卷积神经网络，Keras让我们使用机器学习世界中最新的CNN架构来导入和构建我们的模型。查看官方文档页面，在这里你可以找到Keras中完整的预训练模型库，以便进行微调。</p>
+
+
+
+<h2 id="h-image-classifier-creation-real-life-project-example">图像分类器创建:真实项目示例</h2>
+
+
+
+<h3>项目描述</h3>
+
+
+
+<p>好了，让我们利用Keras中可用的预训练模型，解决一个现实生活中的计算机视觉问题。我们将要进行的项目旨在解决一个图像方向问题。我们需要创建一个可以对输入图像的方向进行分类的模型。输入图像有四种方向选项:</p>
+
+
+
+<ul><li>正常，</li><li>逆时针旋转90度，</li><li>逆时针旋转180度，</li><li>逆时针旋转270度。</li></ul>
+
+
+
+<p>给定输入图像的四个方向，我们可以得出结论，模型应该能够区分四个类别。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/96121d3c601901a13316825f55cd41d1.png" alt="Input image orientation" class="wp-image-45227" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161302im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Input-image-orientation.png?ssl=1"/><figcaption><em>Input image orientation options displayed</em></figcaption></figure></div>
+
+
+
+<p>该模型不应该检测任何图像的方向。如上所述，模型将处理的图像集仅限于一种类型。</p>
+
+
+
+<p>该数据集包含大约11，000幅图像，所有图像都经过检查并确认处于正常方向。</p>
+
+
+
+<h3>数据生成器创建</h3>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/0da8cbc2f91796a921f48368f9b071dc.png" alt="Data generator creation" class="wp-image-45228" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161302im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Data-generator-creation.png?ssl=1"/><figcaption><em><a href="https://web.archive.org/web/20221201161302/https://towardsdatascience.com/keras-data-generators-and-how-to-use-them-b69129ed779c" target="_blank" rel="noreferrer noopener nofollow">Source</a>: Keras data generators and how to use them by Ilya Michlin</em></figcaption></figure></div>
+
+
+
+<p>因为数据集中的所有图像都处于正常方向，所以我们需要在将它们输入到神经网络之前对它们进行旋转，以确保每个类都被表示出来。为此，我们使用一个定制的图像生成器。</p>
+
+
+
+<p>自定义生成器的工作方式如下:</p>
+
+
+
+<ul><li>在给定路径的情况下，从数据集中读取单个图像；</li><li>图像旋转到四个方向之一。旋转方向是随机选择的。以相等的概率对每个方向进行采样，得到四个输入类的平衡；</li><li>使用一组预定义的增强方法来增强旋转的图像；</li><li>使用传递的预处理函数对旋转和增强的图像进行预处理；</li><li>堆叠旋转和增强的图像以创建一批给定大小的图像；</li><li>当这一批形成时，它被输出并输入神经网络。</li></ul>
+
+
+
+<p>以下是项目中使用的自定义数据生成器的完整代码:</p>
+
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DataGenerator</span><span class="hljs-params">(Sequence)</span>:</span>
+
+    <span class="hljs-string">"""
+    Generates rotated images for the net that detects orientation
+    """</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self,
+                 data_folder,
+                 target_samples,
+                 preprocessing_f,
+                 input_size,
+                 batch_size,
+                 shuffle,
+                 aug)</span>:</span>
+        <span class="hljs-string">"""
+        Initialization
+
+        :data_folder: path to folder with images (all images: both train and valid)
+        :target_samples: an array of basenames for images to use within generator (e.g.: only those for train)
+        :preprocessing_f: input preprocessing function
+        :input_size: (typle, (width, height) format) image size to be fed into the neural net
+        :batch_size: (int) batch size at each iteration
+        :shuffle: True to shuffle indices after each epoch
+        :aug: True to augment input images
+        """</span>
+
+        self.data_folder = data_folder
+        self.target_samples = target_samples
+        self.preprocessing_f = preprocessing_f
+        self.input_size = input_size
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.aug = aug
+        self.on_epoch_end()
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__len__</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-string">"""
+        Denotes the number of batches per epoch
+
+        :return: nuber of batches per epoch
+        """</span>
+        <span class="hljs-keyword">return</span> math.ceil(len(self.target_samples) / self.batch_size)
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__getitem__</span><span class="hljs-params">(self, index)</span>:</span>
+        <span class="hljs-string">"""
+        Generates a batch of data (X and Y)
+        """</span>
+
+        indices = self.indices[index * self.batch_size : (index + <span class="hljs-number">1</span>) * self.batch_size]
+
+        images_bn4batch = [self.target_samples[i] <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> indices]
+        path2images4batch = [os.path.join(self.data_folder, im_bn) <span class="hljs-keyword">for</span> im_bn <span class="hljs-keyword">in</span> images_bn4batch]
+
+        images4batch_bgr = [cv2.imread(path2image) <span class="hljs-keyword">for</span> path2image <span class="hljs-keyword">in</span> path2images4batch]
+        images4batch_rgb = [cv2.cvtColor(bgr_im, cv2.COLOR_BGR2RGB) <span class="hljs-keyword">for</span> bgr_im <span class="hljs-keyword">in</span> images4batch_bgr]
+
+        <span class="hljs-keyword">if</span> self.aug:
+            angle4rotation = <span class="hljs-number">2</span>
+            images4batch_aug = [self.__data_augmentation(im, angle4rotation) <span class="hljs-keyword">for</span> im <span class="hljs-keyword">in</span> images4batch_rgb]
+        <span class="hljs-keyword">else</span>:
+            images4batch_aug = images4batch_rgb
+
+        rotated_images, labels = self.__data_generation(images4batch_aug)
+        images4batch_resized = [cv2.resize(rotated_im, self.input_size) <span class="hljs-keyword">for</span> rotated_im <span class="hljs-keyword">in</span> rotated_images]
+
+        <span class="hljs-keyword">if</span> self.preprocessing_f:
+            prep_images4batch = [self.preprocessing_f(resized_im) <span class="hljs-keyword">for</span> resized_im <span class="hljs-keyword">in</span> images4batch_resized]
+        <span class="hljs-keyword">else</span>:
+            prep_images4batch = images4batch_resized
+
+        images4yielding = np.array(prep_images4batch)
+
+        <span class="hljs-keyword">return</span> images4yielding, labels
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_epoch_end</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-string">"""
+        Updates indices after each epoch
+        """</span>
+
+        self.indices = np.arange(len(self.target_samples))
+        <span class="hljs-keyword">if</span> self.shuffle:
+            np.random.shuffle(self.indices) 
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__data_generation</span><span class="hljs-params">(self, images)</span>:</span>
+        <span class="hljs-string">"""
+        Applies random image rotation and geterates labels.
+        Labels map: counter clockwise direction! 0 = 0, 90 = 1, 180 = 2, 270 = 3
+
+        :return: rotated_images, labels
+        """</span>
+
+        labels = np.random.choice([<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>], size=len(images), p=[<span class="hljs-number">0.25</span>] * <span class="hljs-number">4</span>)
+        rotated_images = [np.rot90(im, angle) <span class="hljs-keyword">for</span> im, angle <span class="hljs-keyword">in</span> zip(images, labels)]
+
+        <span class="hljs-keyword">return</span> rotated_images, labels
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__data_augmentation</span><span class="hljs-params">(self, image, max_rot_angle = <span class="hljs-number">2</span>)</span>:</span>
+        <span class="hljs-string">"""
+        Applies data augmentation
+
+        :max_rot_angle: maximum angle that can be selected for image rotation
+        :return: augmented_images
+        """</span>
+
+        rotation_options = np.arange(<span class="hljs-number">-1</span> * max_rot_angle, max_rot_angle + <span class="hljs-number">1</span>, <span class="hljs-number">1</span>)
+        angle4rotation = np.random.choice(rotation_options, <span class="hljs-number">1</span>)
+
+        sometimes = <span class="hljs-keyword">lambda</span> aug: iaa.Sometimes(<span class="hljs-number">0.5</span>)
+
+        seq = iaa.Sequential(
+            [
+            iaa.OneOf(
+                [iaa.Add((<span class="hljs-number">-15</span>,<span class="hljs-number">15</span>), per_channel=<span class="hljs-keyword">False</span>),
+                 iaa.Multiply((<span class="hljs-number">0.8</span>, <span class="hljs-number">1.2</span>)),
+                 iaa.MultiplyHueAndSaturation((<span class="hljs-number">0.8</span>,<span class="hljs-number">1.1</span>))
+            ]),
+
+            iaa.OneOf(
+                [iaa.AdditiveGaussianNoise(loc=<span class="hljs-number">0</span>, scale=(<span class="hljs-number">0.02</span>, <span class="hljs-number">0.05</span>*<span class="hljs-number">255</span>), per_channel=<span class="hljs-number">0.5</span>),
+                 iaa.AdditiveLaplaceNoise(loc=<span class="hljs-number">0</span>,scale=(<span class="hljs-number">0.02</span>, <span class="hljs-number">0.05</span>*<span class="hljs-number">255</span>), per_channel=<span class="hljs-number">0.5</span>),
+                 iaa.AdditivePoissonNoise(lam=(<span class="hljs-number">8</span>,<span class="hljs-number">16</span>), per_channel=<span class="hljs-number">0.5</span>),
+            ]),
+
+            iaa.OneOf(
+                [iaa.Dropout(p=<span class="hljs-number">0.005</span>,per_channel=<span class="hljs-keyword">False</span>),
+                 iaa.Pepper(p=<span class="hljs-number">0.005</span>),
+                 iaa.Salt(p=<span class="hljs-number">0.01</span>)
+            ]),
+
+            sometimes(
+                iaa.FrequencyNoiseAlpha(
+                    exponent=(<span class="hljs-number">-1</span>,<span class="hljs-number">2</span>),
+                    first=iaa.Multiply((<span class="hljs-number">0.9</span>, <span class="hljs-number">1.1</span>), per_channel=<span class="hljs-keyword">False</span>),
+                    second=iaa.ContrastNormalization((<span class="hljs-number">0.8</span>,<span class="hljs-number">1.2</span>)))
+            ),
+
+            iaa.OneOf([
+                iaa.GaussianBlur((<span class="hljs-number">0.5</span>, <span class="hljs-number">1</span>)), 
+                iaa.AverageBlur(k=(<span class="hljs-number">3</span>, <span class="hljs-number">5</span>)), 
+                iaa.MotionBlur(k=(<span class="hljs-number">5</span>, <span class="hljs-number">7</span>), angle=(<span class="hljs-number">0</span>, <span class="hljs-number">359</span>)), 
+                iaa.MedianBlur(k=(<span class="hljs-number">5</span>, <span class="hljs-number">7</span>)), 
+            ]),
+
+            sometimes(iaa.JpegCompression((<span class="hljs-number">60</span>,<span class="hljs-number">80</span>))),
+
+            iaa.OneOf(
+                [iaa.GammaContrast((<span class="hljs-number">0.7</span>,<span class="hljs-number">1.3</span>)),
+                 iaa.GammaContrast((<span class="hljs-number">0.7</span>,<span class="hljs-number">1.3</span>),per_channel=<span class="hljs-keyword">True</span>),
+                 iaa.SigmoidContrast(gain=(<span class="hljs-number">5</span>,<span class="hljs-number">8</span>)),
+                 iaa.LogContrast((<span class="hljs-number">0.6</span>,<span class="hljs-number">1</span>)),
+                 iaa.LinearContrast((<span class="hljs-number">0.6</span>,<span class="hljs-number">1.4</span>))
+            ]),
+
+            sometimes(
+                iaa.Affine(rotate = angle4rotation, mode = <span class="hljs-string">'edge'</span>)
+            )
+        ])
+
+        img_aug = seq(images = [image])[<span class="hljs-number">0</span>]
+
+        <span class="hljs-keyword">return</span> img_aug</pre>
+
+
+
+<p>应该仔细考虑图像增强。例如，我们的项目假设没有几何变换。由于两个原因，作物、翻耕和翻地应排除在可能的选项之外:</p>
+
+
+
+<ul><li>这种增强会影响输入图像的方向，结果，我们可能会得到无效的模型预测。</li><li>这种变换并不反映模型将来要处理的图像。情况并非总是如此，但对于这个特殊的项目，模型将接收没有几何变化的图像。这就是为什么在训练模型时不需要综合应用这些变化。</li></ul>
+
+
+
+<p>应该应用主要在像素级工作的其他增强类型。它意味着细微的变化，例如，颜色和对比度。模糊，混合和汇集也适用。要了解更多关于各种增强技术的信息，请看一下imgaug GitHub页面。</p>
+
+
+
+<p>值得一提的是，该项目将初始化两个数据生成器:</p>
+
+
+
+<ul><li>第一个用于生成训练数据，</li><li>第二个将用于产生验证数据。</li></ul>
+
+
+
+<p>定型集和验证集之间的数据拆分比例为8:2。所有数据的80 %将专用于训练模型，20 %将用于模型评估。</p>
+
+
+
+<h3>神经网络架构设计</h3>
+
+
+
+<p>我们将通过引入一个主干来开始设计我们未来的图像分类器。Keras让我们可以访问<a href="https://web.archive.org/web/20221201161302/https://www.tensorflow.org/api_docs/python/tf/keras/applications" target="_blank" rel="noreferrer noopener nofollow">它的模型动物园</a>，有多个CNN可供输入。我们的目标是创建一个轻量级的分类器，所以我们肯定应该考虑EfficientNet，它非常高效和准确。</p>
+
+
+
+<p>要导入EfficientNet，首先你必须决定使用哪种深度。EfficientNet有8个深度级别，从B0(基线)开始，到最深的B7结束。EfficientNet-B7在ImageNet数据集上达到了84.4%的前1名/ 97.1%的前5名准确率。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/29c00db0b3134e7acbac712a99de5631.png" alt="EfficientNet comparison" class="wp-image-45229" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161302im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/EfficientNet-comparison.png?resize=640%2C505&amp;ssl=1"/><figcaption><em>EfficientNet compared to other popular CNN architectures.<br/>Performance metrics shown on ImageNet dataset.</em></figcaption></figure></div>
+
+
+
+<p>要选择合适的深度级别，您应该始终考虑问题的复杂性。从我的个人经验来看，选择B1或B2是一个很好的起点，因为它们足以解决大多数现实生活中的计算机视觉问题。如果你想了解更多关于EfficientNet的架构设计，可以考虑阅读由<a href="https://web.archive.org/web/20221201161302/https://medium.com/@marmughanshahid?source=post_page-----3fde32aef8ff--------------------------------" target="_blank" rel="noreferrer noopener nofollow"> Armughan Shahid </a>撰写的<a href="https://web.archive.org/web/20221201161302/https://towardsdatascience.com/efficientnet-scaling-of-convolutional-neural-networks-done-right-3fde32aef8ff" target="_blank" rel="noreferrer noopener nofollow">这篇文章</a>。</p>
+
+
+
+<p>我们的项目并不复杂。这就是为什么B1是高效网络主干的理想深度。让我们导入EfficientNet B1并初始化这个类的一个对象。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow.keras.applications.efficientnet <span class="hljs-keyword">import</span> EfficientNetB1, preprocess_input
+
+backbone = EfficientNetB1(include_top = <span class="hljs-keyword">False</span>,
+                          input_shape = (<span class="hljs-number">128</span>, <span class="hljs-number">128</span>, <span class="hljs-number">3</span>),
+                          pooling = <span class="hljs-string">'avg'</span>)</pre>
+
+
+
+<p>查看用于初始化的参数集。有很多这样的例子，但我只想重点介绍其中的几个:</p>
+
+
+
+<ul><li>include_top是一个布尔值，它指定是否在网络顶部包括完全连接的层。对于一个自定义的图像分类器，我们需要创建我们自己的网络的顶部来反映我们拥有的类的数量；</li><li>input_shape是一个指示输入图像尺寸的元组:(图像高度、图像宽度、通道数量)。对于B1，我决定使用相当小的输入图像大小—(128，128，3)，但请记住，您的卷积神经网络越深，图像大小就越高。你肯定不希望从B1移到B3，并保持输入图像大小不变；</li><li>池化指定用于特征提取的池化模式。池有助于我们对要素地图中的要素进行下采样。选择的“平均”用于平均池模式。</li></ul>
+
+
+
+<p>因为我们没有包括顶部，所以我们必须明确地定义它。特别是，我们应该确定:</p>
+
+
+
+<ul><li>顶部完全连接的层数；</li><li>每个全连接层中的神经元数量；</li><li>每层之后使用的激活函数；</li><li>用于使人工神经网络更快、更稳定且不容易过度拟合的方法(例如:正则化、规范化等)；</li><li>反映我们试图解决的分类问题的最后一层设计。</li></ul>
+
+
+
+<p>这是我为这个项目选择的顶部架构:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Dense, BatchNormalization, LeakyReLU, Softmax
+<span class="hljs-keyword">from</span> tensorflow.keras.models <span class="hljs-keyword">import</span> Sequential
+
+n_classes = <span class="hljs-number">4</span>
+dense_count = <span class="hljs-number">256</span>
+
+model = Sequential()
+model.add(backbone)
+
+model.add(Dense(dense_count))
+model.add(LeakyReLU())
+model.add(BatchNormalization())
+
+model.add(Dense(n_classes))
+model.add(Softmax())</pre>
+
+
+
+<p>如您所见，该模型是使用Sequence类实例设计的。第一步，添加模型主干。主干仍然是我们导入并初始化的EfficientNet CNN实例。</p>
+
+
+
+<p>模型的顶部有两个完全连接的(密集)层。第一个有256个神经元和一个LeakyReLU激活功能。批量标准化通过图层输入的标准化来确保速度和稳定性。</p>
+
+
+
+<p>第二层的神经元数量等于类的数量。Softmax激活用于进行预测。</p>
+
+
+
+<p>这是顶部的基本设计，我用在我开始的大多数基线模型上。作为一个生活黑客，我建议用没有中间全连接层的顶部来训练你的模型，只有用于预测的最终全连接层。</p>
+
+
+
+<p>起初，这似乎是一个坏主意，因为它可能会由于模型容量减少而导致模型性能下降。令人惊讶的是，我的个人经验证明EfficientNet并非如此。在顶部删除中间层不会导致性能下降。此外，在10个案例中有7个案例中，它在减小最终模型尺寸的同时带来了更好的性能。很鼓舞人心，不是吗？试一试，你会发现EfficientNet有多酷。</p>
+
+
+
+
+
+
+
+<h3>模特培训</h3>
+
+
+
+<p>到目前为止，您应该已经有了一个生成器和一个模型设计来继续进行。现在，让我们训练模型并得到结果。</p>
+
+
+
+<section id="blog-intext-cta-block_6092b6a221b63" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>查看如何使用<a href="https://web.archive.org/web/20221201161302/https://docs.neptune.ai/integrations-and-supported-tools/model-training/tensorflow-keras" target="_blank" rel="noopener">Neptune+tensor flow/Keras integration</a>跟踪模型训练元数据。</p>
+    
+    </section>
+
+
+
+<p>我通常使用两阶段方法进行模型训练。当我不想因为迁移学习而引入新的数据集而大幅改变原始权重时，这对于微调尤其方便。随着高学习率的建立，它将导致第一模型层的权重发生显著变化，第一模型层负责简单的低级特征提取，并且已经在ImageNet数据集上进行了良好的训练。</p>
+
+
+
+<p>在两阶段方法中，我们冻结了几乎整个主干，只留下最后几层可以训练。通过这样的冻结，模型被训练几个时期(如果我的训练数据集足够大，我通常不超过5-10个时期)。当这些最后层的权重被训练并且进一步的训练没有提高模型性能时，我们然后解冻整个主干，给模型一个机会对先前冻结的层中的权重进行轻微的改变，因此，在保持训练过程稳定的同时获得更好的结果。</p>
+
+
+
+<p>下面是两阶段方法的代码:</p>
+
+
+
+<p><strong> 1。模型被冻结</strong></p>
+
+
+
+
+
+
+
+<p>我们模型的主干有7个模块。对于第一阶段，前四个块是冻结的，因此这些块中的所有层都是不可训练的。第五，第六和第七块，以及模型的顶部没有被冻结，将在第一阶段进行训练。下面是在代码中如何执行模型冻结:</p>
+
+
+
+<pre class="hljs">block_to_unfreeze_from = <span class="hljs-number">5</span>
+trainable_flag = <span class="hljs-keyword">False</span>
+
+<span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> model.layers[<span class="hljs-number">0</span>].layers:
+    <span class="hljs-keyword">if</span> layer.name.find(<span class="hljs-string">'bn'</span>) != <span class="hljs-number">-1</span>:
+        layer.trainable = <span class="hljs-keyword">True</span>
+    <span class="hljs-keyword">else</span>:
+        layer.trainable = trainable_flag
+
+    <span class="hljs-keyword">if</span> layer.name.find(f<span class="hljs-string">'block{block_to_unfreeze_from}'</span>) != <span class="hljs-number">-1</span>:
+        trainable_flag = <span class="hljs-keyword">True</span>
+        layer.trainable = trainable_flag
+
+<span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> model.layers[<span class="hljs-number">0</span>].layers:
+    <span class="hljs-keyword">print</span> (layer.name, layer.trainable) </pre>
+
+
+
+<p>为了检查冻结的结果，使用一个简单的打印语句来检查每一层的可训练性。</p>
+
+
+
+<p><strong> 2。模型已编译</strong></p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow.keras.optimizers <span class="hljs-keyword">import</span> Adam
+
+model.compile(optimizer=Adam(learning_rate=<span class="hljs-number">0.001</span>), loss=<span class="hljs-string">'sparse_categorical_crossentropy'</span>,
+              metrics=[<span class="hljs-string">'sparse_categorical_accuracy'</span>])</pre>
+
+
+
+<p>第一阶段，我建议编一个学习率稍微高一点的模型。例如，1e-3是一个很好的选择。当在最后一层使用Softmax激活函数时，模型产生稀疏输出。这就是为什么稀疏度量和损失函数用于编译:它们可以正确地处理我们的模型产生的稀疏输出。</p>
+
+
+
+<p>单词“稀疏”仅仅意味着模型输出一组概率:每个类一个概率。总而言之，所有这些概率总是等于1。为了得出关于预测类别的结论，应该选择具有最高概率的索引。索引号是模型预测的类别。</p>
+
+
+
+<p>如果您想知道稀疏和非稀疏指标有何不同，这里有一个准确性示例:</p>
+
+
+
+<ul><li>categorical _ accuracy检查最大真值的<em>索引</em>是否等于最大预测值的<em>索引</em>。</li><li>sparse _ categorical _ accuracy检查最大真值是否等于最大预测值的索引。</li></ul>
+
+
+
+<p><strong> 3。使用标准启动培训作业。Tensorflow / Keras中的拟合方法:</strong></p>
+
+
+
+<pre class="hljs">logdir = os.path.join(dir4saving, <span class="hljs-string">'logs'</span>)
+os.makedirs(logdir, exist_ok=<span class="hljs-keyword">True</span>)
+
+tbCallBack = keras.callbacks.TensorBoard(log_dir = logdir,
+                                         histogram_freq = <span class="hljs-number">0</span>,
+                                         write_graph = <span class="hljs-keyword">False</span>,
+                                         write_images = <span class="hljs-keyword">False</span>)
+
+first_stage_n = <span class="hljs-number">15</span>
+
+model.fit_generator(generator = train_generator,
+                    steps_per_epoch = training_steps_per_epoch,
+                    epochs = first_stage_n,
+                    validation_data = validation_generator,
+                    validation_steps = validation_steps_per_epoch,
+                    callbacks=[tbCallBack],
+                    use_multiprocessing = <span class="hljs-keyword">True</span>,
+                    workers = <span class="hljs-number">16</span>
+                   )</pre>
+
+
+
+<ul><li>training_steps_per_epoch和validation_steps_per_epoch只是两个整数，计算如下:</li></ul>
+
+
+
+<p>–training _ steps _ per _ epoch = int(len(train _ set)/batch _ train)<br/>–validation _ steps _ per _ epoch = int(len(validation _ set)/batch _ validation</p>
+
+
+
+<ul><li>tbCallBack是Tensorboard的回调</li><li>first_stage_n是第一阶段训练的时期数</li><li>use_multiprocessing和workers是设置多处理和要使用的CPU内核数量的两个参数</li></ul>
+
+
+
+<p>到第一阶段结束时，模型性能已经达到了一个良好的水平:主要度量(稀疏分类准确率)达到了80%。现在，让我们解冻之前冻结的块，重新编译模型，并启动第二阶段的培训工作。</p>
+
+
+
+<p><strong> 4。解冻模型，为第二个训练阶段做准备:</strong></p>
+
+
+
+<p>以下是解冻是如何完成的:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> model.layers:
+    layer.trainable = <span class="hljs-keyword">True</span>
+
+<span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> model.layers[<span class="hljs-number">0</span>].layers:
+    layer.trainable = <span class="hljs-keyword">True</span></pre>
+
+
+
+<p><strong> 5。模型被重新编译以应用块冻结中的变化</strong></p>
+
+
+
+<p>编译类似于我们在第一阶段所做的。唯一的区别是学习率值的设置。第二阶段，应该减少。对于这个项目，我将其从1e-3降低到1e-4。</p>
+
+
+
+<p><strong> 6。使用标准启动第二阶段培训。Tensorflow / Keras中的拟合方法</strong></p>
+
+
+
+<p>同样，除了使用的回调次数之外，培训工作启动与我们在第一阶段的情况没有太大的不同。我们有很多这样的机会。我强烈推荐阅读<a href="https://web.archive.org/web/20221201161302/https://blog.paperspace.com/tensorflow-callbacks/" target="_blank" rel="noreferrer noopener nofollow">这篇文章</a>来熟悉TensorFlow / Keras中可用的选项。</p>
+
+
+
+<p>在第二阶段结束时，模型性能很可能达到了99.97 %左右——还不错！整个培训使用单个GeForce RTX 2080 GPU，耗时约4-5小时。最终的模型检查点确实非常轻量级，只占用85 mb内存。</p>
+
+
+
+<h2 id="h-conclusions">结论</h2>
+
+
+
+<p>我们已经完成了一个真实的计算机视觉项目，在TensorFlow / Keras中创建了一个图像分类器。我们作为主干网使用的CNN是来自谷歌的尖端高效网络架构。我们最终得到的模型非常轻。</p>
+
+
+
+<p>为了比较，我用其他CNN做了很多骨干的实验。我得到的最好结果是ResNet 50。使用这种架构，最终的模型大小约为550 mb，达到的最高精度为95.1 %。即使我们决定更深入地使用EfficientNet，从B-0迁移到B1、B2甚至B3，与ResNet相比，它们都要轻得多。</p>
+
+
+
+<p>请记住，您可以考虑去掉模型的顶部，得到一个更轻的架构，它的性能也相当不错。在没有顶部部件和ResNet B-0的情况下，我能够实现99.12 %的准确性，并且最终的模型大小非常小:只有39 mb。为效率网热烈鼓掌！</p>
+
+
+
+
+
+
+
+<h3>参考</h3>
+
+
+
+<ol><li><a href="https://web.archive.org/web/20221201161302/http://cs231n.stanford.edu/" target="_blank" rel="noreferrer noopener nofollow">斯坦福大学CS231n课程</a>，讲解视觉识别的卷积神经网络；</li><li><a href="https://web.archive.org/web/20221201161302/https://www.coursera.org/learn/convolutional-neural-networks" target="_blank" rel="noreferrer noopener nofollow">卷积神经网络课程</a>由吴恩达教授，他是一位著名的机器学习讲师，知道如何用简单的术语解释复杂的概念；</li><li>来自谷歌的关于图像分类的ML实习，这是一个单页的网站，提供了你开始与CNN合作时需要知道的最基本的事情。对于那些没有时间，但仍然需要深入主题的人来说，这是一个很好的信息来源。</li></ol>
+        </div>
+        
+    </div>    
+</body>
+</html>

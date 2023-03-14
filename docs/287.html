@@ -1,0 +1,567 @@
+<html>
+<head>
+<title>Top 8 Image-Processing Python Libraries Used in Machine Learning </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>机器学习中使用的8大图像处理Python库</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/image-processing-python-libraries-for-machine-learning#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/image-processing-python-libraries-for-machine-learning#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>据<a href="https://web.archive.org/web/20221203093533/https://www.idc.com/" target="_blank" rel="noreferrer noopener nofollow"> IDC </a>预测，数字数据将暴涨至175 zettabytes，而这些数据的巨大部分是图像。数据科学家需要在将这些图像输入任何机器学习模型之前对其进行(预)处理。在有趣的部分开始之前，他们必须做重要的(有时是肮脏的)工作。</p>
+
+
+
+<p>为了在不影响结果的情况下高效快速地处理大量数据，数据科学家需要使用图像处理工具来完成机器学习和深度学习任务。</p>
+
+
+
+<p>在这篇文章中，我将列出Python中最有用的图像处理库，它们在机器学习任务中被大量使用。</p>
+
+
+
+<h2 id="h-1-opencv">1.OpenCV</h2>
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20221203093533/https://opencv.org/" target="_blank" rel="noreferrer noopener nofollow"> <strong> OpenCV </strong> </a>是英特尔在2000年开发的开源库。它主要用于计算机视觉任务，如物体检测，人脸检测，人脸识别，图像分割等，但也包含了许多有用的功能，你可能需要在ML。</p>
+
+
+
+<h3><strong>灰度级</strong></h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> cv2 <span class="hljs-keyword">as</span> cv
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+
+img = cv.imread(<span class="hljs-string">'goku.jpeg'</span>)
+gray_image = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+fig, ax = plt.subplots(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, figsize=(<span class="hljs-number">16</span>, <span class="hljs-number">8</span>))
+fig.tight_layout()
+
+ax[<span class="hljs-number">0</span>].imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
+ax[<span class="hljs-number">0</span>].set_title(<span class="hljs-string">"Original"</span>)
+
+ax[<span class="hljs-number">1</span>].imshow(cv.cvtColor(gray_image, cv.COLOR_BGR2RGB))
+ax[<span class="hljs-number">1</span>].set_title(<span class="hljs-string">"Grayscale"</span>)
+plt.show()
+</pre>
+
+
+
+
+
+
+
+<p>彩色图像由3个颜色通道组成，而灰色图像仅由1个颜色通道组成，该通道携带每个像素的强度信息，将图像显示为黑白。</p>
+
+
+
+<p>以下代码分隔每个颜色通道:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> cv2 <span class="hljs-keyword">as</span> cv
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+img = cv.imread(<span class="hljs-string">'goku.jpeg'</span>)
+b, g, r = cv.split(img)
+
+fig, ax = plt.subplots(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, figsize=(<span class="hljs-number">16</span>, <span class="hljs-number">8</span>))
+fig.tight_layout()
+
+ax[<span class="hljs-number">0</span>].imshow(cv.cvtColor(r, cv.COLOR_BGR2RGB))
+ax[<span class="hljs-number">0</span>].set_title(<span class="hljs-string">"Red"</span>)
+
+ax[<span class="hljs-number">1</span>].imshow(cv.cvtColor(g, cv.COLOR_BGR2RGB))
+ax[<span class="hljs-number">1</span>].set_title(<span class="hljs-string">"Green"</span>)
+
+ax[<span class="hljs-number">2</span>].imshow(cv.cvtColor(b, cv.COLOR_BGR2RGB))
+ax[<span class="hljs-number">2</span>].set_title(<span class="hljs-string">"Blue"</span>)
+</pre>
+
+
+
+
+
+
+
+<h3><strong>图像翻译</strong></h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> cv2 <span class="hljs-keyword">as</span> cv
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+
+image = cv.imread(<span class="hljs-string">"pics/goku.jpeg"</span>)
+h, w = image.shape[:<span class="hljs-number">2</span>]
+
+half_height, half_width = h//<span class="hljs-number">4</span>, w//<span class="hljs-number">8</span>
+transition_matrix = np.float32([[<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, half_width],
+                               [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, half_height]])
+
+img_transition = cv.warpAffine(image, transition_matrix, (w, h))
+
+plt.imshow(cv.cvtColor(img_transition, cv.COLOR_BGR2RGB))
+plt.title(<span class="hljs-string">"Translation"</span>)
+plt.show()
+</pre>
+
+
+
+
+
+
+
+<p>上面的代码将图像从一个坐标转换到另一个坐标。</p>
+
+
+
+<h3><strong>图像旋转</strong></h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> cv2 <span class="hljs-keyword">as</span> cv
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+
+image = cv.imread(<span class="hljs-string">"pics/goku.jpeg"</span>)
+
+h, w = image.shape[:<span class="hljs-number">2</span>]
+rotation_matrix = cv.getRotationMatrix2D((w/<span class="hljs-number">2</span>,h/<span class="hljs-number">2</span>), <span class="hljs-number">-180</span>, <span class="hljs-number">0.5</span>)
+
+rotated_image = cv.warpAffine(image, rotation_matrix, (w, h))
+
+plt.imshow(cv.cvtColor(rotated_image, cv.COLOR_BGR2RGB))
+plt.title(<span class="hljs-string">"Rotation"</span>)
+plt.show()</pre>
+
+
+
+
+
+
+
+<p>图像绕X轴或Y轴旋转。</p>
+
+
+
+<h3><strong>缩放和调整大小</strong></h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> cv2 <span class="hljs-keyword">as</span> cv
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+
+image = cv.imread(<span class="hljs-string">"pics/goku.jpeg"</span>)
+
+fig, ax = plt.subplots(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, figsize=(<span class="hljs-number">16</span>, <span class="hljs-number">8</span>))
+
+
+image_scaled = cv.resize(image, <span class="hljs-keyword">None</span>, fx=<span class="hljs-number">0.15</span>, fy=<span class="hljs-number">0.15</span>)
+ax[<span class="hljs-number">0</span>].imshow(cv.cvtColor(image_scaled, cv.COLOR_BGR2RGB))
+ax[<span class="hljs-number">0</span>].set_title(<span class="hljs-string">"Linear Interpolation Scale"</span>)
+
+
+image_scaled_2 = cv.resize(image, <span class="hljs-keyword">None</span>, fx=<span class="hljs-number">2</span>, fy=<span class="hljs-number">2</span>, interpolation=cv.INTER_CUBIC)
+ax[<span class="hljs-number">1</span>].imshow(cv.cvtColor(image_scaled_2, cv.COLOR_BGR2RGB))
+ax[<span class="hljs-number">1</span>].set_title(<span class="hljs-string">"Cubic Interpolation Scale"</span>)
+
+
+image_scaled_3 = cv.resize(image, (<span class="hljs-number">200</span>, <span class="hljs-number">400</span>), interpolation=cv.INTER_AREA)
+ax[<span class="hljs-number">2</span>].imshow(cv.cvtColor(image_scaled_3, cv.COLOR_BGR2RGB))
+ax[<span class="hljs-number">2</span>].set_title(<span class="hljs-string">"Skewed Interpolation Scale"</span>)
+</pre>
+
+
+
+
+
+
+
+<p>图像的缩放是指将图像阵列转换成更低或更高的维度。</p>
+
+
+
+<p>这些是可以用OpenCV在图像上执行的一些最基本的操作。除此之外，OpenCV还可以执行诸如<strong>图像分割、人脸检测、物体检测、三维重建、特征提取</strong>等操作。</p>
+
+
+
+<p>如果你想看看这些图片是如何使用<strong> OpenCV </strong>生成的，那么你可以看看这个GitHub <a href="https://web.archive.org/web/20221203093533/https://github.com/Akshay594/OpenCV/tree/master/tutorials" target="_blank" rel="noreferrer noopener nofollow"> <strong>库</strong> </a>。</p>
+
+
+
+<h2 id="h-2-scikit-image">2. Scikit-Image</h2>
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20221203093533/https://scikit-image.org/" target="_blank" rel="noreferrer noopener nofollow"> <strong> scikit-image </strong> </a>是一个基于python的图像处理库，其中一些部分是用<a href="https://web.archive.org/web/20221203093533/https://cython.org/" target="_blank" rel="noreferrer noopener nofollow"><strong>cy thon</strong></a>(<a href="https://web.archive.org/web/20221203093533/https://cython.org/" target="_blank" rel="noreferrer noopener nofollow">cy thon</a>是一种编程语言，它是Python编程语言的超集，旨在具有类似C编程语言的性能。)才能取得好的成绩。它包括以下算法:</p>
+
+
+
+<ul><li>分段，</li><li>几何变换，</li><li>色彩空间操作，</li><li>分析，</li><li>过滤，</li><li>形态学，</li><li>特征检测等等</li></ul>
+
+
+
+<p>你会发现它对几乎任何计算机视觉任务都很有用。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221203093533/https://scikit-image.org/" target="_blank" rel="noreferrer noopener nofollow"><strong>scikit-image</strong></a>使用<a href="https://web.archive.org/web/20221203093533/https://numpy.org/" target="_blank" rel="noreferrer noopener nofollow"> <strong> NumPy </strong> </a>数组作为图像对象。</p>
+
+
+
+
+
+
+
+<h4><strong>活动轮廓</strong></h4>
+
+
+
+
+
+
+
+<p>在计算机视觉中，轮廓模型描述了图像中形状的边界。</p>
+
+
+
+<blockquote class="wp-block-quote"><p>活动轮廓模型是为基于曲线流、曲率和轮廓的图像分割而定义的，以获得图像中精确的目标区域或片段</p></blockquote>
+
+
+
+<p>下面的代码产生了上面的输出:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">from</span> skimage.color <span class="hljs-keyword">import</span> rgb2gray
+<span class="hljs-keyword">from</span> skimage <span class="hljs-keyword">import</span> data
+<span class="hljs-keyword">from</span> skimage.filters <span class="hljs-keyword">import</span> gaussian
+<span class="hljs-keyword">from</span> skimage.segmentation <span class="hljs-keyword">import</span> active_contour
+
+img = data.astronaut()
+
+
+s = np.linspace(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>*np.pi, <span class="hljs-number">400</span>)
+x = <span class="hljs-number">220</span> + <span class="hljs-number">100</span>*np.cos(s)
+y = <span class="hljs-number">100</span> + <span class="hljs-number">100</span>*np.sin(s)
+init = np.array([x, y]).T
+
+
+cntr = active_contour(gaussian(img, <span class="hljs-number">3</span>),init, alpha=<span class="hljs-number">0.015</span>, beta=<span class="hljs-number">10</span>, gamma=<span class="hljs-number">0.001</span>)
+fig, ax = plt.subplots(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, figsize=(<span class="hljs-number">7</span>, <span class="hljs-number">7</span>))
+ax[<span class="hljs-number">0</span>].imshow(img, cmap=plt.cm.gray)
+ax[<span class="hljs-number">0</span>].set_title(<span class="hljs-string">"Original Image"</span>)
+
+ax[<span class="hljs-number">1</span>].imshow(img, cmap=plt.cm.gray)
+
+ax[<span class="hljs-number">1</span>].plot(init[:, <span class="hljs-number">0</span>], init[:, <span class="hljs-number">1</span>], <span class="hljs-string">'--r'</span>, lw=<span class="hljs-number">3</span>)
+ax[<span class="hljs-number">1</span>].plot(cntr[:, <span class="hljs-number">0</span>], cntr[:, <span class="hljs-number">1</span>], <span class="hljs-string">'-b'</span>, lw=<span class="hljs-number">3</span>)
+ax[<span class="hljs-number">1</span>].set_title(<span class="hljs-string">"Active Contour Image"</span>)
+</pre>
+
+
+
+<h2 id="h-3-scipy">3.我的天啊</h2>
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20221203093533/https://www.scipy.org/" target="_blank" rel="noreferrer noopener nofollow"> <strong> Scipy </strong> </a>用于数学和科学计算，但也可以使用子模块<a href="https://web.archive.org/web/20221203093533/https://docs.scipy.org/doc/scipy/reference/ndimage.html#module-scipy.ndimage" target="_blank" rel="noreferrer noopener nofollow"> <strong> scipy.ndimage </strong> </a>执行多维图像处理。它提供了在n维Numpy数组上操作的函数，最终图像就是这样。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221203093533/https://www.scipy.org/" target="_blank" rel="noreferrer noopener nofollow"> <strong> Scipy </strong> </a>提供了最常用的图像处理操作如:</p>
+
+
+
+<ul><li>读取图像</li><li>图象分割法</li><li>盘旋</li><li>人脸检测</li><li>特征提取等等。</li></ul>
+
+
+
+<h3><strong>用</strong><a href="https://web.archive.org/web/20221203093533/https://www.scipy.org/" target="_blank" rel="noreferrer noopener nofollow"><strong/></a>模糊图像</h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> scipy <span class="hljs-keyword">import</span> misc,ndimage
+<span class="hljs-keyword">from</span> matplotlib <span class="hljs-keyword">import</span> pyplot <span class="hljs-keyword">as</span> plt
+
+face = misc.face()
+blurred_face = ndimage.gaussian_filter(face, sigma=<span class="hljs-number">3</span>)
+
+fig, ax = plt.subplots(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, figsize=(<span class="hljs-number">16</span>, <span class="hljs-number">8</span>))
+
+ax[<span class="hljs-number">0</span>].imshow(face)
+ax[<span class="hljs-number">0</span>].set_title(<span class="hljs-string">"Original Image"</span>)
+ax[<span class="hljs-number">0</span>].set_xticks([])
+ax[<span class="hljs-number">0</span>].set_yticks([])
+ax[<span class="hljs-number">1</span>].imshow(blurred_face)
+ax[<span class="hljs-number">1</span>].set_title(<span class="hljs-string">"Blurred Image"</span>)
+ax[<span class="hljs-number">1</span>].set_xticks([])
+ax[<span class="hljs-number">1</span>].set_yticks([])</pre>
+
+
+
+<p>输出:</p>
+
+
+
+
+
+
+
+<p>在 这里可以找到所有操作<a href="https://web.archive.org/web/20221203093533/https://docs.scipy.org/doc/scipy/reference/ndimage.html" target="_blank" rel="noreferrer noopener nofollow"> <strong>。</strong></a></p>
+
+
+
+<h2 id="h-4-pillow-pil">4.pillow/GDP</h2>
+
+
+
+
+
+
+
+<p><strong> PIL (Python图像库)</strong>是一个开源库，用于需要Python编程语言的图像处理任务。<strong> PIL </strong>可以在图像上执行任务，例如读取、缩放、以不同的图像格式保存。</p>
+
+
+
+<p><strong> PIL </strong>可用于图像存档、图像处理、图像显示。</p>
+
+
+
+<h3><strong>用PIL增强图像</strong></h3>
+
+
+
+<p>例如，让我们将下面的图像增强30%的对比度。</p>
+
+
+
+
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image, ImageFilter
+
+im = Image.open(<span class="hljs-string">'cat_inpainted.png'</span>)
+
+im.show()
+
+<span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> ImageEnhance
+enh = ImageEnhance.Contrast(im)
+enh.enhance(<span class="hljs-number">1.8</span>).show(<span class="hljs-string">"30% more contrast"</span>)</pre>
+
+
+
+<p>输出:</p>
+
+
+
+
+
+
+
+<p>欲了解更多信息，请点击<a href="https://web.archive.org/web/20221203093533/https://pillow.readthedocs.io/en/stable/reference/Image.html" target="_blank" rel="noreferrer noopener nofollow">这里</a>。</p>
+
+
+
+<h2 id="h-5-numpy">5.NumPy</h2>
+
+
+
+
+
+
+
+<p>图像本质上是像素值的数组，其中每个像素由1(灰度)或3 (RGB)值表示。因此，NumPy可以轻松执行图像裁剪、遮罩或像素值操作等任务。</p>
+
+
+
+<p>例如，从下图中提取红/绿/蓝通道:</p>
+
+
+
+
+
+
+
+<p>我们可以使用numpy，通过用零替换所有的像素值，一次“惩罚”一个通道。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+
+im = np.array(Image.open(<span class="hljs-string">'goku.png'</span>))
+
+im_R = im.copy()
+im_R[:, :, (<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)] = <span class="hljs-number">0</span>
+im_G = im.copy()
+im_G[:, :, (<span class="hljs-number">0</span>, <span class="hljs-number">2</span>)] = <span class="hljs-number">0</span>
+im_B = im.copy()
+im_B[:, :, (<span class="hljs-number">0</span>, <span class="hljs-number">1</span>)] = <span class="hljs-number">0</span>
+
+im_RGB = np.concatenate((im_R, im_G, im_B), axis=<span class="hljs-number">1</span>)
+
+pil_img = Image.fromarray(im_RGB)
+pil_img.save(<span class="hljs-string">'goku.jpg'</span>)</pre>
+
+
+
+
+
+
+
+<h2 id="h-6-mahotas">6.马霍塔斯</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20221203093533/https://mahotas.readthedocs.io/" target="_blank" rel="noreferrer noopener nofollow"> <strong> Mahotas </strong> </a>是另一个为<a href="https://web.archive.org/web/20221203093533/http://en.wikipedia.org/wiki/Bioimage_informatics" target="_blank" rel="noreferrer noopener nofollow"> <strong>生物图像信息学</strong> </a>设计的图像处理和计算机视觉库。它在NumPy数组中读写图像，用C++实现，具有流畅的python接口。</p>
+
+
+
+<p>Mahotas最受欢迎的功能是</p>
+
+
+
+
+
+
+
+<p>让我们看看如何使用<a href="https://web.archive.org/web/20221203093533/https://mahotas.readthedocs.io/" target="_blank" rel="noreferrer noopener nofollow"> <strong> Mahotas </strong> </a> <strong> </strong>进行模板匹配，以便<strong>找到wally。</strong></p>
+
+
+
+<p>下面的代码片段有助于在人群中找到Wally。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pylab <span class="hljs-keyword">import</span> imshow, show
+<span class="hljs-keyword">import</span> mahotas
+<span class="hljs-keyword">import</span> mahotas.demos
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+
+wally = mahotas.demos.load(<span class="hljs-string">'Wally'</span>)
+wfloat = wally.astype(float)
+
+r,g,b = wfloat.transpose((<span class="hljs-number">2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>))
+w = wfloat.mean(<span class="hljs-number">2</span>)
+pattern = np.ones((<span class="hljs-number">24</span>,<span class="hljs-number">16</span>), float)
+
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">2</span>):
+    pattern[i::<span class="hljs-number">4</span>] = <span class="hljs-number">-1</span>
+    v = mahotas.convolve(r-w, pattern)
+    mask = (v == v.max())
+    mask = mahotas.dilate(mask, np.ones((<span class="hljs-number">48</span>,<span class="hljs-number">24</span>)))
+    np.subtract(wally, <span class="hljs-number">.8</span>*wally * ~mask[:,:,<span class="hljs-keyword">None</span>], out=wally, casting=<span class="hljs-string">'unsafe'</span>)
+imshow(wally)
+show()</pre>
+
+
+
+
+
+
+
+<h2 id="h-7-simpleitk">7.SimpleITK</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20221203093533/https://itk.org/"> ITK </a>或<strong> Insight分割和配准工具包</strong>是一个开源平台，广泛用于图像分割和图像配准(一个叠加两个或更多图像的过程)。</p>
+
+
+
+<h3><strong>图像分割</strong></h3>
+
+
+
+<p>ITK使用了<a href="https://web.archive.org/web/20221203093533/https://en.wikipedia.org/wiki/CMake" target="_blank" rel="noreferrer noopener nofollow"> <strong> CMake </strong> </a> <strong> </strong>构建环境，库是用Python包装的C++实现的。</p>
+
+
+
+
+
+
+
+<p>你可以检查这个<a href="https://web.archive.org/web/20221203093533/http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/" target="_blank" rel="noreferrer noopener nofollow"> Jupyter笔记本</a>用于学习和研究。</p>
+
+
+
+<h2 id="h-8-pgmagick">8.Pgmagick</h2>
+
+
+
+<p>Pgmagick是Python的一个<a href="https://web.archive.org/web/20221203093533/http://www.graphicsmagick.org/" rel="noreferrer noopener nofollow" target="_blank"><strong>GraphicsMagick</strong></a><strong/>绑定，它提供了对图像执行调整大小、旋转、锐化、渐变图像、绘制文本等操作的工具。</p>
+
+
+
+<h3><strong>模糊图像</strong></h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pgmagick.api <span class="hljs-keyword">import</span> Image
+
+img = Image(<span class="hljs-string">'leena.jpeg'</span>)
+
+
+img.blur(<span class="hljs-number">10</span>, <span class="hljs-number">5</span>)</pre>
+
+
+
+
+
+
+
+<h3><strong>图像的缩放</strong></h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pgmagick.api <span class="hljs-keyword">import</span> Image
+
+img = Image(<span class="hljs-string">'leena.png'</span>)
+
+
+img.scale((<span class="hljs-number">150</span>, <span class="hljs-number">100</span>), <span class="hljs-string">'leena_scaled'</span>)
+</pre>
+
+
+
+
+
+
+
+<p>要了解更多信息，你可以查看Jupyter笔记本的精选列表<a href="https://web.archive.org/web/20221203093533/https://github.com/hhatto/pgmagick" target="_blank" rel="noreferrer noopener nofollow">这里</a>。</p>
+
+
+
+<h2 id="h-final-thoughts">最后的想法</h2>
+
+
+
+<p>我们已经介绍了用于机器学习的前8个图像处理库。希望您现在已经知道哪一个最适合您的项目。祝你好运。🙂</p>
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

@@ -1,0 +1,425 @@
+<html>
+<head>
+<title>Gumbel Softmax Loss Function Guide + How to Implement it in PyTorch </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>Gumbel Softmax损失函数指南+如何在PyTorch中实现</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/gumbel-softmax-loss-function-guide-how-to-implement-it-in-pytorch#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/gumbel-softmax-loss-function-guide-how-to-implement-it-in-pytorch#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>训练深度学习模型从未如此简单。你只需要定义架构和损失函数，坐下来，监视，至少在简单的情况下。一些架构带有固有的随机组件。这使得正向传递具有随机性，而你的模型不再具有确定性。</p>
+
+
+
+<blockquote class="wp-block-quote"><p>在确定性模型中，模型的输出完全由参数值和初始条件决定。</p><p>随机模型具有内在的随机性。同一组参数值和初始条件将导致不同输出的集合。</p></blockquote>
+
+
+
+<p>这意味着你不能像以前那样采样，因为从确定性函数采样会得到相同的结果，但随机函数及其附加的随机性则不能实现这一点，整个采样会变得不确定。</p>
+
+
+
+<p>你看，反向传播算法依赖于在神经网络的每一层都有连续函数链。很多神经网络从根本上利用了<em>离散运算。</em>由于从离散空间采样不同于从连续空间采样，这就是<em> Gumbel-Softmax技巧</em>的用处。它不仅有助于从离散空间采样像连续操作，但它保持节点的随机性质完整，同时也保持反向传播步骤可行<em>。</em></p>
+
+
+
+<p>让我们通过例子来探究这些操作，以便更好地理解。</p>
+
+
+
+<h2 id="discrete-operations-in-deep-learning">深度学习中的离散操作</h2>
+
+
+
+<p>我们在许多涉及深度学习的领域使用离散采样。例如，在语言模型中，我们有被采样的单词或字符标记序列，其中每个离散的标记对应于一个单词或一个字符。这样我们就可以从离散空间采样。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/d4c4c30d0bb8d667d381a134df9faf57.png" alt="Discrete Operations" class="wp-image-31690" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230107030634im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Discrete-Operations.png?ssl=1"/><figcaption><em>A sequence of word tokenizations demonstrating sampling from discrete space | <a href="https://web.archive.org/web/20230107030634/https://www.youtube.com/watch?v=JFgXEbgcT7g" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>另一个流行的例子是LSTM循环神经网络结构。它具有用于学习长期依赖性的内部门控机制。虽然这些选通单元是连续的，但整个LSTM单元的操作具有某种离散的性质。</p>
+
+
+
+
+
+
+
+<p>在深度学习中使用离散采样的一个更受欢迎的例子是seq2seq DNC架构。Seq2Seq-DNC使用外部存储器上的读/写(离散)操作来存储编码器-解码器状态，以支持长距离依赖性。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full"><img decoding="async" src="../Images/e5222b59b428474eb432611f3d645693.png" alt="Operation structure of DNC memory area" class="wp-image-62153" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230107030634im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Gumbel-softmax-1-1.png?ssl=1"/><figcaption><em>Operation structure of DNC memory area | <a href="https://web.archive.org/web/20230107030634/https://www.semanticscholar.org/paper/Seq-DNC-seq%3A-Context-Aware-Dialog-Generation-System-Kang-Lee/5aa26397dc670beebcc74952c2b0a99a4e44ffa4" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>使用另一种神经网络架构对这些读/写操作进行采样。在某种程度上，这个神经网络是从一个离散的空间采样。</p>
+
+
+
+<p>现在我们来看看Gumbel-Softmax背后的动机和目的。</p>
+
+
+
+<h2 id="understanding-gumbel-softmax">了解Gumbel-Softmax</h2>
+
+
+
+<p>Gumbel-Softmax解决的问题是处理从分类分布中生成的离散数据。让我们看看背后的内在机制。</p>
+
+
+
+<h3 id="gumbel-max-trick-1">甘贝尔最大技巧</h3>
+
+
+
+<p>Gumbel Max trick是一种允许在神经网络正向传递期间从分类分布中采样的技术。这基本上是通过结合<a href="https://web.archive.org/web/20230107030634/https://sassafras13.github.io/GumbelSoftmax/">重新参数化技巧</a>和平滑松弛来完成的。让我们看看这是如何工作的。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/e17e67621592d3e890f925121ac1bdef.png" alt="Gumbel softmax 2" class="wp-image-62156" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230107030634im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Gumbel-softmax-2.png?resize=511%2C505&amp;ssl=1"/><figcaption><em>Sampling from a categorical distribution by taking argmax of a combination class probabilities and Gumbel noise | <a href="https://web.archive.org/web/20230107030634/https://www.youtube.com/watch?v=JFgXEbgcT7g" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>在这种技术中，如果我们获取类别概率并对每个类别概率应用对数函数，并且对这些对数中的每一个添加Gumbel噪声，可以通过获取某种均匀分布的两个对数来对该噪声进行采样。这一步类似于上面重新参数化技巧中使用的步骤，我们将正态分布噪声添加到平均值中。</p>
+
+
+
+<p>在结合了采样过程的确定性和随机性部分之后，我们使用argmax函数来查找每个样本中具有最大值的类。该类或样本被编码为独热向量，供神经网络的其余部分使用。</p>
+
+
+
+<p>现在我们有了一种从分类分布中抽样的方法，与连续分布相反。然而，我们仍然不能通过<em> argmax </em>反向传播，因为从它得到的梯度是0，即它是不可微的。</p>
+
+
+
+<p>论文[ <a href="https://web.archive.org/web/20230107030634/https://arxiv.org/pdf/1611.01144.pdf" target="_blank" rel="noreferrer noopener nofollow"> 3 </a>提出了用<em> softmax代替<em> argmax </em>的技术。</em>让我们来看看这个。</p>
+
+
+
+<h3 id="gumbel-softmax-1">Gumbel Softmax</h3>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/12224daf9fdfb3721a19ca78cb47a901.png" alt="Gumbel Softmax&#10;" class="wp-image-31699" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230107030634im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Gumbel-Softmax.png?resize=626%2C547&amp;ssl=1"/><figcaption><em>Replacing argmax with softmax because softmax is differentiable(required by backpropagation) | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>在这种方法中，我们仍然将对数概率与Gumbel噪声相结合，但现在我们对样本采用softmax而不是argmax。</p>
+
+
+
+<p>λ(λ)是softmax温度参数，它允许我们控制Gumbel-softmax分布接近分类分布的程度。如果λ非常小，那么我们非常接近量化的分类样本，相反，随着λ的增加，Gumbel-softmax分布变得更加均匀。</p>
+
+
+
+<h3 id="implementation-of-gumbel-softmax">Gumbel Softmax的实现</h3>
+
+
+
+<p>在这一节中，我们将在MNIST数据集上训练一个变分自动编码器来重建图像。我们将在编码器状态的采样中应用Gumbel-softmax。我们来编码吧！</p>
+
+
+
+<p><em>注意:我们将使用Pytorch作为这个实现的框架选择</em></p>
+
+
+
+
+
+
+
+<p>首先，让我们导入所需的依赖项。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Union, Optional, List, Tuple, Text, BinaryIO
+<span class="hljs-keyword">import</span> io
+<span class="hljs-keyword">import</span> pathlib
+<span class="hljs-keyword">import</span> math
+irange = range
+
+<span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F
+<span class="hljs-keyword">from</span> torch <span class="hljs-keyword">import</span> nn, optim
+<span class="hljs-keyword">from</span> torch.nn <span class="hljs-keyword">import</span> functional <span class="hljs-keyword">as</span> F
+<span class="hljs-keyword">from</span> torchvision <span class="hljs-keyword">import</span> datasets, transforms
+<span class="hljs-keyword">from</span> torchvision.utils <span class="hljs-keyword">import</span> save_image
+
+
+<span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+<span class="hljs-keyword">from</span> neptune.new.types <span class="hljs-keyword">import</span> File
+run = neptune.init(project=<span class="hljs-string">'common/pytorch-integration'</span>,
+                   api_token=<span class="hljs-string">'ANONYMOUS'</span>)</pre>
+
+
+
+<p>尽早定义一些超参数总是很方便的。</p>
+
+
+
+<pre class="hljs">batch_size = <span class="hljs-number">100</span>
+epochs = <span class="hljs-number">10</span>
+temperature = <span class="hljs-number">1.0</span>
+no_cuda = <span class="hljs-keyword">False</span>
+seed = <span class="hljs-number">2020</span>
+log_interval = <span class="hljs-number">10</span>
+hard = <span class="hljs-keyword">False</span> </pre>
+
+
+
+<p><strong>如前所述，我们将利用MNIST来实施。还是导入吧。</strong></p>
+
+
+
+<pre class="hljs">is_cuda = <span class="hljs-keyword">not</span> no_cuda <span class="hljs-keyword">and</span> torch.cuda.is_available()
+torch.manual_seed(seed)
+<span class="hljs-keyword">if</span> is_cuda:
+torch.cuda.manual_seed(seed)
+
+kwargs = {<span class="hljs-string">'num_workers'</span>: <span class="hljs-number">1</span>, <span class="hljs-string">'pin_memory'</span>: <span class="hljs-keyword">True</span>} <span class="hljs-keyword">if</span> is_cuda <span class="hljs-keyword">else</span> {}
+
+train_loader = torch.utils.data.DataLoader(
+datasets.MNIST(<span class="hljs-string">'./data/MNIST'</span>, train=<span class="hljs-keyword">True</span>, download=<span class="hljs-keyword">True</span>,
+transform=transforms.ToTensor()),
+batch_size=batch_size, shuffle=<span class="hljs-keyword">True</span>, **kwargs)
+test_loader = torch.utils.data.DataLoader(
+datasets.MNIST(<span class="hljs-string">'./data/MNIST'</span>, train=<span class="hljs-keyword">False</span>, transform=transforms.ToTensor()),
+batch_size=batch_size, shuffle=<span class="hljs-keyword">True</span>, **kwargs)</pre>
+
+
+
+<p>现在，我们将定义Gumbel-softmax采样辅助函数。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sample_gumbel</span><span class="hljs-params">(shape, eps=<span class="hljs-number">1e-20</span>)</span>:</span>
+    U = torch.rand(shape)
+    <span class="hljs-keyword">if</span> is_cuda:
+        U = U.cuda()
+    <span class="hljs-keyword">return</span> -torch.log(-torch.log(U + eps) + eps)
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gumbel_softmax_sample</span><span class="hljs-params">(logits, temperature)</span>:</span>
+    y = logits + sample_gumbel(logits.size())
+    <span class="hljs-keyword">return</span> F.softmax(y / temperature, dim=<span class="hljs-number">-1</span>)
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">gumbel_softmax</span><span class="hljs-params">(logits, temperature, hard=False)</span>:</span>
+    <span class="hljs-string">"""
+    ST-gumple-softmax
+    input: [*, n_class]
+    return: flatten --&gt; [*, n_class] an one-hot vector
+    """</span>
+    y = gumbel_softmax_sample(logits, temperature)
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> hard:
+        <span class="hljs-keyword">return</span> y.view(<span class="hljs-number">-1</span>, latent_dim * categorical_dim)
+
+    shape = y.size()
+    _, ind = y.max(dim=<span class="hljs-number">-1</span>)
+    y_hard = torch.zeros_like(y).view(<span class="hljs-number">-1</span>, shape[<span class="hljs-number">-1</span>])
+    y_hard.scatter_(<span class="hljs-number">1</span>, ind.view(<span class="hljs-number">-1</span>, <span class="hljs-number">1</span>), <span class="hljs-number">1</span>)
+    y_hard = y_hard.view(*shape)
+    
+    y_hard = (y_hard - y).detach() + y
+    <span class="hljs-keyword">return</span> y_hard.view(<span class="hljs-number">-1</span>, latent_dim * categorical_dim)</pre>
+
+
+
+<p>接下来，让我们定义VAE结构和损失函数。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">loss_function</span><span class="hljs-params">(recon_x, x, qy)</span>:</span>
+    BCE = F.binary_cross_entropy(recon_x, x.view(<span class="hljs-number">-1</span>, <span class="hljs-number">784</span>), size_average=<span class="hljs-keyword">False</span>) / x.shape[<span class="hljs-number">0</span>]
+
+    log_ratio = torch.log(qy * categorical_dim + <span class="hljs-number">1e-20</span>)
+    KLD = torch.sum(qy * log_ratio, dim=<span class="hljs-number">-1</span>).mean()
+
+    <span class="hljs-keyword">return</span> BCE + KLD
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">VAE_gumbel</span><span class="hljs-params">(nn.Module)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, temp)</span>:</span>
+        super(VAE_gumbel, self).__init__()
+
+        self.fc1 = nn.Linear(<span class="hljs-number">784</span>, <span class="hljs-number">512</span>)
+        self.fc2 = nn.Linear(<span class="hljs-number">512</span>, <span class="hljs-number">256</span>)
+        self.fc3 = nn.Linear(<span class="hljs-number">256</span>, latent_dim * categorical_dim)
+
+        self.fc4 = nn.Linear(latent_dim * categorical_dim, <span class="hljs-number">256</span>)
+        self.fc5 = nn.Linear(<span class="hljs-number">256</span>, <span class="hljs-number">512</span>)
+        self.fc6 = nn.Linear(<span class="hljs-number">512</span>, <span class="hljs-number">784</span>)
+
+        self.relu = nn.ReLU()
+        self.sigmoid = nn.Sigmoid()
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">encode</span><span class="hljs-params">(self, x)</span>:</span>
+        h1 = self.relu(self.fc1(x))
+        h2 = self.relu(self.fc2(h1))
+        <span class="hljs-keyword">return</span> self.relu(self.fc3(h2))
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">decode</span><span class="hljs-params">(self, z)</span>:</span>
+        h4 = self.relu(self.fc4(z))
+        h5 = self.relu(self.fc5(h4))
+        <span class="hljs-keyword">return</span> self.sigmoid(self.fc6(h5))
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, x, temp, hard)</span>:</span>
+        q = self.encode(x.view(<span class="hljs-number">-1</span>, <span class="hljs-number">784</span>))
+        q_y = q.view(q.size(<span class="hljs-number">0</span>), latent_dim, categorical_dim)
+        z = gumbel_softmax(q_y, temp, hard)
+        <span class="hljs-keyword">return</span> self.decode(z), F.softmax(q_y, dim=<span class="hljs-number">-1</span>).reshape(*q.size())</pre>
+
+
+
+<p><strong>更多超参数的时间到了。</strong></p>
+
+
+
+<pre class="hljs">latent_dim = <span class="hljs-number">30</span>
+categorical_dim = <span class="hljs-number">10</span>  
+
+temp_min = <span class="hljs-number">0.5</span>
+
+ANNEAL_RATE = <span class="hljs-number">0.00003</span>
+
+model = VAE_gumbel(temperature)
+
+<span class="hljs-keyword">if</span> is_cuda:
+model.cuda()
+optimizer = optim.Adam(model.parameters(), lr=<span class="hljs-number">1e-3</span>)</pre>
+
+
+
+<p>我们将以两种不同的方式进行训练和测试。</p>
+
+
+
+<p>在测试函数中，我们将应用图像的重建，基本上是为了测试一个看不见的数据样本的采样和建模效率。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train</span><span class="hljs-params">(epoch)</span>:</span>
+    model.train()
+    train_loss = <span class="hljs-number">0</span>
+    temp = temperature
+    <span class="hljs-keyword">for</span> batch_idx, (data, _) <span class="hljs-keyword">in</span> enumerate(train_loader):
+        <span class="hljs-keyword">if</span> is_cuda:
+            data = data.cuda()
+        optimizer.zero_grad()
+        recon_batch, qy = model(data, temp, hard)
+        loss = loss_function(recon_batch, data, qy)
+        loss.backward()
+        train_loss += loss.item() * len(data)
+        optimizer.step()
+        <span class="hljs-keyword">if</span> batch_idx % <span class="hljs-number">100</span> == <span class="hljs-number">1</span>:
+            temp = np.maximum(temp * np.exp(-ANNEAL_RATE * batch_idx), temp_min)
+
+        <span class="hljs-keyword">if</span> batch_idx==<span class="hljs-number">0</span>:
+            reconstructed_image = recon_batch.view(batch_size, <span class="hljs-number">1</span>, <span class="hljs-number">28</span>, <span class="hljs-number">28</span>)
+            grid_array = get_grid(reconstructed_image)
+
+            run[<span class="hljs-string">"train_reconstructed_images/{}"</span>.format(<span class="hljs-string">'training_reconstruction_'</span> + str(epoch))].upload(File.as_image(grid_array))
+        <span class="hljs-keyword">if</span> batch_idx % log_interval == <span class="hljs-number">0</span>:
+            print(<span class="hljs-string">'Train Epoch: {} [{}/{} ({:.0f}%)]tLoss: {:.6f}'</span>.format(
+                epoch, batch_idx * len(data), len(train_loader.dataset),
+                       <span class="hljs-number">100.</span> * batch_idx / len(train_loader),
+                       loss.item()))
+
+    print(<span class="hljs-string">'====&gt; Epoch: {} Average loss: {:.4f}'</span>.format(
+        epoch, train_loss / len(train_loader.dataset)))
+    run[<span class="hljs-string">'metrics/avg_train_loss'</span>].log(train_loss / len(train_loader.dataset))
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test</span><span class="hljs-params">(epoch)</span>:</span>
+    model.eval()
+    test_loss = <span class="hljs-number">0</span>
+    temp = temperature
+    <span class="hljs-keyword">for</span> i, (data, _) <span class="hljs-keyword">in</span> enumerate(test_loader):
+        <span class="hljs-keyword">if</span> is_cuda:
+            data = data.cuda()
+        recon_batch, qy = model(data, temp, hard)
+        test_loss += loss_function(recon_batch, data, qy).item() * len(data)
+        <span class="hljs-keyword">if</span> i % <span class="hljs-number">100</span> == <span class="hljs-number">1</span>:
+            temp = np.maximum(temp * np.exp(-ANNEAL_RATE * i), temp_min)
+        <span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span>:
+            n = min(data.size(<span class="hljs-number">0</span>), <span class="hljs-number">8</span>)
+            comparison = torch.cat([data[:n],
+                                    recon_batch.view(batch_size, <span class="hljs-number">1</span>, <span class="hljs-number">28</span>, <span class="hljs-number">28</span>)[:n]])
+            grid_array = get_grid(comparison)
+
+            run[<span class="hljs-string">"test_reconstructed_images/{}"</span>.format(<span class="hljs-string">'test_reconstruction_'</span> + str(epoch))].upload(File.as_image(grid_array))
+
+    test_loss /= len(test_loader.dataset)
+    print(<span class="hljs-string">'====&gt; Test set loss: {:.4f}'</span>.format(test_loss))
+    run[<span class="hljs-string">'metrics/avg_test_loss'</span>].log(test_loss)</pre>
+
+
+
+<p><strong> <em>注</em> </strong> <em>:请在笔记本<a href="https://web.archive.org/web/20230107030634/https://ui.neptune.ai/theaayushbajaj/sandbox/n/Gumbel-Softmax-Implementation-99d2bd92-171d-4b3e-bca8-33eddaa958e0" target="_blank" rel="noreferrer noopener">这里</a> </em>找到上面代码摘录中用到的实用函数。</p>
+
+
+
+<p>最后，我们将定义事件循环来联合运行所有的单个函数。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(<span class="hljs-number">1</span>, epochs + <span class="hljs-number">1</span>):
+    train(epoch)
+    test(epoch)
+</pre>
+
+
+
+<p>在成功执行结束时，您将获得MNIST样本的重建图像，如下所示:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/7e18809dd842a6cef90119b8c494f908.png" alt="MNIST samples" class="wp-image-31704" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230107030634im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/MNIST-samples.gif?ssl=1"/></figure>
+
+
+
+<p>只要看到重建部分和原始部分之间的对比，就可以知道Gumbel-softmax的采样效果如何。我们可以在下图中看到训练和测试损失收敛:</p>
+
+
+
+
+
+
+
+<p>你可以在这里访问捆绑了重建图像<a href="https://web.archive.org/web/20230107030634/https://app.neptune.ai/theaayushbajaj/sandbox/e/SAN-16/all?path=logs&amp;attribute=reconstructed_images" target="_blank" rel="noreferrer noopener">的完整实验，在这里</a>访问上面<a href="https://web.archive.org/web/20230107030634/https://colab.research.google.com/drive/1OhTklED4UblF15c8uIfNJspQmm-Cr9Ih?usp=sharing" target="_blank" rel="noreferrer noopener nofollow">的代码。</a></p>
+
+
+
+<h2 id="you-ve-reached-the-end">你已经到达终点了！</h2>
+
+
+
+<p>Gumbel-Softmax技巧可以证明在离散采样任务中非常有用，这在过去是以其他方式处理的。例如，NLP任务几乎必然是离散的——比如单词、字符或音素的采样。</p>
+
+
+
+<h2 id="future-prospects">未来前景</h2>
+
+
+
+<p>Gumbel-softmax的论文也提到了它在可变自动编码器中的有用性，但它肯定不限于此。</p>
+
+
+
+<p>您可以将相同的技术应用于二进制自动编码器和其他复杂的神经网络，如<a href="/web/20230107030634/https://neptune.ai/blog/generative-adversarial-networks-gan-applications" target="_blank" rel="noreferrer noopener">生成对抗网络(GAN的)</a>。它似乎是无限的。</p>
+
+
+
+<p>目前就这些，敬请关注更多！再见！</p>
+
+
+
+<h2 id="references">参考</h2>
+
+
+
+<ol><li><a href="https://web.archive.org/web/20230107030634/https://www.youtube.com/watch?v=JFgXEbgcT7g" target="_blank" rel="noreferrer noopener nofollow">https://www.youtube.com/watch?v=JFgXEbgcT7g</a></li><li><a href="https://web.archive.org/web/20230107030634/https://sassafras13.github.io/GumbelSoftmax/" target="_blank" rel="noreferrer noopener nofollow">https://sassafras13.github.io/GumbelSoftmax/</a>。</li><li><a href="https://web.archive.org/web/20230107030634/https://arxiv.org/pdf/1611.01144.pdf">https://arxiv.org/pdf/1611.01144.pdf</a></li><li><a href="https://web.archive.org/web/20230107030634/https://towardsdatascience.com/what-is-gumbel-softmax-7f6d9cdcb90e" target="_blank" rel="noreferrer noopener nofollow">https://towards data science . com/what-is-gum bel-soft max-7f 6d 9 cdcb 90 e</a></li><li><a href="https://web.archive.org/web/20230107030634/https://blog.evjang.com/2016/11/tutorial-categorical-variational.html" target="_blank" rel="noreferrer noopener nofollow">https://blog . ev jang . com/2016/11/tutorial-categorial-variable . html</a></li><li><a href="https://web.archive.org/web/20230107030634/https://arxiv.org/abs/1611.00712" target="_blank" rel="noreferrer noopener nofollow">https://arxiv.org/abs/1611.00712</a></li></ol>
+        </div>
+        
+    </div>    
+</body>
+</html>

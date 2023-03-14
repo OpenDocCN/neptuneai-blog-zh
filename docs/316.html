@@ -1,0 +1,917 @@
+<html>
+<head>
+<title>Top Open Source Tools and Libraries for Deep Learning - ICLR 2020 Experience </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>深度学习的顶级开源工具和库——ICLR 2020经验</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/iclr-2020-deep-learning-open-source#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/iclr-2020-deep-learning-open-source#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>前沿的深度学习是在哪里产生和讨论的？</p>
+
+
+
+<p>排名靠前的地方之一是ICLR，这是一个领先的深度学习会议，于2020年4月27日至30日举行。作为一个完全虚拟的活动，有5600多名参与者和近700份论文/海报，它可以被称为一个巨大的成功。您可以在这里、<a href="https://web.archive.org/web/20221206133724/https://medium.com/@iclr_conf/gone-virtual-lessons-from-iclr2020-1743ce6164a3" target="_blank" rel="noreferrer noopener nofollow">这里</a>或<a href="https://web.archive.org/web/20221206133724/https://www.analyticsvidhya.com/blog/2020/05/key-takeaways-iclr-2020/" target="_blank" rel="noreferrer noopener nofollow">这里</a>找到关于会议的全面信息。</p>
+
+
+
+<p>虚拟社交会议是ICLR 2020的吸引力之一。我们决定在最先进的DL研究中运行我们自己命名为<strong>的开源工具和实践。我们选择这个主题是因为合适的工具是深度学习研究不可避免的一部分。该领域的进步导致了大型框架生态系统(TensorFlow、<a href="/web/20221206133724/https://neptune.ai/blog/model-training-libraries-pytorch-ecosystem" target="_blank" rel="noreferrer noopener">、PyTorch </a>、MXNet)以及服务于特定需求的小型定向工具的激增。</strong></p>
+
+
+
+<p>我们社交活动的目的是会见开源工具的创造者和用户，并与深度学习社区分享经验和印象。我们总共召集了100多人，包括<strong>工具的维护人员</strong>，我们给了他们很短的时间来展示他们的工作。我们对展示的<strong>工具和库的多样性和创造性感到惊讶和兴奋。</strong></p>
+
+
+
+<p>在本帖<strong>中，创作者再次登台</strong>,<strong>告诉我们更多关于他们的项目</strong>。</p>
+
+
+
+
+
+
+
+<p>在这里，出席ICLR社交活动的八位创造者分享了更多关于他们工具的点滴。因此，亲爱的读者，由于他们的工作，你对所有可能的奇迹有了第一手的了解。</p>
+
+
+
+<p>每一部分都以非常简洁的方式告诉您几件事情:</p>
+
+
+
+<ol><li>工具/库解决什么问题？</li><li>如何运行或创建一个极简的例子？</li><li>深入了解库/工具的外部资源数量。</li><li>创作者简介，以防你想联系到他们。</li></ol>
+
+
+
+<p>你可以跳到下面特定部分，或者只是一个一个地浏览，以获得一些灵感:</p>
+
+
+
+<p><em>(按工具名称的字母顺序)</em></p>
+
+
+
+
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2 id="h-ampligraph"><strong>放大图</strong></h2>
+
+
+
+<div class="wp-block-media-text"><figure class="wp-block-media-text__media"><img decoding="async" src="../Images/d6d13a7f84c07e1394ce8877ae8bf2b2.png" alt="" class="wp-image-19119 size-full" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206133724im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/ampligraph_logo.png?ssl=1"/></figure><div class="wp-block-media-text__content">
+<h3>知识图嵌入模型</h3>
+
+
+
+<p><strong>描述</strong></p>
+</div></div>
+
+
+
+
+
+
+
+
+
+
+
+<h3>知识图是一种表示复杂系统的通用语言。</h3>
+
+
+
+<p>无论是社交网络、生物信息学数据集，还是零售购买数据，将知识建模为图表可以让组织捕捉到否则会被忽略的模式。</p>
+
+
+
+<p>然而，揭示这些数据之间的联系需要专门为图表设计的机器学习模型。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/https://github.com/Accenture/AmpliGraph" target="_blank" rel="noreferrer noopener nofollow"> AmpliGraph </a>是Apache 2许可的一套神经机器学习模型，称为知识图嵌入。这种模型用低维向量对图的节点和边进行编码，并组合它们来预测缺失的事实。仅举几个例子，知识图嵌入在知识图完成、知识发现和基于链接的聚类中有应用。</p>
+
+
+
+<p>AmpliGraph降低了知识图嵌入的门槛，使这种模型可以被没有经验的用户使用，从而培养了一个从业者社区，可以利用开源API的优势在知识图上进行机器学习。我们将学习如何从真实世界的知识图中生成和可视化嵌入，以及如何在下游的机器学习任务中使用它们。</p>
+
+
+
+<p>首先，下面是一个最小的代码片段，用于在基准图数据集上训练模型，并预测缺失的链接:</p>
+
+
+
+<p>AmpliGraph最初由埃森哲都柏林实验室开发，用于各种工业项目。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> ampligraph.datasets <span class="hljs-keyword">import</span> load_fb15k_237
+<span class="hljs-keyword">from</span> ampligraph.latent_features <span class="hljs-keyword">import</span> TransE
+
+
+X = load_fb15k_237()
+
+
+model = TransE(batches_count=<span class="hljs-number">100</span>, epochs=<span class="hljs-number">20</span>, k=<span class="hljs-number">20</span>, verbose=<span class="hljs-keyword">True</span>)
+
+model.fit(X[<span class="hljs-string">'train'</span>])
+
+model.calibrate(X[<span class="hljs-string">'valid'</span>], positive_base_rate=<span class="hljs-number">0.5</span>)
+
+
+
+
+X[<span class="hljs-string">'test'</span>][<span class="hljs-number">42</span>]
+
+
+
+
+model.predict_proba(X[<span class="hljs-string">'test'</span>][<span class="hljs-number">42</span>])
+
+
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter"><img decoding="async" src="../Images/84cb11f65e871b9ab1f42d9a31cd9eed.png" alt="" data-original-src="https://web.archive.org/web/20221206133724im_/https://lh3.googleusercontent.com/kEkwGAPgsL2YuSrfzhTG5E27d2liBiMD_85KDpiCLAeFxWhHAfh9WMsB4xEZ-oUUMwl6UbSwQoU717711FOhn6s7pH1FkcHHHdumBB_lacBcJRiAKvEnNqKF3fkQBwmFAMjJ1wl-"/><figcaption><em>AmpliGraph’s machine learning models generate knowledge graph embeddings, vector representations of concepts in a metric space.</em></figcaption></figure></div>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter"><img decoding="async" src="../Images/52ffc45dda1397563a196b926ce6429b.png" alt="" data-original-src="https://web.archive.org/web/20221206133724im_/https://lh6.googleusercontent.com/wwq4nPv75gXaqCVXaFjvmkvzLelKTVGIdJOgpKhReQQ70bIuHgo20DA6GgmT3hw9Ey5GYRs1emJQ_klf6dRzKd7vNJTN7PiwKQ0yn2HIEpE_cTAhYVSVxGpKAw_XpqqTahNCJ352"/><figcaption><em>It then combines embeddings with model-specific scoring functions to predict unseen and novel links.</em></figcaption></figure></div>
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/https://github.com/Accenture/AmpliGraph" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a> | <a href="https://web.archive.org/web/20221206133724/https://docs.ampligraph.org/" target="_blank" rel="noreferrer noopener nofollow">文档</a></p>
+
+
+
+
+
+
+
+<p><strong>自动装载</strong></p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2 id="h-automunge">表格数据预处理平台</h2>
+
+
+
+<div class="wp-block-media-text"><figure class="wp-block-media-text__media"><img decoding="async" src="../Images/4924f632459a053f4a03c20d2a4908fc.png" alt="" class="wp-image-19142 size-full" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206133724im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/automunge-logo.png?ssl=1"/></figure><div class="wp-block-media-text__content">
+<h3><strong>描述</strong></h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/https://www.automunge.com/" target="_blank" rel="noreferrer noopener nofollow"> Automunge </a>是一个Python库平台，为机器学习准备表格数据。通过应用，简单的特征工程变换被应用于标准化、数字编码和插入填充。转换“适合”训练集的属性，然后在此基础上一致地应用于测试数据。转换可以自动执行，从内部库分配，或由用户自定义。填充选项包括“ML填充”，其中自动机器学习模型针对每个列进行训练，以预测填充。</p>
+</div></div>
+
+
+
+
+
+
+
+
+
+
+
+<h3>换句话说，简单地说:</h3>
+
+
+
+<p><code>automunge(.)</code>为机器学习准备表格数据。</p>
+
+
+
+<p><code>postmunge(.)</code>持续高效地准备额外数据。</p>
+
+
+
+<ul><li>pip安装现在可以使用自动安装:</li><li>安装后，在笔记本中运行以初始化:</li></ul>
+
+
+
+<p>使用默认参数运行自动列车组处理的位置:</p>
+
+
+
+<pre class="hljs">pip install Automunge</pre>
+
+
+
+<p>为了测试数据的后续一致处理，使用从相应的<code>automunge(.)</code>调用中填充的<code>postprocess_dict</code>字典，运行:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> Automunge <span class="hljs-keyword">import</span> Automunger
+am = Automunger.AutoMunge()
+</pre>
+
+
+
+<p>用户可以通过<code>assigncat</code>和<code>assigninfill</code>参数在<code>automunge(.)</code>调用中指定转换或填充类型。例如，对于具有列标题“列1”和“列2”的训练集，可以将具有ML填充的最小-最大缩放(“mnmx”)分配给列1，将具有模式填充的单热编码(“text”)分配给列2。任何未明确指定的列都将遵从自动化。</p>
+
+
+
+<pre class="hljs">train, trainID, labels,
+validation1, validationID1, validationlabels1,
+validation2, validationID2, validationlabels2,
+test, testID, testlabels,
+labelsencoding_dict, finalcolumns_train, finalcolumns_test,
+featureimportance, postprocess_dict
+= am.automunge(df_train)</pre>
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/http://automunge.com/" target="_blank" rel="noreferrer noopener nofollow">网站</a> <a href="https://web.archive.org/web/20221206133724/https://github.com/Automunge/AutoMunge"> </a> | <a href="https://web.archive.org/web/20221206133724/https://github.com/Automunge/AutoMunge" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a> | <a href="https://web.archive.org/web/20221206133724/https://medium.com/automunge/automunge-explained-in-brief-354c9b92aa1c" target="_blank" rel="noreferrer noopener nofollow">简介</a></p>
+
+
+
+<pre class="hljs">test, testID, testlabels,
+labelsencoding_dict, postreports_dict
+= am.postmunge(postprocess_dict, df_test)
+</pre>
+
+
+
+<p><strong> DynaML </strong></p>
+
+
+
+<pre class="hljs">train, trainID, labels,
+validation1, validationID1, validationlabels1,
+validation2, validationID2, validationlabels2,
+test, testID, testlabels,
+labelsencoding_dict, finalcolumns_train, finalcolumns_test,
+featureimportance, postprocess_dict
+= am.automunge(df_train,
+            assigncat = {<span class="hljs-string">'mnmx'</span>:[<span class="hljs-string">'column1'</span>], <span class="hljs-string">'text'</span>:[<span class="hljs-string">'column2'</span>]},
+            assigninfill = {<span class="hljs-string">'MLinfill'</span>:[<span class="hljs-string">'column1'</span>], <span class="hljs-string">'modeinfill'</span>:[<span class="hljs-string">'column2'</span>]})
+</pre>
+
+
+
+
+
+
+
+<p>Scala中的机器学习</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2 id="h-dynaml"><strong>描述</strong></h2>
+
+
+
+<div class="wp-block-media-text"><figure class="wp-block-media-text__media"><img decoding="async" src="../Images/0c2440089dea31f8e9c0a7deb784da64.png" alt="" class="wp-image-19143 size-full" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206133724im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/dynaml_logo3_small.png?ssl=1"/></figure><div class="wp-block-media-text__content">
+<h3>DynaML是一个基于Scala的工具箱，用于机器学习研究和应用。它旨在为用户提供一个端到端的环境，有助于:</h3>
+
+
+
+<p>开发/原型模型。</p>
+</div></div>
+
+
+
+
+
+
+
+
+
+
+
+<h3>处理大型复杂的数据管道。</h3>
+
+
+
+<p>可视化数据和结果。</p>
+
+
+
+<ol><li>以脚本、笔记本的形式重用代码。</li><li>DynaML充分利用了Scala语言和生态系统的优势，提供了一个能够提高性能和灵活性的环境。它基于<a href="https://web.archive.org/web/20221206133724/https://ammonite.io/" target="_blank" rel="noreferrer noopener nofollow">菊石</a> scala shell、<a href="https://web.archive.org/web/20221206133724/https://github.com/eaplatanios/tensorflow_scala" target="_blank" rel="noreferrer noopener nofollow"> Tensorflow-Scala </a>和<a href="https://web.archive.org/web/20221206133724/https://github.com/scalanlp/breeze" target="_blank" rel="noreferrer noopener nofollow"> Breeze </a>数值计算库等优秀项目构建。</li><li>DynaML的一个关键组件是REPL/shell，它具有语法高亮和高级自动完成/命令历史。</li><li>在终端会话中复制粘贴代码片段，以运行它们。</li></ol>
+
+
+
+<p>该环境加载了2d和3d可视化支持，可以直接从shell会话中绘制结果。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/https://transcendent-ai-labs.github.io/DynaML/pipes/pipes/" target="_blank" rel="noreferrer noopener nofollow">数据管道</a>模块可以方便地以可组合和模块化的方式创建数据处理管道。使用<code>DataPipe</code>构造函数创建函数并包装它们，使用<code>&gt;</code>操作符组成功能块。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/1e9913e7f55d4d74e6c5c268a8e50d2d.png" alt="" data-original-src="https://web.archive.org/web/20221206133724im_/https://lh4.googleusercontent.com/m1Oua7snfefwaTyP2v-9pEQruW3xa-3zHePKNpmUgX_Ch8Hi83UqlrtwLE_EYCASRgu4efSR4F_uHqlgpXHvEBPap3C9hGCpKVWJ7iMhOu_i876MxUz-ngt-U6VUXihdEO7sifHQ"/></figure>
+
+
+
+<p class="has-text-align-center">一个实验性的Jupyter笔记本集成特性也是可用的，资源库中的<a href="https://web.archive.org/web/20221206133724/https://github.com/transcendent-ai-labs/DynaML/tree/master/notebooks" target="_blank" rel="noreferrer noopener nofollow"> <em>笔记本</em> </a>目录包含了一些使用DynaML-Scala Jupyter内核的例子。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/https://transcendent-ai-labs.github.io/DynaML/" target="_blank" rel="noreferrer noopener nofollow">用户指南</a>包含广泛的支持和文档，用于学习和充分利用DynaML环境。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/2c595472b89e14c9b826b8f4d2672530.png" alt="" class="wp-image-34975" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206133724im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/plot3dsmall.jpeg?ssl=1"/><figcaption><em>3D charts are rendered using the <a href="https://web.archive.org/web/20221206133724/http://www.jzy3d.org/" target="_blank" rel="noreferrer noopener">jzy3d</a> Java API.</em></figcaption></figure></div>
+
+
+
+<p>突出DynaML优势的一些有趣的应用程序是:</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/e94eb060652949ad91cb50c955f7f959.png" alt="" data-original-src="https://web.archive.org/web/20221206133724im_/https://lh5.googleusercontent.com/OFFNI13Q32Q8VHqhJVoPhuQgf_XiWIbe7t7XPzX3kIWi8V22W84hPnGh6COsMJac0pgDDnzIIyDOyMCghOjUejw8ffktVSAH9uy7F09ErnLVtl9G3xELu3o4Jw9gRabxL_LV7RYM"/><figcaption><em>Processing streams of data is intuitive when using pipe composition, the pipeline is divided logically into steps; with each step doing a single task.</em></figcaption></figure>
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/https://github.com/transcendent-ai-labs/DynaML/" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a> | <a href="https://web.archive.org/web/20221206133724/https://transcendent-ai-labs.github.io/DynaML/" target="_blank" rel="noreferrer noopener nofollow">用户指南</a></p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/d733acf1e0aa1bb182717bdf9bad0ba0.png" alt="" data-original-src="https://web.archive.org/web/20221206133724im_/https://lh4.googleusercontent.com/qHyM3oLv5FekqimhqiQGQ7dfK4VeRyXYfEFjt-abW2pvr1cdDZi81uwssWydBtXnc7TGsiZLSFSIbEwHT3yUdJfwomG6EXS4Rp1grySQPTA60_L_0hTBDX9aeYGspTIlWhHp-yYG"/><figcaption><em>The <a href="https://web.archive.org/web/20221206133724/https://github.com/transcendent-ai-labs/DynaML/blob/master/notebooks/linear-regression.ipynb" target="_blank" rel="noreferrer noopener">linear regression notebook</a> demonstrates the use of the low level Tensorflow API to compute coefficients of a linear regression model.</em></figcaption></figure>
+
+
+
+<p>九头蛇</p>
+
+
+
+<p>配置和参数管理器</p>
+
+
+
+
+
+
+
+
+
+
+
+<p><strong>描述</strong></p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2 id="h-hydra">Hydra由脸书人工智能公司开发，是一个简化研究应用程序开发的Python框架，提供了通过配置文件和命令行组合和覆盖配置的能力。它还提供参数扫描支持，通过插件远程和并行执行，自动工作目录管理和动态标签完成。</h2>
+
+
+
+<div class="wp-block-media-text"><figure class="wp-block-media-text__media"><img decoding="async" src="../Images/fe026db8c8b484e99f52fb478e1cdda1.png" alt="" class="wp-image-19144 size-full" data-original-src="https://web.archive.org/web/20221206133724im_/https://neptune.ai/wp-content/uploads/2022/10/hydra-logo.svg"/></figure><div class="wp-block-media-text__content">
+<h3>使用Hydra还可以使您的代码在不同的机器学习环境中具有更好的可移植性。使您能够在个人工作站、公共集群和私有集群之间移动，而无需更改代码。它通过可插拔架构实现这一点。</h3>
+
+
+
+<p><strong>基本示例:</strong></p>
+</div></div>
+
+
+
+
+
+
+
+
+
+
+
+<h3>这个例子使用了数据库配置，但是您可以很容易地用模型、数据集或任何您想要的东西来替换它。</h3>
+
+
+
+<p><strong> config.yaml </strong></p>
+
+
+
+<p><strong> my_app.py </strong>:</p>
+
+
+
+<h4>您可以从命令行覆盖配置中的任何内容:</h4>
+
+
+
+<p><strong>作文示例:</strong></p>
+
+
+
+<p>您可能希望在两种不同的数据库配置之间进行切换:<br/></p>
+
+
+
+<pre class="hljs">db:
+  driver: mysql
+  user: omry
+  <span class="hljs-keyword">pass</span>: secret</pre>
+
+
+
+<p>创建此目录结构:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> hydra
+<span class="hljs-keyword">from</span> omegaconf <span class="hljs-keyword">import</span> DictConfig
+
+<span class="hljs-meta">@hydra.main(config_path="config.yaml")</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">my_app</span><span class="hljs-params">(cfg : DictConfig)</span> -&gt; <span class="hljs-keyword">None</span>:</span>
+  print(cfg.pretty())
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>:
+  my_app()</pre>
+
+
+
+<p><strong> config.yaml: </strong></p>
+
+
+
+<pre class="hljs">$ python my_app.py db.user=root db.<span class="hljs-keyword">pass</span>=<span class="hljs-number">1234</span>
+db:
+  driver: mysql
+  user: root
+  <span class="hljs-keyword">pass</span>: <span class="hljs-number">1234</span></pre>
+
+
+
+<h4>defaults是一个特殊的指令，告诉Hydra在构造配置对象时使用db/mysql.yaml。<br/>您现在可以从中选择要使用的数据库配置，并从命令行覆盖值:<br/></h4>
+
+
+
+<p>查看<a href="https://web.archive.org/web/20221206133724/https://hydra.cc/docs/next/tutorials/intro" target="_blank" rel="noreferrer noopener nofollow">教程</a>了解更多信息。</p>
+
+
+
+<p>此外，一些激动人心的新功能即将推出:</p>
+
+
+
+<pre class="hljs">├── db
+│ ├── mysql.yaml
+│ └── postgresql.yaml
+├── config.yaml
+└── my_app.py</pre>
+
+
+
+<p>强类型配置(结构化配置)</p>
+
+
+
+<pre class="hljs">defaults:
+  - db: mysql
+
+website:
+  domain: example.com</pre>
+
+
+
+<p>通过Ax和Nevergrad插件优化超参数</p>
+
+
+
+<pre class="hljs">$ python my_app.py db=postgresql db.timeout=<span class="hljs-number">20</span>
+db:
+  driver: postgresql
+  <span class="hljs-keyword">pass</span>: drowssap
+  timeout: <span class="hljs-number">20</span>
+  user: postgre_user
+website:
+	domain: example.com</pre>
+
+
+
+<p>通过射线发射器插件启动AWS</p>
+
+
+
+<p>通过joblib插件进行本地并行执行</p>
+
+
+
+<ul><li>还有更多。</li><li><a href="https://web.archive.org/web/20221206133724/https://hydra.cc/" target="_blank" rel="noreferrer noopener nofollow">网站</a> | <a href="https://web.archive.org/web/20221206133724/https://github.com/facebookresearch/hydra" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a> | <a href="https://web.archive.org/web/20221206133724/https://hydra.cc/docs/tutorial/simple_cli" target="_blank" rel="noreferrer noopener nofollow">教程</a> | <a href="https://web.archive.org/web/20221206133724/https://medium.com/pytorch/hydra-a-fresh-look-at-configuration-for-machine-learning-projects-50583186b710" target="_blank" rel="noreferrer noopener nofollow">博文</a> | <a href="https://web.archive.org/web/20221206133724/http://hydra_framework/" target="_blank" rel="noreferrer noopener nofollow">推特</a></li><li><strong> Larq </strong></li><li>二值化神经网络</li></ul>
+
+
+
+<p><strong>描述</strong></p>
+
+
+
+
+
+
+
+<p>Larq是一个开源Python包的生态系统，用于构建、训练和部署二进制神经网络(BNNs)。bnn是深度学习模型，其中激活和权重不使用32、16或8位编码，而是仅使用1位。这可以大大加快推理时间和降低能耗，使BNNs非常适合移动和边缘设备。</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2 id="h-larq">开源Larq生态系统由三个主要组件组成:</h2>
+
+
+
+<div class="wp-block-media-text"><figure class="wp-block-media-text__media"><img decoding="async" src="../Images/a645f25fe6fc98ce84831cdee9297959.png" alt="" class="wp-image-19145 size-full" data-original-src="https://web.archive.org/web/20221206133724im_/https://neptune.ai/wp-content/uploads/2022/10/larq-logo.svg"/></figure><div class="wp-block-media-text__content">
+<h3>Larq 是一个强大而易用的库，用于构建和训练极度量化的神经网络。它提供了一致而简单的API，可扩展并与更大的TensorFlow Keras生态系统完全兼容。这允许在您当前的代码库中逐步采用，并在开发模型时实现快速迭代。虽然Larq主要关注于BNNs，但它也可以用于训练具有任意精确权重和激活的网络</h3>
+
+
+
+<p>Larq Zoo 提供了bnn的参考实现，可与预训练的权重一起使用。它的目的是鼓励可复制的研究，使研究人员能够在最新的BNN文献的基础上进行研究，而不必花费大量的时间复制现有的论文。</p>
+</div></div>
+
+
+
+
+
+
+
+
+
+
+
+<h3>Larq计算引擎是一个用于部署bnn的推理库。它构建在TensorFlow Lite之上，包括一个基于MLIR的转换器，用于将Larq模型转换为与TF Lite运行时兼容的FlatBuffer文件。它目前支持基于ARM64的移动平台，如Android手机和Raspberry Pi，并通过使用手动优化的二进制卷积内核和针对BNN模型的网络级优化，在设备上的推理速度方面实现了一流的性能。</h3>
+
+
+
+<p>我们不断创造更好、更快的模型，并将Larq生态系统扩展到新的硬件平台和深度学习应用。例如，我们目前正在致力于8位量化的端到端集成，因此您可以使用Larq来训练和部署混合二进制和8位网络。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/https://larq.dev/" target="_blank" rel="noreferrer noopener nofollow">网站</a>|<a href="https://web.archive.org/web/20221206133724/https://github.com/larq/larq" target="_blank" rel="noreferrer noopener nofollow">GitHub larq/larq</a>|<a href="https://web.archive.org/web/20221206133724/https://github.com/larq/zoo" target="_blank" rel="noreferrer noopener nofollow">GitHub larq/zoo</a>|<a href="https://web.archive.org/web/20221206133724/https://github.com/larq/compute-engine" target="_blank" rel="noreferrer noopener nofollow">GitHub larq/compute-engine</a>|<a href="https://web.archive.org/web/20221206133724/https://docs.larq.dev/larq/tutorials/mnist/" target="_blank" rel="noreferrer noopener nofollow">教程</a> | <a href="https://web.archive.org/web/20221206133724/https://blog.larq.dev/" target="_blank" rel="noreferrer noopener nofollow">博客</a> | <a href="https://web.archive.org/web/20221206133724/https://twitter.com/plumeraihq" target="_blank" rel="noreferrer noopener nofollow">推特</a></p>
+
+
+
+<ol><li>麦克内尔</li><li>对数线性时间内的近似核展开</li><li><strong>描述</strong></li></ol>
+
+
+
+<p>第一个开源的C++库，通过随机特性提供了内核近似值，还提供了一个成熟的DL框架。</p>
+
+
+
+
+
+
+
+<p>McKernel提供了四种不同的可能用途:</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2 id="h-mckernel">独立照明快速开源Hadamard。用于:压缩、加密或量子计算。</h2>
+
+
+
+<div class="wp-block-media-text"><figure class="wp-block-media-text__media"><img decoding="async" src="../Images/6c99f67985707acc289e06c6e356062f.png" alt="" class="wp-image-19146 size-full" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206133724im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/mckernel-logo.png?ssl=1"/></figure><div class="wp-block-media-text__content">
+<h3>极快的内核方法。用在:SVM在DL上有用的地方。例如在机器人和医疗保健的ML的一些应用中。其他令人兴奋的新兴用途包括联合学习和通信中的信道估计。</h3>
+
+
+
+<p>DL方法和内核扩展的集成。培育具有更好的人为/数学先验的新DL架构。</p>
+</div></div>
+
+
+
+
+
+
+
+
+
+
+
+<h3>DL研究框架。解决ML中的多重开放问题。</h3>
+
+
+
+<p>控制整个计算的等式如下:</p>
+
+
+
+<p>在这里，我们开创了一种通过使用随机特征来解释DL和内核方法(<a href="https://web.archive.org/web/20221206133724/https://www.arxiv.org/pdf/1702.08159" target="_blank" rel="noreferrer noopener nofollow">arxiv.org/pdf/1702.08159</a>)的形式主义。理论背景依赖于四个巨人:高斯、维纳、傅立叶和卡尔曼。构建模块由拉希米和雷希特(NIPS 2007)和勒等人(2013)建立。</p>
+
+
+
+<ol><li><strong>记住目标用户</strong></li></ol>
+
+
+
+<ol start="2"><li>McKernel的主要受众是机器人、医疗保健、信号处理和通信领域的ML研究人员和从业者，他们正在寻找高效快速的C++实现。在这种情况下，大多数DL库不能满足这种特定的需求，因为它们主要依赖于Python中的高级实现。以及更广泛的ML和DL社区中试图通过利用内核方法提出更好的NN架构的人们。</li></ol>
+
+
+
+<ol start="3"><li>下面是一个非常简单的实践示例，可以让库立即运行起来:</li></ol>
+
+
+
+<ol start="4"><li>下一步是什么？</li></ol>
+
+
+
+<p>端到端的训练，自我监督学习，元学习，与进化策略的集成，NAS大大减少搜索空间，…</p>
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20221206133724/http://github.com/curto2/mckernel" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a> | <a href="https://web.archive.org/web/20221206133724/http://www.decurto.tw/c/iclr2020_DeCurto.pdf" target="_blank" rel="noreferrer noopener nofollow">完整呈现</a></p>
+
+
+
+<h4><strong> SCCH培训引擎</strong></h4>
+
+
+
+<p>自动化DL开发例程</p>
+
+
+
+<p><strong>描述</strong></p>
+
+
+
+
+
+
+
+<h4><strong>什么事？</strong></h4>
+
+
+
+<p>一个典型的深度学习流水线开发是相当标准的:数据预处理、任务设计/实现、训练、评估。然而，从一个项目到另一个项目的开发需要开发人员在开发过程的每个阶段都参与进来。这导致了相同动作的重复，代码复制粘贴，最终导致了错误。</p>
+
+
+
+
+
+
+
+<p>SCCH培训引擎的目标是两个最流行的框架PyTorch和TensorFlow的DL开发例程的统一和自动化。单个条目允许最小化开发时间，并防止开发错误。</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2 id="h-scch-training-engine"><strong>为谁？</strong></h2>
+
+
+
+<div class="wp-block-media-text"><figure class="wp-block-media-text__media"><img decoding="async" src="../Images/451c7178d5f5caa2ba12cb1515aed438.png" alt="" class="wp-image-19147 size-full" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206133724im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/scch_training_engine.png?ssl=1"/></figure><div class="wp-block-media-text__content">
+<h3>SCCH培训引擎的灵活架构有两个用户交互级别:</h3>
+
+
+
+<p><strong>基本。</strong>在这个级别，用户需要在配置文件中提供他的数据并定义训练参数。此后，包括数据处理、训练和验证在内的所有过程都将自动完成。因此，将提供一个已定义框架中的训练有素的网络。</p>
+</div></div>
+
+
+
+
+
+
+
+
+
+
+
+<h3><strong>高级。</strong>由于发动机的模块化概念，用户可以根据自己的需要，通过部署自己的模型、损失和精度功能来修改发动机。这种模块化允许在不干扰核心管道的情况下添加额外的特征。</h3>
+
+
+
+<h4>它能做什么？</h4>
+
+
+
+<p>目前的特点是:</p>
+
+
+
+<p>在TensorFlow和PyTorch上工作</p>
+
+
+
+<h4>来自不同格式的数据解析的标准化管道</h4>
+
+
+
+<p>标准化的培训和验证渠道</p>
+
+
+
+<p>支持分类、分割和检测任务</p>
+
+
+
+<p>支持交叉验证</p>
+
+
+
+
+
+
+
+<h4>开发中的功能:</h4>
+
+
+
+<p>训练参数的超参数搜索</p>
+
+
+
+<ul><li>给定检查点的负重和训练</li><li>GAN架构支持</li><li>它是如何工作的？</li><li>要查看SCCH培训引擎的工作情况，您需要执行2个步骤:</li><li>只需复制存储库并使用<code>pip install requirements.txt</code>安装需求</li></ul>
+
+
+
+<p>运行<code>python main.py</code>查看在LeNet-5上处理和训练的MNIST玩具示例</p>
+
+
+
+<ul><li>关于如何创建配置文件以及如何使用高级特性的所有信息都可以在我们的GitHub页面上找到。</li><li><em>主要功能稳定发布:2020年5月底</em></li><li><a href="https://web.archive.org/web/20221206133724/https://github.com/SCCH-KVS/training-engine" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a> | <a href="https://web.archive.org/web/20221206133724/https://www.scch.at/" target="_blank" rel="noreferrer noopener nofollow">网站</a></li></ul>
+
+
+
+<h4><strong>记号标记符</strong></h4>
+
+
+
+<p>语言:Rust with Python API</p>
+
+
+
+<ol><li><strong>描述</strong></li><li><a href="https://web.archive.org/web/20221206133724/https://github.com/huggingface/tokenizers" target="_blank" rel="noreferrer noopener nofollow"> huggingface/tokenizers </a>提供最先进的tokenizers，重点关注性能和多功能性。这使得培训新的标记器和使用它们变得轻而易举。无论你是NLP研究者还是NLP实践者，tokenizers都能帮到你。</li></ol>
+
+
+
+<p>主要特点:</p>
+
+
+
+<p><strong>极快</strong>:标记化不应该成为NLP管道中的瓶颈，也不应该对数据集进行预处理。由于Rust中的本机实现，标记千兆字节的文本只需几秒钟。</p>
+
+
+
+
+
+
+
+<p><strong>偏移/对准</strong>:提供对准跟踪，即使是复杂的标准化处理。这使得像NER或问答这样的任务的文本提取变得容易。</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h2 id="h-tokenizers"><strong>预处理</strong>:在输入你的语言模型之前，处理任何需要的预处理(截断、填充、添加特殊标记等等)。</h2>
+
+
+
+
+
+
+
+<div class="wp-block-media-text"><figure class="wp-block-media-text__media"><img decoding="async" src="../Images/088fb1e1cfe0262a61b53c7c9d6f3608.png" alt="" class="wp-image-19138 size-full" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206133724im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2020/05/Logo.png?ssl=1"/></figure><div class="wp-block-media-text__content">
+<h3><strong>简单训练</strong>:在新的语料库上训练任何分词器。例如，为BERT培训一门新语言的标记器从未如此简单。</h3>
+
+
+
+<p><strong>多语言</strong>:多语言绑定。现在，您可以开始在Python、Node.js或Rust中使用它。更多即将推出！</p>
+</div></div>
+
+
+
+
+
+
+
+<h3>示例:</h3>
+
+
+
+<p>很快:</p>
+
+
+
+<p>任何标记化器的单文件序列化和单行加载。</p>
+
+
+
+<ul><li>支持Unigram。</li><li>在<a href="https://web.archive.org/web/20221206133724/https://huggingface.co/" target="_blank" rel="noreferrer noopener nofollow">拥抱脸</a>，我们的使命是帮助每个人推进和民主化NLP。</li><li><strong>资源和链接</strong></li><li><a href="https://web.archive.org/web/20221206133724/https://github.com/huggingface/transformers" target="_blank" rel="noreferrer noopener nofollow">GitHub hugging face/变形金刚</a>|<a href="https://web.archive.org/web/20221206133724/https://github.com/huggingface/tokenizers" target="_blank" rel="noreferrer noopener nofollow">GitHub hugging face/tokenizers</a>|<a href="https://web.archive.org/web/20221206133724/https://twitter.com/huggingface" target="_blank" rel="noreferrer noopener nofollow">Twitter</a></li><li>摘要</li></ul>
+
+
+
+<p>首先:</p>
+
+
+
+
+
+
+
+<p>感谢Anthony，J. de Curtó i Díaz，Luca，Lukas，Mandar，Natalia，Nicholas和Omry为这篇文章付出的努力！</p>
+
+
+
+<ul><li>没有你，它永远不会被创造出来。</li><li>在这篇文章中，工具制造商只是强调了现在可能的前沿。考虑的主题范围从配置管理思想、有效的文本标记到知识图嵌入。我们甚至接触了二值化的神经网络。</li></ul>
+
+
+
+<p>我们强烈建议给他们一个尝试，因为他们可以让你的研究更容易和(可能)更快——无论是在学术还是工业环境中。</p>
+
+
+
+<h3>最后，我们愿意听取更多关于深度学习开源生态系统的信息。如果您有一些问题、想法或工具想带到舞台上，请联系Kamil。你可以在下面找到他的联系方式。</h3>
+
+
+
+<p>本文由ICLR社交活动协办方协调:</p>
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<h1 id="h-summary"><strong> PS: </strong></h1>
+
+
+
+<p>我们还针对ICLR 2020期间讨论的主要话题(<a href="https://web.archive.org/web/20221206133724/https://www.analyticsvidhya.com/blog/2020/05/key-takeaways-iclr-2020/" target="_blank" rel="noreferrer noopener nofollow">来源</a>)发布了一系列帖子，即:</p>
+
+
+
+<blockquote class="wp-block-quote is-style-large"><p><strong>深度学习</strong>(此处<a href="/web/20221206133724/https://neptune.ai/blog/iclr-2020-deep-learning" target="_blank" rel="noreferrer noopener"/>)</p><p><strong>强化学习</strong>(此处<a href="/web/20221206133724/https://neptune.ai/blog/iclr-2020-reinforcement-learning" target="_blank" rel="noreferrer noopener"/>)</p></blockquote>
+
+
+
+<p><strong>生成型</strong>(此处<a href="/web/20221206133724/https://neptune.ai/blog/iclr-2020-generative-models" target="_blank" rel="noreferrer noopener"/>)</p>
+
+
+
+<p><strong>自然语言处理/理解</strong>(此处<a href="/web/20221206133724/https://neptune.ai/blog/iclr-2020-nlp-nlu" target="_blank" rel="noreferrer noopener"/>)</p>
+
+
+
+<p>找点时间看看它们吧！</p>
+
+
+
+<p>This post was coordinated by the ICLR social event co-hosts:</p>
+
+
+
+
+
+
+
+
+
+
+
+<hr class="wp-block-separator"/>
+
+
+
+<p><strong>PS:</strong></p>
+
+
+
+<p>We also built a series of posts focused on the main topics (<a href="https://web.archive.org/web/20221206133724/https://www.analyticsvidhya.com/blog/2020/05/key-takeaways-iclr-2020/" target="_blank" rel="noreferrer noopener nofollow">source</a>) discussed during ICLR 2020, that is:</p>
+
+
+
+<ul><li><strong>Deep learning</strong> (<a href="/web/20221206133724/https://neptune.ai/blog/iclr-2020-deep-learning" target="_blank" rel="noreferrer noopener">here</a>)</li><li><strong>Reinforcement learning</strong> (<a href="/web/20221206133724/https://neptune.ai/blog/iclr-2020-reinforcement-learning" target="_blank" rel="noreferrer noopener">here</a>)</li><li><strong>Generative models</strong> (<a href="/web/20221206133724/https://neptune.ai/blog/iclr-2020-generative-models" target="_blank" rel="noreferrer noopener">here</a>)</li><li><strong>Natural Language Processing/Understanding</strong> (<a href="/web/20221206133724/https://neptune.ai/blog/iclr-2020-nlp-nlu" target="_blank" rel="noreferrer noopener">here</a>)</li></ul>
+
+
+
+<p>Find some time to take a look at them!</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

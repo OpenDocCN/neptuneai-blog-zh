@@ -1,0 +1,1024 @@
+<html>
+<head>
+<title>When to Choose CatBoost Over XGBoost or LightGBM [Practical Guide] </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>何时选择CatBoost而不是XGBoost或light GBM[实用指南]</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/when-to-choose-catboost-over-xgboost-or-lightgbm#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/when-to-choose-catboost-over-xgboost-or-lightgbm#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>Boosting算法已经成为对结构化(表格)数据进行训练的最强大的<em>算法</em>之一。为<a href="https://web.archive.org/web/20230219051826/https://medium.com/kaggle-blog" target="_blank" rel="noreferrer noopener nofollow">赢得ML竞赛</a>提供了各种方法的三个最著名的boosting算法实现是:</p>
+
+
+
+<div id="case-study-numbered-list-block_442d0c16c356b16845351e7124d9c843" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item">1 催化增强</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 2 </span> XGBoost</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>灯GBM</li>
+            </ul>
+</div>
+
+
+
+<p/>
+
+
+
+<p>在本文中，我们将主要关注CatBoost，它与其他算法相比如何，以及何时应该选择它。</p>
+
+
+
+
+
+
+
+<h2 id="overview-of-gradient-boosting">梯度增强概述</h2>
+
+
+
+<p>为了理解boosting，我们必须首先理解<a href="/web/20230219051826/https://neptune.ai/blog/ensemble-learning-guide" target="_blank" rel="noreferrer noopener">集成学习</a>，这是一套结合来自多个模型(弱学习器)的预测以获得更好的预测性能的技术。它的策略就是团结的力量，因为弱学习者的有效组合可以产生更准确和更健壮的模型。集成学习方法的三个主要类别是:</p>
+
+
+
+<ul>
+<li><strong> Bagging: </strong>该技术使用数据的随机子集并行构建不同的模型，并确定性地聚合所有预测者的预测。</li>
+
+
+
+<li><strong> Boosting </strong>:这种技术是迭代的、连续的、自适应的，因为每个预测器都修正了其前一个预测器的误差。</li>
+
+
+
+<li><strong>堆叠</strong>:这是一种元学习技术，涉及结合多种机器学习算法的预测，如bagging和boosting。</li>
+</ul>
+
+
+
+<p/>
+
+
+
+<p>1988年，Micheal Kearns在他的论文<a href="https://web.archive.org/web/20230219051826/https://www.cis.upenn.edu/~mkearns/papers/boostnote.pdf" target="_blank" rel="noreferrer noopener nofollow">关于假设提升的思考</a>中，提出了一个相对较差的假设是否可以转化为非常好的假设的想法。本质上是一个学习能力差的人是否可以通过改造变得更好。从那以后，已经有许多成功的技术应用来开发一些强大的boosting算法。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><img decoding="async" src="../Images/ec21e27bce4f890da3f4bbf5ddd01eee.png" alt="The most popular boosting algorithms: Catboost, XGBoost, LightGBM" class="wp-image-60517" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_13.png?resize=771%2C431&amp;ssl=1"/><figcaption class="wp-element-caption"><em>The most popular boosting algorithms: Catboost, XGBoost, LightGBM | Source: Author</em></figcaption></figure></div>
+
+
+<p>scope中的三种算法(CatBoost、XGBoost和LightGBM)都是梯度增强算法的变体。随着我们的进展，对梯度推进的良好理解将是有益的。梯度推进算法可以是回归器(预测连续目标变量)或分类器(预测分类目标变量)。</p>
+
+
+
+<p>这种技术涉及使用梯度下降优化过程，基于最小化弱学习者的微分损失函数来训练学习者，这与像自适应增强(Adaboost)那样调整训练实例的权重相反。因此，所有学习者的权重是相等的。梯度提升使用串联的决策树作为弱学习器。由于它的顺序架构，它是一个阶段式的加法模型，每次添加一个决策树，现有的决策树不变。</p>
+
+
+
+<p>梯度增强主要用于减少模型的偏差误差。基于偏差-方差权衡，它是一种贪婪算法，可以快速地过拟合训练数据集。然而，这种过拟合可以通过收缩、树约束、正则化和随机梯度增强来控制。</p>
+
+
+
+
+
+
+
+<h2 id="overview-of-catboost">CatBoost概述</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20230219051826/https://catboost.ai/" target="_blank" rel="noreferrer noopener nofollow"> CatBoost </a>是一个开源的机器学习(梯度提升)算法，其名字由“<strong> <em>类别</em> </strong>”和“<strong> <em>提升</em> </strong>”杜撰而来它是由<a href="https://web.archive.org/web/20230219051826/https://yandex.com/" target="_blank" rel="noreferrer noopener nofollow"> Yandex </a>(俄罗斯谷歌)在2017年开发的。Yandex表示，CatBoost已被广泛应用于推荐系统、搜索排名、自动驾驶汽车、预测和虚拟助手等领域。它是在Yandex产品中广泛使用的<a href="https://web.archive.org/web/20230219051826/https://en.wikipedia.org/wiki/MatrixNet" target="_blank" rel="noreferrer noopener nofollow"> MatrixNet </a>的继任者。</p>
+
+
+
+
+
+<h2 id="key-features-of-catboost">CatBoost的主要特性</h2>
+
+
+
+<p>让我们来看看使CatBoost优于其同类产品的一些关键特性:</p>
+
+
+
+<ol class="has-huge-font-size">
+<li><strong>对称树</strong> : CatBoost构建对称(平衡)树，不像XGBoost和LightGBM。在每一步中，前一棵树的叶子都使用相同的条件进行分割。考虑到最低损失的特征分割对被选择并用于所有级别的节点。这种平衡树结构有助于有效的CPU实现，减少预测时间，使模型应用程序更快，并在该结构用作正则化时控制过拟合。</li>
+</ol>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/42868a01925b71507284475d4c1e06f0.png" alt="Symmetric trees" class="wp-image-60511" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_7.png?resize=851%2C311&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Asymmetric tree vs symmetric tree | Source: Author</em></figcaption></figure></div>
+
+
+<ol start="2" class="has-huge-font-size">
+<li><strong>有序推进:</strong>由于被称为预测偏移的问题，经典推进算法容易在小/有噪声的数据集上过度拟合。计算数据实例的梯度估计值时，这些算法使用构建模型时使用的相同数据实例，因此不会遇到看不见的数据。另一方面，CatBoost使用有序提升的概念，这是一种排列驱动的方法，用于在数据子集上训练模型，同时在另一个子集上计算残差，从而防止目标泄漏和过度拟合。</li>
+</ol>
+
+
+
+<ol start="3" class="has-huge-font-size">
+<li><strong>原生特性支持:</strong> CatBoost支持所有类型的特性，无论是数字、分类还是文本，节省了预处理的时间和精力。</li>
+</ol>
+
+
+
+<h3 id="numerical-features">数字特征</h3>
+
+
+
+<p>CatBoost像其他基于树的算法一样处理数字特征，即通过基于信息增益选择最佳可能的分割。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/57fa6e09e96e6e04c25b1e5dda581390.png" alt="Numerical features" class="wp-image-60513" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_9.png?resize=283%2C182&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Numerical features | Source: Author</em></figcaption></figure></div>
+
+
+<h3 id="categorical-features">分类特征</h3>
+
+
+
+<p>决策树基于类别而不是连续变量中的阈值来分割分类特征。分割标准是直观的，因为类被分成子节点。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/90c2bf1ea92a3051c879d63a17c90d44.png" alt="Categorical features" class="wp-image-60509" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_5.png?resize=296%2C528&amp;ssl=1"/><figcaption class="wp-element-caption">Categorical features <em>| Source: Author</em></figcaption></figure></div>
+
+
+<p>类别特征在高基数特征中可能更复杂，如'<em> id </em>特征。每个机器学习算法都需要解析数字形式的输入和输出变量；CatBoost提供了各种本地策略来处理分类变量:</p>
+
+
+
+<ul>
+<li><strong>单热编码</strong>:默认情况下，CatBoost用单热编码表示所有二进制(两类)特征。通过改变训练参数<strong><em>one _ hot _ max _ size</em></strong><em>=</em><strong><em>N .</em></strong>CatBoost<em/>通过指定分类特征和类别来处理一键编码<em> </em>，可以将该策略扩展到具有<strong> N </strong>数量类别的特征，以产生更好、更快、更高质量的结果。</li>
+</ul>
+
+
+
+<ul>
+<li><strong>基于类别的统计:</strong> CatBoost应用随机排列的目标编码来处理类别特征。这种策略对于高基数列非常有效，因为它只创建了一个新的特性来说明类别编码。将随机排列添加到编码策略是为了防止由于数据泄漏和特征偏差导致的过拟合。你可以在这里详细了解<a href="https://web.archive.org/web/20230219051826/https://catboost.ai/en/docs/concepts/algorithm-main-stages_cat-to-numberic" target="_blank" rel="noreferrer noopener nofollow">。</a></li>
+</ul>
+
+
+
+<ul>
+<li><strong>贪婪搜索组合:</strong> CatBoost还自动组合分类特征，大多数情况下是两个或三个。为了限制可能的组合，CatBoost不会枚举所有的组合，而是使用类别频率等统计数据来枚举一些最佳组合。因此，对于每个树分割，CatBoost会将当前树中先前分割已经使用的所有分类特征(及其组合)与数据集中的所有分类特征相加。</li>
+</ul>
+
+
+
+<h3 id="text-features">文本特征</h3>
+
+
+
+<p>CatBoost还通过使用单词包(BoW)、Naive-Bayes和BM-25(用于多类)提供固有的文本预处理来处理文本特征(包含常规文本),以便从文本数据中提取单词、创建词典(字母、单词、grams)并将其转换为数字特征。这种文本转换是快速的、可定制的、生产就绪的，并且也可以用于其他库，包括神经网络。</p>
+
+
+
+<ol start="4" class="has-huge-font-size">
+<li><strong>排名:</strong>排名技术主要应用于搜索引擎，解决搜索相关性问题。排名可以在三个目标函数下大致完成:<a href="https://web.archive.org/web/20230219051826/https://medium.com/@nikhilbd/pointwise-vs-pairwise-vs-listwise-learning-to-rank-80a8fe8fadfd" target="_blank" rel="noreferrer noopener nofollow">点方式、成对方式和列表方式</a>。这三个目标函数在较高层次上的区别在于训练模型时考虑的实例数量。</li>
+</ol>
+
+
+
+<p/>
+
+
+
+<p>CatBoost有一个排名模式——<a href="https://web.archive.org/web/20230219051826/https://catboost.ai/docs/concepts/loss-functions-ranking" target="_blank" rel="noreferrer noopener nofollow">CatBoostRanking</a>就像<a href="https://web.archive.org/web/20230219051826/https://xgboost.readthedocs.io/en/stable/python/python_api.html" target="_blank" rel="noreferrer noopener nofollow"> XGBoost ranker </a>和<a href="https://web.archive.org/web/20230219051826/https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMRanker.html" target="_blank" rel="noreferrer noopener nofollow"> LightGBM ranke </a> r一样，但是，它提供了比XGBoost和LightGBM更强大的变化。这些变化是:</p>
+
+
+
+<ul>
+<li>排名(yetirank，yetirankpairwise)</li>
+
+
+
+<li>成对(PairLogit，PairLogitPairwise)</li>
+
+
+
+<li>排名+分类(QueryCrossEntropy)</li>
+
+
+
+<li>排名+回归(QueryRMSE)</li>
+
+
+
+<li>选择前1名候选人(QuerySoftMax)</li>
+</ul>
+
+
+
+<p>CatBoost还提供了排名基准，通过不同的排名变化来比较CatBoost、XGBoost和LightGBM，其中包括:</p>
+
+
+
+<ul>
+<li><strong> CatBoost </strong> : RMSE、QueryRMSE、pairlogit、pairlogitpairwise、yetirank、yetirankpairwise</li>
+
+
+
+<li><strong> XGBoost </strong> : reg:线性，xgb-lmart-ndcg，XG b-成对</li>
+
+
+
+<li><strong> LightGBM </strong> : lgb-rmse，LG b-成对</li>
+</ul>
+
+
+
+<p>这些基准评估使用了四(4)个排名靠前的数据集:</p>
+
+
+
+<ol>
+<li><strong>百万查询数据集</strong>来自TREC 2008，<a href="https://web.archive.org/web/20230219051826/https://www.microsoft.com/en-us/research/project/letor-learning-rank-information-retrieval/#!letor-4-0"> MQ2008 </a>，(训练和测试折叠)。</li>
+
+
+
+<li><strong>微软LETOR数据集</strong>(we b-10K)<a href="https://web.archive.org/web/20230219051826/https://www.microsoft.com/en-us/research/project/mslr/"/>(第一套，训练，测试折叠)。</li>
+
+
+
+<li><strong>雅虎LETOR数据集</strong> (C14)，<a href="https://web.archive.org/web/20230219051826/https://webscope.sandbox.yahoo.com/catalog.php?datatype=c&amp;guccounter=1" target="_blank" rel="noreferrer noopener nofollow">雅虎</a>(第一套，set1.train.txt和set1.test.txt文件)。</li>
+
+
+
+<li><strong> Yandex LETOR数据集</strong>、<a href="https://web.archive.org/web/20230219051826/https://github.com/spbsu-ml-community/jmll/tree/master/ml/src/test/resources/com/expleague/ml">Yandex</a>(features.txt.gz和featuresTest.txt.gz文件)。</li>
+</ol>
+
+
+
+<p>使用平均<a href="https://web.archive.org/web/20230219051826/https://en.wikipedia.org/wiki/Discounted_cumulative_gain" target="_blank" rel="noreferrer noopener nofollow"> NDCG度量</a>进行性能评估的结果如下:</p>
+
+
+
+
+
+
+
+
+
+
+
+<p>可以看出，CatBoost在所有情况下都优于LightGBM和XGBoost。可以在CatBoost文档<a href="https://web.archive.org/web/20230219051826/https://catboost.ai/en/docs/concepts/loss-functions-ranking" target="_blank" rel="noreferrer noopener nofollow">这里</a>找到更多关于分级模式变化及其各自性能指标的详细信息。这些技术可以在CPU和GPU上运行。</p>
+
+
+
+<ol start="5">
+<li><strong>速度</strong> : CatBoost通过支持<a href="https://web.archive.org/web/20230219051826/https://docs.neptune.ai/how-to-guides/neptune-api/distributed-computing" target="_blank" rel="noreferrer noopener">多服务器分布式GPU</a>(支持多主机加速学习)和容纳旧GPU来提供可扩展性。它在大型数据集上设置了一些CPU和GPU训练速度基准，如<a href="https://web.archive.org/web/20230219051826/https://catboost.ai/en/docs/concepts/python-reference_datasets_epsilon" target="_blank" rel="noreferrer noopener nofollow"> Epsilon </a>和<a href="https://web.archive.org/web/20230219051826/https://catboost.ai/en/docs/concepts/python-reference_datasets_higgs" target="_blank" rel="noreferrer noopener nofollow"> Higgs </a>。它的预测时间比XGBoost和LightGBM快；这对于低延迟环境极其重要。</li>
+</ol>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/28b143b02881cf572a8f472a61076625.png" alt="Dataset Epsilon (400K samples, 2000 features). Parameters: 128 bins, 64 leafs, 400 iterations." class="wp-image-60515" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_11.png?resize=613%2C398&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Dataset Epsilon (400K samples, 2000 features). Parameters: 128 bins, 64 leafs, 400 iterations | Source: Author</em></figcaption></figure></div>
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/19d3bb532b8ed4ab02ddec1f41c11dfd.png" alt="Dataset Higgs (4M samples, 28 features). Parameters: 128 bins, 64 leafs, 400 iterations." class="wp-image-60516" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_12.png?resize=609%2C395&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Dataset Higgs (4M samples, 28 features). Parameters: 128 bins, 64 leafs, 400 iterations | Source: Author</em></figcaption></figure></div>
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/8144a2ccb3fb8110acee0150548dfe0e.png" alt="Prediction time on CPU and GPU respectively on the Epsilon dataset" class="wp-image-60519" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_15.png?resize=869%2C465&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Prediction time on CPU and GPU respectively on the <a href="https://web.archive.org/web/20230219051826/https://catboost.ai/en/docs/concepts/python-reference_datasets_epsilon" target="_blank" rel="noreferrer noopener nofollow">Epsilon dataset</a> | Source: Author</em></figcaption></figure></div>
+
+
+<p><a href="https://web.archive.org/web/20230219051826/https://catboost.ai/en/docs/concepts/python-reference_datasets_epsilon"> </a></p>
+
+
+
+<ol start="6">
+<li><strong>模型分析:</strong> CatBoost提供固有的模型分析工具，在高效的统计和可视化的帮助下，帮助理解、诊断和提炼机器学习模型。其中一些是:</li>
+</ol>
+
+
+
+<h3 id="feature-importance">特征重要性</h3>
+
+
+
+<p>CatBoost有一些智能技术，可以为给定模型找到最佳特性:</p>
+
+
+
+<ul>
+<li><strong>预测值变化:</strong>显示预测值相对于特征值变化的平均变化量。由于特征导致的预测变化的平均值越大，重要性越高。要素重要性值被归一化以避免否定，所有要素的重要性都等于100。这很容易计算，但可能会导致排名问题的误导性结果。</li>
+</ul>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/9774933f3207f40c461ef92c699a1c49.png" alt="Feature Importance based on PredictionValuesChange" class="wp-image-60518" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_14.png?ssl=1"/><figcaption class="wp-element-caption"><em>Feature Importance based on PredictionValuesChange | Source: Author</em></figcaption></figure></div>
+
+
+<ul>
+<li><strong> LossFunctionChange: </strong>这是一种繁重的计算技术，通过获取包括给定特征的模型的损失函数与没有该特征的模型之间的差异来获得特征重要性。差异越大，该特征越重要。</li>
+</ul>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/d6d882f4ba6b365f1c8827b23886d36f.png" alt="Feature Importance based on LossFunctionChange" class="wp-image-60507" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_3.png?ssl=1"/><figcaption class="wp-element-caption"><em>Feature Importance based on LossFunctionChange | Source: Author</em></figcaption></figure></div>
+
+
+<ul>
+<li><strong>InternalFeatureImportance:</strong>该技术使用路径对称树叶上的节点中的分割值来计算每个输入要素和各种组合的值。</li>
+</ul>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/0c56c339a7d1d5d174a0f4aebc7889b9.png" alt="Pairwise feature importance" class="wp-image-60505" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_1.png?ssl=1"/><figcaption class="wp-element-caption"><em>Pairwise feature importance | Source: Author</em></figcaption></figure></div>
+
+
+<ul>
+<li><strong> SHAP: </strong> CatBoost使用<a href="https://web.archive.org/web/20230219051826/https://github.com/slundberg/shap" target="_blank" rel="noreferrer noopener nofollow"><strong>SHAP</strong></a>(SHapley Additive exPlanations)将一个预测值分解成每个特征的贡献。它通过测量要素对单个预测值(与基线预测相比)的影响来计算要素重要性。这种技术提供了对模型决策影响最大的特征的可视化解释。SHAP有两种应用方式:</li>
+</ul>
+
+
+
+<h4 id="per-data-instance">每个数据实例</h4>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/5d558e22476ad0e31d5e29ad6fedab1f.png" alt="First prediction explanation (Waterfall plot)" class="wp-image-60526" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_22.png?ssl=1"/><figcaption class="wp-element-caption"><em>First prediction explanation (Waterfall plot) | Source: Author</em></figcaption></figure></div>
+
+
+<p>上面的可视化显示了将模型输出从基础值(训练数据集上的平均模型输出)推至模型输出的要素。红色要素将预测值推高，而蓝色要素将预测值推低。这个概念可以用力图来形象化。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/6f8b3b8f4bc4d4a828a1b428f26412f9.png" alt="First prediction explanation (Force plot)" class="wp-image-60525" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_21.png?ssl=1"/><figcaption class="wp-element-caption"><em>First prediction explanation (Force plot) | Source: Author</em></figcaption></figure></div>
+
+
+<h4 id="whole-dataset">整个数据集</h4>
+
+
+
+<p>SHAP提供了绘图功能来突出显示模型的最重要的特征。该图按所有数据实例的SHAP值大小的总和对要素进行排序，并使用SHAP值来突出显示每个要素对模型输出的影响分布。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/d2b5ecee89a372e6a2bb0e18a62c2c65.png" alt="Summarized effects of all the features" class="wp-image-60510" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_6.png?resize=576%2C550&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Summarized effects of all the features | Source: Author</em></figcaption></figure></div>
+
+
+<h3 id="feature-analysis-chart">特征分析图表</h3>
+
+
+
+<p>这是CatBoost集成到其最新版本中的另一个独特功能。该功能提供计算和绘制的特定于要素的统计数据，并可视化CatBoost如何为每个要素拆分数据。更具体地说，统计数据是:</p>
+
+
+
+<ul>
+<li>每个条柱(条柱对连续要素进行分组)或类别(当前仅支持一个热编码要素)的平均目标值。</li>
+
+
+
+<li>每个箱的平均预测值</li>
+
+
+
+<li>每个箱中数据实例(对象)的数量</li>
+
+
+
+<li>各种特征值的预测</li>
+</ul>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/5f172435b7f2ee46d2280c7582553cc6.png" alt="Statistics of feature" class="wp-image-60524" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_20.png?resize=822%2C407&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Statistics of feature | Source: Author</em></figcaption></figure></div>
+
+
+<h3 id="catboost-parameters">CatBoost参数</h3>
+
+
+
+<p>CatBoost与XGBoost和LightGBM有共同的训练参数，但提供了一个非常灵活的参数调整界面。下表提供了三种增强算法提供的参数的快速比较。</p>
+
+
+
+<p id="separator-block_f8be600b99d13650b4dc6ff2b1639299" class="block-separator block-separator--5"> </p>
+
+
+
+<div id="medium-table-block_86653d06116585bf1c06e4e111b3dfa8" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">功能</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">CatBoost</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">XGBoost</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">LightGBM</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>控制过拟合的参数</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p><span>–学习_速率</span></p><p><span>–深度</span></p><p>–L2 _ reg</p></div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p><span>–学习_速率</span></p><p><span>–最大_深度</span></p><p><span>–最小_孩子_体重</span> </p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p><span>–learning _ rate</span></p><p><span>–Max _ depth</span></p><p><span>–Num _ leaves</span></p><p><span>–min _ data _ in _ leaf</span></p></div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> <span>用于处理分类值的参数</span> </p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p><span>–猫_特性</span></p><p><span>–one _ hot _ max _ size</span></p></div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> <span>控制速度的参数</span> </p> </div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p><span>–col sample _ bytree</span></p><p><span>–子样本</span></p><p><span>–n _ estimates</span></p></div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p><span>–feature _ fraction</span></p>T5<span>–bagging fraction</span><p><span>–num _ iterations</span></p></div></td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_027fc61e6b1133b3e16b2ba954c66078" class="block-separator block-separator--20">此外，从下图可以明显看出，CatBoost的默认参数提供了一个优秀的基线模型，比其他增强算法好得多。</p>
+
+
+
+<p>你可以在这里阅读所有关于CatBoost的参数<a href="https://web.archive.org/web/20230219051826/https://tech.yandex.com/catboost/doc/dg/concepts/parameter-tuning-docpage/" target="_blank" rel="noreferrer noopener nofollow">。这些参数控制过度拟合、分类特征和速度。</a></p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/c8bec76fa4c1a3f97d34a99b83dd9958.png" alt="Log loss values (lower is better) for Classification mode. The percentage is metric difference measured against tuned CatBoost results." class="wp-image-60520" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230219051826im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/When-to-Choose-CatBoost-Over-XGBoost-or-LightGBM-Practical-Guide_16.png?ssl=1"/><figcaption class="wp-element-caption"><em>Log loss values (lower is better) for Classification mode. <br/>The percentage is metric difference measured against tuned CatBoost results | Source: Author</em></figcaption></figure></div>
+
+
+<p>其他有用的功能</p>
+
+
+
+<h3 id="other-useful-features"><strong>过拟合检测器:</strong> CatBoost的算法结构抑制了梯度提升偏差和过拟合。此外，CatBoost有一个过拟合检测器，如果发生过拟合，它可以在训练参数指示之前停止训练。CatBoost使用两种策略实现过拟合检测:</h3>
+
+
+
+<ul>
+<li>Iter:考虑过拟合模型，使用具有最优度量值的迭代，在指定的迭代次数后停止训练。与其他梯度增强算法(如LightGBM和XGBoost)一样，该策略使用early_stopping_rounds参数。<ul>
+<li>IncToDec:当达到阈值时忽略过拟合检测器，并在用最佳度量值迭代后继续学习指定的迭代次数。通过在参数中设置“od_type”来激活过拟合检测器，以产生更一般化的模型。</li>
+
+
+
+<li><strong>缺失值支持</strong> : CatBoost为处理缺失值提供了三种固有的缺失值策略:</li>
+</ul>
+</li>
+
+
+
+<li>“禁止”:缺少的值被解释为错误，因为它们不受支持。<ul>
+<li>“最小值”:缺失值被处理为所观察特征的最小值(小于所有其他值)。</li>
+
+
+
+<li>“最大值”:缺失值被视为所观察特征的最大值(大于所有其他值)。CatBoost只有数值的缺失值插补，默认模式为最小。</li>
+
+
+
+<li><strong> CatBoost viewer </strong>:除了CatBoost模型分析工具，CatBoost还有一个<a href="https://web.archive.org/web/20230219051826/https://github.com/catboost/catboost-viewer" target="_blank" rel="noreferrer noopener nofollow">独立的可执行应用</a>，用于在浏览器中绘制具有不同训练统计数据的图表。</li>
+</ul>
+</li>
+
+
+
+<li><strong>交叉验证</strong> : CatBoost允许对给定数据集进行交叉验证。在交叉验证模式中，训练数据被分成学习和评估两部分。</li>
+
+
+
+<li><strong>社区支持</strong> : CatBoost有一个庞大且不断增长的开源社区，提供大量关于理论和应用的<a href="https://web.archive.org/web/20230219051826/https://github.com/catboost/tutorials" target="_blank" rel="noreferrer noopener nofollow">教程</a>。</li>
+
+
+
+<li>CatBoost与XGBoost和LightGBM:性能和速度的实际比较</li>
+</ul>
+
+
+
+<h2 id="catboost-vs-xgboost-and-lightgbm-hands-on-comparison-of-performance-and-speed">前面几节介绍了CatBoost的一些特性，这些特性将作为选择CatBoost而不是LightGBM和XGBoost的有力标准。本节将有一个实践经验，我们将使用一个航班延误预测问题来比较性能和速度。</h2>
+
+
+
+<p>数据集和环境</p>
+
+
+
+<h3 id="dataset-and-environment">该数据集包含2015年大型航空运营商运营的国内航班准点性能数据，由美国交通部(DOT)提供，可在<a href="https://web.archive.org/web/20230219051826/https://www.kaggle.com/usdot/flight-delays" target="_blank" rel="noreferrer noopener nofollow"> Kaggle </a>上找到。这种比较分析使用CatBoost、LightGBM和XGBoost探索和模拟具有可用独立特征的航班延误。该数据的一个子集(25%)用于建模，并且将使用ROC AUC评分评估各个生成的模型。在测量训练时间、预测时间和参数调整时间时，分析将涵盖默认和调整的设置。</h3>
+
+
+
+<p>为了便于比较，我们将使用<a href="/web/20230219051826/https://neptune.ai/" target="_blank" rel="noreferrer noopener"> neptune.ai </a>，这是一个用于MLOps的<a href="/web/20230219051826/https://neptune.ai/blog/ml-metadata-store" target="_blank" rel="noreferrer noopener">元数据存储库</a>，为可能涉及大量实验的项目而构建。‌具体来说，我们将使用neptune.ai来:</p>
+
+
+
+<p>所以，事不宜迟，我们开始吧！</p>
+
+
+
+
+
+
+
+<p>通过<a href="https://web.archive.org/web/20230219051826/https://docs.neptune.ai/integrations/xgboost/"> Neptune-XGBoost集成</a>和<a href="https://web.archive.org/web/20230219051826/https://docs.neptune.ai/integrations/lightgbm/" target="_blank" rel="noopener"> Neptune-LightGBM集成</a>，检查在使用XGBoost或LightGBM时如何跟踪您的模型构建元数据。</p>
+
+
+
+<section id="blog-intext-cta-block_b11b9e22fa853f7c40a8d360e56babcd" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>首先，我们必须安装所需的库。</p>
+    
+    </section>
+
+
+
+<p>导入已安装的库。</p>
+
+
+
+<pre class="hljs">!pip install catboost
+!pip install xgboost
+!pip install lgb
+!pip install neptune-client</pre>
+
+
+
+<p>设置Neptune客户机来适当地记录项目的元数据。你可以在这里阅读更多相关信息<a href="https://web.archive.org/web/20230219051826/https://docs.neptune.ai/setup/installation/" target="_blank" rel="noreferrer noopener">。</a></p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> lightgbm <span class="hljs-keyword">as</span> lgb
+<span class="hljs-keyword">import</span> xgboost <span class="hljs-keyword">as</span> xgb
+<span class="hljs-keyword">import</span> catboost <span class="hljs-keyword">as</span> cb
+
+
+<span class="hljs-keyword">import</span> timeit
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+
+
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split, GridSearchCV
+<span class="hljs-keyword">from</span> sklearn.metrics <span class="hljs-keyword">import</span> roc_auc_score</pre>
+
+
+
+<p>数据预处理和争论操作可以在<a href="https://web.archive.org/web/20230219051826/https://github.com/codebrain001/Catboost-tutorial/blob/main/Catboost_vs_LightGBM_vs_XGBoost.ipynb" target="_blank" rel="noreferrer noopener nofollow">参考笔记本</a>中找到。我们将使用30%的数据作为测试集。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+
+run = neptune.init(project=<span class="hljs-string">'&lt;YOUR_WORKSPACE/YOUR_PROJECT&gt;'</span>,
+                  api_token=<span class="hljs-string">'&lt;YOUR_API_TOKEN&gt;'</span>)</pre>
+
+
+
+<p>模型</p>
+
+
+
+<pre class="hljs">X = data_df.drop(columns=[<span class="hljs-string">'ARRIVAL_DELAY'</span>])
+y = data_df[<span class="hljs-string">'ARRIVAL_DELAY'</span>]
+
+
+X_train, X_test,  y_train, y_test= train_test_split(X,y, random_state=<span class="hljs-number">2021</span>, test_size=<span class="hljs-number">0.30</span>)</pre>
+
+
+
+<h3 id="models">接下来，让我们定义度量评估函数和模型执行函数。指标评估功能记录ROC AUC得分。</h3>
+
+
+
+<p>现在转到模型执行函数，它接受四个主要参数:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">metrics</span><span class="hljs-params">(run, y_pred_test)</span>:</span>
+   score = roc_auc_score(y_test, y_pred_test)
+   run[<span class="hljs-string">'ROC AUC score'</span>] = score</pre>
+
+
+
+<p><strong>模型:</strong>生成的各个机器学习模型即LightGBM、XGBoost和CatBoost</p>
+
+
+
+<ul>
+<li><strong>描述:</strong>模型执行实例的描述</li>
+
+
+
+<li><strong>键:</strong>键指定模型训练设置，尤其是要实现的分类特征参数</li>
+
+
+
+<li><strong> cat_features: </strong>用作分类特征名称(对于LightGBM)或索引(CatBoost)</li>
+
+
+
+<li>该函数计算并记录元数据，包括描述、训练时间、预测时间和ROC AUC分数。</li>
+</ul>
+
+
+
+<p>让我们在两种设置下运行相应模型的功能:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">run_model</span><span class="hljs-params">(run, model, description, key, cat_features=<span class="hljs-string">''</span>)</span>:</span>
+ <span class="hljs-keyword">if</span> key ==<span class="hljs-string">'LGB'</span>:
+   
+   run[<span class="hljs-string">"Description"</span>] = description
+
+   
+   start = timeit.default_timer()
+   model.fit(X_train,y_train, categorical_feature=cat_features)
+   stop = timeit.default_timer()
+   run[<span class="hljs-string">'Training time'</span>] = stop - start
+
+   
+   start = timeit.default_timer()
+   y_pred_test = model.predict(X_test)
+   stop = timeit.default_timer()
+   run[<span class="hljs-string">'Prediction time'</span>] = stop - start
+
+   
+   metrics(y_pred_test)
+
+ <span class="hljs-keyword">elif</span> key ==<span class="hljs-string">'CAT'</span>:
+   
+   run[<span class="hljs-string">"Description"</span>] = description
+
+   
+   start = timeit.default_timer()
+   model.fit(X_train,y_train,
+             eval_set=(X_test, y_test),
+             cat_features=cat_features,
+             use_best_model=<span class="hljs-keyword">True</span>)
+   stop = timeit.default_timer()
+   run[<span class="hljs-string">'Training time'</span>] = stop - start
+
+   
+   start = timeit.default_timer()
+   y_pred_test = model.predict(X_test)
+   stop = timeit.default_timer()
+   run[<span class="hljs-string">'Prediction time'</span>] = stop - start
+
+   
+   metrics(y_pred_test)
+
+ <span class="hljs-keyword">else</span>:
+   
+   run[<span class="hljs-string">"Description"</span>] = description
+
+   
+   start = timeit.default_timer()
+   model.fit(X_train,y_train)
+   stop = timeit.default_timer()
+   run[<span class="hljs-string">'Training time'</span>] = stop - start
+
+   
+   start = timeit.default_timer()
+   y_pred_test = model.predict(X_test)
+   stop = timeit.default_timer()
+   run[<span class="hljs-string">'Prediction time'</span>] = stop - start
+
+   
+   metrics(y_pred_test)</pre>
+
+
+
+<p>1.CatBoost vs XGBoost vs LightGBM:默认超参数</p>
+
+
+
+<h3 id="1-catboost-vs-xgboost-vs-lightgbm-default-hyperparameters">可以在Neptune仪表板上查看基于LightGBM、XGBoost和CatBoost算法的默认设置的比较分析。</h3>
+
+
+
+<pre class="hljs">
+model_lgb_def = lgb.LGBMClassifier()
+run_model(model_lgb_def,<span class="hljs-string">'Default LightGBM without categorical support'</span>, key=<span class="hljs-string">'LGB'</span>)
+
+
+model_lgb_cat_def = lgb.LGBMClassifier()
+run_model(model_lgb_cat_def, <span class="hljs-string">'Default LightGBM with categorical support'</span>,key=<span class="hljs-string">'LGB'</span>, cat_features=cat_cols)
+
+
+model_xgb_def = xgb.XGBClassifier()
+run_model(model_xgb_def, <span class="hljs-string">'Default XGBoost'</span>, key=<span class="hljs-string">'XGB'</span>)
+
+
+model_cat_def = cb.CatBoostClassifier()
+run_model(model_cat_def,<span class="hljs-string">'Default CatBoost without categorical support'</span>, key=<span class="hljs-string">'CAT'</span>)
+
+
+model_cat_cat_def = cb.CatBoostClassifier()
+cat_features_index = [<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]
+run_model(model_cat_cat_def,<span class="hljs-string">'Default CatBoost with categorical support'</span>,<span class="hljs-string">'CAT'</span>, cat_features_index)</pre>
+
+
+
+<p>结果:默认设置</p>
+
+
+
+
+
+<h4 id="results-default-setting">从仪表板上可以明显看出:</h4>
+
+
+
+<p>CatBoost在没有分类支持的情况下具有最快的预测时间，因此在有分类支持的情况下显著增加。</p>
+
+
+
+<ul>
+<li>对于测试数据，CatBoost的AUC指标得分最高(AUC得分越高，模型区分类别的性能越好)。</li>
+
+
+
+<li>与LightGBM相比，XGBoost在默认设置下的ROC-AUC得分最低，训练时间相对较长，但是其预测时间很快(在相应的默认设置运行中时间第二快)。</li>
+
+
+
+<li>在训练时间上，LightGBM的表现优于所有其他型号。</li>
+
+
+
+<li>2.CatBoost vs XGBoost vs LightGBM:优化的超参数</li>
+</ul>
+
+
+
+<h3 id="2-catboost-vs-xgboost-vs-lightgbm-tuned-hyperparameters">以下是我们将在这次运行中使用的优化的超参数。三种算法中所选的参数非常相似:</h3>
+
+
+
+<p>“最大深度”和“深度”控制树模型的深度。</p>
+
+
+
+<ul>
+<li>“learning_rate”说明了添加到树模型的修改量，并描述了模型学习的速度。</li>
+
+
+
+<li>n_estimators和iterations说明了树(轮)的数量，突出了增加迭代的数量。CatBoost‘l2 _ leaf _ reg’表示L2正则化系数，以阻止学习更复杂或灵活的模型，从而防止过拟合。</li>
+
+
+
+<li>而LightGBM num_leaves参数对应于每棵树的最大叶子数，XGBoost‘min-child-weight’表示每个节点中所需的最小实例数。</li>
+
+
+
+<li>这些参数被调整以控制过拟合和学习速度。</li>
+</ul>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_8914fea76e931336b7ba8bc047e68c35" class="block-separator block-separator--100">                                                      </p>
+
+
+
+<div id="medium-table-block_94d117ef3815642993e9fe2b535eec38" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">LightBGM</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">XGBoost</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">CatBoost</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"><p><span>max _ depth:7</span></p><p><span>learning _ rate:0.08</span></p><p><span>num _ leaves:100</span></p><p><span>n _ estimates:1000</span></p></div></td>
+
+                    
+                        <td class="c-ceil"><span>最大深度:7 </span></td>
+
+                    
+                        <td class="c-ceil"><span>最大深度:5 </span></td>
+
+                    
+                        <td class="c-ceil"><span>深度:10 </span></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"> </td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_45da53a9d06673b7c2f5d2795c359c06" class="block-separator block-separator--15">超参数调谐部分可在<a href="https://web.archive.org/web/20230219051826/https://github.com/codebrain001/Catboost-tutorial/blob/main/Catboost_vs_LightGBM_vs_XGBoost.ipynb" target="_blank" rel="noreferrer noopener nofollow">参考笔记本</a>中找到。</p>
+
+
+
+<p>现在让我们用前面提到的调整设置运行这些模型。</p>
+
+
+
+<p>同样，基于调优设置的比较分析可以在Neptune仪表盘上查看。</p>
+
+
+
+<pre class="hljs">
+params = {<span class="hljs-string">"max_depth"</span>: <span class="hljs-number">7</span>, <span class="hljs-string">"learning_rate"</span> : <span class="hljs-number">0.08</span>, <span class="hljs-string">"num_leaves"</span>: <span class="hljs-number">100</span>,  <span class="hljs-string">"n_estimators"</span>: <span class="hljs-number">1000</span>}
+
+
+model_lgb_tun = lgb.LGBMClassifier(boosting_type=<span class="hljs-string">'gbdt'</span>, objective=<span class="hljs-string">'binary'</span>, metric=<span class="hljs-string">'auc'</span>,**params)
+run_model(model_lgb_tun, <span class="hljs-string">'Tuned LightGBM without categorical support'</span>, <span class="hljs-string">'LGB'</span>)
+
+
+model_lgb_cat_tun = lgb.LGBMClassifier(boosting_type=<span class="hljs-string">'gbdt'</span>, objective=<span class="hljs-string">'binary'</span>, metric=<span class="hljs-string">'auc'</span>,**params)
+run_model(model_lgb_cat_tun, <span class="hljs-string">'Tuned LightGBM with categorical support'</span>, <span class="hljs-string">'LGB'</span>, cat_cols)
+
+
+params = {<span class="hljs-string">"max_depth"</span>: <span class="hljs-number">5</span>, <span class="hljs-string">"learning_rate"</span>: <span class="hljs-number">0.8</span>, <span class="hljs-string">"min_child_weight"</span>: <span class="hljs-number">6</span>,  <span class="hljs-string">"n_estimators"</span>: <span class="hljs-number">1000</span>}
+
+
+model_xgb_tun = xgb.XGBClassifier(**params)
+run_model(model_xgb_tun, <span class="hljs-string">'Tuned XGBoost'</span>,<span class="hljs-string">'XGB'</span>)
+
+
+params = {<span class="hljs-string">"depth"</span>: <span class="hljs-number">10</span>, <span class="hljs-string">"learning_rate"</span>: <span class="hljs-number">0.5</span>, <span class="hljs-string">"iterations"</span>: <span class="hljs-number">1000</span>, <span class="hljs-string">"l2_leaf_reg"</span>: <span class="hljs-number">5</span>}
+
+
+model_cat_tun = cb.CatBoostClassifier(**params)
+run_model(model_cat_tun,<span class="hljs-string">'Tuned CatBoost without categorical support'</span>, key=<span class="hljs-string">'CAT'</span>)
+
+
+model_cat_cat_tun = cb.CatBoostClassifier(**params)
+cat_features_index = [<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>]
+run_model(model_cat_cat_tun,<span class="hljs-string">'Default CatBoost with categorical support'</span>,<span class="hljs-string">'CAT'</span>, cat_features_index)
+</pre>
+
+
+
+<p>结果:调整设置</p>
+
+
+
+
+
+<h4 id="results-tuned-setting">从仪表板上可以明显看出:</h4>
+
+
+
+<p>在分类特征支持下，CatBoost仍然保持了最快的预测时间和最佳的性能得分。CatBoost对分类数据的内部识别允许它产生最慢的训练时间。</p>
+
+
+
+<ul>
+<li>尽管进行了超参数调优，但默认结果和调优结果之间的差异并不大，这也凸显了CatBoost的默认设置会产生很好的结果这一事实。</li>
+
+
+
+<li>XGBoost性能随着调整的设置而提高，但是，它产生了第四好的AUC-ROC分数，并且训练时间和预测时间变得更差。</li>
+
+
+
+<li>LightGBM仍然拥有最快的训练时间和最快的参数调整时间。然而，如果你愿意在更快的训练时间和性能之间做出权衡，CatBoost将是一个很好的选择。</li>
+
+
+
+<li>结论</li>
+</ul>
+
+
+
+<h2 id="conclusion">CatBoost的算法设计可能类似于“老”一代GBDT模型，但是，它有一些关键属性，如:</h2>
+
+
+
+<p>排序目标函数</p>
+
+
+
+<ul>
+<li>自然分类特征预处理</li>
+
+
+
+<li>模型分析</li>
+
+
+
+<li>最快预测时间</li>
+
+
+
+<li>CatBoost还提供了巨大的性能潜力，因为它在缺省参数下表现出色，在调优时显著提高了性能。本文旨在通过讨论这些关键特性及其提供的优势，帮助您决定何时选择CatBoost而不是LightGBM或XGBoost。我希望现在你对此有一个很好的想法，下次你面临这样的选择时，你将能够做出明智的决定。</li>
+</ul>
+
+
+
+<p>如果你想更深入地了解这一切，下面的链接将帮助你做到这一点。暂时就这样吧！</p>
+
+
+
+<p>If you would like to get a deeper look inside all of this, the following links will help you to do just that. That’s all for now! </p>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

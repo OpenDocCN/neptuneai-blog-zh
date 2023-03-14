@@ -1,0 +1,391 @@
+<html>
+<head>
+<title>Tokenization in NLP: Types, Challenges, Examples, Tools </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>自然语言处理中的标记化:类型、挑战、例子、工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/tokenization-in-nlp#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/tokenization-in-nlp#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>在任何NLP项目中，您需要做的第一件事是<a href="https://web.archive.org/web/20221108111346/https://www.kdnuggets.com/2019/04/text-preprocessing-nlp-machine-learning.html#:~:text=What%20is%20text%20preprocessing%3F,an%20example%20of%20a%20Task." target="_blank" rel="noreferrer noopener nofollow">文本预处理</a>。预处理输入文本仅仅意味着将数据转换成可预测和可分析的形式。这是构建令人惊叹的NLP应用程序的关键一步。</p>
+
+
+
+<p>预处理文本有不同的方法:</p>
+
+
+<div class="custom-point-list">
+<ul><li>停止单词删除，</li><li>符号化，</li><li>堵塞。</li></ul>
+</div>
+
+
+<p>其中，最重要的一步是标记化。它是将文本数据流分解成单词、术语、句子、符号或其他一些有意义的元素(称为标记)的过程。有很多开源工具可以用来执行令牌化过程。</p>
+
+
+
+<p>在本文中，我们将深入探讨标记化的重要性和不同类型的标记化，探索一些实现标记化的工具，并讨论面临的挑战。</p>
+
+
+
+
+
+
+
+
+<h2 id="why">为什么我们需要标记化？</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20221108111346/https://www.analyticsvidhya.com/blog/2020/05/what-is-tokenization-nlp/" target="_blank" rel="noreferrer noopener nofollow">标记化</a>是任何NLP流水线的第一步。它对你管道的其他部分有着重要的影响。记号赋予器将非结构化数据和自然语言文本分解成可以被视为离散元素的信息块。文档中出现的标记可以直接用作表示该文档的向量。</p>
+
+
+
+<p>这就立刻把一个非结构化的字符串(文本文档)变成了适合机器学习的数值数据结构。它们也可以被计算机直接用来触发有用的动作和响应。或者它们可以在机器学习管道中用作触发更复杂决策或行为的功能。</p>
+
+
+
+
+
+
+
+<p>标记化可以分隔句子、单词、字符或子词。当我们将文本拆分成句子时，我们称之为句子标记化。对于单词，我们称之为单词标记化。</p>
+
+
+
+<p><strong>句子标记化的例子</strong></p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/ba13b4cdb5236a426eda9ea40877fe86.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh6.googleusercontent.com/BEufjOroFPFhQNAoHW49IDlg78lV4qLj_ot-E75fSwQLovqRtmsiXauYcLHmyMoWttXRKI921skpY9c3u0y8rPy8VLHJgHJ3BxXH45vZP461DetR0jdZzDA95sRKOAE9nUTC7dY7?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh6.googleusercontent.com/BEufjOroFPFhQNAoHW49IDlg78lV4qLj_ot-E75fSwQLovqRtmsiXauYcLHmyMoWttXRKI921skpY9c3u0y8rPy8VLHJgHJ3BxXH45vZP461DetR0jdZzDA95sRKOAE9nUTC7dY7"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/ba13b4cdb5236a426eda9ea40877fe86.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh6.googleusercontent.com/BEufjOroFPFhQNAoHW49IDlg78lV4qLj_ot-E75fSwQLovqRtmsiXauYcLHmyMoWttXRKI921skpY9c3u0y8rPy8VLHJgHJ3BxXH45vZP461DetR0jdZzDA95sRKOAE9nUTC7dY7"/></noscript></figure>
+
+
+
+<p><strong>单词标记化的例子</strong></p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/a7b57f3dbe94d9029846492966ac0528.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh3.googleusercontent.com/xB7dCfwj3eGVooVzhL-7qBSbMETzcfnSvNSG0l79f9l7f446N7TXdxZ-PRu-yH2QD7aIRHu8uJyUX2Vm3JrgwhnhvSmGt0RFeqQ_RKcF8XMERrN_znnn1mg9El4WiiegJdL7g6UJ?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh3.googleusercontent.com/xB7dCfwj3eGVooVzhL-7qBSbMETzcfnSvNSG0l79f9l7f446N7TXdxZ-PRu-yH2QD7aIRHu8uJyUX2Vm3JrgwhnhvSmGt0RFeqQ_RKcF8XMERrN_znnn1mg9El4WiiegJdL7g6UJ"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/a7b57f3dbe94d9029846492966ac0528.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh3.googleusercontent.com/xB7dCfwj3eGVooVzhL-7qBSbMETzcfnSvNSG0l79f9l7f446N7TXdxZ-PRu-yH2QD7aIRHu8uJyUX2Vm3JrgwhnhvSmGt0RFeqQ_RKcF8XMERrN_znnn1mg9El4WiiegJdL7g6UJ"/></noscript></figure>
+
+
+
+
+
+
+
+<p>虽然Python中的标记化可能很简单，但我们知道它是开发良好模型和帮助我们理解文本语料库的基础。本节将列出一些可用于标记文本内容的工具，如NLTK、TextBlob、spacy、Gensim和Keras。</p>
+
+
+
+<h3>空白标记化</h3>
+
+
+
+<p>标记文本最简单的方法是在字符串中使用空格作为单词的“分隔符”。这可以通过<strong> Python的split函数</strong>来实现，该函数可用于所有string对象实例以及string内置类本身。您可以根据需要任意更改分隔符。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/f590bbf7295cf7b58d586f8e3a1bd30c.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh6.googleusercontent.com/_j8ACbtsO5xK55sgFlTho9pfCg4-OaiicDULdaeqULAcRGU60kdGykhXbjLLvqMmT1GH4qyXKcoL2BHMf2-OA3YDBlDuMZDOjAmXUeGd4xrUKnrYkyn5JAuOdagzxAk3a8Yu9KOt?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh6.googleusercontent.com/_j8ACbtsO5xK55sgFlTho9pfCg4-OaiicDULdaeqULAcRGU60kdGykhXbjLLvqMmT1GH4qyXKcoL2BHMf2-OA3YDBlDuMZDOjAmXUeGd4xrUKnrYkyn5JAuOdagzxAk3a8Yu9KOt"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/f590bbf7295cf7b58d586f8e3a1bd30c.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh6.googleusercontent.com/_j8ACbtsO5xK55sgFlTho9pfCg4-OaiicDULdaeqULAcRGU60kdGykhXbjLLvqMmT1GH4qyXKcoL2BHMf2-OA3YDBlDuMZDOjAmXUeGd4xrUKnrYkyn5JAuOdagzxAk3a8Yu9KOt"/></noscript></figure>
+
+
+
+<p>正如您所注意到的，这个内置的Python方法在标记一个简单的句子方面已经做得很好了。它的“错误”在最后一个词上，在那里它包括了带有符号<strong>“1995”的句尾标点符号。</strong>我们需要将标记与句子中相邻的标点符号和其他重要标记分开。</p>
+
+
+
+<p>在下面的例子中，我们将使用逗号作为分隔符来执行句子标记化。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/4fbc27d63878f10da647c51174777166.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh4.googleusercontent.com/dwJ5iPbII3us093isIm8aqbD3AaZdGhP6aYFXvfW3u1dZqIizNfNWCUrxCiVvKFugAC9q3eWFtyrxgsJnvKrgCnozo2prd0izW3r_ymXaM_S99ZastZOryQrrx55HtJzRu7LnS1t?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/dwJ5iPbII3us093isIm8aqbD3AaZdGhP6aYFXvfW3u1dZqIizNfNWCUrxCiVvKFugAC9q3eWFtyrxgsJnvKrgCnozo2prd0izW3r_ymXaM_S99ZastZOryQrrx55HtJzRu7LnS1t"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/4fbc27d63878f10da647c51174777166.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/dwJ5iPbII3us093isIm8aqbD3AaZdGhP6aYFXvfW3u1dZqIizNfNWCUrxCiVvKFugAC9q3eWFtyrxgsJnvKrgCnozo2prd0izW3r_ymXaM_S99ZastZOryQrrx55HtJzRu7LnS1t"/></noscript></figure>
+
+
+
+<h3>NLTK单词标记化</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221108111346/http://www.nltk.org/" target="_blank" rel="noreferrer noopener nofollow"> NLTK </a>(自然语言工具包)是一个用于自然语言处理的开源Python库。它为50多个语料库和词汇资源(如WordNet)提供了易于使用的界面，以及一组用于分类、标记化、词干提取和标记的文本处理库。</p>
+
+
+
+<p>您可以使用NLTK的tokenize模块轻松地对文本中的句子和单词进行标记。</p>
+
+
+
+<p>首先，我们将从NLTK库中导入相关的函数:</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/aa433540bec96718a42541f167eec42e.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh4.googleusercontent.com/NBxVcZ8q77tRJiFT3kuI-55R-EZ_m3384TLmDcgmAX1jOcwD3dqwUmS0AobGPwclW4W_ksoYkbjx8GUrk6Zi2lez3QfRYPFWrKp3p66bVAMb8OEHy4Kdkk_BidIbF2S6HiF0rk4c?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/NBxVcZ8q77tRJiFT3kuI-55R-EZ_m3384TLmDcgmAX1jOcwD3dqwUmS0AobGPwclW4W_ksoYkbjx8GUrk6Zi2lez3QfRYPFWrKp3p66bVAMb8OEHy4Kdkk_BidIbF2S6HiF0rk4c"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/aa433540bec96718a42541f167eec42e.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/NBxVcZ8q77tRJiFT3kuI-55R-EZ_m3384TLmDcgmAX1jOcwD3dqwUmS0AobGPwclW4W_ksoYkbjx8GUrk6Zi2lez3QfRYPFWrKp3p66bVAMb8OEHy4Kdkk_BidIbF2S6HiF0rk4c"/></noscript></figure>
+
+
+<div class="custom-point-list">
+<ul><li><strong>单词和句子分词器</strong></li></ul>
+</div>
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/0e9436141f3998636504ade66376aa97.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh4.googleusercontent.com/vjAO01ec54Ktzr9c1sPtS1gmrzKogRF6zMgHmkFGOAhZcynYkZ4GozUhc2lIwyzKPqI2_DHkK_PaHX9s9eFG6SG_THbRaAQ0PUV8jWWf34eTBd0gfwTs9T6oXt6NRlYj7ylAZAZ_?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/vjAO01ec54Ktzr9c1sPtS1gmrzKogRF6zMgHmkFGOAhZcynYkZ4GozUhc2lIwyzKPqI2_DHkK_PaHX9s9eFG6SG_THbRaAQ0PUV8jWWf34eTBd0gfwTs9T6oXt6NRlYj7ylAZAZ_"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/0e9436141f3998636504ade66376aa97.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/vjAO01ec54Ktzr9c1sPtS1gmrzKogRF6zMgHmkFGOAhZcynYkZ4GozUhc2lIwyzKPqI2_DHkK_PaHX9s9eFG6SG_THbRaAQ0PUV8jWWf34eTBd0gfwTs9T6oXt6NRlYj7ylAZAZ_"/></noscript></figure>
+
+
+
+<p><em>注意:sent_tokenize使用来自token izers/punkt/English . pickle的预训练模型</em></p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>基于标点符号的分词器</strong></li></ul>
+</div>
+
+
+<p>这个分词器根据空格和标点符号将句子拆分成单词。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/241549b607d00ae7c25ce1a8d16815f4.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh4.googleusercontent.com/zbRNpppo-K_EABXT_ZZHE3cNHUaDMYhKyG8pFRZA9A3PRpK6L3A1CPu-5fgb1p0mTuijnmwwHk7PmZleESPYLcOK_RFNQMCRSKGj8iYkD1IKFpJS1relfdBxBANucA33qkBzFGay?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/zbRNpppo-K_EABXT_ZZHE3cNHUaDMYhKyG8pFRZA9A3PRpK6L3A1CPu-5fgb1p0mTuijnmwwHk7PmZleESPYLcOK_RFNQMCRSKGj8iYkD1IKFpJS1relfdBxBANucA33qkBzFGay"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/241549b607d00ae7c25ce1a8d16815f4.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/zbRNpppo-K_EABXT_ZZHE3cNHUaDMYhKyG8pFRZA9A3PRpK6L3A1CPu-5fgb1p0mTuijnmwwHk7PmZleESPYLcOK_RFNQMCRSKGj8iYkD1IKFpJS1relfdBxBANucA33qkBzFGay"/></noscript></figure>
+
+
+
+<p>我们可以注意到考虑“Amal。m " word _ token ize中的一个单词，并在wordpunct_tokenize中将其拆分。</p>
+
+
+
+
+
+<p>这个分词器包含了各种英语单词分词的通用规则。它分隔像(？！。；，)从相邻的标记中分离出来，并将十进制数保留为单个标记。此外，它还包含英语缩写的规则。</p>
+
+
+
+<p>例如，“不”被标记为[“做”，“不”]。您可以在这个<a href="https://web.archive.org/web/20221108111346/http://www.nltk.org/api/nltk.tokenize.html#module-nltk.tokenize.treebank">链接</a>中找到Treebank标记器的所有规则。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/e9fd6f657ce51e13239dd8441cd54b13.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh3.googleusercontent.com/KJfPOpuWZPqETyXMldBWzY36gV7vC69yKmRj0WLZINtTMHsNb9Zb5knEl-OJTbRFr7nL9Tnr-UvYq8o2gdUa5Cv0kGH_IhNuV6PvkyD9MhMfX7iI5P9NDOi25V1CQVjywj13U55S?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh3.googleusercontent.com/KJfPOpuWZPqETyXMldBWzY36gV7vC69yKmRj0WLZINtTMHsNb9Zb5knEl-OJTbRFr7nL9Tnr-UvYq8o2gdUa5Cv0kGH_IhNuV6PvkyD9MhMfX7iI5P9NDOi25V1CQVjywj13U55S"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/e9fd6f657ce51e13239dd8441cd54b13.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh3.googleusercontent.com/KJfPOpuWZPqETyXMldBWzY36gV7vC69yKmRj0WLZINtTMHsNb9Zb5knEl-OJTbRFr7nL9Tnr-UvYq8o2gdUa5Cv0kGH_IhNuV6PvkyD9MhMfX7iI5P9NDOi25V1CQVjywj13U55S"/></noscript></figure>
+
+
+
+
+
+<p>当我们想要在像tweets这样的文本数据中应用标记化时，上面提到的标记化器无法产生实用的标记。通过这个问题，NLTK有了一个专门针对tweets的基于规则的标记器。如果我们需要像情感分析这样的任务，我们可以将表情符号分成不同的单词。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/8337f4a9df10da83345b4e20f7db46a8.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh5.googleusercontent.com/XfnbfVcPTHwzAJ5vSzTV6ChHvjcZgtanj013c2xzmQlEWXm4mPti8Zeh72ToBNX8YnB7cTOTIJSxrvcLuGW56gq0zWQV6AxEjJulPe1-58UWUdI2mH-PPdoCnDtTclKrEnylaSp4?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh5.googleusercontent.com/XfnbfVcPTHwzAJ5vSzTV6ChHvjcZgtanj013c2xzmQlEWXm4mPti8Zeh72ToBNX8YnB7cTOTIJSxrvcLuGW56gq0zWQV6AxEjJulPe1-58UWUdI2mH-PPdoCnDtTclKrEnylaSp4"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/8337f4a9df10da83345b4e20f7db46a8.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh5.googleusercontent.com/XfnbfVcPTHwzAJ5vSzTV6ChHvjcZgtanj013c2xzmQlEWXm4mPti8Zeh72ToBNX8YnB7cTOTIJSxrvcLuGW56gq0zWQV6AxEjJulPe1-58UWUdI2mH-PPdoCnDtTclKrEnylaSp4"/></noscript></figure>
+
+
+
+
+
+<p>NLTK的多词表达式标记器(MWETokenizer)提供了一个函数add_mwe()，允许用户在对文本使用标记器之前输入多个词表达式。更简单地说，它可以将多词表达式合并成单个令牌。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/4eadfb0e0095d570808393394fca9f70.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh6.googleusercontent.com/kqsPupltv3IvcJGUYcQaVvM6Z_JuFpezmBhI5d8nsMcGiJAP3F7iQwXYmdFPnIhV5hpui3UmoSrKjpr9QNLfSfRoScjUE6ZWoVsiQ-zlYKC3maN7l42FfArJhklsLFHeNHDbXelV?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh6.googleusercontent.com/kqsPupltv3IvcJGUYcQaVvM6Z_JuFpezmBhI5d8nsMcGiJAP3F7iQwXYmdFPnIhV5hpui3UmoSrKjpr9QNLfSfRoScjUE6ZWoVsiQ-zlYKC3maN7l42FfArJhklsLFHeNHDbXelV"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/4eadfb0e0095d570808393394fca9f70.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh6.googleusercontent.com/kqsPupltv3IvcJGUYcQaVvM6Z_JuFpezmBhI5d8nsMcGiJAP3F7iQwXYmdFPnIhV5hpui3UmoSrKjpr9QNLfSfRoScjUE6ZWoVsiQ-zlYKC3maN7l42FfArJhklsLFHeNHDbXelV"/></noscript></figure>
+
+
+
+<h3>TextBlob单词标记化</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221108111346/https://textblob.readthedocs.io/en/dev/" target="_blank" rel="noreferrer noopener nofollow"> TextBlob </a>是一个用于处理文本数据的Python库。它提供了一个一致的API，用于处理常见的自然语言处理(NLP)任务，如词性标注、名词短语提取、情感分析、分类、翻译等。</p>
+
+
+
+<p>让我们从安装TextBlob和NLTK语料库开始:</p>
+
+
+
+<pre class="hljs">$pip install -U textblob 
+$python3 -m textblob.download_corpora
+</pre>
+
+
+
+<p>在下面的代码中，我们使用TextBlob库执行单词标记化:</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/9a6958c6bff5de43c9f25c9b69071acc.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh6.googleusercontent.com/hIdSsmj8zcAqTufwfPode0D8Q-SA63zitPzY0tZsfTBzT8Is0K9EFqSAyiPBysZbrMdRyvI8N0w4ESSksvAq8YZfr5JbewthAXGYDNjaqqzZYY0QmW8r_0BECuFE8PrDzxEz1JMw?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh6.googleusercontent.com/hIdSsmj8zcAqTufwfPode0D8Q-SA63zitPzY0tZsfTBzT8Is0K9EFqSAyiPBysZbrMdRyvI8N0w4ESSksvAq8YZfr5JbewthAXGYDNjaqqzZYY0QmW8r_0BECuFE8PrDzxEz1JMw"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/9a6958c6bff5de43c9f25c9b69071acc.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh6.googleusercontent.com/hIdSsmj8zcAqTufwfPode0D8Q-SA63zitPzY0tZsfTBzT8Is0K9EFqSAyiPBysZbrMdRyvI8N0w4ESSksvAq8YZfr5JbewthAXGYDNjaqqzZYY0QmW8r_0BECuFE8PrDzxEz1JMw"/></noscript></figure>
+
+
+
+<p>我们可以注意到TextBlob标记器删除了标点符号。此外，它还有英语缩写的规则。</p>
+
+
+
+<h3>空间记号化器</h3>
+
+
+
+<p>SpaCy是一个开源的Python库，可以解析和理解大量文本。提供适合特定语言(英语、法语、德语等)的型号。)，它以最高效的常用算法实现来处理NLP任务。</p>
+
+
+
+<p>spaCy tokenizer提供了指定特殊标记的灵活性，这些标记不需要分段，或者需要使用每种语言的特殊规则进行分段，例如，句子末尾的标点符号应该分开，而“U.K .”应该保留为一个标记。</p>
+
+
+
+<p>在使用spaCy之前，您需要安装它，下载英语语言的数据和模型。</p>
+
+
+
+<pre class="hljs">$ pip install spacy
+$ python3 -m spacy download en_core_web_sm
+</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/a142894e2f12fbf7b1ecfa9aa146bd76.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh5.googleusercontent.com/To5jxiWBQOrE4PjHVOy7XpQnRmtK17ybW3zmTghvKAGnt6V7OvHrDYDI9KNlB5z5UG-db49q-tGODyTuqeIOqAm6ilWZHhWJ6kqBpirpo8XmcZtP7ycgx2SWgDmB4NH14DYaQ5XZ?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh5.googleusercontent.com/To5jxiWBQOrE4PjHVOy7XpQnRmtK17ybW3zmTghvKAGnt6V7OvHrDYDI9KNlB5z5UG-db49q-tGODyTuqeIOqAm6ilWZHhWJ6kqBpirpo8XmcZtP7ycgx2SWgDmB4NH14DYaQ5XZ"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/a142894e2f12fbf7b1ecfa9aa146bd76.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh5.googleusercontent.com/To5jxiWBQOrE4PjHVOy7XpQnRmtK17ybW3zmTghvKAGnt6V7OvHrDYDI9KNlB5z5UG-db49q-tGODyTuqeIOqAm6ilWZHhWJ6kqBpirpo8XmcZtP7ycgx2SWgDmB4NH14DYaQ5XZ"/></noscript></figure>
+
+
+
+<h3>Gensim单词标记器</h3>
+
+
+
+<p>Gensim是一个Python库，用于大型语料库的主题建模、文档索引和相似性检索。目标受众是自然语言处理(NLP)和信息检索(IR)社区。它为标记化提供了实用函数。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/98c0323b6b4540ca20d85d91e0ca2294.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh3.googleusercontent.com/kfSNqZt3OlkxFB9xnWt78MMssfD6AvtNZWje85bjaXBNNrPv-rL_lregtsMWH2x8ntWSrZET088XIGg6bB2r-y0uSsGpFk0arA2eBJm0pcSjwKXwQvNr7e2UawntSWJEm6te1MrZ?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh3.googleusercontent.com/kfSNqZt3OlkxFB9xnWt78MMssfD6AvtNZWje85bjaXBNNrPv-rL_lregtsMWH2x8ntWSrZET088XIGg6bB2r-y0uSsGpFk0arA2eBJm0pcSjwKXwQvNr7e2UawntSWJEm6te1MrZ"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/98c0323b6b4540ca20d85d91e0ca2294.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh3.googleusercontent.com/kfSNqZt3OlkxFB9xnWt78MMssfD6AvtNZWje85bjaXBNNrPv-rL_lregtsMWH2x8ntWSrZET088XIGg6bB2r-y0uSsGpFk0arA2eBJm0pcSjwKXwQvNr7e2UawntSWJEm6te1MrZ"/></noscript></figure>
+
+
+
+<h3>使用Keras的标记化</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221108111346/https://keras.io/" target="_blank" rel="noreferrer noopener nofollow"> Keras </a>开源库是最可靠的深度学习框架之一。为了执行标记化，我们使用Keras.preprocessing.text类中的text_to_word_sequence方法。Keras最大的优点是在标记之前将字母表转换成小写字母，这样可以节省大量时间。</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/f0edb1a21547be10418fb8a03358de23.png" alt="" data-lazy-src="https://web.archive.org/web/20221108111346/https://lh4.googleusercontent.com/skHBi_77xZHws1wIMwtrb-2U_zNQxSAx4BK4PK5x3sHtWdbK4Ha8BffDD-lLsCGW5GxuaRNuASc607d5N9MHN_CYXTTMUncAiT1mELR1EioLkf_KltBpVaQScEe_TX_syBg2QlF3?is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/skHBi_77xZHws1wIMwtrb-2U_zNQxSAx4BK4PK5x3sHtWdbK4Ha8BffDD-lLsCGW5GxuaRNuASc607d5N9MHN_CYXTTMUncAiT1mELR1EioLkf_KltBpVaQScEe_TX_syBg2QlF3"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/f0edb1a21547be10418fb8a03358de23.png" alt="" data-original-src="https://web.archive.org/web/20221108111346im_/https://lh4.googleusercontent.com/skHBi_77xZHws1wIMwtrb-2U_zNQxSAx4BK4PK5x3sHtWdbK4Ha8BffDD-lLsCGW5GxuaRNuASc607d5N9MHN_CYXTTMUncAiT1mELR1EioLkf_KltBpVaQScEe_TX_syBg2QlF3"/></noscript></figure>
+
+
+
+<p><em> <strong>注意:</strong>你可以在这里找到所有的代码示例<a href="https://web.archive.org/web/20221108111346/https://github.com/AmalM7/NLP-Stuff/blob/main/Tokenization_in_NLP.ipynb" target="_blank" rel="noreferrer noopener nofollow">。</a></em></p>
+
+
+
+<div id="blog-cta-intext-block_60d42fbe1e1c9" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">可能有用</h3>
+  <div class="blog-cta-intext__content"><p>检查如何<a href="https://web.archive.org/web/20221108111346/https://docs.neptune.ai/integrations-and-supported-tools/model-training/tensorflow-keras" target="_blank" rel="noopener">跟踪您的TensorFlow / Keras模型训练元数据</a>(指标、参数、硬件消耗等)。</p>
+</div>
+  </div>
+
+
+<h2 id="challenges-limitations">挑战和局限</h2>
+
+
+
+<p>让我们讨论一下标记化任务的挑战和局限性。</p>
+
+
+
+<p>通常，该任务用于用英语或法语编写的文本语料库，其中这些语言通过使用空格或标点符号来分隔单词，以定义句子的边界。不幸的是，这种方法不适用于其他语言，如汉语、日语、朝鲜语、印地语、乌尔都语、泰米尔语等。这个问题产生了开发一个结合所有语言的通用标记化工具的需求。</p>
+
+
+
+<p>另一个限制是阿拉伯文本的标记化，因为阿拉伯语作为一种语言具有复杂的形态。例如，一个阿拉伯单词可能包含多达六个不同的标记，如单词“عقد”(eaqad)。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="48160" data-permalink="https://web.archive.org/web/20221108111346/https://neptune.ai/blog/tokenization-in-nlp/attachment/tokenization-challenges" data-orig-file="https://web.archive.org/web/20221108111346/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?fit=522%2C530&amp;ssl=1" data-orig-size="522,530" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Tokenization-challenges" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221108111346/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?fit=295%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20221108111346/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?fit=522%2C530&amp;ssl=1" decoding="async" src="../Images/dba44d4a54a77112a38a2913e5fff6c3.png" alt="Tokenization challenges" class="wp-image-48160 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221108111346/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?resize=522%2C530&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221108111346im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?resize=522%2C530&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="48160" data-permalink="https://web.archive.org/web/20221108111346/https://neptune.ai/blog/tokenization-in-nlp/attachment/tokenization-challenges" data-orig-file="https://web.archive.org/web/20221108111346/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?fit=522%2C530&amp;ssl=1" data-orig-size="522,530" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Tokenization-challenges" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221108111346/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?fit=295%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20221108111346/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?fit=522%2C530&amp;ssl=1" decoding="async" src="../Images/dba44d4a54a77112a38a2913e5fff6c3.png" alt="Tokenization challenges" class="wp-image-48160" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221108111346im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Tokenization-challenges.png?resize=522%2C530&amp;ssl=1"/></noscript><figcaption><em>One Arabic word gives the meanings of 6 different words in the English language. | <a href="https://web.archive.org/web/20221108111346/https://www.pinterest.com/pin/484699978625704765/visual-search/?x=17&amp;y=14&amp;w=530&amp;h=530&amp;cropSource=6" target="_blank" rel="noreferrer noopener nofollow">Source</a> </em></figcaption></figure></div>
+
+
+
+<p>在自然语言处理方面有很多研究正在进行。你需要选择一个挑战或问题，并开始寻找解决方案。</p>
+
+
+
+<h2><strong>结论</strong></h2>
+
+
+
+<p>通过这篇文章，我们已经了解了来自各种库和工具的不同记号赋予器。</p>
+
+
+
+<p>我们看到了这项任务在任何NLP任务或项目中的重要性，并且我们还使用Python和Neptune实现了跟踪。您可能会觉得这是一个简单的主题，但是一旦深入到每个记号赋予器模型的细节，您会注意到它实际上非常复杂。</p>
+
+
+
+<p>从上面的例子开始练习，并在任何文本数据集上尝试它们。你练习得越多，你就越能理解标记化是如何工作的。</p>
+
+
+
+<p>如果你陪我到最后——谢谢你的阅读！</p>
+
+
+
+
+<div id="author-box-new-format-block_60421797c49c6" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">阿迈勒·门兹利</h3>
+    
+          <p class="article__authorContent-text">创新、足智多谋、自我激励的数据科学家。我热衷于用数据解决难题，我相信它是我们今天最强大的工具，来回答宇宙中最模糊的问题。此外，我喜欢教学、指导和写技术博客。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="is-layout-flow wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>如何构建和管理自然语言处理(NLP)项目</h2>
+
+
+
+<p class="has-small-font-size">Dhruvil Karani |发布于2020年10月12日</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>如果说我在ML行业工作中学到了什么的话，那就是:<strong>机器学习项目很乱。</strong></p>
+
+
+
+<p>这并不是说人们不想把事情组织起来，只是在项目过程中有很多事情很难组织和管理。</p>
+
+
+
+<p>你可以从头开始，但有些事情会阻碍你。</p>
+
+
+
+<p>一些典型的原因是:</p>
+
+
+<div class="custom-point-list">
+<ul><li>笔记本中的快速数据探索，</li><li>取自github上的研究报告的模型代码，</li><li>当一切都已设置好时，添加新的数据集，</li><li>发现了数据质量问题并且需要重新标记数据，</li><li>团队中的某个人“只是快速地尝试了一些东西”,并且在没有告诉任何人的情况下改变了训练参数(通过argparse传递),</li><li>从高层推动将原型转化为产品“仅此一次”。</li></ul>
+</div>
+
+
+<p>多年来，作为一名机器学习工程师，我学到了一堆<strong>东西，它们可以帮助你保持在事物的顶端，并检查你的NLP项目</strong>(就像你真的可以检查ML项目一样:)。</p>
+
+
+
+<p>在这篇文章中，我将分享我在从事各种数据科学项目时学到的关键指针、指南、技巧和诀窍。许多东西在任何ML项目中都是有价值的，但有些是NLP特有的。</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221108111346/https://neptune.ai/blog/how-to-structure-and-manage-nlp-projects-templates" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

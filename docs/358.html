@@ -1,0 +1,632 @@
+<html>
+<head>
+<title>Best Tools for Model Tuning and Hyperparameter Optimization </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>模型调整和超参数优化的最佳工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/best-tools-for-model-tuning-and-hyperparameter-optimization#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/best-tools-for-model-tuning-and-hyperparameter-optimization#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>我清楚地记得两年前我参加的一次机器学习黑客马拉松，当时我正处于数据科学职业生涯的初期。这是尼日利亚数据科学组织的训练营的资格预审黑客马拉松。</p>
+
+
+
+<p>该数据集包含某些雇员的信息。我必须预测一个员工是否应该得到晋升。经过几天努力改进和设计功能，该模型的准确性似乎在80%左右波动。</p>
+
+
+
+<p>我需要做些什么来提高我在排行榜上的分数。我开始手动调整模型——得到了更好的结果。通过改变一个参数，准确率提高到了82%(这一步非常重要，任何参加过黑客马拉松的人都可以证明！).兴奋之余，我开始调整其他超参数，但结果并不都很好。我已经精疲力尽了，想象一下连续工作7个小时来改进一个模型。挺累的。</p>
+
+
+
+<p>我知道GridSearchCV T1和T2 randomsearccv T3。我试用了GridSearchCV，花了3个多小时才从我提供的一系列值中得出结果。更糟糕的是，来自GridSearchCV的结果并没有更好。沮丧之余，我决定试试RandomSearchCV。这带来了一点喜悦，我的准确率从82%上升到了86%。</p>
+
+
+
+<p>经过大量的试验，没有改善，我回到手动调谐，看看我能得到什么。在黑客马拉松结束时，我达到了90%的准确率。我希望我已经知道了更快优化超参数的工具！幸运的是，尽管我没有进入前50名，我仍然有资格参加训练营。</p>
+
+
+
+<p>那是过去的事了。现在，我知道有很好的超参数调优工具我可以使用，我很高兴与您分享它们。</p>
+
+
+
+<p>在开始超调之前，请确保完成以下工作:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>获得基线</strong>。您可以通过较小的模型、较少的迭代、默认参数或手动调整的模型来实现这一点。</li><li><strong>将您的数据</strong>分成训练集、验证集和测试集。</li><li>使用<strong>提前停止周期</strong>来防止过度拟合。</li><li>在培训前设置好您的<strong>完整模型管道</strong>。</li></ul>
+</div>
+
+
+<p>现在，我想讨论一下我将在文章中使用的一些术语:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>模型参数</strong>–模型参数是您的模型从数据中学习的参数，如特征、关系等。，不能手动调整(不是特征工程)。</li><li><strong>模型超参数</strong>–超参数是您可以从模型本身手动调整的值，如学习率、估计器数量、正则化类型等..</li><li><strong>优化</strong>–通过使用<strong>优化</strong>技术之一，调整超参数以最小化成本函数的过程。</li><li><strong>超参数优化</strong>–超参数优化只是一个搜索，以获得最佳超参数集，从而在特定数据集上给出模型的最佳版本。</li><li><a href="https://web.archive.org/web/20220928202019/https://github.com/fmfn/BayesianOptimization" target="_blank" rel="noreferrer noopener nofollow"> <strong>贝叶斯优化</strong></a>–一类基于模型的顺序优化(SMBO)算法的一部分，用于使用之前实验的结果来改进下一次实验。</li><li><strong>超参数采样</strong>–简单指定在超参数空间使用的参数采样方法。</li></ul>
+</div>
+
+
+
+
+
+<p>我不反对使用GridSearchCV。这是一个很好的选择，只是它非常耗时，计算量也很大。如果你像我一样，日程繁忙，你一定会找到更好的选择。</p>
+
+
+
+<p>更好的替代方法是RandomSearch CV，它使用随机超参数值来挑选最佳超参数。这比GridSearchCV快多了。这里的缺点是，由于它采用随机值，我们不能确定这些值是最佳组合。</p>
+
+
+
+<p>但是说真的，<strong>我什么时候知道我需要做超参数优化</strong>？</p>
+
+
+
+<p>作为数据科学家，我们经常犯的一个错误是使用模型的默认参数。根据您使用的默认参数，您可能没有使用模型的最佳版本。</p>
+
+
+
+<p>有时，当您的模型过度拟合(在训练集上表现良好，在测试数据集上表现不佳)或欠拟合(在训练数据集上表现不佳，在测试数据集上表现良好)时，优化您的超参数确实会有所帮助。一点小小的调整就能带来很大的不同，从60%的准确率到80%的准确率，甚至更多！</p>
+
+
+
+<p>好了，让我们结束介绍。在本文结束时，您将了解到:</p>
+
+
+<div class="custom-point-list">
+<ul><li>最好的超参数调优工具，</li><li>各种开源服务(免费使用)和付费服务，</li><li>它们的特征和优点，</li><li>他们支持的框架，</li><li>如何为你的项目选择最好的工具，</li><li>如何将它们添加到您的项目中。</li></ul>
+</div>
+
+
+<p>我们从一个TL开始。下面讨论的所有工具的灾难恢复比较。</p>
+
+
+
+<h2>模型调整和超参数优化的比较工具</h2>
+
+
+
+<p>如果您时间紧迫，这张表可以帮助您选择一个好的工具，在您的用例中进行尝试。有关每个工具的详细描述，请继续阅读下表。</p>
+
+
+<p id="block_61c9bd3ec5627" class="separator separator-5"/>
+
+
+
+
+
+
+
+<p>接下来，我将从一些开源工具开始。每个工具将按以下方式描述:</p>
+
+
+<div class="custom-point-list">
+<ul><li>工具简介，</li><li>工具的核心特性/优势，</li><li>如何使用该工具的步骤，</li><li>关于如何在项目中使用该工具的其他链接。</li></ul>
+</div>
+
+
+<h3>1.射线调谐</h3>
+
+
+
+<div class="wp-container-3 wp-block-columns are-vertically-aligned-center">
+<div class="wp-container-1 wp-block-column is-vertically-aligned-center">
+<p>Ray为构建分布式应用程序提供了一个简单、通用的API。Tune是一个Python库，用于任何规模的实验执行和超参数调整。Tune是Ray众多包中的一个。Ray Tune是一个Python库，它通过大规模利用尖端的优化算法来加速超参数调整。</p>
+</div>
+
+
+
+
+</div>
+
+
+
+<p>为什么应该使用RayTune？</p>
+
+
+
+<p><strong>下面是一些<a href="https://web.archive.org/web/20220928202019/https://docs.ray.io/en/master/tune/user-guide.html" target="_blank" rel="noreferrer noopener nofollow">的特点</a> : </strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>它很容易与许多优化库集成，如<a href="https://web.archive.org/web/20220928202019/http://ax.dev/" target="_blank" rel="noreferrer noopener nofollow"> Ax/Botorch </a>和<a href="https://web.archive.org/web/20220928202019/https://github.com/hyperopt/hyperopt" target="_blank" rel="noreferrer noopener nofollow">hyperpt</a>。</li><li>缩放可以在不改变代码的情况下完成。</li><li>Tune利用各种尖端优化算法，如<a href="https://web.archive.org/web/20220928202019/http://ax.dev/" target="_blank" rel="noreferrer noopener nofollow"> Ax/Botorch </a>、<a href="https://web.archive.org/web/20220928202019/https://github.com/hyperopt/hyperopt">hyperpt</a>和<a href="https://web.archive.org/web/20220928202019/https://github.com/fmfn/BayesianOptimization" target="_blank" rel="noreferrer noopener nofollow">贝叶斯优化</a>，使您能够透明地扩展它们。</li><li>Tune跨多个GPU和多个节点并行化，因此您不必构建自己的分布式系统来加速训练。</li><li>你可以用Tensorboard之类的工具自动显示结果。</li><li>它为优化算法提供了一个灵活的<a href="https://web.archive.org/web/20220928202019/https://ray.readthedocs.io/en/latest/tune-searchalg.html#contributing-a-new-algorithm" target="_blank" rel="noreferrer noopener nofollow">接口，您可以用几行代码轻松实现和扩展新的优化算法。</a></li><li>它支持任何机器学习框架，包括Pytorch、Tensorflow、XGBoost、LIghtGBM、Scikit-Learn和Keras。</li></ul>
+</div>
+
+
+<p>使用它需要五个简单的步骤(我假设您已经对数据进行了预处理):</p>
+
+
+
+
+
+<pre class="hljs">pip install ray[tune]</pre>
+
+
+
+
+
+<p>无论您想在ML项目中使用Tensorflow、Pytorch或任何其他框架实现Ray Tune，都有很多教程可供选择。以下是一些可供参考的例子:</p>
+
+
+
+
+
+<p>您可以从本文中了解更多关于配置光线调节及其功能的信息:<a href="https://web.archive.org/web/20220928202019/https://towardsdatascience.com/fast-hyperparameter-tuning-at-scale-d428223b081c" target="_blank" rel="noreferrer noopener nofollow">“光线调节:一个超参数库，可在任何比例下快速调节超参数”</a>。</p>
+
+
+
+<h3>2.奥普图纳</h3>
+
+
+
+<div class="wp-container-6 wp-block-columns are-vertically-aligned-center">
+<div class="wp-container-4 wp-block-column is-vertically-aligned-center">
+<p><a href="https://web.archive.org/web/20220928202019/https://optuna.readthedocs.io/en/stable/" target="_blank" rel="noreferrer noopener nofollow"> Optuna </a>是专门为机器学习设计的。这是一个<a href="https://web.archive.org/web/20220928202019/https://sahinidis.coe.gatech.edu/bbo#:~:text=We%20refer%20to%20systems%20of,specified%20values%20of%20system%20inputs" target="_blank" rel="noreferrer noopener nofollow">黑盒优化器</a>，所以它需要一个目标函数。这个目标函数决定在即将到来的试验中从哪里采样，并返回数值(超参数的性能)。它使用不同的算法，如网格搜索，随机搜索，贝叶斯和进化算法来寻找最佳的超参数值。</p>
+</div>
+
+
+
+
+</div>
+
+
+
+<p><strong>一些特征是:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>高效的采样和剪枝算法。</li><li>易于安装，要求不高。</li><li>比远视更容易使用。</li><li>使用分布式优化。</li><li>您可以使用Python语法定义搜索空间，包括条件和循环。</li><li>您可以直观地分析优化结果。</li><li>简单的可伸缩性，很少或不需要修改代码。</li></ul>
+</div>
+
+
+<p>Optuna使用修剪算法。<strong>修剪</strong>是一种在<strong>机器学习</strong>和搜索算法中使用的技术，通过删除树中对分类实例来说非关键和冗余的部分来减少决策树的大小。</p>
+
+
+
+<p>Optuna中的修剪会在训练的早期阶段自动停止没有希望的试验，您也可以称之为自动提前停止。Optuna提供了以下修剪算法:</p>
+
+
+
+
+
+<p>我将重点介绍使用Optuna所需的简单步骤:</p>
+
+
+<div class="custom-point-list">
+<ol><li>首先，用“pip install optuna”安装Optuna，如果它还没有安装的话。</li><li>定义你的模型。</li><li>选择要优化的参数。</li><li>创建一个研究。</li><li>定义目标函数。</li><li>优化。</li><li>检查试验结果。</li></ol>
+</div>
+
+
+<p>要查看的教程和示例代码:</p>
+
+
+
+
+
+<p>您也可以阅读此文章:<a href="/web/20220928202019/https://neptune.ai/blog/optuna-guide-how-to-monitor-hyper-parameter-optimization-runs" target="_blank" rel="noreferrer noopener nofollow">“Optuna指导如何监控超参数优化运行”</a>，以更好地了解Optuna如何优化您的超参数。</p>
+
+
+
+<div id="blog-cta-intext-block_6095259bdd067" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">可能有用</h3>
+  <div class="blog-cta-intext__content"><p>检查如何使用<a href="https://web.archive.org/web/20220928202019/https://docs.neptune.ai/integrations-and-supported-tools/hyperparameter-optimization/optuna" target="_blank" rel="noopener"> Neptune + Optuna </a>集成来跟踪您的超参数优化过程。</p>
+</div>
+  </div>
+
+
+<h3>3.远视</h3>
+
+
+
+<div class="wp-container-9 wp-block-columns are-vertically-aligned-center">
+<div class="wp-container-7 wp-block-column is-vertically-aligned-center">
+<p>从官方文档来看，<a href="https://web.archive.org/web/20220928202019/https://github.com/hyperopt/hyperopt" target="_blank" rel="noreferrer noopener nofollow"> Hyperopt </a>是一个Python库，用于在笨拙的搜索空间上进行串行和并行优化，搜索空间可能包括实值、离散和条件维度。</p>
+
+
+
+<p><strong> Hyperopt </strong>使用贝叶斯优化算法进行超参数调整，为给定模型选择最佳参数。它可以优化具有数百个超参数的大规模模型。</p>
+</div>
+
+
+
+
+</div>
+
+
+
+<p>Hyperopt目前实现了三种算法:</p>
+
+
+<div class="custom-point-list">
+<ul><li>随机搜索，</li><li>Parzen估计量树，</li><li>自适应TPE。</li></ul>
+</div>
+
+
+<p>Hyperopt的设计是为了适应基于高斯过程和回归树的贝叶斯优化算法，但不幸的是，它们目前还没有实现。</p>
+
+
+
+<p><strong>远视的特征:</strong></p>
+
+
+
+<p>超视需要4个基本组件来优化超参数:</p>
+
+
+<div class="custom-point-list">
+<ul><li>搜索空间，</li><li>损失函数，</li><li>优化算法，</li><li>用于存储历史(分数、配置)的数据库</li></ul>
+</div>
+
+
+<p>在您的项目中使用Hyperopt的步骤:</p>
+
+
+<div class="custom-point-list">
+<ol><li>初始化要搜索的空间。</li><li>定义目标函数。</li><li>选择要使用的搜索算法。</li><li>运行<strong>远视</strong>功能。</li><li>分析存储在trials对象中的评估输出。</li></ol>
+</div>
+
+
+<p>这里有一些实践教程，你可以看看:</p>
+
+
+
+
+
+<p>这里还有一款不错的<a href="https://web.archive.org/web/20220928202019/https://www.kaggle.com/prashant111/bayesian-optimization-using-hyperopt" target="_blank" rel="noreferrer noopener nofollow"> kaggle笔记本</a>你可以试试。</p>
+
+
+
+
+
+
+<h3>4.sci kit-优化</h3>
+
+
+
+<div class="wp-container-12 wp-block-columns are-vertically-aligned-center">
+<div class="wp-container-10 wp-block-column is-vertically-aligned-center">
+<p><a href="https://web.archive.org/web/20220928202019/https://scikit-optimize.github.io/stable/auto_examples/hyperparameter-optimization.html" target="_blank" rel="noreferrer noopener nofollow"> Scikit-Optimize </a>是Python中超参数优化的开源库。它是由Scikit-learn背后的团队开发的。与其他超参数优化库相比，它相对容易使用。</p>
+
+
+
+<p>它有基于模型的连续优化库，称为贝叶斯超参数优化(BHO)。BHO的优势在于，他们可以在更少的迭代中找到比随机搜索更好的模型设置。</p>
+</div>
+
+
+
+
+</div>
+
+
+
+<p>贝叶斯优化到底是什么？</p>
+
+
+
+<p>贝叶斯优化是一种用于黑盒函数全局优化的顺序设计策略，它不采用任何函数形式。它通常用于优化计算量大的函数。至少维基百科是这么说的。</p>
+
+
+
+<p>但是，简单地说，BO评估了从过去的结果看起来更有希望的超参数，并找到了更好的设置，而不是使用迭代次数更少的随机搜索。过去超参数的表现影响未来的决策。</p>
+
+
+
+<p><strong>sci kit-Optimize的特性:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>基于顺序模型的优化，</li><li>构建于NumPy、SciPy和Scikit-Learn之上，</li><li>开源，商业可用，BSD许可。</li></ul>
+</div>
+
+
+<p>Scikit-Optimize使用高斯<strong> </strong>过程的贝叶斯优化基于一种叫做<strong> gp_optimize的算法。</strong>你可以在这里了解更多<a href="https://web.archive.org/web/20220928202019/https://scikit-optimize.github.io/stable/modules/generated/skopt.gp_minimize.html" target="_blank" rel="noreferrer noopener nofollow">。如果你对如何从零开始构建自己的贝叶斯优化器感兴趣，你也可以看看这个教程:“</a><a href="https://web.archive.org/web/20220928202019/https://machinelearningmastery.com/what-is-bayesian-optimization/" target="_blank" rel="noreferrer noopener nofollow">如何用Python </a>从零开始实现贝叶斯优化”。</p>
+
+
+
+<p>以下是使用Scikit-Optimize需要遵循的简单步骤:</p>
+
+
+<div class="custom-point-list">
+<ol><li>如果尚未安装skopt，请使用pip install skopt安装skopt。</li><li>定义模型。</li><li>决定要优化的参数。</li><li>定义搜索空间。</li><li>定义目标函数。</li><li>运行优化。</li></ol>
+</div>
+
+
+<p>以下是在您的项目中实现Scikit Optimize的教程列表:</p>
+
+
+
+
+
+<p>关于Scikit优化特性的深入解释，请查看本文。</p>
+
+
+
+<div id="blog-cta-intext-block_60952608dd068" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">可能有用</h3>
+  <div class="blog-cta-intext__content"><p>检查如何使用<a href="https://web.archive.org/web/20220928202019/https://docs.neptune.ai/integrations-and-supported-tools/hyperparameter-optimization/scikit-optimize" target="_blank" rel="noopener"> Neptune + Scikit优化集成</a>跟踪您的超参数优化过程。</p>
+</div>
+  </div>
+
+
+<h3>5.<a href="https://web.archive.org/web/20220928202019/https://www.microsoft.com/en-us/research/project/neural-network-intelligence/" target="_blank" rel="noreferrer noopener nofollow">微软的NNI </a>(神经网络智能)</h3>
+
+
+
+<div class="wp-container-15 wp-block-columns are-vertically-aligned-center">
+<div class="wp-container-13 wp-block-column is-vertically-aligned-center">
+<p>NNI是由微软开发的免费、开源的AutoML工具包。它用于自动化特征工程、模型压缩、神经架构搜索和超参数调整。</p>
+</div>
+
+
+
+
+</div>
+
+
+
+<p>它是如何工作的？</p>
+
+
+
+<p>该工具调度并运行由调整算法生成的试验作业，以在不同的环境(如本地机器、远程服务器和云)中搜索最佳的神经架构和/或超参数。</p>
+
+
+
+<p>微软的NNI支持Pytorch、Tensorflow、Keras、Theano、Caffe2等框架。，以及像Sckit-learn、XGBoost、CatBoost和LightGBM这样的库。</p>
+
+
+
+<p><strong><a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Overview.html" target="_blank" rel="noreferrer noopener nofollow">NNI的特色</a> : </strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>很多流行的<a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Tuner/BuiltinTuner.html" target="_blank" rel="noreferrer noopener nofollow">自动调谐算法</a>(像<a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Tuner/BuiltinTuner.html#TPE" target="_blank" rel="noreferrer noopener nofollow"> TPE </a>、<a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Tuner/BuiltinTuner.html#Random" target="_blank" rel="noreferrer noopener nofollow">随机搜索</a>、<a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Tuner/BuiltinTuner.html#GPTuner" target="_blank" rel="noreferrer noopener nofollow"> GP调谐器</a>、<a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Tuner/BuiltinTuner.html#MetisTuner" target="_blank" rel="noreferrer noopener nofollow"> Metis调谐器</a>等等)和<a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Assessor/BuiltinAssessor.html" target="_blank" rel="noreferrer noopener nofollow">提前停止算法</a> ( <a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Assessor/BuiltinAssessor.html#MedianStop" target="_blank" rel="noreferrer noopener nofollow"> Medianstop </a>、<a href="https://web.archive.org/web/20220928202019/https://nni.readthedocs.io/en/stable/Assessor/BuiltinAssessor.html#Curvefitting" target="_blank" rel="noreferrer noopener nofollow"> Curvefitting </a> assessors)。</li><li>NAS(神经架构搜索)框架，用户可以轻松指定他们想要使用的神经架构。</li><li>通过NNI试用SDK支持NAS算法，如ENAS(高效神经架构搜索)和飞镖(可区分架构搜索)。</li><li>通过NNI试用软件开发工具包的自动特征工程:您不必创建一个NNI实验，只需在您的试用代码中导入一个内置的自动特征工程算法并运行！</li><li>命令行工具和web UI来管理培训实验。</li><li>可扩展的API来定制您的自动ML模型。</li><li>它可以在本地机器、远程服务器、Azure机器学习、基于kubernetes的服务(如Kube Flow、Adapt DL、Open pal等)上进行训练..</li><li>它具有用于超参数调整的方法，包括穷举搜索、启发式搜索、贝叶斯优化和基于RL。</li><li>它的一些贝叶斯优化算法的超参数调整是TPE，GP调谐器，Metis调谐器，BOHB，等等。</li></ul>
+</div>
+
+
+<p>以下是使用NNI时需要遵循的步骤:</p>
+
+
+<div class="custom-point-list">
+<ol><li><a href="https://web.archive.org/web/20220928202019/https://github.com/Microsoft/nni" target="_blank" rel="noreferrer noopener nofollow">在Windows或Linux上安装NNI </a>并验证安装。</li><li>定义和更新模型。</li><li>启用NNI API。</li><li>定义搜索空间。</li><li>定义你的实验。</li><li>准备庭审。</li><li>准备调谐器。</li><li>准备配置文件。</li><li>进行实验。</li></ol>
+</div>
+
+
+<p>要了解更多关于这些步骤的信息，请查看NNI的官方文档。你也可以从<a href="https://web.archive.org/web/20220928202019/https://github.com/Microsoft/nni" target="_blank" rel="noreferrer noopener nofollow"> Github </a>了解更多关于微软的NNI算法。</p>
+
+
+
+<p>寻找如何在您的项目中实现这一点？看看这个教程:“<a href="https://web.archive.org/web/20220928202019/https://galhever.medium.com/nni-an-automl-toolkit-e0e4234ebf12" target="_blank" rel="noreferrer noopener nofollow">如何将微软的NNI添加到你的项目</a>”。</p>
+
+
+
+<h3>6.谷歌的Vizer</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20220928202019/https://research.google/pubs/pub46180/" target="_blank" rel="noreferrer noopener nofollow"> AI平台Vizier </a>是一个黑盒优化服务，用于调整复杂机器学习模型中的超参数。</p>
+
+
+
+
+
+
+
+<p>它不仅通过调整超参数来优化模型的输出，还可以有效地用来调整函数中的参数。</p>
+
+
+
+<p>它是如何工作的？</p>
+
+
+<div class="custom-point-list">
+<ul><li>通过设置结果和影响结果的超参数来确定研究配置。</li><li>根据已设置的配置值创建研究，使用它来执行实验以产生结果。</li></ul>
+</div>
+
+
+<p>为什么要用Vizer？</p>
+
+
+<div class="custom-point-list">
+<ul><li>很好用。</li><li>需要最少的用户配置和设置。</li><li>托管最先进的黑盒优化算法。</li><li>高可用性。</li><li>可扩展到每项研究数百万次试验，每项研究数千次平行试验评估，以及数十亿项研究。</li></ul>
+</div>
+
+
+<p>按照以下步骤使用Vizer:</p>
+
+
+
+
+
+<p>在<a href="https://web.archive.org/web/20220928202019/https://cloud.google.com/ai-platform/optimizer/docs/using-optimizer" target="_blank" rel="noreferrer noopener nofollow">文档页面</a>中，显示了如何使用<a href="https://web.archive.org/web/20220928202019/https://curl.se/docs/httpscripting.html" target="_blank" rel="noreferrer noopener nofollow"> curl </a>进行API请求的步骤。</p>
+
+
+
+<h3>7.AWS Sage制造商</h3>
+
+
+
+<div class="wp-container-18 wp-block-columns are-vertically-aligned-center">
+<div class="wp-container-16 wp-block-column is-vertically-aligned-center">
+<p><a href="https://web.archive.org/web/20220928202019/https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html" target="_blank" rel="noreferrer noopener nofollow"> AWS Sage Maker </a>是一款完全托管的机器学习服务。使用SageMaker，您可以快速轻松地构建和训练机器学习模型。您可以在构建后直接将它们部署到生产就绪的托管环境中，就像一个完整的包一样。</p>
+</div>
+
+
+
+
+</div>
+
+
+
+<p>它还提供了机器学习算法，这些算法经过优化，可以针对分布式环境中的海量数据高效运行。<strong> SageMaker本身支持自带算法和框架</strong>，还提供灵活的分布式培训选项，以适应您的特定工作流程。</p>
+
+
+
+<p>SageMaker使用随机搜索或贝叶斯搜索进行模型超参数调整。对于贝叶斯搜索，它要么使用接近来自最佳先前训练作业的组合的超参数值的组合来提高性能，要么选择远离它所尝试的那些超参数值的一组超参数值。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20220928202019/https://towardsdatascience.com/why-do-we-need-aws-sagemaker-79bce465f19f" target="_blank" rel="noreferrer noopener nofollow">为什么要使用AWS？</a></p>
+
+
+
+<p>AWS Sagemaker负责提取完成任务所需的大量软件开发技能，同时保持高效、灵活和成本效益。您可以专注于更重要的核心ML实验，SageMaker用类似于您现有工作流程的简单抽象工具补充了剩余的必要技能。您的所有工具都在一个地方，因此您可以在一个平台上轻松地从数据预处理转移到模型构建和模型部署。</p>
+
+
+
+<p>简而言之，你可以使用SageMaker的自动模型调优，内置算法，自定义算法，以及SageMaker为机器学习框架预先构建的容器。</p>
+
+
+
+<p>在这些教程中了解更多信息:</p>
+
+
+
+
+
+<p>👉也检查一下<a href="/web/20220928202019/https://neptune.ai/vs/sagemaker" target="_blank" rel="noreferrer noopener"> SageMaker和Neptune </a>之间的比较。</p>
+
+
+
+<h3>7.Azure机器学习</h3>
+
+
+
+<div class="wp-container-21 wp-block-columns are-vertically-aligned-center">
+<div class="wp-container-19 wp-block-column is-vertically-aligned-center">
+<p>Azure 由微软开发，利用其不断扩张的全球数据中心网络。Azure是一个云平台，可以在任何地方构建、部署和管理服务和应用。</p>
+</div>
+
+
+
+
+</div>
+
+
+
+<p><strong> Azure Machine Learning </strong>是一个独立的现代化服务，提供完整的数据科学平台。从数据预处理到模型构建、模型部署和维护，整个数据科学之旅都在一个平台上完成。它支持代码优先和低代码体验。如果你喜欢很少或不喜欢代码，你应该考虑使用Azure Machine Learning Studio。</p>
+
+
+
+<p>Azure Machine Learning Studio是一个关于Azure Machine Learning的门户网站，包含用于项目创作和资产管理的低代码和无代码选项(拖放)。</p>
+
+
+
+<p>Azure机器学习支持以下超参数采样方法:</p>
+
+
+<div class="custom-point-list">
+<ul><li>随机抽样用于为每个超参数随机选择一个值，该值可以是离散值和连续值的混合。它还支持低性能运行的提前终止，就像基于树的模型中的提前停止一样。</li><li>仅当所有超参数都是离散的时，才可以采用网格采样，并且网格采样用于尝试搜索空间中参数的每个可能组合。</li><li>贝叶斯采样基于贝叶斯优化算法来选择超参数值，该算法尝试选择将导致先前选择的性能提高的参数组合。</li></ul>
+</div>
+
+
+<p>对于一个非常大的超参数搜索空间(数百个超参数或更多)，将需要很多次迭代来尝试每一个组合。为了节省您的时间，您可以将早期迭代停止设置为那些结果比早期差的实验(迭代)。Azure有提前停止策略来帮助你:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>土匪政策</strong>。如果目标性能指标的表现比迄今为止的最佳运行差了一个指定的差值，您可以使用bandit策略来停止运行(实验或迭代)。</li><li><strong>中位数停止策略</strong>。像bandit策略一样，它放弃目标性能度量比所有运行的运行平均值的中值差的运行。</li><li><strong>截断选择策略</strong>。如果百分比低于您指定的截断百分比值，截断选择策略将取消每个评估间隔的所有运行。</li></ul>
+</div>
+
+
+<p>如何在项目中开始使用Azure进行超参数调优？</p>
+
+
+<div class="custom-point-list">
+<ol><li>定义搜索空间。</li><li>配置采样。您可以选择格网外采样、贝叶斯采样或随机采样。</li><li>配置提前终止。您可以使用Bandit策略、中值停止策略或截断停止策略。</li><li>运行一个超调训练实验。</li></ol>
+</div>
+
+
+<p>查看微软的这个教程模块:<a href="https://web.archive.org/web/20220928202019/https://docs.microsoft.com/en-us/learn/modules/tune-hyperparameters-with-azure-machine-learning/" target="_blank" rel="noreferrer noopener nofollow">“用Azure机器学习调优超参数”</a>。</p>
+
+
+
+<h2>结论</h2>
+
+
+
+<p>我希望我能够教你一两件关于超参数工具的事情。不要只是让它停留在你的脑海里，尝试一下吧！请随时联系我，我很乐意了解您的意见和偏好。感谢阅读！</p>
+
+
+
+<p>还可以查看其他资源:</p>
+
+
+
+
+
+
+<div id="author-box-new-format-block_609520e14ee38" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">文米·阿基雷米</h3>
+    
+          <p class="article__authorContent-text">一位热爱为移动设备构建AI解决方案的数据科学家和Android开发人员。我是一个有抱负的演讲者，对关于人工智能的技术演讲感兴趣。我从事过各种项目，包括图像分类、文本生成、聊天机器人、回归和分类问题。我也写科技文章和博客。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-22 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>如何跟踪机器学习模型的超参数？</h2>
+
+
+
+<p class="has-small-font-size">卡米尔·卡什马雷克|发布于2020年7月1日</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p><strong>机器学习算法可通过称为超参数</strong>的多个量规进行调整。最近的深度学习模型可以通过数十个超参数进行调整，这些超参数与数据扩充参数和训练程序参数一起创建了非常复杂的空间。在强化学习领域，您还应该计算环境参数。</p>
+
+
+
+<p>数据科学家要<strong>控制好</strong> <strong>超参数</strong> <strong>空间</strong>，才能<strong>使</strong> <strong>进步</strong>。</p>
+
+
+
+<p>在这里，我们将向您展示<strong>最近的</strong> <strong>实践</strong>，<strong>提示&amp;技巧，</strong>和<strong>工具</strong>以最小的开销高效地跟踪超参数。你会发现自己掌控了最复杂的深度学习实验！</p>
+
+
+
+<h2>为什么我应该跟踪我的超参数？也就是为什么这很重要？</h2>
+
+
+
+<p>几乎每一个深度学习实验指南，像<a href="https://web.archive.org/web/20220928202019/https://www.deeplearningbook.org/contents/guidelines.html" target="_blank" rel="noreferrer noopener">这本深度学习书籍</a>，都建议你如何调整超参数，使模型按预期工作。在<strong>实验-分析-学习循环</strong>中，数据科学家必须控制正在进行的更改，以便循环的“学习”部分正常工作。</p>
+
+
+
+<p>哦，忘了说<strong>随机种子也是一个超参数</strong>(特别是在RL领域:例如检查<a href="https://web.archive.org/web/20220928202019/https://www.reddit.com/r/MachineLearning/comments/76th74/d_why_random_seeds_sometimes_have_quite_large/" target="_blank" rel="noreferrer noopener">这个Reddit </a>)。</p>
+
+
+
+<h2>超参数跟踪的当前实践是什么？</h2>
+
+
+
+<p>让我们逐一回顾一下管理超参数的常见做法。我们关注于如何构建、保存和传递超参数给你的ML脚本。</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20220928202019/https://neptune.ai/blog/how-to-track-hyperparameters" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

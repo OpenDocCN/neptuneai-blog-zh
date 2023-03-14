@@ -1,0 +1,613 @@
+<html>
+<head>
+<title>How to Keep Track of TensorFlow/Keras Model Development with Neptune </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何用Neptune跟踪TensorFlow/Keras模型开发</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/keep-track-of-tensorflow-keras-model-development-with-neptune#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/keep-track-of-tensorflow-keras-model-development-with-neptune#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>模型开发生命周期从数据探索开始，然后我们为模型选择特性，选择基线算法，接下来，我们尝试用不同的算法和参数调整来提高基线性能。</p>
+
+
+
+<p>听起来很简单。但是，在所有这些过程中，您可能会创建多个笔记本，或者反复修改一个笔记本。这是一个忘记你的研究的好方法。</p>
+
+
+
+<p>幸运的是，这是可以避免的。你只需要<strong>记录你所有的模型、数据和特性</strong>。这样，无论何时你想重温你以前做过的事情，都很容易做到。</p>
+
+
+
+
+
+
+
+<p>在本文中，我将向您展示如何组织和跟踪<a href="/web/20221206061349/https://neptune.ai/blog/how-to-make-your-tensorboard-projects-easy-to-share-and-collaborate-on" target="_blank" rel="noreferrer noopener"> Tensorflow项目</a>并保持一切整洁。</p>
+
+
+
+<p>这一切都归结于<a href="/web/20221206061349/https://neptune.ai/blog/mlops-what-it-is-why-it-matters-and-how-to-implement-it-from-a-data-scientist-perspective" target="_blank" rel="noreferrer noopener"> MLOps </a>，它是一套原则和工具，汇集了产品团队和数据科学团队，以及生产中开发、部署、监控、管理和保护ML模型的所有关键操作。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206061349/https://valohai.com/blog/difference-between-devops-and-mlops/" target="_blank" rel="noreferrer noopener nofollow"> MLOps基本上就是DevOps </a>，但是针对机器学习。<a href="/web/20221206061349/https://neptune.ai/blog/life-cycle-of-a-machine-learning-project" target="_blank" rel="noreferrer noopener"> ML生命周期</a>应该支持模型交付的速度和规模，以便在您的组织中处理数据的速度和数量。你为什么需要这个？因为将ML应用从概念阶段发展到生产中的实际部署是非常困难的。</p>
+
+
+
+
+
+
+
+<h2 id="h-challenges-in-ml-model-lifecycle">ML模型生命周期中的挑战</h2>
+
+
+
+<p>为了跟踪您的实验，有必要跟踪<strong>代码、数据、模型版本、超参数和度量</strong>。以一种有意义的方式组织它们将有助于你在你的组织内合作。</p>
+
+
+
+<p>在现实世界的项目中，数据一直在变化。添加了新的表格，删除了错误标记的点，改变了特征工程技术，改变了验证和测试数据集以反映生产环境。当数据更改时，基于该数据的所有内容也会更改，但代码保持不变，因此跟踪数据版本非常重要。</p>
+
+
+
+
+
+
+
+<h2 id="h-ways-to-keep-track-of-your-ml-experiments">跟踪您的ML实验的方法</h2>
+
+
+
+<p>适当的<a href="/web/20221206061349/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>使得基于数据版本比较指标和参数、比较实验以及比较测试或验证集的最佳或最差预测变得容易。还可以分析模型训练的硬件消耗。从<a href="https://web.archive.org/web/20221206061349/https://github.com/marcotcr/lime" target="_blank" rel="noreferrer noopener nofollow">石灰</a>等工具看预测解释和特征重要性。</p>
+
+
+
+
+
+
+
+<p>下面的解释将帮助你惊人地跟踪你的实验，并获得像上面所附的图表。</p>
+
+
+
+<h2 id="h-specify-project-requirements">指定项目要求</h2>
+
+
+
+<p>首先，为您的项目设置一个度量标准(性能的阈值)。例如，针对<a href="https://web.archive.org/web/20221206061349/https://en.wikipedia.org/wiki/F-score">F1-得分</a>优化您的模型。</p>
+
+
+
+<p>第一次部署应该包括构建一个简单的模型，重点是构建一个合适的ML管道来进行预测。这将帮助您快速交付价值，并避免花费太多时间试图构建完美模型的陷阱。当你在你的组织中开始一个新的ML项目时，实验运行可以迅速扩展到几十、几百甚至几千个。如果不跟踪，你的工作流程会变得混乱。</p>
+
+
+
+<p>因此，像<a href="/web/20221206061349/https://neptune.ai/product/experiment-tracking" target="_blank" rel="noreferrer noopener"> Neptune </a>这样的跟踪工具正在成为ML项目中的标准工具。您可以使用它来记录您的数据、模型、超参数、混淆矩阵、图表等等。在你的工作流/代码中包含一个像Neptune这样的工具，相对于你不跟踪任何东西时所经历的痛苦，是非常简单的。</p>
+
+
+
+<p>为了向您展示如何进行跟踪，我们将使用<a href="https://web.archive.org/web/20221206061349/https://www.tensorflow.org/" target="_blank" rel="noreferrer noopener nofollow"> Tensorflow </a>来训练一个文本分类模型。我们将使用LSTMs训练模型:</p>
+
+
+
+<ul><li>长短期记忆网络是一种特殊的RNN，能够处理长期依赖。</li><li>LSTMs是专门为解决长期依赖问题(长时间记忆信息)而设计的。</li><li>所有的rnn都有链状的重复神经网络模块。</li></ul>
+
+
+
+<p>下图显示了LSTM中的重复模块。</p>
+
+
+
+
+
+
+
+<p>不要担心内部发生了什么(如果你渴望了解，请阅读本文以获得关于LSTMs的深入见解)。</p>
+
+
+
+<p>介绍够了，让我们使用<a href="/web/20221206061349/https://neptune.ai/product" target="_blank" rel="noreferrer noopener"> Neptune </a>实现和跟踪模型开发。</p>
+
+
+
+<p>在我们进行任何建模或分析之前，让我们建立一个组织良好的ML代码库。</p>
+
+
+
+<h2 id="h-avoid-mess-in-your-model-development-process-with-neptune">使用Neptune避免模型开发过程中的混乱</h2>
+
+
+
+<h3>为此项目安装依赖项</h3>
+
+
+
+<p>我们将在Jupyter笔记本中使用Neptune，因此我们需要Neptune客户端和Neptune jupyter扩展。为jupyter笔记本配置Neptune，它将帮助我们将笔记本检查点保存到Neptune。按照下面的命令来做这件事。</p>
+
+
+
+<pre class="hljs">!pip install neptune-client numpy~=<span class="hljs-number">1.19</span><span class="hljs-number">.2</span> tensorflow nltk
+!pip install -U neptune-notebooks
+!jupyter nbextension enable --py neptune-notebooks</pre>
+
+
+
+<p>运行以上命令后，您将在jupyter笔记本中看到以下扩展。</p>
+
+
+
+
+
+
+
+<p>现在我们已经安装了必要的依赖项，让我们导入它们。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tfl
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> csv
+<span class="hljs-keyword">from</span> tensorflow.keras.preprocessing.text <span class="hljs-keyword">import</span> Tokenizer
+<span class="hljs-keyword">from</span> tensorflow.keras.preprocessing.sequence <span class="hljs-keyword">import</span> pad_sequences
+<span class="hljs-keyword">from</span> nltk.corpus <span class="hljs-keyword">import</span> stopwords
+<span class="hljs-keyword">from</span> neptune.new.integrations.tensorflow_keras <span class="hljs-keyword">import</span> NeptuneCallback
+<span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+STOPWORDS = set(stopwords.words(<span class="hljs-string">'english'</span>))
+</pre>
+
+
+
+<p>将您的项目连接到Neptune客户端。如果您是该平台的新手，请阅读<a href="https://web.archive.org/web/20221206061349/https://docs.neptune.ai/getting-started/hello-world" target="_blank" rel="noreferrer noopener">指南</a>开始使用。</p>
+
+
+
+<pre class="hljs">run = neptune.init(project=<span class="hljs-string">'aravindcr/Tensorflow-Text-Classification'</span>,
+                   api_token=’YOUR TOKEN’) </pre>
+
+
+
+<p>这些是我在这个项目中使用的一些参数，我把它们记录在<a href="https://web.archive.org/web/20221206061349/https://app.neptune.ai/aravindcr/Tensorflow-Text-Classification/e/CLASSIFY-9/all?path=parameters" target="_blank" rel="noreferrer noopener">这里</a>。要跟进，使用应用程序中附带的笔记本<a href="https://web.archive.org/web/20221206061349/https://app.neptune.ai/aravindcr/Tensorflow-Text-Classification/n/Tensorflow-Classification-942a1459-ea07-426a-9703-033614bb52cf/4d3cdd39-eea5-441c-872e-23302882a95d">这里</a>。要了解更多关于记录元数据的信息，请查看这个<a href="https://web.archive.org/web/20221206061349/https://docs.neptune.ai/you-should-know/logging-metadata" target="_blank" rel="noreferrer noopener">指南</a>。</p>
+
+
+
+<h3>保存超参数(每次迭代)</h3>
+
+
+
+<pre class="hljs">
+run[<span class="hljs-string">'parameters'</span>] = {<span class="hljs-string">'embed_dims'</span>: <span class="hljs-number">64</span>,
+                    <span class="hljs-string">'vocab_size'</span>: <span class="hljs-number">5000</span>,
+                    <span class="hljs-string">'max_len'</span>: <span class="hljs-number">200</span>,
+                    <span class="hljs-string">'padding_type'</span>: <span class="hljs-string">'post'</span>,
+                    <span class="hljs-string">'trunc_type'</span>: <span class="hljs-string">'post'</span>,
+                    <span class="hljs-string">'oov_tok'</span>: <span class="hljs-string">'&lt;OOV&gt;'</span>,
+                    <span class="hljs-string">'training_portion'</span>: <span class="hljs-number">0.8</span>
+                    }</pre>
+
+
+
+<h3>数据集版本</h3>
+
+
+
+<p>我们使用的数据集是用于分类的BBC新闻文章数据。从<a href="https://web.archive.org/web/20221206061349/https://app.neptune.ai/aravindcr/Tensorflow-Text-Classification/e/CLASSIFY-8/all?path=&amp;attribute=dataset" target="_blank" rel="noreferrer noopener">这里</a>下载数据。您也可以使用下面的命令将您的数据记录到Neptune。</p>
+
+
+
+<p>这将帮助我们在进行实验时跟踪数据集的不同版本。这可以用Python中的Neptune的<strong> set_property </strong>函数和<strong> hashlib </strong>模块来完成。</p>
+
+
+
+<pre class="hljs">
+run[<span class="hljs-string">'dataset'</span>].upload(<span class="hljs-string">'news-docs-bbc.csv'</span>)</pre>
+
+
+
+<p>在下面的部分，我创建了一个名为标签和文本的列表，它将帮助我们存储新闻文章的标签和与之相关的实际文本。我们还使用<a href="https://web.archive.org/web/20221206061349/https://www.nltk.org/" target="_blank" rel="noreferrer noopener"> nltk </a>删除了停用词。</p>
+
+
+
+<pre class="hljs">labels = []
+texts = []
+
+<span class="hljs-keyword">with</span> open(<span class="hljs-string">'news-docs-bbc.csv'</span>, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> file:
+    data = csv.reader(file, delimiter=<span class="hljs-string">','</span>)
+    next(data)
+    <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> data:
+        labels.append(row[<span class="hljs-number">0</span>])
+        text = row[<span class="hljs-number">1</span>]
+        <span class="hljs-keyword">for</span> word <span class="hljs-keyword">in</span> STOPWORDS:
+            token = <span class="hljs-string">' '</span> + word + <span class="hljs-string">' '</span>
+            text = text.replace(token, <span class="hljs-string">' '</span>)
+            text = text.replace(<span class="hljs-string">' '</span>, <span class="hljs-string">' '</span>)
+        texts.append(text)
+print(len(labels))
+print(len(texts))
+train_size = int(len(texts) * training_portion)</pre>
+
+
+
+<p>让我们将数据分成训练集和验证集。如果您查看上述参数，我们将80%用于培训，20%用于验证我们为此用例构建的模型。</p>
+
+
+
+<pre class="hljs">train_text = texts[<span class="hljs-number">0</span>: train_size]
+train_labels = labels[<span class="hljs-number">0</span>: train_size]
+
+validation_text = texts[train_size:]
+validaiton_labels = labels[train_size: ]</pre>
+
+
+
+<p>让我们把句子转换成子单词标记串。这需要五千个最常见的单词。每当我们<strong>遇到看不见的特殊值</strong>时，我们就使用<strong> <em> oov_token </em> </strong>。</p>
+
+
+
+<p>&lt;00V&gt;将用于在<strong> <em> word_index </em> </strong>中找不到的单词。<strong> <em> fit_on_texts </em> </strong>将根据文本列表更新内部词汇。该方法基于词频创建词汇索引。</p>
+
+
+
+<pre class="hljs">tokenizer = Tokenizer(num_words = vocab_size, oov_token=oot_tok)
+tokenizer.fit_on_texts(train_text)
+word_index = tokenizer.word_index
+
+dict(list(word_index.items())[<span class="hljs-number">0</span>:<span class="hljs-number">8</span>])</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/3ac4884f34082f51888e554c120b8175.png" alt="" data-original-src="https://web.archive.org/web/20221206061349im_/https://lh6.googleusercontent.com/LbMoeDozsfQrLaRhtp7aPg_lyrPxdrUDI1-knPjh8O7zLB1GIXQQNwSzTsxub3y7oGBTbzoF0uP7wUbdiOL3-P6WDyLBqxkk1r6YLd-YuG2q7yaX3ZemAA-HqPTvukW9oh-ZKdLz"/></figure>
+
+
+
+<p>正如我们在上面的输出中看到的，<strong> &lt; oov &gt; </strong>是语料库中最常见的标记，其次是其他单词。</p>
+
+
+
+<p>现在我们已经创建了一个基于频率的词汇索引，让我们将这些标记转换成序列列表，<br/><strong><em>text _ to _ sequence</em></strong>将文本转换成一个整数序列。简单来说，它将文本中的单词转换成<strong> word_index </strong>字典中对应的整数值。</p>
+
+
+
+<pre class="hljs">train_sequences = tokenizer.texts_to_sequences(train_text)
+print(train_sequences[<span class="hljs-number">16</span>])
+
+train_padded = pad_sequences(train_sequences, maxlen=max_len, padding=padding_type, truncating=trunc_type)
+</pre>
+
+
+
+<p>当在你的下游NLP任务上训练神经网络时，需要记住一件事，序列需要具有相同的大小，所以我们使用<strong> <em> max_len </em> </strong>参数填充那些序列。在我们的例子中，我在开始时指定了200，这就是为什么我们在下面使用<strong> <em>填充_序列</em> </strong>的原因。</p>
+
+
+
+<p>序列长度小于或大于<strong> <em> max_len </em> </strong>的文章将被截断为200。例如，如果序列长度为186，它将被填充到200，并带有14个零。通常，我们拟合数据一次，但转换序列多次，所以我们没有合并训练集和验证集。</p>
+
+
+
+<pre class="hljs">valdn_sequences = tokenizer.texts_to_sequences(validation_text)
+valdn_padded = pad_sequences(valdn_sequences,
+                             maxlen=max_len,
+                             padding=padding_type,
+                             truncating=trunc_type)
+
+print(len(valdn_sequences))
+print(valdn_padded.shape)</pre>
+
+
+
+<p>让我们看看我们的标签。标签需要被标记化，所有的训练标签都应该是NumPy数组的形式。我们将用下面的代码将它们转换成一个NumPy数组。</p>
+
+
+
+<pre class="hljs">label_tokenizer = Tokenizer()
+label_tokenizer.fit_on_texts(labels)
+
+label_tokenizer = Tokenizer()
+label_tokenizer.fit_on_texts(labels)</pre>
+
+
+
+<p>在开始建模任务之前，让我们看看它们填充前后的样子。我们可以看到有些词变成<oov>是因为它们没有出现在顶部提到的<strong> <em> vocab_size </em> </strong>中。</oov></p>
+
+
+
+<pre class="hljs">word_index_reverse = dict([(value, key) <span class="hljs-keyword">for</span> (key, value) <span class="hljs-keyword">in</span> word_index.items()])
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">decode_article</span><span class="hljs-params">(text)</span>:</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">' '</span>.join([word_index_reverse.get(i, <span class="hljs-string">'?'</span>) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> text])
+print(decode_article(train_padded[<span class="hljs-number">24</span>]))
+print(<span class="hljs-string">'**********'</span>)
+print(train_text[<span class="hljs-number">24</span>])</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/9aebfb86df3f12851061396df4bddcd8.png" alt="" data-original-src="https://web.archive.org/web/20221206061349im_/https://lh3.googleusercontent.com/V8XOtQRAdcXcwMVHdWc5f3zTzfV2DAiC2lPN5S4pnJiPdxyKmKG9QYsBCis3o7e0b4izn89FjUaiV62KoTkz6_L5S0ZQWiFeqyIcIdzW_EYXGtcqAW9mMou-qHMj351z6V7aSoGg"/></figure>
+
+
+
+<h3>列车张量流模型</h3>
+
+
+
+<p>使用<strong> tfl.keras.sequential </strong>我们将层的线性堆栈分组到tfl.keras.Model中。f <strong>第一层是嵌入层</strong>，它为每个单词存储一个向量。单词序列被转换成向量序列。NLP中的嵌入主要是为了让意义相近的词有相似的向量表示(词嵌入就是意义相近的词有相似的向量表示的词向量)。</p>
+
+
+
+<p><strong>tfl . keras . layers . bidirectional</strong>是RNNs的双向包装器，它有助于通过LSTM层向前和向后传播输入，然后链接输出。这对学习LSTMs中的长期依赖关系很有好处。为了进行分类，我们将它组成一个密集的神经网络。</p>
+
+
+
+<p>我们在这里使用的激活函数是<strong> relu </strong>和<strong> softmax </strong>。如果relu函数返回负输入，则返回0，但是对于x的任何正值，它都返回值。要了解更多关于relu的信息，请查看<a href="https://web.archive.org/web/20221206061349/https://machinelearningmastery.com/rectified-linear-activation-function-for-deep-learning-neural-networks/" target="_blank" rel="noreferrer noopener nofollow">指南</a>。</p>
+
+
+
+<p>密集层增加了六个单元。最后一层是<strong>‘soft max’</strong>激活函数，它将网络输出归一化为预测输出类别的概率分布。</p>
+
+
+
+<pre class="hljs">model = tfl.keras.Sequential([
+    tfl.keras.layers.Embedding(vocab_size, embed_dims),
+    tfl.keras.layers.Bidirectional(tfl.keras.layers.LSTM(embed_dims)),
+    tfl.keras.layers.Dense(embed_dims, activation=<span class="hljs-string">'relu'</span>),
+    tfl.keras.layers.Dense(<span class="hljs-number">6</span>, activation=<span class="hljs-string">'softmax'</span>)
+])
+model.summary()</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/e09424deb2001fb3f461d159237f8f4c.png" alt="" data-original-src="https://web.archive.org/web/20221206061349im_/https://lh5.googleusercontent.com/h3-L-p5K0ICRSzg38yC85RKU6tIShAPLD_Y3KDg6NDuBJ1TKnA1bGEfOcUM7OVZCwn-Q_Diqo2PxbA6P4NheyhmUd20YLnQWC2YZyH-ANJU_WITou9vnahCvMnQOdXgnr7-MvYNO"/></figure>
+
+
+
+<p>正如您在上面的模型摘要中看到的，我们有一个嵌入层和双向LSTM。双向的产出是我们在LSTM投入的两倍。</p>
+
+
+
+<p>我这里用过的损失函数是<strong><em>categorial _ cross _ entropy</em></strong>，通常用于多类分类任务。它主要量化两个概率分布之间的差异。我们使用的优化器是<strong> <em>【亚当】</em> </strong>，梯度下降的一种变体。</p>
+
+
+
+<pre class="hljs">model.compile(loss=<span class="hljs-string">'sparse_categorical_crossentropy'</span>, optimizer=<span class="hljs-string">'adam'</span>, metrics=[<span class="hljs-string">'accuracy'</span>])</pre>
+
+
+
+<h2 id="h-ml-model-development-organized-using-neptune">使用Neptune组织ML模型开发</h2>
+
+
+
+<p>为了将训练指标记录到Neptune，我们使用来自Neptune库的回调。例如，如下图所示，来自Tensorflow / Keras和<strong> NeptuneCallback </strong>的日志元数据。这有助于您记录通常会在这些ML库中记录的大多数元数据:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> neptune.new.integrations.tensorflow_keras <span class="hljs-keyword">import</span> NeptuneCallback
+
+neptune_clbk = NeptuneCallback(run=run, base_namespace=<span class="hljs-string">'metrics'</span>)
+
+epochs_count = <span class="hljs-number">10</span>
+history = model.fit(train_padded, training_label_seq, epochs=epochs_count, validation_data=(valdn_padded, validation_label_seq), verbose=<span class="hljs-number">2</span>, callbacks=[neptune_clbk])
+</pre>
+
+
+
+<p>现在，当你运行这个时，你所有的指标和损失都会被记录在<a href="https://web.archive.org/web/20221206061349/https://app.neptune.ai/aravindcr/Tensorflow-Text-Classification/e/CLASSIFY-20/all" target="_blank" rel="noreferrer noopener"> Neptune </a>中。</p>
+
+
+
+
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/34170106e8e26e329cc6505e77da1ec0.png" alt="" data-original-src="https://web.archive.org/web/20221206061349im_/https://lh4.googleusercontent.com/1IRlbpv03fpsMg9hvQGkfJ7T-D13QZM4yKEKXAvstTjl_iRt1hIAjDBv0E27dsVBHF6XZzJBitIGaDjgcW_59xynmze4EKvnGfdyETHtEkbpHV4XTBVFA5dYfymMaNhlf8w5p98l"/></figure>
+
+
+
+
+
+
+
+
+
+
+
+<p>作为模型训练的一部分，我们还可以监控RAM和CPU的使用情况。这些信息可以在实验的监控部分找到。</p>
+
+
+
+
+
+
+
+<p>建立模型性能的基线。从使用初始数据管道的简单模型开始。在您的领域中找到问题的区域模型的状态，然后再现结果。稍后，将数据集应用到下一个基线。</p>
+
+
+
+<h3>模型版本控制</h3>
+
+
+
+<pre class="hljs">tfl.keras.models.save_model(model, <span class="hljs-string">'classification.h5'</span>, overwrite=<span class="hljs-keyword">True</span>, include_optimizer=<span class="hljs-keyword">True</span>, save_format=<span class="hljs-keyword">None</span>,
+        signatures=<span class="hljs-keyword">None</span>, options=<span class="hljs-keyword">None</span>, save_traces=<span class="hljs-keyword">True</span>)
+
+model.save(<span class="hljs-string">'my_model'</span>)
+
+run[<span class="hljs-string">'my_model/saved_model'</span>].upload(<span class="hljs-string">'classification.h5'</span>)</pre>
+
+
+
+<p>模型保存在<a href="https://web.archive.org/web/20221206061349/https://app.neptune.ai/aravindcr/Tensorflow-Text-Classification/e/CLASSIFY-21/all?path=my_model&amp;attribute=saved_model" target="_blank" rel="noreferrer noopener"> Neptune </a>中的<strong> saved_model </strong>目录下。</p>
+
+
+
+<h3>记录项目中的任何内容</h3>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">graphs_plotting</span><span class="hljs-params">(history, string)</span>:</span>
+    plt.plot(history.history[string])
+    plt.plot(history.history[<span class="hljs-string">'val_'</span>+string])
+    plt.xlabel(<span class="hljs-string">'Epochs'</span>)
+    plt.ylabel(string)
+    plt.legend([string, <span class="hljs-string">'val_'</span>+string])
+    plt.show()
+
+graphs_plotting(history, <span class="hljs-string">'accuracy'</span>)
+graphs_plotting(history, <span class="hljs-string">'loss'</span>)</pre>
+
+
+
+<pre class="hljs">run[<span class="hljs-string">'train/plots/accuray'</span>].upload(<span class="hljs-string">'val_accuracy.png'</span>)
+run[<span class="hljs-string">'train/plots/loss'</span>].upload(<span class="hljs-string">'val_loss.png'</span>)</pre>
+
+
+
+
+
+
+
+
+
+
+
+<pre class="hljs">
+
+PARAMS = {<span class="hljs-string">'epoch_num'</span>: <span class="hljs-number">10</span>,
+          <span class="hljs-string">'batch_size'</span>: <span class="hljs-number">64</span>,
+          <span class="hljs-string">'optimizer'</span>: <span class="hljs-string">'adam'</span>,
+          <span class="hljs-string">'loss_fun'</span>: <span class="hljs-string">'categorical_corss_entropy'</span>,
+          <span class="hljs-string">'metrics'</span>: [<span class="hljs-string">'accuracy'</span>],
+          <span class="hljs-string">'activation'</span>: <span class="hljs-string">'relu'</span>}
+
+
+run[<span class="hljs-string">'parameters'</span>] = PARAMS
+
+
+</pre>
+
+
+
+<p>记录的参数可以在<a href="https://web.archive.org/web/20221206061349/https://app.neptune.ai/aravindcr/Tensorflow-Text-Classification/e/CLASSIFY-13/all?path=parameters&amp;attribute=activation" target="_blank" rel="noreferrer noopener"> Neptune </a>中找到。</p>
+
+
+
+<p>在处理一个行业项目时，您使用的度量标准可能会根据您正在处理的问题和部署模型的领域而发生变化。记录度量可以为您的团队节省大量时间。</p>
+
+
+
+<p>在海王星，你所有的实验都组织在一个地方。你可以在你的实验中添加标签，准确记录你所做的尝试，比较指标，在需要的时候重现或重新运行实验。你可以安心地睡觉，因为你知道你所有的想法都安全地藏在一个地方。</p>
+
+
+
+
+
+
+
+<p>你也可以给你的实验添加标签，这将有助于你更好地跟踪你的实验。在模型部署之前，请确保为以下各项准备好版本:模型配置、模型参数训练数据集和验证数据集。部署ML模型的一些常见方法是将它们打包到docker容器中，并且——为了推理公开——打包到REST API中。</p>
+
+
+
+<p>您还可以比较已登录到Neptune的笔记本的多个版本。</p>
+
+
+
+
+
+
+
+<h3>模型细化</h3>
+
+
+
+<p>上述模型在6个时期后开始过度拟合。您可以更改纪元并重新训练您的模型，然后将您的参数记录到Neptune。</p>
+
+
+
+<p>随着模型的复杂性增加，要反复调试它。执行误差分析对于发现模型失败的地方是必要的。跟踪模型性能如何随着训练数据量的增加而扩展。一旦你有了成功地为你的问题建立模型的想法，以后你应该试着从模型中获得最好的性能。将您的错误分解为:</p>
+
+
+
+<ul><li>可避免的偏见，</li><li>方差，</li><li>不可约误差，</li><li>测试误差和验证误差的区别。</li></ul>
+
+
+
+<h3>解决欠拟合问题(高偏差、低方差)</h3>
+
+
+
+<p>执行特定于模型的优化。如果您的模型拟合不足，那么它已经捕获了数据中的模式和噪声，但它在您的训练和测试数据中表现不佳。对数据进行版本化和更改模型参数非常重要。您可以通过误差分析、增加模型容量、调整超参数和添加新特征来解决欠拟合问题。</p>
+
+
+
+<h3>解决过度拟合问题</h3>
+
+
+
+<p>当您的模型过度拟合时，它在训练数据上表现很好，在测试数据上表现很差。这表明你的模型有<strong>高方差和低偏差</strong>。调查关于此类问题的文献，与你团队中的专家或你认识的可能处理过类似问题的人交谈。</p>
+
+
+
+<p>我们可以通过添加更多的训练数据、<a href="https://web.archive.org/web/20221206061349/https://en.wikipedia.org/wiki/Regularization_(mathematics)" target="_blank" rel="noreferrer noopener nofollow">正则化</a>、误差分析、调整超参数和减小模型大小来解决过度拟合问题。</p>
+
+
+
+
+
+
+
+<h3>寻址分布移位</h3>
+
+
+
+<p>优化您的模型非常重要，因为您构建的模型在某些情况下可能会失败。在生产中使用你的方法会有风险。</p>
+
+
+
+<p>我们可以通过执行误差分析来解决分布的偏移，以便确定分布的偏移。扩充您的数据以更好地匹配测试分布，并应用领域适应技术。</p>
+
+
+
+<h3>调试ML项目</h3>
+
+
+
+<p>这一步主要是为了调查为什么你的模型表现不佳。</p>
+
+
+
+<p>可能有一些实现错误、数据集构造问题或坏的超参数。尽快在生产数据上部署基线模型。通常，实时数据会以意想不到的方式发生变化。它可能不会反映您在开发过程中使用的数据(通常称为数据漂移)。</p>
+
+
+
+<p>快速部署一个简单的模型，这样你就可以提前知道你需要做什么。这有助于更快的迭代，而不是试图创建完美模型的慢迭代。需要固定随机种子，以确保模型训练是可重复的。</p>
+
+
+
+<p>通过对你的实验进行适当的跟踪，上面的一些挑战可以被解决，并且更容易将你的结果传达给团队。</p>
+
+
+
+
+
+
+
+<h2 id="h-summary">摘要</h2>
+
+
+
+<p>要高效地构建机器学习项目，从简单开始，逐渐增加复杂性。通常，数据科学家和ML工程师面临着难以表达的问题来开发ML解决方案。</p>
+
+
+
+<p>花大量的时间了解项目的范围，并提前明确定义需求，使您的迭代更好地朝着最终目标前进。</p>
+
+
+
+<h3>参考</h3>
+
+
+
+<ol><li><a href="https://web.archive.org/web/20221206061349/https://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank" rel="noreferrer noopener nofollow">https://colah.github.io/posts/2015-08-Understanding-LSTMs/</a></li><li><a href="/web/20221206061349/https://neptune.ai/" target="_blank" rel="noreferrer noopener">https://neptune.ai/</a></li><li><a href="https://web.archive.org/web/20221206061349/https://towardsdatascience.com/multi-class-text-classification-with-lstm-using-tensorflow-2-0-d88627c10a35" target="_blank" rel="noreferrer noopener">https://towards data science . com/multi-class-text-classification-with-lstm-using-tensor flow-2-0-d 88627 c10a 35</a></li><li><a href="/web/20221206061349/https://neptune.ai/blog/ml-experiment-tracking" target="_blank" rel="noreferrer noopener">https://neptune.ai/blog/ml-experiment-tracking</a></li><li><a href="https://web.archive.org/web/20221206061349/https://www.jeremyjordan.me/ml-requirements/" target="_blank" rel="noreferrer noopener nofollow">https://www.jeremyjordan.me/ml-requirements/</a></li><li><a href="https://web.archive.org/web/20221206061349/https://docs.neptune.ai/integrations-and-supported-tools/model-training/tensorflow-keras" target="_blank" rel="noreferrer noopener">https://docs . Neptune . ai/integrations-and-supported-tools/model-training/tensor flow-keras</a></li><li><a href="https://web.archive.org/web/20221206061349/https://docs.neptune.ai/you-should-know/logging-metadata#what-you-can-log" target="_blank" rel="noreferrer noopener">https://docs . Neptune . ai/you-should-know/logging-metadata # what-you-can-log</a></li></ol>
+        </div>
+        
+    </div>    
+</body>
+</html>

@@ -1,0 +1,579 @@
+<html>
+<head>
+<title>Pandas Plot: Deep Dive Into Plotting Directly With Pandas </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>熊猫情节:深入到直接与熊猫密谋</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/pandas-plot-deep-dive-into-plotting-directly-with-pandas#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/pandas-plot-deep-dive-into-plotting-directly-with-pandas#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>数据可视化是任何数据科学管道中必不可少的一步。可视化地探索数据会让你对许多其他方式看不到的东西有所了解。</p>
+
+
+
+<p>使用Python进行可视化有几个有用的库，比如matplotlib或seaborn。这些库直观且易于使用。还有<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/index.html" target="_blank" rel="noreferrer noopener nofollow"> <strong>熊猫</strong> </a>，主要是一个数据分析工具，但也为可视化提供了多种选择。</p>
+
+
+
+<p>用熊猫来策划相当简单。在本文中，我们将了解如何使用pandas来探索和可视化您的数据，然后我们将更深入地研究pandas的一些高级可视化功能。</p>
+
+
+
+<h2 id="h-plotting-with-pandas">和熊猫一起策划</h2>
+
+
+
+<p>熊猫对象配备了它们的<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html#plotting-tools" target="_blank" rel="noreferrer noopener nofollow">绘图功能</a>。这些绘图函数本质上是围绕<a href="https://web.archive.org/web/20221206012622/https://matplotlib.org/" target="_blank" rel="noreferrer noopener nofollow"> matplotlib </a>库的包装器。把matplotlib想象成熊猫图的后端。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html#hexagonal-bin-plot" target="_blank" rel="noreferrer noopener nofollow"> <strong> Pandas Plot </strong> </a>是一组方法，可用于Pandas数据帧或系列，从该数据帧中的数据绘制各种图形。Pandas Plot简化了图形和绘图的创建，因此您不需要了解使用matplotlib的详细信息。</p>
+
+
+
+<p>pandas内置的可视化功能在帮助快速简单地绘制系列和数据帧方面大放异彩。</p>
+
+
+
+<section id="blog-intext-cta-block_6192735f4cc71" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>检查这个<a href="https://web.archive.org/web/20221206012622/https://docs.neptune.ai/integrations-and-supported-tools/model-visualization-and-debugging/pandas" target="_blank" rel="noreferrer noopener">海王星-熊猫集成</a>让你记录熊猫数据帧到海王星。</p>
+    
+    </section>
+
+
+
+<p> </p>
+
+
+
+<h2 id="h-importing-the-dataset-and-the-libraries">导入数据集和库</h2>
+
+
+
+
+
+
+
+<p>我们将使用<strong> NIFTY-50数据集</strong>。NIFTY 50指数是印度T2国家证券交易所的印度股票市场基准。NIFTY 50代表国家指数50，代表17个行业中50家印度公司股票的加权平均值。该数据集在<a href="https://web.archive.org/web/20221206012622/https://www.kaggle.com/sudalairajkumar/nifty-indices-dataset" target="_blank" rel="noreferrer noopener nofollow"> Kaggle </a>上公开提供，但我们将使用仅包含四个行业股票价值的数据子集——银行、制药、IT和快速消费品。</p>
+
+
+
+<p><em>你可以从</em> <a href="https://web.archive.org/web/20221206012622/https://github.com/parulnith/Website-articles-datasets/tree/master/Pandas%20plot:%20deep%20dive%20into%20plotting%20directly%20with%C2%A0Pandas" target="_blank" rel="noreferrer noopener nofollow"> <em>这里</em> </a> <em>下载样本数据集。</em></p>
+
+
+
+<p>让我们导入可视化所需的必要库和提取的数据集:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+%matplotlib inline
+
+
+nifty_bank = pd.read_csv(<span class="hljs-string">'NIFTY BANK.csv'</span>,parse_dates=[<span class="hljs-string">"Date"</span>])
+nifty_fmcg = pd.read_csv(<span class="hljs-string">'NIFTY FMCG.csv'</span>,parse_dates=[<span class="hljs-string">"Date"</span>])
+nifty_IT = pd.read_csv(<span class="hljs-string">'NIFTY IT.csv'</span>,parse_dates=[<span class="hljs-string">"Date"</span>])
+nifty_pharma = pd.read_csv(<span class="hljs-string">'NIFTY PHARMA.csv'</span>,parse_dates=[<span class="hljs-string">"Date"</span>])
+</pre>
+
+
+
+<p>%matplotlib inline可确保单元格运行时，所绘制的图形在笔记本中正确显示。</p>
+
+
+
+<h3><strong>先来看看俏皮50的数据</strong></h3>
+
+
+
+<p>让我们根据股票在某一天的“<strong>收盘</strong>”价格，将不同的CSV文件组合在一个数据框架中，并筛选出2020年之前的数据。</p>
+
+
+
+<p>接下来让我们看看数据集的前几列:</p>
+
+
+
+<pre class="hljs">nifty_bank_2019 = nifty_bank[nifty_bank[<span class="hljs-string">'Date'</span>] &gt; <span class="hljs-string">'2019-12-31'</span>]
+nifty_fmcg_2019 = nifty_fmcg[nifty_fmcg[<span class="hljs-string">'Date'</span>] &gt; <span class="hljs-string">'2019-12-31'</span>]
+nifty_IT_2019 = nifty_IT[nifty_IT[<span class="hljs-string">'Date'</span>] &gt; <span class="hljs-string">'2019-12-31'</span>]
+nifty_pharma_2019 = nifty_pharma[nifty_pharma[<span class="hljs-string">'Date'</span>] &gt; <span class="hljs-string">'2019-12-31'</span>]
+d = {
+    <span class="hljs-string">'NIFTY Bank index'</span>: nifty_bank_2019[<span class="hljs-string">'Close'</span>].values,
+    <span class="hljs-string">'NIFTY FMCG index'</span>: nifty_fmcg_2019[<span class="hljs-string">'Close'</span>].values,
+    <span class="hljs-string">'NIFTY IT index'</span>: nifty_IT_2019[<span class="hljs-string">'Close'</span>].values,
+    <span class="hljs-string">'NIFTY Pharma index'</span>: nifty_pharma_2019[<span class="hljs-string">'Close'</span>].values,
+   }
+
+
+df = pd.DataFrame(data=d)
+df.index=nifty_bank_2019[<span class="hljs-string">'Date'</span>]
+df.head()
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/7eb4d439ea749362ddc087054ad5bcac.png" alt="" class="wp-image-36061" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/NIFTY-indices.png?ssl=1"/><figcaption><em>Combined dataframe consisting of NIFTY indices of the bank, pharma, IT, and FMCG sectors</em></figcaption></figure></div>
+
+
+
+<h2 id="h-first-plot-with-pandas-line-plots">第一个熊猫图:线形图</h2>
+
+
+
+<p>现在让我们使用pandas来探索和可视化这些数据。首先，看看<strong>漂亮的银行指数</strong>今年的表现会很有趣。</p>
+
+
+
+<p>要使用熊猫绘制图形，可以调用。dataframe上的plot()方法。plot方法只是matplotlib的<a href="https://web.archive.org/web/20221206012622/https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" target="_blank" rel="noreferrer noopener nofollow"> <strong> plt.plot() </strong> </a> <strong>的一个简单包装。</strong>您还需要指定作为x和y轴参考的x和y坐标。因为日期已经是索引列，所以它将被配置为X轴。</p>
+
+
+
+<pre class="hljs">df.plot(y=<span class="hljs-string">'NIFTY Bank index'</span>)
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/bdc9f74deeff6b5faef1bdc89498300d.png" alt="NIFTY index" class="wp-image-30925" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/NIFTY-index-1.png?ssl=1"/><figcaption><em>Line plot showing the NIFTY Bank index performance in the year 2020</em></figcaption></figure></div>
+
+
+
+<p>正如您在上面看到的，调用。dataframe上的plot()方法默认返回一个<strong>线图</strong>。在pandas中绘图很简单，只需要很少的设置。但是，如果需要的话，在某些参数的帮助下，有一些方法可以改变输出。</p>
+
+
+
+<h3><strong>绘图参数</strong></h3>
+
+
+
+<p>除了x和y之外，plot方法还有几个参数，可以调整这些参数来改变绘图。</p>
+
+
+
+<ul><li><strong> x和y参数</strong>指定你想要的x和y列的值。在上面的例子中，这些是日期和漂亮的银行索引列。</li></ul>
+
+
+
+<ul><li><strong> figsize </strong>指定图形对象的大小。</li><li><strong>标题</strong>用于情节。</li><li><strong>图例</strong>待放置<strong> </strong>轴上支线剧情。</li><li><strong> Style </strong>:每列的matplotlib线条样式。</li><li><strong> X和y标签</strong>:用于X轴和y轴标签的名称。</li><li><strong>支线剧情</strong>:为每一列制作单独的支线剧情。</li><li><strong>种类</strong>:要产生的剧情种类。我们将在接下来的章节中详细讨论这个参数。</li></ul>
+
+
+
+<p>现在让我们用更多的参数绘制相同的数据帧，比如指定<strong> figsize </strong>和标签:</p>
+
+
+
+<pre class="hljs">df.plot(y=<span class="hljs-string">'NIFTY Bank index'</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>),title=<span class="hljs-string">'Nifty Bank Index values in 2020'</span>,ylabel = <span class="hljs-string">'Value'</span>);
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/9a17e10d21e7ad2324279f2ce34f77ca.png" alt="NIFTY index " class="wp-image-30927" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/NIFTY-index-2-1.png?ssl=1"/><figcaption><em>Notice this cool Jupyter Notebook trick: adding a semicolon to the end of the plotting call suppresses unwanted output.</em></figcaption></figure></div>
+
+
+
+<h2 id="h-different-plot-styles-in-pandas">《熊猫》不同的情节风格</h2>
+
+
+
+<p>熊猫打印方法可用于打印除默认线形打印之外的样式。这些方法都可以作为“类”关键字参数提供给<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.html#pandas.DataFrame.plot" target="_blank" rel="noreferrer noopener nofollow"><strong/></a><strong>【剧情】。</strong>可用选项有:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/533d23d5654e923759c82466afe65e5a.png" alt="Pandas plot styles" class="wp-image-30929" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Pandas-plot-styles-1.png?ssl=1"/><figcaption><em>Different plot styles in pandas</em></figcaption></figure></div>
+
+
+
+<p>你是如何创造这些情节的？有两种选择:</p>
+
+
+
+<ul><li>使用<strong>种类</strong>参数。此参数接受字符串值，并决定您将创建哪种绘图。你可以这样做:</li></ul>
+
+
+
+<pre class="hljs">Dataframe.plot(kind=<span class="hljs-string">'&lt;kind of the desired plot e.g bar, area etc&gt;'</span>, x,y)
+</pre>
+
+
+
+<ul><li>创建绘图的另一种方法是使用“DataFrame.plot. <kind>”方法，而不是提供kind关键字参数。这使得发现绘图方法及其使用的特定参数变得更加容易:</kind></li></ul>
+
+
+
+<pre class="hljs">Dataframe.plot.&lt;kind of the desired plot e.g bar, area, etc&gt;()
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/b2050df6ed37f43a4d323890274c50ab.png" alt="pandas dataframe" class="wp-image-30932" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-dataframe.png?ssl=1"/><figcaption><em>Creating pandas plots by using the method DataFrame.plot.&lt;kind</em>&gt;</figcaption></figure></div>
+
+
+
+<p>好吧，你知道如何创建一个线图。我们现在来看看《熊猫》中的其他情节。请注意，您可以使用上面显示的任何一种方法来创建它们。</p>
+
+
+
+<h3><strong>条形图</strong></h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.bar.html" target="_blank" rel="noreferrer noopener nofollow">条形图</a>是用矩形条表示分类数据的图。条形的长度与它们所代表的值成正比。</p>
+
+
+
+<p>为了创建漂亮数据的条形图，您需要在月末对数据进行重新采样/汇总。pandas的库有一个resample()函数，它对时间序列数据进行重采样。pandas中的重采样方法与其groupby方法类似，因为它本质上是根据特定的时间跨度进行分组。resample()函数如下所示:</p>
+
+
+
+<pre class="hljs">df_sample = df.resample(rule = <span class="hljs-string">'M'</span>).mean()[:<span class="hljs-number">5</span>]
+df_sample
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/b861382473c947ac8ec4e0599d571f74.png" alt="NIFTY index data" class="wp-image-30934" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/NIFTY-index-data.png?ssl=1"/><figcaption><em>Data resampled by month-end</em></figcaption></figure></div>
+
+
+
+<p><strong>总结一下上面发生的事情:</strong></p>
+
+
+
+<ul><li>data.resample()用于对股票数据进行重采样。</li><li>“M”代表月末频率，表示您想要对数据进行重新采样的偏移值。</li><li>mean()表示这一时期的平均股价。</li></ul>
+
+
+
+<p>现在，让我们创建如下条形图:</p>
+
+
+
+<pre class="hljs">df_sample.plot(kind=<span class="hljs-string">'bar'</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>))
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/dac73c91d81af0d5fb9ce92ca502a007.png" alt="NIFTY indices barplot" class="wp-image-30936" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/NIFTY-indices-barplot-1.png?ssl=1"/><figcaption><em>Barplot showing performance of various NIFTY indices </em></figcaption></figure></div>
+
+
+
+<p>如上所述，您也可以在不提供“kind”参数的情况下创建相同的情节:</p>
+
+
+
+<pre class="hljs">df_sample.plot.bar()
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/e3f8e45a0e2e4b0e82aa2f3405d8e83f.png" alt="NIFTY indices barplot " class="wp-image-30938" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/NIFTY-indices-barplot-2.png?ssl=1"/><figcaption><em>Barplot without providing the ‘kind’ argument.</em></figcaption></figure></div>
+
+
+
+<p>方法的选择完全取决于你。</p>
+
+
+
+<p><strong>条形图的类型</strong></p>
+
+
+
+<p>条形图有两种类型，即:</p>
+
+
+
+<ol><li><strong>水平条形图</strong></li></ol>
+
+
+
+<p>当你想水平而不是垂直的时候。通过将“条形图”指定为图表类型，可以创建水平条形图。</p>
+
+
+
+<pre class="hljs">df_sample.plot(kind=<span class="hljs-string">'barh'</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>))
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/9a0392e67af5459544c817b2d8574625.png" alt="pandas horizontal bar charts" class="wp-image-30941" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-horizontal-bar-charts.png?ssl=1"/><figcaption><em>Horizontal bar charts in pandas</em></figcaption></figure></div>
+
+
+
+<p><strong> 2。堆积条形图</strong></p>
+
+
+
+<p>要生成堆积条形图，请传递stacked=True:</p>
+
+
+
+<pre class="hljs">df_sample.plot(kind=<span class="hljs-string">'bar'</span>,stacked=<span class="hljs-keyword">True</span>) 
+df_sample.plot(kind=<span class="hljs-string">'barh'</span>,stacked=<span class="hljs-keyword">True</span>) 
+</pre>
+
+
+
+
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/dee1964b0d805a75ff88650cca6e08f2.png" alt="pandas stacked bar plots" class="wp-image-30944" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-stacked-bar-plots-2.png?ssl=1"/><figcaption><em>Stacked bar plots in pandas</em></figcaption></figure></div>
+
+
+
+<h3><strong>直方图</strong></h3>
+
+
+
+<p>一个<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.hist.html#pandas.DataFrame.plot.hist" target="_blank" rel="noreferrer noopener nofollow">直方图</a>是数据分布的表示。让我们只为漂亮的快速消费品索引和漂亮的银行索引创建直方图。</p>
+
+
+
+<pre class="hljs">df[[<span class="hljs-string">'NIFTY FMCG index'</span>,<span class="hljs-string">'NIFTY Bank index'</span>]].plot(kind=<span class="hljs-string">'hist'</span>,bins=<span class="hljs-number">30</span>,alpha=<span class="hljs-number">0.5</span>)
+</pre>
+
+
+
+<p>这里<strong> alpha </strong>表示透明度因子，而bin指的是数据被分割的范围。默认bin值为10。可以使用“媒体夹”关键字更改媒体夹的大小。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/edcf3b389dfd7979341c429fd970f054.png" alt="pandas histograms" class="wp-image-30947" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-histograms.png?ssl=1"/><figcaption><em>Histograms in pandas</em></figcaption></figure></div>
+
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>直方图可以使用stacked=True进行堆叠。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/b0d8a911a0d9a59b1cbc2d0943d5869f.png" alt="pandas histograms stacked" class="wp-image-30948" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-histograms-stacked.png?ssl=1"/><figcaption><em>Stacked histogram in pandas</em></figcaption></figure></div>
+
+
+
+<h3><strong> KDE plots </strong></h3>
+
+
+
+<p>熊猫可以使用高斯核生成一个<a href="https://web.archive.org/web/20221206012622/https://en.wikipedia.org/wiki/Kernel_density_estimation" target="_blank" rel="noreferrer noopener nofollow"><strong>【KDE】</strong></a>核密度估计图。一个<a href="https://web.archive.org/web/20221206012622/https://chemicalstatistician.wordpress.com/2013/06/09/exploratory-data-analysis-kernel-density-estimation-in-r-on-ozone-pollution-data-in-new-york-and-ozonopolis/" target="_blank" rel="noreferrer noopener nofollow">核密度估计图显示了单个变量</a>的分布，可以认为是一个平滑的直方图。</p>
+
+
+
+<pre class="hljs">df[[<span class="hljs-string">'NIFTY FMCG index'</span>,<span class="hljs-string">'NIFTY Bank index'</span>]].plot(kind=<span class="hljs-string">'kde'</span>);
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/091f2dd9427a6fa96feb8788f7fa5b9a.png" alt="pandas KDE plot" class="wp-image-30950" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-KDE-plot.png?ssl=1"/><figcaption><em>KDE plot in pandas</em></figcaption></figure></div>
+
+
+
+<h3><strong>箱线图</strong></h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.plot.box.html#pandas.Series.plot.box" target="_blank" rel="noreferrer noopener nofollow">箱线图</a>用于通过其四分位数描绘数据。单个箱线图可以传达大量信息，包括关于四分位距、中位数和异常值的详细信息。让我们首先为我们的数据框架创建盒状图，然后你将看到如何解释它们。</p>
+
+
+
+<pre class="hljs">df.plot(kind=<span class="hljs-string">'box'</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>))
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/361410adb2cbc0b999072f40a08bba6a.png" alt="pandas box plots" class="wp-image-30953" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-box-plots.png?ssl=1"/><figcaption><em>Boxplots in pandas</em></figcaption></figure></div>
+
+
+
+<p>以下是你如何解读一个方框图。</p>
+
+
+
+
+
+
+
+<p>任何在异常点之外的都是那些超过胡须末端的点。您可以看到NiFTY FMCG比其他产品有更高的异常点。与条形图一样，也可以通过指定vert=False来创建水平箱线图。</p>
+
+
+
+<pre class="hljs">df.plot(kind=<span class="hljs-string">'box'</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>),vert=<span class="hljs-keyword">False</span>)
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/49c3b569f02c5182cf472f34fc20b82a.png" alt="pandas horizontal box plot" class="wp-image-30965" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-horizontal-box-plot.png?ssl=1"/><figcaption><em>Horizontal boxplots in pandas</em></figcaption></figure></div>
+
+
+
+<h3><strong>面积图</strong></h3>
+
+
+
+<p>一个<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.plot.area.html#pandas.Series.plot.area" target="_blank" rel="noreferrer noopener nofollow">面积图</a>直观显示定量数据。</p>
+
+
+
+<pre class="hljs">df.plot(kind=<span class="hljs-string">'area'</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>));
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/a376339723c4ccd19e6a0a00f7483fe4.png" alt="pandas stacked area" class="wp-image-30967" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-stacked-area.png?ssl=1"/><figcaption><em>Stacked area plot in pandas</em></figcaption></figure></div>
+
+
+
+<p>默认情况下，pandas创建一个堆叠面积图，可以通过传递stacked= <strong> False的值来取消堆叠。</strong></p>
+
+
+
+<pre class="hljs">df.plot(kind=<span class="hljs-string">'area'</span>,stacked=<span class="hljs-keyword">False</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>));
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/ec32ad52daad7aa4c93077a7950cacf0.png" alt="pandas unstacked area" class="wp-image-30969" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-unstacked-area.png?ssl=1"/><figcaption><em>Unstacked area plot in pandas</em></figcaption></figure></div>
+
+
+
+<h3><strong>散点图</strong></h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.scatter.html#pandas.DataFrame.plot.scatter" target="_blank" rel="noreferrer noopener nofollow">散点图</a>用于绘制两个变量之间的相关性。这些相关性以不同颜色和大小的标记形式绘制。如果你要绘制一个散点图，显示NIFTY IT指数和NIFTY FMCG之间的关系，你可以这样做:</p>
+
+
+
+<pre class="hljs">df.plot(kind=<span class="hljs-string">'scatter'</span>,x=<span class="hljs-string">'NIFTY FMCG index'</span>, y=<span class="hljs-string">'NIFTY Bank index'</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>),color=<span class="hljs-string">'Red'</span>);
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/07fe56015d5fe7a78c3e71e4cc71a430.png" alt="pandas scatter plot" class="wp-image-30972" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-scatter-plot.png?ssl=1"/><figcaption><em>Scatter plot in pandas</em></figcaption></figure></div>
+
+
+
+<h3><strong>六边形面元图</strong></h3>
+
+
+
+<p>六边形bin图，也称为hexbin图，可用作散点图的替代图。当数据点数量巨大，并且每个点不能单独绘制时，这种绘图特别有用。</p>
+
+
+
+<pre class="hljs">df.plot(kind=<span class="hljs-string">'hexbin'</span>,x=<span class="hljs-string">'NIFTY FMCG index'</span>, y=<span class="hljs-string">'NIFTY Bank index'</span>,gridsize=<span class="hljs-number">20</span>,figsize=(<span class="hljs-number">10</span>,<span class="hljs-number">6</span>));</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/33db32be433933dd9d84f5470cd0cd2e.png" alt="pandas hexbin plot" class="wp-image-30974" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-hexbin-plot.png?ssl=1"/><figcaption><em>Hexbin plot in pandas</em></figcaption></figure></div>
+
+
+
+<h3><strong>饼状图</strong></h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.pie.html#pandas.DataFrame.plot.pie" target="_blank" rel="noreferrer noopener nofollow">饼图</a>是一列中数字数据的比例表示。让我们以NIFTY银行指数的月末重采样数据为例，看看它是如何逐月分布的。</p>
+
+
+
+<pre class="hljs">df_sample.index=[<span class="hljs-string">'jan'</span>,<span class="hljs-string">'feb'</span>,<span class="hljs-string">'march'</span>,<span class="hljs-string">'Apr'</span>,<span class="hljs-string">'may'</span>]
+df_sample[<span class="hljs-string">'NIFTY Bank index'</span>].plot.pie(legend=<span class="hljs-keyword">False</span>, autopct=<span class="hljs-string">'%.f'</span>);
+</pre>
+
+
+
+
+
+
+
+<p class="has-text-align-center"><em>熊猫的饼状图</em></p>
+
+
+
+<p>参数<strong> autopct </strong>用于使用Python字符串格式显示百分比值。默认情况下启用的图例可以通过指定legend=False来禁用。此外，如果指定了subplots=True，则每列的饼图将绘制为subplots。</p>
+
+
+
+<pre class="hljs">df_sample.plot.pie(subplots=<span class="hljs-keyword">True</span>, figsize=(<span class="hljs-number">16</span>, <span class="hljs-number">10</span>),legend=<span class="hljs-keyword">False</span>);
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/d80f685f33b32b4b074d1ccdeab9463b.png" alt="pandas pie plots" class="wp-image-30979" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-pie-plots.png?ssl=1"/><figcaption><em>Pie plots for each column are drawn as subplots</em></figcaption></figure></div>
+
+
+
+
+
+
+
+<p>Pandas还有一个名为<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html#plotting-tools" target="_blank" rel="noreferrer noopener nofollow"> pandas.plotting </a>的绘图模块。该模块由几个绘图函数组成，并接受一个<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" target="_blank" rel="noreferrer noopener nofollow"> <strong>系列</strong> </a>或<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" target="_blank" rel="noreferrer noopener nofollow"> <strong>数据帧</strong> </a>作为参数。pandas绘图模块包含以下功能。以下描述摘自<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/plotting.html" target="_blank" rel="noreferrer noopener nofollow">熊猫官方文件</a>。</p>
+
+
+
+
+
+
+
+<p>让我们来看看其中的几个。</p>
+
+
+
+<h3><strong>散点图矩阵图</strong></h3>
+
+
+
+<p>您已经看到了如何使用熊猫创建散点图。散点图矩阵，顾名思义，在pandas中使用scatter_matrix方法创建散点图矩阵。绘图:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pandas.plotting <span class="hljs-keyword">import</span> scatter_matrix
+scatter_matrix(df, alpha=<span class="hljs-number">0.5</span>, figsize=(<span class="hljs-number">10</span>, <span class="hljs-number">6</span>), diagonal=<span class="hljs-string">'kde'</span>);
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/c4b5b8dd8e8bb6becf75cd928b9ddf01.png" alt="pandas scatter matrix" class="wp-image-30984" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-scatter-matrix.png?ssl=1"/><figcaption><em>A scatter matrix in pandas</em></figcaption></figure></div>
+
+
+
+<h3><strong>自举图</strong></h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html#bootstrap-plot" target="_blank" rel="noreferrer noopener nofollow"> Bootstrap plots </a>直观评估统计的不确定性，如平均值、中间值、中间值等。Bootstrapping涉及通过多次从相同的数据中随机采样来计算统计数据，然后对每个样本的单独结果进行平均。然后将从每个随机样本中获得的结果值绘制成线图和条形图。</p>
+
+
+
+<pre class="hljs">pd.plotting.bootstrap_plot(df[<span class="hljs-string">'NIFTY Bank index'</span>])
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/456eef6f7dead95f30e3718a234e0690.png" alt="pandas bootstrap plot" class="wp-image-30986" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012622im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/pandas-bootstrap-plot.png?ssl=1"/><figcaption><em>A bootstrap plot in Pandas</em></figcaption></figure></div>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>在本文中，我们研究了pandas作为绘图库的功能。我们讲述了如何在pandas中绘制一些基本的图，并涉及了一些高级的图，如bootstrap和散点图。</p>
+
+
+
+<p>的。plot()函数是一个非常强大的工具，可以立即帮助您开始数据可视化过程——只需很少的代码行。如果您想了解更多关于pandas作为绘图库的功能，以及设计和定制您的绘图，pandas DataFrame文档的<a href="https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/frame.html#plotting" target="_blank" rel="noreferrer noopener nofollow">绘图部分</a>是一个很好的起点。</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

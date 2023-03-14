@@ -1,0 +1,674 @@
+<html>
+<head>
+<title>Training and Debugging Deep Convolutional Generative Adversarial Networks </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>深度卷积生成对抗网络的训练和调试</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/deep-convolutional-generative-adversarial-networks#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/deep-convolutional-generative-adversarial-networks#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>对抗网络(深度卷积生成对抗网络)最近已经成为深度学习实践者非常活跃的游乐场。对抗网络领域是由蒙特利尔大学的Ian Goodfellow和他的同事在他们的文章<a href="https://web.archive.org/web/20221206093145/https://papers.nips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf" target="_blank" rel="noreferrer noopener nofollow">生成对抗网络</a>中建立的。从那以后，原始模型的新变体不断被开发，研究也不断向前发展。</p>
+
+
+
+<p>对抗网络的主要目标是估计对抗过程中的生成模型。这一过程包括以一种<em>对另一种</em>的方式同时训练两个模型:</p>
+
+
+
+<ul><li><strong>生成型</strong>模型(通常表示为<strong> <em> G </em> </strong>)被训练来捕捉数据分布并对数据模式进行归纳，以最终再现原始样本的完美副本；</li><li><strong>鉴别器</strong>模型(表示为<strong> <em> D </em> </strong>)试图识别来自生成模型的假样本。鉴别器估计数据是原始数据还是生成数据的概率。</li></ul>
+
+
+
+<p>培训过程针对两种模型的两个不同但互补的目标:</p>
+
+
+
+<ul><li>生成模型被训练成通过总是生成更好的假货来胜过鉴别器。</li><li>该鉴别器被训练来学习如何正确地将真实数据与假数据进行分类。</li></ul>
+
+
+
+<p>当生成器创建完美的赝品，并且鉴别器在猜测输出是真还是假时留有50%的置信度时，达到总体平衡。</p>
+
+
+
+<h2 id="h-different-approaches-to-adversarial-networks">对抗网络的不同方法</h2>
+
+
+
+<p>自从Ian Goodfellow的论文为敌对网络的核心机制奠定了基础，其他几种实现生成模型的方法也被提出和测试。其中一些方法如下:</p>
+
+
+
+<h3>完全可见的信念网络</h3>
+
+
+
+<p>这些网络主要用于识别、聚类和生成图像、视频序列和动作捕捉。Geoff Hinton在2006年<a href="https://web.archive.org/web/20221206093145/https://wiki.pathmind.com/deep-belief-network" target="_blank" rel="noreferrer noopener nofollow">推出了它们。</a></p>
+
+
+
+<p>它们是一类显式密度模型。他们使用链式法则来分解向量的概率分布。其思想是将经典的向量分布分解成每个向量成员的乘积。</p>
+
+
+
+<p>这个家族中最流行的模型是一个名为<a href="https://web.archive.org/web/20221206093145/https://arxiv.org/pdf/1606.05328.pdf" target="_blank" rel="noreferrer noopener nofollow"> PixelCNN </a>的自回归生成模型。</p>
+
+
+
+
+
+
+
+<h3>变分自动编码器</h3>
+
+
+
+<p>自动编码器将数据作为输入，并发现该数据的一些潜在状态表示。通常，输入向量被转换成编码向量，其中每个维度表示关于数据的一些学习属性。</p>
+
+
+
+<p>变分自动编码器(VAE)提供了一种概率方法来描述潜在空间的具体观察。我们不是为数据的每个潜在状态属性建立一个专用的编码器，而是制定我们的编码器来描述所有潜在属性的概率分布。</p>
+
+
+
+<p>下图显示了一个非常简单的示例，该示例说明了数据中潜在属性的单个离散值和概率分布之间的差异:</p>
+
+
+
+
+
+
+
+<p>如您所见，最好用概率术语表示数据中的潜在属性，这样我们就可以评估整个范围的值。</p>
+
+
+
+<p>亚历克·拉德福德使用一种可变自动编码器来生成虚构的名人面孔。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full"><img decoding="async" src="../Images/9b5e191b03e5bdb7a258a3d19476f088.png" alt="DCGAN Variational autoencoders results" class="wp-image-51492" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206093145im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/DCGAN-Variational-autoencoders-results.png?ssl=1"/><figcaption><em>Variational Autoencoders to generate fake faces | Credit: <a href="https://web.archive.org/web/20221206093145/https://www.youtube.com/watch?v=XNZIN7Jh3Sg" target="_blank" rel="noreferrer noopener nofollow">Alec Radford</a></em></figcaption></figure></div>
+
+
+
+<h3>玻尔兹曼机器</h3>
+
+
+
+<p>玻尔兹曼机器是由对称连接的单元组成的网络，它们随机决定是否激活。他们有简单的学习算法，使他们能够在由二进制向量组成的数据集中发现有趣的特征。</p>
+
+
+
+<p>它们也可以被看作是一个能量函数，调度特定状态的概率分布。</p>
+
+
+
+<h2 id="h-deep-convolutional-gans">深度卷积GANs</h2>
+
+
+
+<p>深度卷积对抗网络是一种特殊的<a href="/web/20221206093145/https://neptune.ai/blog/6-gan-architectures" target="_blank" rel="noreferrer noopener"> GANs </a>。生成器(<strong> <em> G </em> </strong>)和鉴别器(<strong> <em> D </em> </strong>)的网络架构中的主要层分别是卷积层和转置卷积层。</p>
+
+
+
+<p>这些架构首次在论文<a href="https://web.archive.org/web/20221206093145/https://arxiv.org/pdf/1511.06434.pdf" target="_blank" rel="noreferrer noopener nofollow">中介绍，深度卷积生成对抗网络</a>的无监督表示学习。作者拉德福德等人。艾尔。提出了一种特殊的实现，它需要一系列的步进卷积层、批量范数层和LeakyReLU激活。生成器主要由转置卷积层填充，相反，对于鉴别器，激活是简单的ReLU层。</p>
+
+
+
+<p>鉴别器输入是一个<strong> 3x64x64 </strong>彩色图像，输出是一个标量概率，表示输入是来自真实数据分布还是完全由生成器编造的置信度。</p>
+
+
+
+<p>另一方面，发生器的输入由从标准正态分布提取的潜在向量组成，相应的输出产生一个<strong> 3x64x64 </strong>图像。</p>
+
+
+
+
+
+
+
+<p>让我们用一些数学符号来帮助澄清我们将在本文后面使用的术语。</p>
+
+
+
+<p>鉴别器网络记为<em><strong>【D(x)</strong></em>，其输出<em> x </em>来自训练数据而非生成器的标量概率。</p>
+
+
+
+<p>对于生成器，<em> z </em>是从标准正态分布中采样的潜在空间向量。因此，<em> <strong> G(z) <a href="https://web.archive.org/web/20221206093145/https://www.codecogs.com/eqnedit.php?latex=G(z)#0"/> </strong> </em>表示将潜在向量z映射到数据空间的函数。</p>
+
+
+
+<p>如此，<strong> <em> D(G(z)) </em> </strong> <a href="https://web.archive.org/web/20221206093145/https://www.codecogs.com/eqnedit.php?latex=D(G(z))#0"/>表示发生器<strong> <em> G </em> </strong>的输出为实图像的概率。与我们之前解释的涉及一个模型对另一个模型的竞争一致，<strong><em>【D(x)</em></strong>试图最大化它正确分类真实和虚假的概率，这可以表示为<strong><em>【log(D(x)】</em></strong>和<strong><em>【G(z)</em></strong><a href="https://web.archive.org/web/20221206093145/https://www.codecogs.com/eqnedit.php?latex=G(z)#0"/><strong><em/></strong>相反，试图最小化虚假输出被鉴别器发现的概率，因此 </p>
+
+
+
+<p>官方文件中描述的整体<a href="/web/20221206093145/https://neptune.ai/blog/gan-loss-functions" target="_blank" rel="noreferrer noopener"> GAN损失函数</a>如下所示:</p>
+
+
+
+
+
+
+
+<p>如前所述，当:<strong> <em> P <sub> g </sub> =P <sub>数据</sub> </em> </strong>以及鉴别器猜测输入是真还是假时，理论上的收敛导致了该函数的解。</p>
+
+
+
+<p>现在您已经了解了一般概念，并且有了更好的基础，我们可以有目的地深入到更实际的问题中。</p>
+
+
+
+<p>我们将建立一个基于名人头像训练的DCGAN。我们将打破构建模型、初始化权重、训练和评估最终结果的步骤。接下来，<a href="https://web.archive.org/web/20221206093145/https://docs.neptune.ai/getting-started/installation" target="_blank" rel="noreferrer noopener nofollow">开始你的海王星实验</a>和<a href="https://web.archive.org/web/20221206093145/https://docs.neptune.ai/getting-started/installation#authentication-neptune-api-token">连接你的API令牌</a>到你的笔记本。</p>
+
+
+
+<h3>名人-人脸数据集</h3>
+
+
+
+<p>名人属性面孔是一个大规模的开源数据集，提供了各种各样的名人图像，用40种属性进行了注释。图像质量很好，数据集在实际图像上提出了各种各样的姿势变化和背景杂波，使其非常适合我们的任务。</p>
+
+
+
+<p><em>下载链接:<a href="https://web.archive.org/web/20221206093145/https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg?resourcekey=0-rJlzl934LzC-Xp28GeIBzQ" target="_blank" rel="noreferrer noopener nofollow">大规模名人面孔属性(CelebA)数据集</a> </em></p>
+
+
+
+<p>在笔记本根目录下创建一个目录，并将文件夹解压到其中。应该是这样的:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/b5bf2e57adf209a48b3e9365748b293c.png" alt="DCGAN CelebA-Dataset" class="wp-image-51494" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206093145im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/DCGAN-CelebA-Dataset.png?ssl=1"/><figcaption><em>  CelebA Dataset after extracting the folder</em></figcaption></figure></div>
+
+
+
+<p>现在，我们需要开始预处理部分。转换我们的数据并初始化Torch DataLoader类，该类将在训练过程中负责数据批次的洗牌和加载。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torchvision.datasets <span class="hljs-keyword">as</span> datasets
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">data_preprocessing</span><span class="hljs-params">(root_dir, batch_size=<span class="hljs-number">128</span>, image-size=<span class="hljs-number">64</span>, num_workers=<span class="hljs-number">2</span>)</span>:</span>
+  data = datasets.ImageFolder(root=root_dir,
+                              transform=transforms.Compose([
+                                  transforms.Resize(image_size),
+                                  transforms.CenterCrop(image_size),
+                                  transforms.ToTensor(),
+                                  transforms.Normalize((<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>), (<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>))
+                              ]))
+
+  dataloader = torch.utils.data.DataLoader(dataset, batch_size, shuffle=<span class="hljs-keyword">True</span>, num_workers)
+  <span class="hljs-keyword">return</span> dataloader</pre>
+
+
+
+<p>将所有数据集细节记录到您的Neptune运行中，因此您可以跟踪您的数据集信息和相应的元数据。</p>
+
+
+
+<p>按照这里的说明<a href="https://web.archive.org/web/20221206093145/https://docs.neptune.ai/getting-started/installation" target="_blank" rel="noreferrer noopener">建立自己的Neptune账户</a>来追踪这些跑步记录。</p>
+
+
+
+<p>开始你的实验:</p>
+
+
+
+<pre class="hljs">run = neptune.init(project=<span class="hljs-string">'aymane.hachcham/DCGAN'</span>, api_token=<span class="hljs-string">'ANONYMOUS'</span>) </pre>
+
+
+
+<pre class="hljs">run[<span class="hljs-string">'config/dataset/path'</span>] = <span class="hljs-string">'Documents/DCGAN/dataset'</span>
+run[<span class="hljs-string">'config/dataset/size'</span>] = <span class="hljs-number">202599</span>
+run[<span class="hljs-string">'config/dataset/transforms'</span>] = {
+    <span class="hljs-string">'train'</span>: transforms.Compose([
+                                  transforms.Resize(hparams[<span class="hljs-string">'image_size'</span>]),
+                                  transforms.CenterCrop(hparams[<span class="hljs-string">'image_size'</span>]),
+                                  transforms.ToTensor(),
+                                  transforms.Normalize((<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>), (<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>))])
+}
+
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/674e61377b2b96fe5a0214e3799c6b02.png" alt="DCGAN Neptune-dataset" class="wp-image-51495" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206093145im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/DCGAN-Neptune-dataset.png?ssl=1"/><figcaption><em>The dataset config in your Neptune dashboard</em></figcaption></figure></div>
+
+
+
+<h2 id="h-model-building">模型结构</h2>
+
+
+
+<p>一旦数据集准备好并被记录，我们就可以开始构建实际的模型了。正如我之前解释的那样，我们将尝试一步一步地解决这个问题。我们需要从权重初始化策略开始。</p>
+
+
+
+<p>权重初始化是关于模型权重应该满足的特定标准。官方论文建议从均值=0、标准差=0.02的正态分布中随机初始化权重。</p>
+
+
+
+<p>我们将创建一个函数，将一个通用模型作为输入，并重新初始化<strong> <em>卷积</em> </strong>、<strong> <em>转置卷积</em> </strong>和<strong> <em>批量归一化</em> </strong>层，以完全满足这个标准。</p>
+
+
+
+<p><strong> <em>注</em> </strong> <em>:你可以跟着教程看完整的colab笔记本，这里- &gt; </em> <a href="https://web.archive.org/web/20221206093145/https://colab.research.google.com/drive/1gtByk_8aKTAlVQn0C7X3-2Gv8JKhT_-O?usp=sharing" target="_blank" rel="noreferrer noopener nofollow"> <em> Colab笔记本</em> </a></p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">weights_init</span><span class="hljs-params">(model)</span>:</span>
+  model_classname = model.__class__.__name__
+  
+  <span class="hljs-keyword">if</span> classname.find(<span class="hljs-string">'Conv'</span>) != <span class="hljs-number">-1</span>:
+        nn.init.normal_(m.weight.data, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.02</span>)
+  
+  <span class="hljs-keyword">elif</span> classname.find(<span class="hljs-string">'BatchNorm'</span>) != <span class="hljs-number">-1</span>:
+        nn.init.normal_(m.weight.data, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.02</span>)
+        nn.init.constant_(m.bias.data, <span class="hljs-number">0</span>)</pre>
+
+
+
+<p>由于模型参数将被生成器或鉴别器取代，因此它们肯定会有Conv和BatchNorm层。因此，该函数为这些层中的每一层设置一个随机权重初始化，平均值=0.0，标准偏差=0.02。</p>
+
+
+
+
+
+
+
+<h3>发电机</h3>
+
+
+
+<p>生成器G的作用是将潜在向量Z映射到数据空间。在我们的例子中，这转化为最终创建与数据中的原始图像具有相同大小和尺寸的RGB图像。这是通过堆叠一系列卷积、转置卷积和批处理规范层来实现的，这些层协调工作以产生最终看起来像人脸的3x64x64输出。</p>
+
+
+
+<p>值得注意的是，在转置卷积之后添加的批范数层在很大程度上有助于训练期间的梯度流，因此它们构成了整体训练性能的重要部分。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Generator</span><span class="hljs-params">(nn.Module)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+        super(Generator, self).__init__()
+        self.main = nn.Sequential(
+            
+            nn.ConvTranspose2d(hparams[<span class="hljs-string">"size_latent_z_vector"</span>],
+                               hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">8</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.BatchNorm2d(hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">8</span>),
+            nn.ReLU(<span class="hljs-keyword">True</span>),
+            
+            nn.ConvTranspose2d(hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">8</span>,
+                               hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.BatchNorm2d(hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">4</span>),
+            nn.ReLU(<span class="hljs-keyword">True</span>),
+            
+            nn.ConvTranspose2d( hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">4</span>,
+                               hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">2</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.BatchNorm2d(hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">2</span>),
+            nn.ReLU(<span class="hljs-keyword">True</span>),
+            
+            nn.ConvTranspose2d(hparams[<span class="hljs-string">"size_feature_maps_generator"</span>] * <span class="hljs-number">2</span>,
+                               hparams[<span class="hljs-string">"size_feature_maps_generator"</span>], <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.BatchNorm2d(hparams[<span class="hljs-string">"size_feature_maps_generator"</span>]),
+            nn.ReLU(<span class="hljs-keyword">True</span>),
+            
+            nn.ConvTranspose2d(hparams[<span class="hljs-string">"size_feature_maps_generator"</span>],
+                               hparams[<span class="hljs-string">"num_channels"</span>], <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.Tanh()
+            
+        )
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, input)</span>:</span>
+        <span class="hljs-keyword">return</span> self.main(input)</pre>
+
+
+
+<p>生成器的特征映射会传播到所有层。在输入部分中设置潜在向量的大小和通道的数量，以影响整个架构。</p>
+
+
+
+<p>让我们实例化生成器并应用权重初始化:</p>
+
+
+
+<pre class="hljs">model_name = <span class="hljs-string">"Generator"</span>
+device = <span class="hljs-string">"cuda"</span>
+generator = Generator().to(device)
+
+generator.apply(weights_init)</pre>
+
+
+
+<p>现在我们可以打印总体架构并将其保存到Neptune artifacts文件夹:</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">with</span> open(f<span class="hljs-string">"./{model_name}_arch.txt"</span>, <span class="hljs-string">"w"</span>) <span class="hljs-keyword">as</span> f:
+  f.write(str(generator))
+
+
+run[f<span class="hljs-string">"io_files/artifacts/{model_name}_arch"</span>].upload(f<span class="hljs-string">"./{model_name}_arch.txt"</span>)</pre>
+
+
+
+
+
+
+
+<h3>鉴别器</h3>
+
+
+
+<p>鉴别器<strong>图像经过一系列Conv2、BatchNorm和LeakyReLU层处理，最终概率由Sigmoid评估。</strong></p>
+
+
+
+<p>官方论文声称，为了下采样，使用跨卷积比池化更好，因为它有助于网络学习自己的池化功能。此外，LeakyReLU激活促进健康的梯度流。查看这篇文章，了解更多关于死亡ReLU问题的信息，以及泄漏的ReLU激活如何帮助解决这个问题。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Discriminator</span><span class="hljs-params">(nn.Module)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+        super(Discriminator, self).__init__()
+        self.main = nn.Sequential(
+            
+            nn.Conv2d(hparams[<span class="hljs-string">"num_channels"</span>],
+                      hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>], <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.LeakyReLU(<span class="hljs-number">0.2</span>, inplace=<span class="hljs-keyword">True</span>),
+            
+            nn.Conv2d(hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>],
+                      hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">2</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.BatchNorm2d(hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">2</span>),
+            nn.LeakyReLU(<span class="hljs-number">0.2</span>, inplace=<span class="hljs-keyword">True</span>),
+            
+            nn.Conv2d(hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">2</span>,
+                      hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">4</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.BatchNorm2d(hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">4</span>),
+            nn.LeakyReLU(<span class="hljs-number">0.2</span>, inplace=<span class="hljs-keyword">True</span>),
+            
+            nn.Conv2d(hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">4</span>,
+                      hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">8</span>, <span class="hljs-number">4</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.BatchNorm2d(hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">8</span>),
+            nn.LeakyReLU(<span class="hljs-number">0.2</span>, inplace=<span class="hljs-keyword">True</span>),
+            
+            nn.Conv2d(hparams[<span class="hljs-string">"size_feature_maps_discriminator"</span>] * <span class="hljs-number">8</span>, <span class="hljs-number">1</span>, <span class="hljs-number">4</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, bias=<span class="hljs-keyword">False</span>),
+            nn.Sigmoid()
+        )
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, input)</span>:</span>
+        <span class="hljs-keyword">return</span> self.main(input)</pre>
+
+
+
+<p>接下来，让我们初始化鉴别器，应用权重初始化，并将架构记录到工件文件夹中:</p>
+
+
+
+<pre class="hljs">
+disc_name = <span class="hljs-string">"Discriminator"</span>
+device = <span class="hljs-string">"cuda"</span>
+discriminator = Discriminator().to(device)
+
+generator.apply(weights_init)
+
+
+<span class="hljs-keyword">with</span> open(f<span class="hljs-string">"./{disc_name}_arch.txt"</span>, <span class="hljs-string">"w"</span>) <span class="hljs-keyword">as</span> f:
+  f.write(str(discriminator))
+
+
+run[f<span class="hljs-string">"io_files/artifacts/{disc_name}_arch"</span>].upload(f<span class="hljs-string">"./{disc_name}_arch.txt"</span>)</pre>
+
+
+
+<p>现在，我们已经将两种模型架构登录到我们的仪表板中:</p>
+
+
+
+
+
+
+
+<h2 id="h-model-training-and-debugging">模型训练和调试</h2>
+
+
+
+<p>在实际开始训练过程之前，我们将花一些时间来讨论我们将使用的损失函数和优化器。</p>
+
+
+
+<p>正如该论文所推荐的，使用的优选损失函数是Pytorch中定义的<strong>二元交叉熵</strong>或<a href="https://web.archive.org/web/20221206093145/https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html#torch.nn.BCELoss" target="_blank" rel="noreferrer noopener nofollow">损失</a>。BCELoss的方便之处在于它提供了目标函数中两个对数分量的计算，即<strong> <em> logD(x) </em> </strong>和<em> <strong> log(1-D(G(z))) </strong>。</em></p>
+
+
+
+<p>原纸中使用的另一个约定俗成的是真假标签。在计算<strong> <em> D </em> </strong>和<strong> <em> G </em> </strong>损失时使用。<br/>最后，我们为<strong> <em> G </em> </strong>和<strong> <em> D </em> </strong>设置了两个不同的优化器。根据论文中的规范，两个优化器都是学习率为0.0002且β1 = 0.5的Adam，并且还生成从高斯分布导出的固定批次的潜在向量。</p>
+
+
+
+<pre class="hljs">
+criterion = nn.BCELoss()
+
+
+fixed_noise = torch.randn(<span class="hljs-number">64</span>, nz, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, device=device)
+
+
+real_label = <span class="hljs-number">1.</span>
+fake_label = <span class="hljs-number">0.</span>
+
+
+optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta1, <span class="hljs-number">0.999</span>))
+optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, <span class="hljs-number">0.999</span>))</pre>
+
+
+
+
+
+
+
+<h3>培训阶段</h3>
+
+
+
+<p>现在我们已经定义了所有的部分，我们可以开始训练了。为了进行训练，我们需要一丝不苟地遵循Goodfellow论文中提出的算法。具体来说，我们将为真实和虚假图像构建不同的小批量，同时调整生成器的目标函数以最大化<strong> <em> logD(G(z))。</em>T3】</strong></p>
+
+
+
+<p>训练循环由两个分段部分组成。第一部分处理鉴别器，第二部分处理发生器。</p>
+
+
+
+<h4>甄别训练</h4>
+
+
+
+<p>如官方文件所述，训练鉴别器的目标是“<em>通过提升其随机梯度</em>来更新鉴别器”。在实践中，我们想要实现的是最大化正确分类给定输入为真实或虚假的概率。因此，我们需要从数据集构建一批真实样本，向前传递通过<strong> <em> D </em> </strong>，计算损耗，然后向后传递计算梯度。然后，我们对这批假样本重复同样的模式。</p>
+
+
+
+<h4>发电机培训</h4>
+
+
+
+<p>我们想从生成器中得到什么非常清楚，我们的目标是训练它，让它学会生成更好的假货。在他的论文中，Goodfellow坚持不提供足够的梯度，尤其是在学习过程的早期。为了实际完成以下内容，我们将对来自鉴别器训练部分的发生器输出进行分类，使用真实标签批次计算发生器损耗，计算反向传递中的梯度，最后用相应的优化器步骤更新<strong><em>【G】</em></strong>的参数。</p>
+
+
+
+<p><strong>创建数据加载器:</strong></p>
+
+
+
+<p>dataloader =数据预处理(数据目录)</p>
+
+
+
+<p><strong>建立训练循环:</strong></p>
+
+
+
+<ul><li><strong>鉴别器训练部分:</strong></li></ul>
+
+
+
+<pre class="hljs"> 
+        
+        discriminator.zero_grad()
+        
+        real_cpu = data[<span class="hljs-number">0</span>].to(device)
+        b_size = real_cpu.size(<span class="hljs-number">0</span>)
+        label = torch.full((b_size,), real_label, dtype=torch.float, device=device)
+        
+        output = discriminator(real_cpu).view(<span class="hljs-number">-1</span>)
+        
+        errD_real = criterion(output, label)
+        
+        errD_real.backward()
+        D_x = output.mean().item()
+
+        
+        
+        noise = torch.randn(b_size, hparams[<span class="hljs-string">"size_latent_z_vector"</span>], <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, device=device)
+        
+        fake = generator(noise)
+        label.fill_(fake_label)
+        
+        output = discriminator(fake.detach()).view(<span class="hljs-number">-1</span>)
+        
+        errD_fake = criterion(output, label)
+        
+        errD_fake.backward()
+        D_G_z1 = output.mean().item()
+        
+        errD = errD_real + errD_fake
+        
+        optimizerD.step()</pre>
+
+
+
+
+
+
+
+<pre class="hljs">
+        generator.zero_grad()
+        label.fill_(real_label)  
+        
+        output = discriminator(fake).view(<span class="hljs-number">-1</span>)
+        
+        errG = criterion(output, label)
+        
+        errG.backward()
+        D_G_z2 = output.mean().item()
+        
+        optimizerG.step()</pre>
+
+
+
+<ul><li><strong>调用训练循环内的两部分:</strong></li></ul>
+
+
+
+<pre class="hljs">
+img_list = [] 
+G_losses = [] 
+D_losses = [] 
+iters = <span class="hljs-number">0</span>
+
+
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(hparams[<span class="hljs-string">"num_epochs"</span>]):
+    
+    <span class="hljs-keyword">for</span> i, data <span class="hljs-keyword">in</span> enumerate(dataloader, <span class="hljs-number">0</span>):
+    	discriminator_training()
+	generator_training()
+
+	
+	print(<span class="hljs-string">'[%d/%d][%d/%d]tLoss_D: %.4ftLoss_G: %.4ftD(x): %.4ftD(G(z)): %.4f / %.4f'</span>
+              % (epoch, hparams[<span class="hljs-string">"num_epochs"</span>], i, len(training_data),
+                  errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
+
+        
+        G_losses.append(errG.item())
+        D_losses.append(errD.item())
+
+        
+        run[<span class="hljs-string">"training/batch/Gloss"</span>].log(errG.item())
+        run[<span class="hljs-string">"training/batch/Dloss"</span>].log(errD.item())
+
+        
+        <span class="hljs-keyword">if</span> (iters % <span class="hljs-number">500</span> == <span class="hljs-number">0</span>) <span class="hljs-keyword">or</span> ((epoch == hparams[<span class="hljs-string">"num_epochs"</span>]<span class="hljs-number">-1</span>) <span class="hljs-keyword">and</span> (i == len(training_data)<span class="hljs-number">-1</span>)):
+            <span class="hljs-keyword">with</span> torch.no_grad():
+                fake = generator(fixed_noise).detach().cpu()
+            img_list.append(vutils.make_grid(fake, padding=<span class="hljs-number">2</span>, normalize=<span class="hljs-keyword">True</span>))
+
+        iters += <span class="hljs-number">1</span></pre>
+
+
+
+<p><strong>检查G和D损耗:</strong></p>
+
+
+
+
+
+
+
+<p>我们可以清楚地观察到两个损失减少并最终稳定下来。我们可以通过改变纪元编号来进行多次训练，但变化仍然不大。当我们增加历元数时，我们可以注意到损耗略有改善，这可以从下面的比较中看出:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/adb81de5a2907a1f707eb5066c11d209.png" alt="DCGAN Comparison_losses" class="wp-image-51499" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206093145im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/DCGAN-Comparison_losses.png?ssl=1"/><figcaption><em>Left chart: D and G losses with 10 epochs, Right chart: D and G losses with 5 epochs | <a href="https://web.archive.org/web/20221206093145/https://app.neptune.ai/aymane.hachcham/DCGAN/experiments?compare=KwGgTEA&amp;split=cmp&amp;dash=charts&amp;viewId=standard-view" target="_blank" rel="noreferrer noopener">See in Neptune</a></em></figcaption></figure></div>
+
+
+
+<p>我们还可以看到发生器和鉴频器损耗相互重叠:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/ac90762be6f4bd536a6082f57449197c.png" alt="DCGAN D_G_losses overlapping" class="wp-image-51500" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206093145im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/DCGAN-D_G_losses-overlapping.png?ssl=1"/><figcaption><em>D and G losses overlapping</em></figcaption></figure></div>
+
+
+
+<h3>生成器级数的最终结果</h3>
+
+
+
+<p>最后，我们可以看看生成器并排创建的一些真实和虚假的图像。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/847927075e0afa59809c2aedb0a2db85.png" alt="DCGAN results" class="wp-image-51502" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206093145im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/DCGAN-results.png?ssl=1"/><figcaption><em>Fake images versus real images</em></figcaption></figure></div>
+
+
+
+<h2 id="h-concluding-thoughts">总结想法</h2>
+
+
+
+<p>我们已经成功地从头开始构建了一个深度卷积GAN，解释了所有不同的部件和组件，并在人脸数据集上进行训练。模型的质量总是可以通过增加训练数据和明智地调整超参数来提高。</p>
+
+
+
+<p>生成对抗性神经网络是深度学习进化的下一步，尽管它们在几个应用领域都有很大的前景，但在硬件和框架上都存在重大挑战。然而，GANs有着广阔的应用前景，如图像到图像的翻译、语义图像到照片的翻译、3D对象生成、自动驾驶、人体姿态生成等等。</p>
+
+
+
+<p>和往常一样，如果你想继续了解这个话题，这里有一些好的资源:</p>
+
+
+
+
+
+
+
+<p>如有任何问题，请随时给我发电子邮件:<em>hachcham.ayman@gmail.com</em>。</p>
+
+
+
+<p>不要犹豫去查一下谷歌Colab笔记本:<a href="https://web.archive.org/web/20221206093145/https://colab.research.google.com/drive/1gtByk_8aKTAlVQn0C7X3-2Gv8JKhT_-O?usp=sharing" target="_blank" rel="noreferrer noopener nofollow">带DCGAN的假脸</a></p>
+        </div>
+        
+    </div>    
+</body>
+</html>

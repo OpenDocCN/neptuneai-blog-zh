@@ -1,0 +1,653 @@
+<html>
+<head>
+<title>Top 12 On-Prem Tracking Tools in Machine Learning </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>机器学习中的12大现场跟踪工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/top-12-on-prem-tracking-tools-in-machine-learning#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/top-12-on-prem-tracking-tools-in-machine-learning#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>云很酷——它们提供可扩展性、成本节约以及与众多工具集成的能力。任何东西都有应用程序——机器学习平台、数据存储、项目管理、调试和许多其他工具都在为我们竞争，随时可以使用。</p>
+
+
+
+<p>然而，当一个人需要(或想要！)在本地基础设施上运行培训。它可以是在超级计算机上启动的科学项目。它可以是银行或医疗保健相关机构内部构建的模型，由于合规性问题，这些机构无法使用基于云的服务。</p>
+
+
+
+<p>或者，该公司已经投资了其服务器场，并且不想在内部拥有适量计算能力的情况下为云支付过高的费用。原因数不胜数，有些令人惊讶，有些则平淡无奇。</p>
+
+
+
+<p>对于习惯了云的数据科学家来说，在本地基础设施上运行项目(以及<a href="/web/20221007145036/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">跟踪实验</a>)的愿景可能会令人不安。但是不要害怕！</p>
+
+
+
+<p><strong>本文涵盖了你可以用来跟踪你的机器学习项目的12大内部工具。</strong></p>
+
+
+
+
+
+
+
+<p>Neptune是为运行大量实验的研究和生产团队构建的MLOps的元数据存储。它有本地版本，可免费试用30天。</p>
+
+
+
+<p><a href="/web/20221007145036/https://neptune.ai/product" target="_blank" rel="noreferrer noopener"> Neptune </a>在云和内部都可用。它为日志度量、数据版本、硬件使用、模型检查点等提供元数据跟踪。</p>
+
+
+
+<p>你可以在你的脚本顶部用下面三行代码将Neptune连接到你的任何机器学习模型。</p>
+
+
+
+<p>您可以用简单的命令<code>pip install neptune-client</code>安装Neptune，并在训练和验证脚本中添加以下代码，以记录您的实验数据。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+
+run = neptune.init(<span class="hljs-string">'work-space/MyProject'</span>, api_toke=<span class="hljs-string">'Your_token'</span>)
+run[<span class="hljs-string">'parameters'</span>]={<span class="hljs-string">'lr'</span>:<span class="hljs-number">0.1</span>, <span class="hljs-string">'dropout'</span>:<span class="hljs-number">0.4</span>}
+
+run[<span class="hljs-string">'test_accuracy'</span>].log(<span class="hljs-number">0.84</span>)
+</pre>
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="45167" data-permalink="https://web.archive.org/web/20221007145036/https://neptune.ai/homepage/focus-on-ml" data-orig-file="https://web.archive.org/web/20221007145036/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?fit=1024%2C591&amp;ssl=1" data-orig-size="1024,591" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Focus on ML" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221007145036/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?fit=300%2C173&amp;ssl=1" data-large-file="https://web.archive.org/web/20221007145036/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?fit=1024%2C591&amp;ssl=1" src="../Images/e036d53d8a299511fa72fda07dc289f9.png" alt="Focus on ML" class="wp-image-45167 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221007145036/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?resize=1024%2C591&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221007145036im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?resize=1024%2C591&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="45167" data-permalink="https://web.archive.org/web/20221007145036/https://neptune.ai/homepage/focus-on-ml" data-orig-file="https://web.archive.org/web/20221007145036/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?fit=1024%2C591&amp;ssl=1" data-orig-size="1024,591" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Focus on ML" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221007145036/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?fit=300%2C173&amp;ssl=1" data-large-file="https://web.archive.org/web/20221007145036/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?fit=1024%2C591&amp;ssl=1" src="../Images/e036d53d8a299511fa72fda07dc289f9.png" alt="Focus on ML" class="wp-image-45167" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221007145036im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Focus-on-ML.png?resize=1024%2C591&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>Neptune可以集成<a href="https://web.archive.org/web/20221007145036/https://docs.neptune.ai/integrations-and-supported-tools/model-training/pytorch" target="_blank" rel="noreferrer noopener"> PyTorch </a>、<a href="https://web.archive.org/web/20221007145036/https://docs.neptune.ai/integrations-and-supported-tools/model-training/skorch" target="_blank" rel="noreferrer noopener"> Skorch </a>、<a href="https://web.archive.org/web/20221007145036/https://docs.neptune.ai/integrations-and-supported-tools/model-training/pytorch-ignite" target="_blank" rel="noreferrer noopener"> Ignite </a>、<a href="https://web.archive.org/web/20221007145036/https://docs.neptune.ai/integrations-and-supported-tools/model-training/tensorflow-keras" target="_blank" rel="noreferrer noopener"> keras </a>等框架。</p>
+
+
+
+<h3><strong>使用海王星的优势</strong></h3>
+
+
+<div class="custom-point-list">
+<ul><li>你可以在Jupyter笔记本上追踪实验。</li><li>项目监督以及团队协作</li><li>比较笔记本</li><li>搜索并比较你的实验</li><li>与团队分享您的工作。</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+<p>Comet也是一个跟踪机器学习项目的实验工具。Comet提供了一个自托管和基于云的元机器学习平台，允许数据科学家和团队跟踪、比较、解释、优化实验和模型。</p>
+
+
+
+<p>一名内部成员可免费获得，多名成员可获得30天试用期。</p>
+
+
+
+<p>您可以使用以下代码片段将comet与您的任何机器学习项目集成。</p>
+
+
+
+<p>你可以用下面的代码安装Comet<code>pip install comet_ml</code></p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">from</span> comet_ml <span class="hljs-keyword">import</span> Experiment
+
+
+experiment = Experiment(project_name=<span class="hljs-string">"my-project"</span>, workspace=<span class="hljs-string">"my-workspace"</span>)
+
+
+</pre>
+
+
+
+<p>Comet可以集成类似<a href="https://web.archive.org/web/20221007145036/https://pytorch.org/" target="_blank" rel="noreferrer noopener nofollow"> PyTorch </a>、<a href="https://web.archive.org/web/20221007145036/https://www.fast.ai/" target="_blank" rel="noreferrer noopener nofollow"> fast.ai </a>、<a href="https://web.archive.org/web/20221007145036/https://pytorch.org/ignite/index.html" target="_blank" rel="noreferrer noopener nofollow"> Ignite </a>、<a href="https://web.archive.org/web/20221007145036/https://keras.io/" target="_blank" rel="noreferrer noopener nofollow"> Keras </a>等框架。</p>
+
+
+
+<h3><strong>彗星的优点</strong></h3>
+
+
+<div class="custom-point-list">
+<ul><li>比较实验以了解模型性能的差异。</li><li>从您的模型预测中分析并获得洞察力。</li><li>通过使用最先进的超参数优化和监督早期停止，更快地构建更好的模型。</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20221007145036/https://www.wandb.com/" target="_blank" rel="noreferrer noopener nofollow">权重&amp;偏差</a>是一个机器学习的开发工具，用于执行实验跟踪、超参数优化、模型和数据集版本化。</p>
+
+
+
+<p>Weights &amp; Biases通过帮助团队跟踪他们的模型、可视化模型性能以及轻松地自动化培训和改进模型，帮助组织将深度学习研究项目转化为部署的软件。</p>
+
+
+
+<p>您可以使用下面的代码<code>pip install wandb</code>安装Weights &amp; Biases，通过下面的代码片段将该工具与您的任何机器学习项目集成。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> wandb
+‍
+
+wandb.init(project=<span class="hljs-string">"gpt-3"</span>)
+‍
+
+config = wandb.config
+config.learning_rate = <span class="hljs-number">0.01</span>
+‍
+
+wandb.watch(model)
+<span class="hljs-keyword">for</span> batch_idx, (data, target) <span class="hljs-keyword">in</span> enumerate(train_loader):
+  ...  
+  <span class="hljs-keyword">if</span> batch_idx % args.log_interval == <span class="hljs-number">0</span>:      
+    
+    wandb.log({<span class="hljs-string">"loss"</span>: loss})
+</pre>
+
+
+
+<h3><strong>砝码的优势&amp;偏差</strong></h3>
+
+
+<div class="custom-point-list">
+<ul><li>适合深度学习实验</li><li>更快的集成</li><li>可视化和报告工具的灵活用户界面</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>MLflow是一个开源工具，可以部署在云和本地，用于管理机器学习生命周期，包括实验、再现性、部署和中央模型注册。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221007145036/https://mlflow.org/" target="_blank" rel="noreferrer noopener nofollow"> MLflow </a>有三个构建模块:</p>
+
+
+<div class="custom-point-list">
+<ol><li><strong>跟踪:</strong>日志和查询实验，比较结果和参数。</li><li><strong>项目:</strong>以可重用的方式封装代码。</li><li><strong>模型:</strong>管理和部署模型。</li></ol>
+</div>
+
+
+<p>可以用下面的代码<code>pip install mlflow</code>安装MLflow。</p>
+
+
+
+<p>使用MLflow进行实验跟踪的线性回归示例:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> sklearn.linear_model <span class="hljs-keyword">import</span> LinearRegression
+<span class="hljs-keyword">from</span> sklearn.metrics <span class="hljs-keyword">import</span> mean_squared_error
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> mlflow
+<span class="hljs-keyword">import</span> mlflow.sklearn
+
+
+mlflow.set_tracking_uri(<span class="hljs-string">'file:/myfullppath/myproject/mlruns'</span>)
+
+exp_name = <span class="hljs-string">"Simple_Regression"</span>
+mlflow.set_experiment(exp_name)
+
+x = np.array([[<span class="hljs-number">1</span>], [<span class="hljs-number">2</span>], [<span class="hljs-number">2.1</span>], [<span class="hljs-number">2.5</span>], [<span class="hljs-number">2.7</span>], [<span class="hljs-number">3</span>], [<span class="hljs-number">4</span>], [<span class="hljs-number">4.5</span>], [<span class="hljs-number">3</span>]])
+y = np.array([<span class="hljs-number">0.5</span>, <span class="hljs-number">2.2</span>, <span class="hljs-number">2.5</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3.5</span>, <span class="hljs-number">3.1</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5.1</span>, <span class="hljs-number">3.5</span>])
+
+
+
+
+x_train = x[:<span class="hljs-number">-2</span>]
+y_train = y[:<span class="hljs-number">-2</span>]
+x_test = x[<span class="hljs-number">-2</span>:]
+y_test = y[<span class="hljs-number">-2</span>:]
+
+<span class="hljs-keyword">with</span> mlflow.start_run():
+  model = LinearRegression()
+  model.fit(x_train, y_train)
+  prediction = model.predict(x_test)
+  rmse = np.sqrt(mean_squared_error(y_test, prediction))
+  print(rmse)
+  
+  mlflow.log_metric(<span class="hljs-string">"rmse"</span>, rmse)
+  mlflow.sklearn.log_model(model, <span class="hljs-string">"model"</span>)
+</pre>
+
+
+
+
+
+
+
+<h3>【MLflow的优势:</h3>
+
+
+<div class="custom-point-list">
+<ul><li>开源</li><li>在本地和云上工作。</li><li>借助Apache Spark扩展到大数据</li></ul>
+</div>
+
+
+<p>你可以在这里了解更多关于MLflow <a href="https://web.archive.org/web/20221007145036/https://mlflow.org/" rel="noreferrer noopener nofollow" target="_blank">的信息。</a></p>
+
+
+
+
+
+
+
+
+
+
+<p>神圣自动存储每次运行的实验信息，我们可以在Omniboard的帮助下可视化该实验。</p>
+
+
+
+<p><strong>神圣的</strong>–我们在模型训练脚本中使用<strong>神圣的</strong>装饰者来自动存储每次运行的实验信息。</p>
+
+
+
+<p>omni board–omni board有助于可视化我们的实验，以便跟踪它们，观察每个实验的持续时间，添加注释，以及检查实验(失败或完成)。</p>
+
+
+
+<p>你可以用下面的命令<code>pip install sacred</code>安装<a href="https://web.archive.org/web/20221007145036/https://github.com/IDSIA/sacred" target="_blank" rel="noreferrer noopener nofollow">神圣&amp;全能</a>。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3>神圣的优点</h3>
+
+
+<div class="custom-point-list">
+<ul><li>开源工具</li><li>易于集成</li><li>使用Omniboard跟踪可视化实验</li><li>帮助为每个实验添加注释。</li></ul>
+</div>
+
+
+<p>你可以在这里了解更多关于神圣的<a href="https://web.archive.org/web/20221007145036/https://github.com/IDSIA/sacred#sacred" target="_blank" rel="noreferrer noopener nofollow">。</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20221007145036/https://www.tensorflow.org/tensorboard" target="_blank" rel="noreferrer noopener nofollow"> TensorBoard </a>，开源工具，是<a href="https://web.archive.org/web/20221007145036/https://www.tensorflow.org/" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow </a>的可视化工具包，为机器学习实验提供可视化和工具，包括度量可视化、模型图可视化等。</p>
+
+
+
+<p>用张量板显示图形的简化代码:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+
+writer = tf.summary.create_file_writer(<span class="hljs-string">'./folder'</span>)
+
+accuracy = [<span class="hljs-number">0.1</span>, <span class="hljs-number">0.4</span>, <span class="hljs-number">0.6</span>, <span class="hljs-number">0.8</span>, <span class="hljs-number">0.9</span>, <span class="hljs-number">0.95</span>] 
+
+<span class="hljs-keyword">with</span> writer.as_default():
+    <span class="hljs-keyword">for</span> step, acc <span class="hljs-keyword">in</span> enumerate(accuracy):
+        tf.summary.scalar(<span class="hljs-string">'Accuracy'</span>, acc, step) 
+        writer.flush() 
+
+writer.close() 
+</pre>
+
+
+
+<p>启动网络服务器:</p>
+
+
+
+<pre class="hljs">tensorboard --logdir=<span class="hljs-string">'./folder'</span>
+</pre>
+
+
+
+
+
+
+
+<h3><strong>冲浪板的优势</strong></h3>
+
+
+<div class="custom-point-list">
+<ul><li>提供调试机器学习模型训练所需的度量和可视化</li><li>写总结来形象化学习</li><li>易于集成</li><li>大型社区</li></ul>
+</div>
+
+
+<p>你可以在这里了解更多关于TensorBoard <a href="https://web.archive.org/web/20221007145036/https://www.tensorflow.org/tensorboard" target="_blank" rel="noreferrer noopener nofollow">的信息。</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>Deepkit.ai是一个开源的机器学习开发工具和培训套件，用于深入、快速和可重复的现代机器学习。</p>
+
+
+
+<p>Deepkit.ai可以用来跟踪你的实验，调试你的模型，管理计算服务器。</p>
+
+
+
+<h3><strong>deep kit . ai的主要优势</strong></h3>
+
+
+<div class="custom-point-list">
+<ul><li>实验管理</li><li>模型调试</li><li>计算管理</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+<p>Guild AI是一个开源工具，最适合个人项目。它提供机器学习运行的参数跟踪、加速的ML模型开发、测量实验和<a href="/web/20221007145036/https://neptune.ai/blog/hyperparameter-tuning-in-python-a-complete-guide-2020" target="_blank" rel="noreferrer noopener nofollow">超参数调整</a>。</p>
+
+
+
+<p>Guild AI会自动捕捉训练跑步的每个细节，作为独特的实验。</p>
+
+
+
+
+
+
+
+<h3><strong>公会AI的主要优势</strong></h3>
+
+
+<div class="custom-point-list">
+<ul><li>分析、可视化和差异</li><li>使用AutoML进行超参数调谐</li><li>并行处理</li><li>百分之百免费</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>Trains是一个开源平台，用于跟踪和控制生产级深度学习模型。</p>
+
+
+
+
+
+
+
+<p>任何处于模型原型阶段的研究团队都可以通过添加几行代码，在其内部<a href="https://web.archive.org/web/20221007145036/https://github.com/allegroai/trains" target="_blank" rel="noreferrer noopener nofollow"> Trains </a>的服务器上建立并存储有见地的条目。</p>
+
+
+
+<p>Trains与任何DL/ML工作流程无缝集成。它自动将实验与训练代码(git commit + local diff + Python包版本)链接起来，并自动以Python代码的形式存储jupyter笔记本。</p>
+
+
+
+<h3><strong>火车的主要优势</strong></h3>
+
+
+<div class="custom-point-list">
+<ul><li>易于集成。</li><li>为生产级深度学习模型做好了准备。</li><li>实验的自动记录。</li><li>资源监控(CPU/GPU利用率、温度、IO、网络等。).</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+<p>Polyaxon是一个用于构建、培训和监控大规模深度学习应用的平台，为机器学习应用提供可重复性、自动化和可扩展性。支持Tensorflow、MXNet、Caffe、PyTorch等所有深度学习框架。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20221007145036/https://polyaxon.com/" target="_blank" rel="noreferrer noopener nofollow"> Polyaxon </a>提供节点管理和智能容器，实现深度学习模型的高效开发。</p>
+
+
+
+
+
+
+
+<h3><strong>poly axon的主要优点</strong></h3>
+
+
+<div class="custom-point-list">
+<ul><li>为大规模生产级深度学习模型做好了准备。</li><li>支持几乎所有深度学习框架。</li><li>为机器学习应用程序提供可再现性、自动化和可扩展性。</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>Valhoai是一个MLOps平台(管理ML生命周期的机器学习和操作的结合)。该工具通过自动化实验跟踪和基础设施管理，使数据科学家能够专注于构建定制模型。</p>
+
+
+
+<h3><strong>瓦罗海的优势</strong></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20221007145036/https://www.kubeflow.org/" target="_blank" rel="noreferrer noopener nofollow"> Kubeflow </a>是一个基于开源机器学习Kubernetes的平台，用于开发、部署、管理和运行可扩展的机器学习工作流。</p>
+
+
+
+<p>Kubeflow提供创建交互式Jupyter笔记本、运行模型服务、运行模型培训、创建ML管道的服务。它还支持多种框架。</p>
+
+
+
+<p>Kubeflow提供Kubernetes自定义资源(CRD ),运行各种分布式和非分布式培训作业。其中一些如下:</p>
+
+
+<div class="custom-point-list">
+<ol><li>张量流训练(TFJob)</li><li>PyTorch培训</li><li>MXNet培训</li><li>MPI培训</li><li>链式训练</li></ol>
+</div>
+
+
+<p>Kubleflow支持独立的模型服务系统和多框架模型服务。</p>
+
+
+
+<p>多框架服务包括:</p>
+
+
+<div class="custom-point-list">
+<ol><li>kfserving很少核心服务</li><li>本托尔</li><li>独立框架服务:</li></ol>
+</div>
+
+
+<p>张量流服务</p>
+
+
+<div class="custom-point-list">
+<ol><li>张量流批量预测</li><li>NVIDIA Triton推理服务</li><li><strong>kube flow的优势</strong></li></ol>
+</div>
+
+
+
+
+
+
+<h3>最后的想法</h3>
+
+
+
+
+
+
+
+
+<h2>上面列出的工具将云的便利带到了本地基础设施，解决了项目期间可能遇到的大多数精确问题。所以，不要害怕，拿起你选择的武器，在你现有的基础设施上进行实验！</h2>
+
+
+
+<p>还有一个需要提及的本地基础设施的特征。云服务没有即时的可伸缩性。如果完成内部基础架构培训需要八个小时，您别无选择，只能等待。打个盹，做些伸展运动，读本书。内部基础架构有其优点！</p>
+
+
+
+<p>Python和机器学习讲师| probog.com创始人</p>
+
+
+
+<div class="author-box">
+    
+    
+    <p class="author-desc"><strong>阅读下一篇</strong></p>
+</div>
+
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">在AILS实验室建立可扩展的医学ML研究工作流程[案例研究]</p>
+
+
+
+<h2>8分钟阅读| Ahmed Gad |发布于2021年6月22日</h2>
+
+
+
+<p class="has-small-font-size">8 mins read | Ahmed Gad | Posted June 22, 2021</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10">AILS Labs是一个生物医学信息学研究小组，致力于使人类更加健康。这个任务就是<strong>建造模型，也许有一天可以拯救你的心脏病</strong>。它归结为应用机器学习来基于临床、成像和遗传学数据预测心血管疾病的发展。</p>
+
+
+
+<p>四名全职和五名以上兼职团队成员。生物信息学家、内科医生、计算机科学家，许多人都有望获得博士学位。正经事。</p>
+
+
+
+<p>虽然业务可能是一个错误的术语，因为面向用户的应用程序还没有在路线图上，但研究是主要的焦点。<strong>研究如此激烈，以至于需要一个定制的基础设施</strong>(花了大约一年时间建造)来从不同类型的数据中提取特征:</p>
+
+
+
+<p>电子健康记录(EHR)，</p>
+
+
+<div class="custom-point-list">
+<ul><li>诊断和治疗信息(时间-事件回归方法)，</li><li>图像(卷积神经网络)，</li><li>结构化数据和心电图。</li><li>通过融合这些特征，精确的机器学习模型可以解决复杂的问题。在这种情况下，这是心血管一级预防的<em>风险分层。</em>本质上，它是关于<strong>预测哪些患者最有可能患心血管疾病</strong>。</li></ul>
+</div>
+
+
+<p>AILS实验室有一套完整的研究流程。每个目标都有七个阶段:</p>
+
+
+
+<p>定义要解决的任务(例如，建立心血管疾病的风险模型)。</p>
+
+
+<div class="custom-point-list">
+<ol><li>定义任务目标(例如，定义预期的实验结果)。</li><li>准备数据集。</li><li>使用Jupyter笔记本以交互模式处理数据集；快速试验，找出任务和数据集的最佳特性，用R或Python编码。</li><li>一旦项目规模扩大，使用像Snakemake或Prefect这样的工作流管理系统将工作转化为可管理的管道，并使其可重复。否则，复制工作流程或比较不同模型的成本会很高。</li><li>使用Pytorch Lightning与Neptune集成创建机器学习模型，其中应用了一些初始评估。记录实验数据。</li><li>最后，评估模型性能并检查使用不同特征和超参数集的效果。</li><li>扩大机器学习研究的5个问题</li></ol>
+</div>
+
+
+<h2>AILS Labs最初是由一小群开发人员和研究人员组成的。一个人编写代码，另一个人审查代码。没有太多的实验。但是协作变得更具挑战性，随着新团队成员的到来，新问题开始出现:</h2>
+
+
+
+<p>数据隐私，</p>
+
+
+<div class="custom-point-list">
+<ol><li>工作流程标准化，</li><li>特征和模型选择，</li><li>实验管理，</li><li>信息记录。</li><li>Information logging.</li></ol>
+</div>
+
+<a class="button continous-post blue-filled" href="/web/20221007145036/https://neptune.ai/blog/ml-research-workflow-case-study-ails-labs" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

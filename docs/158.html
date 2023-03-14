@@ -1,0 +1,755 @@
+<html>
+<head>
+<title>7 Tools to Build Proof-of-Concept Pipelines for Machine Learning Applications </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>为机器学习应用构建概念验证管道的7种工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/tools-proof-of-concept-pipelines-for-machine-learning#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/tools-proof-of-concept-pipelines-for-machine-learning#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>将任何想法转化为现实至少需要几步。有时，专家可以依靠线框或模型来证明一个想法是相关的，并具有潜在的价值。但是仅仅依靠线框是有风险的。这就是我们也进行概念验证的原因。</p>
+
+
+
+<p>顾名思义，概念验证是数字产品的最小工作状态，或者至少是某个工作部分。概念验证证明了你的想法的可行性。</p>
+
+
+
+
+
+
+
+<blockquote class="wp-block-quote"><p><em>“它不是为了探索市场对该创意的需求，也不是为了确定最佳的生产流程。相反，它的重点是测试这个想法是否可行。–</em><a href="https://web.archive.org/web/20221206043552/https://searchcio.techtarget.com/definition/proof-of-concept-POC#:~:text=A%20proof%20of%20concept%20is%20not%20intended%20to%20explore%20market,determine%20the%20best%20production%20process.&amp;text=Developing%20a%20proof%20of%20concept,necessary%20physical%20components%20to%20complete." target="_blank" rel="noreferrer noopener nofollow"><em>TechTarget</em></a></p></blockquote>
+
+
+
+<p>在本文中，当您想要创建一个基于机器学习的工具，或者只想为任何确定的解决方案分析数据时，我们将涵盖一些最佳的入门工具。我们将讨论在部署您的机器学习解决方案之前会发生什么，以及如何证明您的想法。</p>
+
+
+
+<h2 id="h-call-for-poc">要求POC</h2>
+
+
+
+<p>POC是一种流行的方法，用于评估服务和产品，以验证某些功能或列出的需求是否可行。构建POC是验证可扩展性、技术潜力等内容的一种方式。</p>
+
+
+
+<p>在POC中，您将介绍最终产品的关键功能，但规模较小。在开发生命周期之前创建POC是在内部验证您的产品并尽早获得反馈的机会。这样，您可以在以后的开发中减少风险。</p>
+
+
+
+<p>POC的构建也应符合长期需求，即展示现在和未来跨团队和平台的价值。</p>
+
+
+
+<h2 id="h-data-science-machine-learning-pocs">数据科学/机器学习概念验证</h2>
+
+
+
+<p>在数据科学和机器学习解决方案的情况下，POC由什么组成？</p>
+
+
+
+<p>为数据科学解决方案创建POC可能与传统软件不同，因为我们必须调查更大的潜在客户才能创建它。与web应用程序概念验证不同，在ML概念验证中，您不能只关注一个方面并构建它。POC应该已经训练有素，能够处理未知数据。</p>
+
+
+
+<p>机器学习是一个广阔的领域，它为许多问题提供了解决方案。但是在将任何机器学习解决方案推向生产之前，我们应该通过概念验证来评估商业价值和可扩展性。</p>
+
+
+
+<p>例如，自动驾驶汽车项目——智能无人驾驶汽车不能在POC阶段不考虑安全和安全措施的情况下就上路。为了部署成功的解决方案，我们必须考虑POC中的任何未来中断和增强，这一点很重要。</p>
+
+
+
+<h2 id="h-steps-to-build-a-data-science-machine-learning-poc">构建数据科学机器学习poco的步骤</h2>
+
+
+
+<p>在部署任何机器学习解决方案之前，POC都扮演着重要的角色。在创建POC时，您将不得不考虑POC的商业价值和更大的目的，这些事情将以不同的方式影响效率。</p>
+
+
+
+<p>考虑到这些挑战，以及并非每个POC最终都会投入生产，我们需要制定一个计划。创建成功的增值概念验证的计划。以下是您在评估过程中可以遵循的一些步骤:</p>
+
+
+
+<ol><li><strong>评估商业价值</strong></li></ol>
+
+
+
+<p>当您开始处理POC时，您需要定义业务价值。它将如何增加利润？它将如何使你的过程更有效？在某些情况下，我们还可以考虑收集客户对现有流程的反馈，并从那里开始思考您的想法如何改善体验。</p>
+
+
+
+<ol start="2"><li><strong>捕获所需数据</strong></li></ol>
+
+
+
+<p>现在您已经知道了您的解决方案将如何增加业务价值，那么您是否拥有构建它所需的数据呢？你有足够的它吗，它需要清洗和处理吗？</p>
+
+
+
+<ol start="3"><li><strong>实施的可行性</strong></li></ol>
+
+
+
+<p>请一位专家来检查您的模型复杂性。为一种解决方案创建的模型可能无法为另一种类型的数据提供相同的效率。可能存在需要解决的基础设施缺口。</p>
+
+
+
+<ol start="4"><li><strong>定义时间范围</strong></li></ol>
+
+
+
+<p>在咨询业务、经理和客户之后，确定一个时间框架是非常重要的。POC不是一个完整的ML项目，因此您不能在每个方面投入太多时间，否则最终会变得太复杂。</p>
+
+
+
+<ol start="5"><li><strong>组装团队</strong></li></ol>
+
+
+
+<p>通过这一步，您知道您希望从POC中获得什么，以及实现它需要什么。现在是时候让队友拥有正确的技能了。例如，用Python做过一些建模的数据科学家/分析师不一定会构建一个准备好处理所需POC的基础设施。让不同技能的人参与进来，并尝试遵循敏捷的项目流程，这样你的团队会更有效率。</p>
+
+
+
+<p>现在，我们已经有了创建POC的计划，让我们来看看哪些工具可以帮助我们在规定的时间内创建一个成功的POC。</p>
+
+
+
+
+
+
+
+<h3>TL；DR–快速工具比较</h3>
+
+
+
+<p>在我们深入研究这些工具的细节之前，您可以查看一下这个快速比较，以便对这些工具有一个大致的了解。</p>
+
+
+
+<p id="separator-block_61af3eadc939a" class="block-separator block-separator--10"> </p>
+
+
+
+<div id="medium-table-block_61af3eb3c939b" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">工具/指标</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">内置算法</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">支持的框架和编程语言</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">基于网络</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">定价</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> TensorFlow，scikit，SparkML，Python，R</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>【每毫升工作室每月9.99美元】每工作室实验小时1美元</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> TensorFlow, Keras, Pytorch, scikit, xgboost, Python, R </p> </div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>每小时价格，视等级而定——0.19 rn标准——1.98 rn免费试用</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> Apache MXNet、Apache Spark、ChainerrnHugging Face、PyTorch、<br/> Scikit-learn、SparkML Serving、TensorFlow、Python </p> </div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>每小时的价格，取决于实例的类型</p></div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> TensorFlow，Pytorch，Keras，MS认知工具，Python，R</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> TensorFlow、Spark、scikit、ggplot2、Python、R、Ruby、Scala、Go和Julia</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> Keras，PyTorch，MxNet，OpenCV，xgboost，python</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>【免费试用和免费版本】更多功能:每年0.01美元起</p> </div></td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_6093c2753479b" class="block-separator block-separator--20"> </p>
+
+
+
+<p>对于给定的业务问题，当您从POC开始时，您将评估技术和财务方面——处理器、编程语言、选择机器学习模型，以及成本效率、可行性等。</p>
+
+
+
+<p>现在，我们将详细介绍每种工具，看看您和您的团队如何使用它们来创建概念验证和部署机器学习模型。</p>
+
+
+
+<h3>1.大太酷</h3>
+
+
+
+<p><em>“</em><a href="https://web.archive.org/web/20221206043552/https://www.dataiku.com/" target="_blank" rel="noreferrer noopener nofollow"><em>【大台库】</em> </a> <em>是一个平台，它使数据访问民主化，并使企业能够以以人为中心的方式构建自己的人工智能之路。”</em></p>
+
+
+
+<p>Dataiku提供不同的能力——数据准备、可视化、机器学习、数据操作、ML操作等等。这个想法是让用户关注需求，同时为您提供最新的技术来满足这些需求。Dataiku已经集成了许多工具，如Python、R、Scala、Hive等。您可以使用这些工具来构建解决方案，Dataiku将在后续步骤中无缝集成结果。</p>
+
+
+
+
+
+
+
+
+
+
+
+<p>谈到机器学习，Dataiku AutoML有许多预先构建的机器学习模型，统计功能，spark的大数据集训练功能，等等。这可以帮助您轻松创建机器学习解决方案。Dataiku是创建POC的良好候选，因为它支持广泛的机器学习领域和工具。但是它并没有将您限制在预先构建的工具上，因为它提供了笔记本支持，您可以在其中自己编写代码并进行实验。</p>
+
+
+
+<p>在<a href="https://web.archive.org/web/20221206043552/https://www.dataiku.com/stories/dataiku-gartner-mq-leader/" target="_blank" rel="noreferrer noopener nofollow"> Gartner 2021年魔力象限报告</a>中，Dataiku还被列为数据科学和机器学习平台<em> </em>的领导者。</p>
+
+
+
+<h4>优势</h4>
+
+
+
+<ul><li>多个用户同时工作的协作工具。</li><li>集成了许多不同的编程语言，让您可以灵活地处理任何事情，而不必担心学习新的语言。</li><li>简单的界面和良好的数据挖掘工具。任何非技术人员都可以轻松使用该工具。</li><li>当用户有任何特定需求时，他们可以使用自己的ML模型进行数据分析。</li></ul>
+
+
+
+<h4>不足之处</h4>
+
+
+
+<ul><li>这个工具的免费版本有一些限制，例如，您只能对30k行执行数据分析。</li><li>Dataiku不支持任何深度学习能力。</li></ul>
+
+
+
+<h3>2.AWS–sage maker</h3>
+
+
+
+<p>"<a href="https://web.archive.org/web/20221206043552/https://aws.amazon.com/sagemaker/" target="_blank" rel="noreferrer noopener nofollow"> <em>亚马逊SageMaker </em> </a> <em>通过汇集一系列专门为机器学习构建的功能，帮助数据科学家和开发人员快速准备、构建、训练和部署高质量的机器学习(ML)模型。"</em></p>
+
+
+
+<p>亚马逊网络服务(AWS)已经在市场上存在了很长时间，许多企业都选择了AWS云服务。使用AWS提供的机器学习服务将具有相同的好处:针对ML的CI/CD服务、监控支持等等。</p>
+
+
+
+<p>SageMaker为ML开发的每一步都预建了工具。一旦部署了机器学习模型或工具，它就有工具(Kubernetes、Edge manager、model monitor等)来管理和观察。您只需点击并选择细节，即可轻松启动您的ML工作流程，然后您可以部署任何东西，从预测分析到计算机视觉，来预测客户流失。</p>
+
+
+
+
+
+
+
+<p>这是第一个完全集成的机器学习开发环境，用户可以大规模部署ML工具。你可以使用你选择的任何框架来试验和定制机器学习算法。有了这些可用的工具和框架，为ML解决方案创建POC将比手动创建要容易得多。</p>
+
+
+
+<p>SageMaker结合了创建ML动力工具的所有四个阶段，如下所示:</p>
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20221206043552/https://aws.amazon.com/machine-learning/" target="_blank" rel="noreferrer noopener nofollow"> AWS SageMaker </a>将数据科学家的生产力提高了10倍，大约89%的深度学习项目都在AWS上的云中。它还可以帮助您减少高达90%的培训成本。</p>
+
+
+
+<h4>优势</h4>
+
+
+
+<ul><li>内置机器学习模型的广泛集合，您可以专注于创建产品，而不是手动调整和改进模型。</li><li>与其他AWS服务集成，为您的ML项目提供一站式解决方案。</li><li>拥有广泛的工具集合，而且还允许用户创建自己的模型。</li><li>支持TensorFlow、MXNet、PyTorch等机器学习和深度学习框架。</li><li>自动驾驶模式，它解释您的数据，并在访问所有可用的内置模型后选择性能最佳的模型。在这种模式下，您无需编写一行代码就可以创建一个工具。</li></ul>
+
+
+
+<h4>不足之处</h4>
+
+
+
+<ul><li>它是昂贵的。</li><li>它支持大多数框架及其库，但并不总是支持更新版本。</li><li>数据只能从Amazon s3中读取和写入。</li></ul>
+
+
+
+<p>检查<a href="/web/20221206043552/https://neptune.ai/vs/sagemakerstudio" target="_blank" rel="noreferrer noopener"> Neptune.ai和AWS Sagemaker </a>之间的差异</p>
+
+
+
+<h3>3.Azure机器学习</h3>
+
+
+
+<p><em>"</em><a href="https://web.archive.org/web/20221206043552/https://azure.microsoft.com/en-in/services/machine-learning/" target="_blank" rel="noreferrer noopener nofollow"><em>Azure ML</em></a><em>让拥有广泛生产经验的数据科学家和开发人员能够构建、训练和部署机器学习模型，并促进团队协作。</em>”</p>
+
+
+
+<p>Azure机器学习服务包括从经典ML到深度学习的工具。它为开源框架和语言(MLflow、Kubeflow、ONNX、PyTorch、TensorFlow、Python、R等)提供了同类最佳的支持。就像AWS一样，Azure也提供了先进的安全性、治理和混合基础设施。</p>
+
+
+
+<p>它通过预构建的工具提高您的生产力，而且通过支持最新的工具帮助您创建有效的模型。它有机器学习辅助标注，你可以快速准备数据。当涉及到处理复杂的机器学习解决方案时，Azure有一个自动扩展功能，所以你可以共享CPU和GPU集群。</p>
+
+
+
+
+
+
+
+<p>当你点击“笔记本”选项时，你将能够从Azure启动Jupyter笔记本:</p>
+
+
+
+
+
+
+
+<p>Azure提供了使用拖放功能的选项，或者使用Azure笔记本并创建自己的实验。在拖放功能中，你只需要创建一个按部就班的流程，所有的脏活都将由Azure的ML工具来完成。</p>
+
+
+
+
+
+
+
+<p>在AutoML的帮助下，您可以识别算法和超参数，并在云端跟踪实验。</p>
+
+
+
+<p>当你准备为机器学习创建一个POC，但预算很少时，Azure可能是一个不错的选择。你可以通过注册Azure免费帐户获得即时访问和一些点数。Azure机器学习计算实例的资源分配具有工作区和资源级别的配额限制，并且具有成本效益。它通过与Microsoft Power BI和其他Azure服务的内置集成来提高工作效率。</p>
+
+
+
+<h4>优势</h4>
+
+
+
+<ul><li>来自微软研究团队、Bing等的经过改进和验证的模型，可以帮助您利用最佳解决方案。</li><li>与许多其他工具不同，它支持R，由于它的简单性和处理时间，对于任何使用R的数据分析人员来说都是非常好的。</li><li>与其他工具相比更便宜。免费等级/免费试用对于构建概念证明非常有用</li><li>Cortana Intelligence Gallery，用户可以在这里查找和交流知识。</li><li>内置的认知API帮助您提高模型的准确性。</li></ul>
+
+
+
+<h4>不足之处</h4>
+
+
+
+<ul><li>节省您的时间和金钱，但有时会有性能问题，例如，如果数据集太复杂或太小，模型准确性会受到影响。</li><li>注册Azure，用户可以获得免费服务，但这只能提供有限的培训时间和功能。</li></ul>
+
+
+
+<h3>4.Google Colab</h3>
+
+
+
+<p><em>“使用</em> <a href="https://web.archive.org/web/20221206043552/https://colab.research.google.com/"> <em> Colab </em> </a> <em>您可以导入图像数据集，在其上训练图像分类器，并评估模型，所有这些都只需几行代码。Colab笔记本在谷歌的云服务器上执行代码，这意味着无论你的机器功率如何，你都可以利用谷歌硬件的能力，包括GPU和TPU。你只需要一个浏览器。”</em></p>
+
+
+
+<p>Colaboratory支持python，代码可以在零配置的浏览器上执行。你可以很容易地分享你的代码，因为当你创建自己的Colab笔记本时，它们会存储在你的Google Drive中。Colab笔记本是由colab托管的Jupyter笔记本。</p>
+
+
+
+<p>只需输入:<a href="https://web.archive.org/web/20221206043552/https://colab.research.google.com/" target="_blank" rel="noreferrer noopener nofollow">https://colab.research.google.com/</a>就可以开始了，就这么简单。</p>
+
+
+
+<p>大多数库都是预安装的，所以您可以直接开始工作。当您想在系统上不做任何配置的情况下构建ML POC，并且仍然想使用强大的处理器时，这是一个很好的选择。这里您可能面临的唯一问题是，您没有任何预构建的工具，您必须自己编码。</p>
+
+
+
+<p>你可以从你的本地(将保存到Google Drive)、Google Drive、Github和许多其他来源将数据导入Colab，你所有的工作都将保存在云上，可以通过互联网从任何设备访问。它还提供了与多个开发人员共同编码的机会——他们可以审查、添加评论、分配任务等等。</p>
+
+
+
+
+
+
+
+<h4>优势</h4>
+
+
+
+<ul><li>它是免费的，并且不收取使用TPU或CPU的费用。</li><li>包括广泛的Python库，所以很少需要安装额外的Python库。</li><li>所有代码都会自动保存到Google Drive。</li></ul>
+
+
+
+<h4>不足之处</h4>
+
+
+
+<ul><li>笔记本、数据集文件等。在Google Drive上保存，因此如果你的使用量超过15GB，你需要为额外的空间付费。</li><li>每个新的会话，你都必须安装所有没有包含在标准Python包中的特定库。</li></ul>
+
+
+
+
+
+
+
+<h3>5.kagglekernel</h3>
+
+
+
+<p>Kaggle归谷歌所有，Kaggle Kernel是一个在浏览器中运行Jupyter notebook的免费平台。Kaggle也有大量的现实生活数据。创建POC时，如果您无法从客户端或组织获取数据，您可以浏览Kaggle数据集并找到您需要的内容。这很像Google Colab，因为它也是免费的，可以在任何地方访问，并提供强大的处理器。</p>
+
+
+
+<p><em/><a href="https://web.archive.org/web/20221206043552/https://www.kaggle.com/getting-started/44939" target="_blank" rel="noreferrer noopener nofollow"><em>ka ggle内核</em> </a> <em>包含代码，有助于使整个模型可复制，并使您能够在需要时邀请合作者。从代码到注释，从环境变量到所需的输入文件，这是数据科学项目的一个关键解决方案。”</em></p>
+
+
+
+
+
+
+
+<p>内核是一个笔记本或脚本，使用容器化的贡献者可以在其中建立他们的Kaggle项目。您不必下载数据，因为它已经装载在容器中了。</p>
+
+
+
+
+
+
+
+<p>如果您希望为ML驱动的应用程序创建POC，Kaggle kernel也是一个不错的选择，因为代码可以很容易地共享。您不需要在您的系统上设置任何东西，并且结果很容易在您的代码中获得。您还可以控制代码的共享，如果您不想公开您的代码，您可以保持它的私密性。</p>
+
+
+
+<h4>优势</h4>
+
+
+
+<ul><li>Kaggle有一个巨大的数据集集合，你可以使用任何数据集来学习或创建概念验证，没有任何麻烦。</li><li>你可以很容易地在Kaggle上上传你的数据集，并在你的笔记本上使用它们进行分析。</li><li>Kaggle创建提交历史，这在比较或恢复更改时很有用。</li><li>Kaggle有一个庞大的社区和积极的支持。</li></ul>
+
+
+
+<h4>不足之处</h4>
+
+
+
+<ul><li>Kaggle内核每个会话只有6小时的可用执行时间。</li><li>许多研究人员在执行内核/ML代码时会遇到延迟。</li></ul>
+
+
+
+
+
+
+
+<h3>6. Jupyter</h3>
+
+
+
+<p><em>"</em><a href="https://web.archive.org/web/20221206043552/https://jupyter.org/" target="_blank" rel="noreferrer noopener nofollow"><em>Jupyter</em></a><em>的存在是为了开发开源软件、开放标准和跨数十种编程语言的交互式计算服务</em></p>
+
+
+
+<p>目前，Jupyter有四种不同的功能:</p>
+
+
+
+<ol><li><strong> Jupyter笔记型电脑</strong></li></ol>
+
+
+
+<p><em/><a href="https://web.archive.org/web/20221206043552/https://jupyter.org/" target="_blank" rel="noreferrer noopener nofollow"><em>Jupyter Notebook</em></a><em>是一个开源的web应用程序，允许您创建和共享包含实时代码、等式、可视化和叙述性文本的文档。用途包括数据清理和转换、数值模拟、统计建模、数据可视化、机器学习等等。”</em></p>
+
+
+
+<p>大多数云笔记本都是基于Jupyter Notebook，或者至少是它的想法。这些笔记本和Jupyter笔记本的区别在于，你必须在你的系统上安装Jupyter。Jupyter也可以通过浏览器访问，您可以看到代码和计算的结果。您可以使用nbviewer为您的Jupyter笔记本创建一个可共享的链接。</p>
+
+
+
+<ol start="2"><li><strong> JupyterLab </strong></li></ol>
+
+
+
+<p><em>"</em><a href="https://web.archive.org/web/20221206043552/https://jupyter.org/" target="_blank" rel="noreferrer noopener nofollow"><em>JupyterLab</em></a><em>是一个基于web的交互式开发环境，用于Jupyter笔记本、代码和数据</em></p>
+
+
+
+<p>Jupyter实验室有一个模块化结构，您可以在其中组织多个笔记本。JupyterLab支持许多文件格式(图像、CSV、JSON、Markdown、PDF、Vega、Vega-Lite等),并以这些格式显示丰富的内核输出。这是Jupyter笔记本的升级版，以更有条理的方式提供了类似的功能。</p>
+
+
+
+<ol start="3"><li><strong> Jupyter Hub </strong></li></ol>
+
+
+
+<p><em>“</em><a href="https://web.archive.org/web/20221206043552/https://jupyter.org/" target="_blank" rel="noreferrer noopener nofollow"><em>Jupyter Hub</em></a><em>是一款为公司、教室和研究实验室设计的多用户版本笔记本电脑。”</em></p>
+
+
+
+<p>Jupyter Hub丰富了笔记本电脑的功能，并将数据和代码的使用集中到一组用户。它是可定制的、可扩展的，适合小型和大型团队、学术课程以及大型基础设施。</p>
+
+
+
+<ol start="4"><li><strong>这里</strong></li></ol>
+
+
+
+<p><em>"</em><a href="https://web.archive.org/web/20221206043552/https://jupyter.org/" target="_blank" rel="noreferrer noopener nofollow"><em/></a><em>通过将Jupyter笔记本转变为您可以共享的独立网络应用程序，帮助您交流见解</em></p>
+
+
+
+<p>Voilà对于在不共享代码的情况下向他人展示您的结果非常有用，这可以增强阅读体验。瞧，这是一个极好的工具。它很快，我们可以立即分享结果。它具有高度的可扩展性、灵活性和高可用性。</p>
+
+
+
+<p>看看Jupyter所提供的功能，它可能是创建POC的合适工具。它是创建ML驱动的应用程序的一站式解决方案，因为它提供了笔记本、IDE、仪表板工具，并且是开源工具。</p>
+
+
+
+<h4>优势</h4>
+
+
+
+<ul><li>Jupyter可以安装在您的本地系统上，因此与云服务不同，您不必总是依赖互联网连接。</li><li>一旦你安装了你的Python包，你就不需要再安装它们了。</li><li>支持Python，R，Ruby，Scala，Go，Julia。</li><li>您可以按需使用的不同功能。</li><li>笔记本可以保存为多种不同的格式，如HTML、Markdown、PDF等。</li><li>使用基于单元的方法，在Jupyter中记录代码更容易。</li></ul>
+
+
+
+<h4>不足之处</h4>
+
+
+
+<ul><li>Jupyter笔记本经常因为内存错误而出现故障。</li><li>没有IDE支持使得这个工具在与团队合作时很难使用。</li><li>运行异步任务很困难。</li></ul>
+
+
+
+<p>Jupyter利大于弊，这也是为什么大多数数据科学家、分析师和ML从业者更喜欢使用Jupyter的原因。</p>
+
+
+
+
+
+
+
+<h3>7.云汽车</h3>
+
+
+
+<p><em/><a href="https://web.archive.org/web/20221206043552/https://cloud.google.com/automl" target="_blank" rel="noreferrer noopener nofollow"><em>Cloud AutoML</em></a><em>用最少的努力和机器学习专业知识训练出高质量的定制机器学习模型</em></p>
+
+
+
+<p>借助Cloud AutoML，机器学习专业知识有限的开发人员可以训练出针对其业务需求的高质量模型。在几分钟内构建您自己的定制机器学习模型。您可以使用易于使用的GUI创建自己的定制机器学习模型。</p>
+
+
+
+<p>Google将其AutoML功能分为四个不同的类别:</p>
+
+
+
+<ol><li><strong>平台</strong></li></ol>
+
+
+
+<p>使用带有AutomML的AI平台，用户可以准备数据、构建模型、验证、微调数据，并大规模部署数据。</p>
+
+
+
+<ol start="2"><li><strong>视线</strong></li></ol>
+
+
+
+<p>使用AutoML vision REST APIs，开发人员可以构建用于对象检测的工具，并使用自定义标签对图像进行分类。开发人员还可以使用AutoML视频智能工具来注释视频，并改善客户的视频体验。</p>
+
+
+
+<ol start="3"><li><strong>语言</strong></li></ol>
+
+
+
+<p>这一部分包括自动翻译和自然语言。开发人员可以通过将API集成到他们的项目中来使用这两者。你可以使用这些进行情感分析，将翻译嵌入到你的应用程序或网站中。</p>
+
+
+
+<ol start="4"><li><strong>结构化数据</strong></li></ol>
+
+
+
+<p>使用AutoML表，开发人员可以在结构化数据上构建和部署最先进的机器学习模型。</p>
+
+
+
+<p>这些AutoML REST APIs可以很容易地集成到您的项目中，并且您不必编写任何对象检测或转换器模型。正是这个原因使它成为创建与计算机视觉、NLP等相关的POC的最佳工具之一。</p>
+
+
+
+<h4>优势</h4>
+
+
+
+<ul><li>像大多数云服务一样，CloudML也提供了用于视觉、语音等的API，以及用于通用解决方案的预训练模型，如欺诈检测、库存管理或呼叫中心。这在构建POC时会很有用。</li><li>它加速了新业务应用程序的开发，因为您将必须做最少的编码来创建ML模型。</li><li>灵活性，按需快速切换型号。</li><li>你将可以访问谷歌的分布式网络，并能够使用他们的GPU进行更好的处理。</li><li>CloudML上有Tensorflow、PyTorch、Keras、XGBoost、Scikit-learn等更多框架。</li></ul>
+
+
+
+<h4>不足之处</h4>
+
+
+
+<ul><li>它很贵</li><li>对于一些人来说，UI可能有点混乱，尤其是如果您是该工具的新手。</li></ul>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>在本文中，我们探讨了为什么为数据科学和机器学习构建POC比传统软件更困难。我们还描述了用于构建您自己的POC的最佳工具。</p>
+
+
+
+<p>其中一些工具可以免费使用，另一些则以高价提供优质服务。在查看这些工具时，您可能已经注意到笔记本电脑与您拥有预建模型的工具或在获得批准后大规模部署POC的选项有所不同。您可以根据自己的需求选择这些工具中的任何一个，并开始使用ML-powered POCs。祝你好运！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

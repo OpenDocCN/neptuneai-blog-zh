@@ -1,0 +1,694 @@
+<html>
+<head>
+<title>The Best Amazon SageMaker Alternatives [for Experiment Tracking and Model Management] </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>亚马逊SageMaker的最佳替代品[用于实验跟踪和模型管理]</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/amazon-sagemaker-alternatives#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/amazon-sagemaker-alternatives#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>机器学习项目远比典型的软件项目复杂。与主要涉及编写和测试一些代码的软件项目相比，ML项目遵循一个迭代过程，需要大量的实验。ML项目失败不仅仅是因为代码错误，还因为概念漂移、超参数值的不良调整以及错误的模型架构。<a href="/web/20220926082702/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">追踪机器学习模型</a>帮助<a href="/web/20220926082702/https://neptune.ai/blog/ml-engineer-vs-data-scientist" target="_blank" rel="noreferrer noopener">数据科学家和ML工程师</a>处理这类问题。市场上有许多工具可以帮助专业人员跟踪模型实验及其管理。</p>
+
+
+
+<p>在本文中:</p>
+
+
+<div class="custom-point-list">
+<ul><li>我们将看看这一类别中最流行的工具之一— <a href="/web/20220926082702/https://neptune.ai/vs/sagemakerstudio" target="_blank" rel="noreferrer noopener"> AWS SageMaker </a>及其功能。</li><li>我们还将讨论AWS SageMaker存在不足的几种情况，以及我们可以参考的替代方案。</li></ul>
+</div>
+
+<p id="block_6230584a0a19c" class="separator separator-25">AWS SageMaker概述</p>
+
+
+
+
+
+<h2 id="aws-sagemaker-overview"><a href="https://web.archive.org/web/20220926082702/https://aws.amazon.com/sagemaker/" target="_blank" rel="noreferrer noopener nofollow"> Amazon SageMaker </a>是一项完全托管的服务，为每个开发人员和数据科学家提供了准备、构建、训练和部署机器学习模型的能力，没有任何麻烦。SageMaker负责所有复杂的过程，并使其用户更容易开发高质量的模型。为了使模型可以投入生产，并通过机器学习模型创造价值，数据科学家和ML工程师定期训练数千个不同版本的模型，以找到最准确的模型..</h2>
+
+
+
+<p>当ML团队必须处理成千上万的工作，跟踪不同的度量标准，比较不同实验的结果等时，创建模型并找到最佳模型可能是一项乏味的工作。Amazon SageMaker在一个罩下包含不同的功能，可以帮助机器学习服务的端到端处理。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20220926082702/https://docs.aws.amazon.com/sagemaker/latest/dg/experiments.html" target="_blank" rel="noreferrer noopener nofollow">亚马逊SageMaker实验</a>和<a href="https://web.archive.org/web/20220926082702/https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html" target="_blank" rel="noreferrer noopener nofollow">模型监控</a>是亚马逊SageMaker Studio集成的两项功能。ML工程师可以很容易地运行查询来可视化模型、性能指标和任何概念漂移，如果有的话。它还提供了<a href="https://web.archive.org/web/20220926082702/https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html">模型</a> <a href="https://web.archive.org/web/20220926082702/https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html" target="_blank" rel="noreferrer noopener nofollow">注册表</a>功能，用户可以在其中识别模型实例——以前的模型元数据、训练指标、超参数等。</p>
+
+
+
+<p>如何在亚马逊pagemaker中管理实验</p>
+
+
+
+<h3 id="how-to-manage-experiments-in-amazon-sagemaker"><a href="https://web.archive.org/web/20220926082702/https://docs.aws.amazon.com/sagemaker/latest/dg/experiments.html" target="_blank" rel="noreferrer noopener nofollow"> SageMaker实验</a>自动跟踪每次实验迭代的输入、参数、配置和结果。它与SageMaker studio集成在一起，并提供可视化功能来查看实验，根据关键指标进行比较，并决定哪一个是性能最佳的模型。它支持跟踪所有用于创建模型的工件，并且用户可以轻松地重新访问模型以进行故障诊断或审计。</h3>
+
+
+
+<p><strong>组织实验—</strong>它为用户组织模型实验提供了一种结构化的方式。一个实验可以有多个试验，一个试验是运行ML模型所需的输入资产的集合。通过SageMaker实验，用户可以对每个机器学习迭代进行分组，然后确定哪个试验产生了最好的模型。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60935" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_14" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?fit=1365%2C633&amp;ssl=1" data-orig-size="1365,633" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_14" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?fit=300%2C139&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?fit=1024%2C475&amp;ssl=1" src="../Images/1de6586d6c322f5169d591a01f113dcb.png" alt="AWS SageMaker: experiments" class="wp-image-60935 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?resize=762%2C352&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?resize=762%2C352&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60935" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_14" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?fit=1365%2C633&amp;ssl=1" data-orig-size="1365,633" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_14" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?fit=300%2C139&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?fit=1024%2C475&amp;ssl=1" src="../Images/1de6586d6c322f5169d591a01f113dcb.png" alt="AWS SageMaker: experiments" class="wp-image-60935" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_14.png?resize=762%2C352&amp;ssl=1"/></noscript><figcaption><em>AWS SageMaker: experiments | <a href="https://web.archive.org/web/20220926082702/https://aws.amazon.com/blogs/aws/amazon-sagemaker-studio-the-first-fully-integrated-development-environment-for-machine-learning/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<div class="custom-point-list">
+<ul><li><strong>跟踪实验–</strong>有两种方法可以使用此功能跟踪实验——自动和手动。它可以自动记录和跟踪独立的训练、批量转换、所有实验工件，包括数据集、算法、超参数和度量等。对于手动跟踪，SageMaker提供了跟踪API来在笔记本上本地记录和跟踪ML实验。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li><strong>比较和评估实验—</strong>使用SageMaker studio用户可以使用度量图表和图形比较多个实验。这些实验可视化随着实验的进行而实时更新。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li><strong>sage maker auto pilot—</strong>auto pilot自动构建、训练和调整ML模型。这消除了繁重的工作，并自动探索不同的实验以找到最佳模型。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>如何在amazon pagemaker中监控你的模型</li></ul>
+</div>
+
+
+
+
+
+<h3 id="how-to-monitor-your-model-in-amazon-sagemaker"><a href="https://web.archive.org/web/20220926082702/https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html" target="_blank" rel="noreferrer noopener nofollow"> SageMaker模型监控</a>自动监控生产中的机器学习模型，如果出现任何不准确的预测和数据漂移，可以提醒ML工程师。</h3>
+
+
+
+<p>根据2010年的一些数据训练的模型在2021年运行时可能会失败，因为输入数据的统计性质会逐渐改变，最终会影响模型的准确性。它还有助于识别机器学习模型中的任何潜在偏差。用户可以使用预构建的模型监控功能，也可以根据自己的需求进行编辑。SageMaker为模型监控提供了以下功能:</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60926" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_23" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?fit=1304%2C956&amp;ssl=1" data-orig-size="1304,956" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_23" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?fit=300%2C220&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?fit=1024%2C751&amp;ssl=1" src="../Images/6d4b6df6e08d41c1d6b7ea5cb5d3b61b.png" alt="AWS SageMaker: model monitoring" class="wp-image-60926 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?resize=820%2C589&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?resize=820%2C589&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60926" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_23" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?fit=1304%2C956&amp;ssl=1" data-orig-size="1304,956" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_23" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?fit=300%2C220&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?fit=1024%2C751&amp;ssl=1" src="../Images/6d4b6df6e08d41c1d6b7ea5cb5d3b61b.png" alt="AWS SageMaker: model monitoring" class="wp-image-60926" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_23.png?resize=820%2C589&amp;ssl=1"/></noscript><figcaption><em>AWS SageMaker: model monitoring | <a href="https://web.archive.org/web/20220926082702/https://aws.amazon.com/blogs/aws/amazon-sagemaker-studio-the-first-fully-integrated-development-environment-for-machine-learning/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p><strong>数据质量—</strong>用户可以创建基准作业并分析输入数据集。这些基线作业可以计算基线模式约束和统计数据。监控数据质量有助于了解模型是否开始失去准确性。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>模型质量—</strong>模型质量可以使用性能指标进行监控。用户可以将模型的预测与实际情况进行比较。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li><strong>偏差漂移–</strong>sage maker用户可以定期监控模型的偏差。当训练数据不同于实时数据时，可能会引入偏差。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li><strong>特征归因漂移–</strong>与偏差漂移类似，使用特征归因漂移，用户可以查看单个特征，并比较训练数据和实时数据的排名。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>amazon pagemaker模型注册表</li></ul>
+</div>
+
+
+<h3 id="amazon-sagemaker-model-registry"><a href="https://web.archive.org/web/20220926082702/https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html" target="_blank" rel="noreferrer noopener nofollow">亚马逊SageMaker模型注册中心</a>帮助对模型的不同版本进行编目。用户可以按照几个步骤注册模型版本，然后将其部署到生产环境中。下面是使用模型注册中心可以完成的事情:</h3>
+
+
+
+<p>创建模型目录，将模型的不同版本打包在一起。</p>
+
+
+<div class="custom-point-list">
+<ul><li>管理模型版本。</li><li>将元数据与模型相关联。</li><li>跟踪一组中的所有模型。</li><li>AWS Sagemaker什么时候不是最佳选择？</li></ul>
+</div>
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60928" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_21" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?fit=1439%2C887&amp;ssl=1" data-orig-size="1439,887" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_21" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?fit=300%2C185&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?fit=1024%2C631&amp;ssl=1" src="../Images/fd61ecbacd589676b2b650b4c75bbba4.png" alt="AWS SageMaker: model groups and registry" class="wp-image-60928 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?resize=762%2C469&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?resize=762%2C469&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60928" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_21" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?fit=1439%2C887&amp;ssl=1" data-orig-size="1439,887" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_21" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?fit=300%2C185&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?fit=1024%2C631&amp;ssl=1" src="../Images/fd61ecbacd589676b2b650b4c75bbba4.png" alt="AWS SageMaker: model groups and registry" class="wp-image-60928" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_21.png?resize=762%2C469&amp;ssl=1"/></noscript><figcaption><em>AWS SageMaker: model groups and registry | <a href="https://web.archive.org/web/20220926082702/https://docs.aws.amazon.com/sagemaker/latest/dg/images/model_registry/model-version-details.png" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+
+
+
+<h3 id="when-is-aws-sagemaker-not-the-best-choice">AWS SageMaker为其用户提供了对其机器学习模型和维护的完全控制。这有助于客户专注于创造价值，而不是不断检查他们的模型。尽管AWS是一个非常受欢迎的选择，但它在很多事情和很多情况下都是失败的</h3>
+
+
+
+<p><strong>灵活性—</strong>AWS SageMaker具有多种功能，可帮助用户跟踪和比较模型实验，但它们都是一个生态系统(即AWS sage maker)的一部分，不能单独使用。这是它的不足之处，因为它没有为不同专业水平的用户提供灵活性，这些用户只希望利用少数几个功能，并且只对跟踪实验和发现哪个模型是最好的感兴趣。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>费用-</strong>AWS sage maker可免费使用AWS免费层服务。尽管免费层有一些限制，但用户可以使用一些基本服务和有限的功能。如果用户超出基线，AWS会相应收费。与其他可用的解决方案相比，AWS非常昂贵，并且随着用户继续消费更多的服务，成本会呈指数级增长。AWS SageMaker实例比同等的AWS EC2实例<a href="https://web.archive.org/web/20220926082702/https://stackoverflow.com/questions/52198660/which-is-lower-cost-sagemaker-or-ec2" target="_blank" rel="noreferrer noopener nofollow">贵40%</a>。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li><strong>模型比较–</strong>通过AWS SageMaker，用户可以比较多个ML作业，尽管它支持的视觉效果和数据类型数量有限。它不提供不同实验的表格比较，用户不能一次比较3个以上的实验。用户不能使用笔记本或代码记录自定义比较。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li><strong>强制工作流–</strong>AWS最初是一家云服务提供商，现在已经增加了多种ML功能。AWS SageMaker不仅仅是一个服务，而是一个端到端的平台，让用户创建ML管道。这有点像一个封闭的盒子，用户只能在AWS的能力范围内工作，例如ML模型和相关资产存储在S3上，这使得很难与他人分享结果。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li><strong>文档&amp;社区支持—</strong>sage maker提供了大量的设置文档，但这些文档令人困惑，而且需要花费时间才能找到正确的指南或教程。尽管SageMaker已经存在了一段时间，但在StackOverflow这样的平台上很难找到在线解决方案。每次你在网上搜索答案的时候，你都会发现AWS网页上只有教程和博客，它们可能并不相关。用户能做的最好的事情就是查看Python SDK代码或联系AWS支持。用户也可以在AWS论坛上发布他们的问题，但可能需要一段时间才能得到答案。</li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>总的来说，当您的企业或团队已经使用AWS时，AWS SageMaker是一个很好的工具。市场上还有其他高级工具，它们可以通过广泛的集成阵容为客户提供最佳体验。这些工具也更加简单，可移植，允许用户访问SageMaker。</li></ul>
+</div>
+
+
+<p>亚马逊pagemaker替代品</p>
+
+
+
+<h2 id="amazon-sagemaker-alternatives">1.海王星. ai</h2>
+
+
+
+<h3 id="1-neptune-ai"><a href="/web/20220926082702/https://neptune.ai/" target="_blank" rel="noreferrer noopener"> Neptune.ai </a>是一个ML <a href="/web/20220926082702/https://neptune.ai/blog/ml-metadata-store" target="_blank" rel="noreferrer noopener">元数据存储库</a>，它提供了一个单一的位置来记录、存储、显示、组织、比较和查询所有的模型构建元数据。这个<a href="https://web.archive.org/web/20220926082702/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display" target="_blank" rel="noreferrer noopener"> ML元数据</a>包括度量、超参数、学习曲线、训练代码、配置文件、控制台日志、诊断图表、模型版本、数据集版本等等。</h3>
+
+
+
+<p>记录的ML元数据用于<a href="https://web.archive.org/web/20220926082702/https://docs.neptune.ai/how-to-guides/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>和<a href="https://web.archive.org/web/20220926082702/https://docs.neptune.ai/how-to-guides/model-registry" target="_blank" rel="noreferrer noopener">模型注册</a>。它使ML工程师和数据科学家能够在实验运行时监控实验，并跟踪指标、参数等。Neptune.ai提供了一个非常友好的用户体验，允许用户搜索、分组和比较实验。用户可以很容易地<a href="https://web.archive.org/web/20220926082702/https://docs.neptune.ai/you-should-know/collaboration-in-neptune" target="_blank" rel="noreferrer noopener">与他们的团队成员</a>分享结果。</p>
+
+
+
+<p>Neptune.ai的优势</p>
+
+
+
+<h4 id="advantages-of-neptune-ai">它提供了与25种以上不同工具的简单无缝集成<a href="https://web.archive.org/web/20220926082702/https://docs.neptune.ai/integrations-and-supported-tools/intro" target="_blank" rel="noreferrer noopener"/></h4>
+
+
+<div class="custom-point-list">
+<ul><li>团队可以轻松协作、共享报告和见解等。</li><li>它有一个非常直观和灵活的用户界面，允许用户根据自己的选择可视化和安排数据</li><li>Neptune.ai存储了大部分元数据及其版本，可以帮助用户重现模型</li><li>用户可以选择使用不同的过滤器搜索实验和数据</li><li>模型跟踪和管理的主要功能</li></ul>
+</div>
+
+
+<h4 id="main-features-for-model-tracking-and-management">实验跟踪</h4>
+
+
+
+<h5 id="experiment-tracking">通过<a href="/web/20220926082702/https://neptune.ai/product/experiment-tracking" target="_blank" rel="noreferrer noopener"> Neptune.ai的实验跟踪</a>用户可以在一个地方轻松记录任何模型对象，并显示它们以供监控。用户可以在任何地方运行实验——在个人笔记本电脑、云、笔记本电脑等。但仍然能够使用托管版本或内部部署将结果整合到一个地方。</h5>
+
+
+
+<p>在对比实验时，平台会自动将差异显示在表格中。用户还可以利用交互式性能图表来清楚地了解每个实验。可以将比较视图保存为仪表板，供以后使用，或者与其他利益相关者一起研究和共享结果。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?ssl=1" target="_blank" rel="noopener" data-lbwps-width="1999" data-lbwps-height="978" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png"><img data-attachment-id="60947" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_2" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?fit=1999%2C978&amp;ssl=1" data-orig-size="1999,978" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?fit=300%2C147&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?fit=1024%2C501&amp;ssl=1" src="../Images/0b1ca10c80ebfbeef242ebab3a85b5bb.png" alt="Neptune: experiment tracking" class="wp-image-60947 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?resize=784%2C383&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?resize=784%2C383&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60947" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_2" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?fit=1999%2C978&amp;ssl=1" data-orig-size="1999,978" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?fit=300%2C147&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?fit=1024%2C501&amp;ssl=1" src="../Images/0b1ca10c80ebfbeef242ebab3a85b5bb.png" alt="Neptune: experiment tracking" class="wp-image-60947" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_2.png?resize=784%2C383&amp;ssl=1"/></noscript></a><figcaption><em>Neptune.ai: experiment tracking | <a href="https://web.archive.org/web/20220926082702/https://app.neptune.ai/common/project-cv/e/PROJCV-103/dashboard/model-a72c0f5f-76e0-4386-b960-b186427a8b91" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+<p>此外，所有记录的对象和比较视图都可以提取到本地机器上。用户甚至可以在几个月后回到实验中，并且可以在任何需要的时候访问这些实验。更多细节请查看Neptune.ai的<a href="/web/20220926082702/https://neptune.ai/product/experiment-tracking" target="_blank" rel="noreferrer noopener">概述</a>。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?ssl=1" target="_blank" rel="noopener" data-lbwps-width="1999" data-lbwps-height="1079" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png"><img data-attachment-id="60940" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_9" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?fit=1999%2C1079&amp;ssl=1" data-orig-size="1999,1079" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_9" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?fit=300%2C162&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?fit=1024%2C553&amp;ssl=1" src="../Images/c1c5154aa8dfdb728a07d53ff8afb20a.png" alt="Neptune: comparing experiments" class="wp-image-60940 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?resize=781%2C421&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?resize=781%2C421&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60940" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_9" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?fit=1999%2C1079&amp;ssl=1" data-orig-size="1999,1079" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_9" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?fit=300%2C162&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?fit=1024%2C553&amp;ssl=1" src="../Images/c1c5154aa8dfdb728a07d53ff8afb20a.png" alt="Neptune: comparing experiments" class="wp-image-60940" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_9.png?resize=781%2C421&amp;ssl=1"/></noscript></a><figcaption><em>Neptune.ai: comparing experiments | <a href="https://web.archive.org/web/20220926082702/https://app.neptune.ai/common/project-cv/experiments?compare=KwdgNAzAHEA&amp;split=cmp&amp;dash=leaderboard&amp;viewId=46a5f9b7-26ad-4dc1-a7ae-d571ca246c3c" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+<p>模型注册表</p>
+
+
+
+<h5 id="model-registry"><a href="/web/20220926082702/https://neptune.ai/product/model-registry" target="_blank" rel="noreferrer noopener">Neptune . ai中的模型注册表</a>帮助用户存储不同版本的机器学习模型和建模元数据。这允许用户在中央模型注册中心组织模型。它存储任何模型的每个训练版本以及数据集、代码和参数，这有助于重现、重新运行和部署模型。</h5>
+
+
+
+<p>2.彗星</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><a href="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?ssl=1" data-lbwps-width="1022" data-lbwps-height="591" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png"><img data-attachment-id="60946" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_3" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?fit=1022%2C591&amp;ssl=1" data-orig-size="1022,591" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?fit=300%2C173&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?fit=1022%2C591&amp;ssl=1" src="../Images/dd2f1487168ddedbde98527ed31a70d0.png" alt="Neptune: model registry" class="wp-image-60946 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?resize=792%2C457&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?resize=792%2C457&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60946" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_3" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?fit=1022%2C591&amp;ssl=1" data-orig-size="1022,591" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?fit=300%2C173&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?fit=1022%2C591&amp;ssl=1" src="../Images/dd2f1487168ddedbde98527ed31a70d0.png" alt="Neptune: model registry" class="wp-image-60946" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_3.png?resize=792%2C457&amp;ssl=1"/></noscript></a><figcaption><em>Neptune.ai: model registry | <a href="https://web.archive.org/web/20220926082702/https://app.neptune.ai/common/sklearn-integration/e/SKLEAR-95/all?path=sys" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+
+
+
+<h3 id="2-comet"><a href="https://web.archive.org/web/20220926082702/https://www.comet.ml/site/" target="_blank" rel="noreferrer noopener nofollow"> Comet </a>帮助用户管理和优化从实验跟踪到模型生产监控的整个ML生命周期。它提供了简单快速的集成，只需在现有代码中包含几行代码，用户就可以开始跟踪实验并比较不同版本的模型等。用户可以实时监控模型，并确定模型在所有细分市场中的表现是否符合预期。</h3>
+
+
+
+<p>它允许企业将实验和所有过程可视化。用户可以轻松整合、管理和协作所有报告，甚至让利益相关方了解绩效。</p>
+
+
+
+<p>优于pagemaker</p>
+
+
+
+<h4 id="advantages-over-sagemaker">与其他工具无缝集成。</h4>
+
+
+<div class="custom-point-list">
+<ul><li>提供用户管理功能，项目或工作区的可见性可能受到限制。</li><li>为实验跟踪和比较提供交互式可视化。</li><li>在基于网络的用户界面中，实验台是完全可定制的。</li><li>分段性能跟踪有助于监控数据漂移。</li><li>模型跟踪和管理的主要功能</li></ul>
+</div>
+
+
+<h4 id="main-features-for-model-tracking-and-management">实验管理</h4>
+
+
+
+<h5 id="experiment-management">使用<a href="https://web.archive.org/web/20220926082702/https://www.comet.ml/site/data-scientists/" target="_blank" rel="noreferrer noopener nofollow">实验管理</a>，comet有助于使用所有记录的数据建立更好的模型，同时提高生产力、协作和可解释性。用户可以使用代码、超参数、度量、预测、依赖性、系统度量来比较实验。用户可以记录、转换、比较和可视化任何人工制品。</h5>
+
+
+
+<p>Comet还允许用户从模型预测中查看、分析和获得洞察力，例如检测过度拟合和概念漂移。在使用一个实验记录一个模型之后，用户可以在comet平台上注册这个模型，并且可以将同一个模型的不同版本与不同的工件或者一些变更进行分组。</p>
+
+
+
+<p>Comet有两个实验视图——实验表和实验选项卡。用户可以查看他们的实验，状态，运行时间和可见性设置等，也有额外的列。在实验选项卡视图中，用户将能够在不同的选项卡中查看每个工件——指标、超参数、图表视图、输出、数据等。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="60932" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_17" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?fit=939%2C648&amp;ssl=1" data-orig-size="939,648" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_17" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?fit=300%2C207&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?fit=939%2C648&amp;ssl=1" src="../Images/dc8426aba1df7dc43f6ccf1a71c4a473.png" alt="Comet: track and compare" class="wp-image-60932 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?resize=804%2C554&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?resize=804%2C554&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60932" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_17" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?fit=939%2C648&amp;ssl=1" data-orig-size="939,648" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_17" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?fit=300%2C207&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?fit=939%2C648&amp;ssl=1" src="../Images/dc8426aba1df7dc43f6ccf1a71c4a473.png" alt="Comet: track and compare" class="wp-image-60932" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_17.png?resize=804%2C554&amp;ssl=1"/></noscript><figcaption><em>Comet: track and compare | <a href="https://web.archive.org/web/20220926082702/https://www.comet.ml/site/app/uploads/2020/02/video_image-1-e1587413725588.png" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>模型生产监控</p>
+
+
+
+<h5 id="model-production-monitoring">在comet中，用户可以实时监控生产模型，包括关键生产指标，以确定模型是否按预期执行。在训练和部署模型之后，数据和环境往往会改变，这可能会导致模型不合适。在comet的帮助下，用户可以监控超出准确度的指标，并了解基本事实。</h5>
+
+
+
+<p>Comet还提供分段的性能跟踪，确保所有关键部分的可见性。用户可以将生产监控与实验管理相结合，探索模型在不同环境中的表现。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60938" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_11" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?fit=1341%2C761&amp;ssl=1" data-orig-size="1341,761" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_11" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?fit=300%2C170&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?fit=1024%2C581&amp;ssl=1" src="../Images/15aad7aa037ed326df8ad5550283a6e9.png" alt="Comet: model production monitoring" class="wp-image-60938 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?resize=768%2C435&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?resize=768%2C435&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60938" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_11" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?fit=1341%2C761&amp;ssl=1" data-orig-size="1341,761" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_11" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?fit=300%2C170&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?fit=1024%2C581&amp;ssl=1" src="../Images/15aad7aa037ed326df8ad5550283a6e9.png" alt="Comet: model production monitoring" class="wp-image-60938" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_11.png?resize=768%2C435&amp;ssl=1"/></noscript><figcaption><em>Comet: model production monitoring | <a href="https://web.archive.org/web/20220926082702/https://www.comet.ml/site/app/uploads/2021/04/MPM-Screenshot.png" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>史前古器物</p>
+
+
+
+<h5 id="artifacts">用户<strong> </strong>可以记录和存储不同版本的数据和模型，并更新它们，而不用担心回到以前的版本。comet工件的目的是允许在任何实验之外跟踪不同的资产。用户可以在ML管道中随时创建、管理和使用这些资产。这些存储的工件可以通过工作区访问，并且可以重新用于任何其他实验。</h5>
+
+
+
+<p>3.重量和偏差</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60937" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_12" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?fit=1512%2C742&amp;ssl=1" data-orig-size="1512,742" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_12" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?fit=300%2C147&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?fit=1024%2C503&amp;ssl=1" src="../Images/c2717917c3d6a5b23e5529cb4b8b00f1.png" alt="Comet: dataset and model versioning" class="wp-image-60937 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?resize=800%2C392&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?resize=800%2C392&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60937" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_12" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?fit=1512%2C742&amp;ssl=1" data-orig-size="1512,742" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_12" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?fit=300%2C147&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?fit=1024%2C503&amp;ssl=1" src="../Images/c2717917c3d6a5b23e5529cb4b8b00f1.png" alt="Comet: dataset and model versioning" class="wp-image-60937" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_12.png?resize=800%2C392&amp;ssl=1"/></noscript><figcaption><em>Comet: dataset and model versioning | <a href="https://web.archive.org/web/20220926082702/https://www.comet.ml/site/app/uploads/2021/07/seamless-dataset-and-model-versioning-1536x752.png" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+
+
+
+<h3 id="3-weight-biases"><a href="https://web.archive.org/web/20220926082702/https://wandb.ai/site" target="_blank" rel="noreferrer noopener nofollow">Weight&amp;bias</a>是一个平台，用于记录模型训练，在交互式图形和表格的帮助下比较和可视化不同的模型实验。WandB主要专注于深度学习项目。</h3>
+
+
+
+<p>它是最受欢迎的平台之一，因为它的定制功能是许多工具所不具备的，例如，它会告诉您哪些指标是重要的，它可以提前发布任何表现不如预期的实验，以节省处理时间。使用W&amp;B用户可以跟踪培训过程的每个部分。</p>
+
+
+
+<p>优于pagemaker</p>
+
+
+
+<h4 id="advantages-over-sagemaker">日志数据集的重复数据消除。</h4>
+
+
+<div class="custom-point-list">
+<ul><li>及早停止以避免浪费昂贵的资源。</li><li>用户友好的交互式仪表板，一个跟踪所有实验的中心位置。</li><li>可视化端到端ML管道流，并为最佳性能模型保留检查点</li><li>可视化重要的、将对模型度量和性能产生影响的特性</li><li>无论是系统还是云服务提供商，W&amp;B都提供了对工件的灵活跟踪和托管。</li><li>模型跟踪和管理的主要功能</li></ul>
+</div>
+
+
+<h4 id="main-features-for-model-tracking-and-management">实验</h4>
+
+
+
+<h5 id="experiments">WandB提供了一个轻量级的集成，可以与任何python脚本一起工作。<a href="https://web.archive.org/web/20220926082702/https://wandb.ai/site/experiment-tracking" target="_blank" rel="noreferrer noopener nofollow">实验跟踪</a>，比较和可视化模型及其性能就像编写5行代码一样简单。用户可以在交互式表格和图形中实时查看模型指标，并比较任何实验，而不管您的模型在什么环境和地方接受训练。用户可以直接在W &amp; B上保存代码提交、超参数、数据集和权重等，也可以链接到他们自己的存储。</h5>
+
+
+
+<p>用户可以监控GPU和CPU的使用情况，以确定资源分配中的任何瓶颈，并确定问题区域。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60929" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_20" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?fit=1329%2C928&amp;ssl=1" data-orig-size="1329,928" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_20" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?fit=300%2C209&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?fit=1024%2C715&amp;ssl=1" src="../Images/a037ac127eb1e230bbbbe67ffb987ae2.png" alt="Weight &amp; Biases: visualize and compare experiments" class="wp-image-60929 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?resize=771%2C538&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?resize=771%2C538&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60929" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_20" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?fit=1329%2C928&amp;ssl=1" data-orig-size="1329,928" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_20" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?fit=300%2C209&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?fit=1024%2C715&amp;ssl=1" src="../Images/a037ac127eb1e230bbbbe67ffb987ae2.png" alt="Weight &amp; Biases: visualize and compare experiments" class="wp-image-60929" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_20.png?resize=771%2C538&amp;ssl=1"/></noscript><figcaption><em>Weight &amp; Biases: visualize and compare experiments | <a href="https://web.archive.org/web/20220926082702/https://assets.website-files.com/5ac6b7f2924c656f2b13a88c/60c2531e5144f46276377517_visualize-metrics.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="2402" data-lbwps-height="1670" data-lbwps-srcsmall="https://assets.website-files.com/5ac6b7f2924c656f2b13a88c/60c2531e5144f46276377517_visualize-metrics.png">Source</a></em></figcaption></figure></div>
+
+
+
+<p>史前古器物</p>
+
+
+
+<h5 id="artifacts">使用WandB，用户不必担心记录模型和数据集中的变化。该平台支持保存机器学习管道中每个步骤的版本，除此之外，它还自动复制数据集，即它只保存最新的更改或新数据。</h5>
+
+
+
+<p>用户还可以在增量跟踪的帮助下跟踪数据流，WandB将为性能最佳的模型保留数据流中的检查点。用W&amp;B更容易处理敏感数据，并在有限的组内控制可访问性。</p>
+
+
+
+<p>全胜</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="60944" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_5" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?fit=653%2C400&amp;ssl=1" data-orig-size="653,400" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?fit=300%2C184&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?fit=653%2C400&amp;ssl=1" src="../Images/23d989e1ef382f8f67d5650ef852d9db.png" alt="Weight &amp; Biases: dataset and model versioning" class="wp-image-60944 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?resize=774%2C474&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?resize=774%2C474&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60944" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_5" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?fit=653%2C400&amp;ssl=1" data-orig-size="653,400" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?fit=300%2C184&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?fit=653%2C400&amp;ssl=1" src="../Images/23d989e1ef382f8f67d5650ef852d9db.png" alt="Weight &amp; Biases: dataset and model versioning" class="wp-image-60944" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_5.png?resize=774%2C474&amp;ssl=1"/></noscript><figcaption><em>Weight &amp; Biases: dataset and model versioning | <a href="https://web.archive.org/web/20220926082702/https://assets.website-files.com/5ac6b7f2924c656f2b13a88c/5eed3c414693158a94df888f_Group%2023.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="656" data-lbwps-height="398" data-lbwps-srcsmall="https://assets.website-files.com/5ac6b7f2924c656f2b13a88c/5eed3c414693158a94df888f_Group%2023.png">Source</a></em></figcaption></figure></div>
+
+
+
+<h5 id="sweep">WandB为超参数搜索和模型优化提供了这种独特的功能。这清楚地展示了将影响模型度量或性能的重要超参数。</h5>
+
+
+
+<p>由于WandB还跟踪GPU的使用情况，为了避免浪费昂贵的资源，他们在工具中实现了Hyperband算法，可定制提前停止。这个特性保持了性能最好的模型的运行，而扼杀了其余的模型。用户可以定制扫描，并为输入、逻辑甚至提前停止的时间提供他们自己的分布。</p>
+
+
+
+<p>4.MLflow</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="60931" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_18" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?fit=800%2C424&amp;ssl=1" data-orig-size="800,424" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_18" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?fit=300%2C159&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?fit=800%2C424&amp;ssl=1" src="../Images/afb454088a502203238af985be8724ef.png" alt="Weight &amp; Biases: parameter importance and logic for sweeps" class="wp-image-60931 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?resize=803%2C426&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?resize=803%2C426&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60931" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_18" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?fit=800%2C424&amp;ssl=1" data-orig-size="800,424" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_18" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?fit=300%2C159&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?fit=800%2C424&amp;ssl=1" src="../Images/afb454088a502203238af985be8724ef.png" alt="Weight &amp; Biases: parameter importance and logic for sweeps" class="wp-image-60931" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_18.jpg?resize=803%2C426&amp;ssl=1"/></noscript><figcaption><em>Weight &amp; Biases: parameter importance and logic for sweeps | <a href="https://web.archive.org/web/20220926082702/https://assets.website-files.com/5ac6b7f2924c656f2b13a88c/5edabe12e93ebb651f3b77ff_5e1790a2fb9c0354e3182389_parallel%20coordinates%202.jpeg" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="800" data-lbwps-height="424" data-lbwps-srcsmall="https://assets.website-files.com/5ac6b7f2924c656f2b13a88c/5edabe12e93ebb651f3b77ff_5e1790a2fb9c0354e3182389_parallel%20coordinates%202.jpeg">Source</a></em></figcaption></figure></div>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="60948" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_1" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?fit=640%2C398&amp;ssl=1" data-orig-size="640,398" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?fit=300%2C187&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?fit=640%2C398&amp;ssl=1" src="../Images/7b6f6177702f555badeffcda85b7f2a4.png" alt="Weight &amp; Biases: parameter importance and logic for sweeps" class="wp-image-60948 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?resize=541%2C336&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?resize=541%2C336&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60948" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_1" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?fit=640%2C398&amp;ssl=1" data-orig-size="640,398" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?fit=300%2C187&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?fit=640%2C398&amp;ssl=1" src="../Images/7b6f6177702f555badeffcda85b7f2a4.png" alt="Weight &amp; Biases: parameter importance and logic for sweeps" class="wp-image-60948" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_1.jpg?resize=541%2C336&amp;ssl=1"/></noscript><figcaption><em>Weight &amp; Biases: parameter importance and logic for sweeps | <a href="https://web.archive.org/web/20220926082702/https://assets.website-files.com/5ac6b7f2924c656f2b13a88c/5edabe12e93ebb651f3b77ff_5e1790a2fb9c0354e3182389_parallel%20coordinates%202.jpeg" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="800" data-lbwps-height="424" data-lbwps-srcsmall="https://assets.website-files.com/5ac6b7f2924c656f2b13a88c/5edabe12e93ebb651f3b77ff_5e1790a2fb9c0354e3182389_parallel%20coordinates%202.jpeg">Source</a></em></figcaption></figure></div>
+
+
+
+
+
+
+<h3 id="4-mlflow">MLflow 是一个开源的、与库无关的平台。用户可以在任何系统中使用MLflow，并且可以实现实验跟踪、监控模型和创建他们的模型的中央存储库。用户可以使用任何编程语言的任何机器学习库使用MLflow，因为所有功能都可以通过REST API访问。这些功能也可以通过Python、R和Java APIs获得。</h3>
+
+
+
+<p>MLflow没有像其他可用工具那样的UI，但为了可视化结果，用户可以通过访问本地服务器来访问MLflow UI，但当我们想要协作时，它并不理想。幸运的是，由于其结构，很容易在任何第三方工具(如AWS)上设置远程MLflow跟踪服务器。一个现实世界的例子是Databricks，它有一个MLflow的托管版本，ML团队可以在其上高效地工作和协作ML项目。</p>
+
+
+
+<p>"<em>Databricks上的托管MLflow是MLflow的完全托管版本，为从业者提供跨Data bricks笔记本、作业和数据存储的再现性和实验管理，以及统一数据分析平台的可靠性、安全性和可扩展性。</em></p>
+
+
+
+<blockquote class="wp-block-quote"><p>优于pagemaker</p><cite><a href="https://web.archive.org/web/20220926082702/https://docs.databricks.com/applications/mlflow/index.html" target="_blank" rel="noreferrer noopener nofollow">Databricks documentation</a></cite></blockquote>
+
+
+
+<h4 id="advantages-over-sagemaker">一个帮助统一ML工作流程的开源平台。</h4>
+
+
+<div class="custom-point-list">
+<ul><li>MLflow可以与任何云服务提供商合作。</li><li>与大量开源ML框架(如TensorFlow、Apache Spark等)的强大而简单的集成</li><li>实时实验跟踪，这意味着当代码运行时，用户可以跟踪模型的性能</li><li>模型跟踪和管理的主要功能</li></ul>
+</div>
+
+
+<h4 id="main-features-for-model-tracking-and-management">物流跟踪</h4>
+
+
+
+<h5 id="mlflow-tracking">借助<a href="https://web.archive.org/web/20220926082702/https://mlflow.org/docs/latest/tracking.html" target="_blank" rel="noreferrer noopener nofollow"> MLflow tracking </a>组件，用户可以轻松记录参数、代码版本、指标和输出文件。用户可以在任何地方使用Python、REST、R和Java APIs记录和查询实验。实验可以在本地或远程服务器上记录。MLflow使用两种类型的存储—后端存储和工件存储。</h5>
+
+
+
+<p>后端存储将保存MLflow实体，如运行、参数、度量、标签、注释、元数据等，而工件存储包含文件、模型、图像、内存中的对象或模型摘要等。</p>
+
+
+
+<p>MLflow模型注册表</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60942" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_7" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?fit=1057%2C521&amp;ssl=1" data-orig-size="1057,521" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_7" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?fit=300%2C148&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?fit=1024%2C505&amp;ssl=1" src="../Images/632c666b2152c969aee34af36179e4e8.png" alt="MLflow: comparing the models" class="wp-image-60942 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?resize=798%2C394&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?resize=798%2C394&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60942" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_7" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?fit=1057%2C521&amp;ssl=1" data-orig-size="1057,521" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_7" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?fit=300%2C148&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?fit=1024%2C505&amp;ssl=1" src="../Images/632c666b2152c969aee34af36179e4e8.png" alt="MLflow: comparing the models" class="wp-image-60942" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_7.png?resize=798%2C394&amp;ssl=1"/></noscript><figcaption><em>MLflow: comparing the models | <a href="https://web.archive.org/web/20220926082702/https://www.mlflow.org/docs/latest/_images/tutorial-compare.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="1070" data-lbwps-height="527" data-lbwps-srcsmall="https://www.mlflow.org/docs/latest/_images/tutorial-compare.png">Source</a></em></figcaption></figure></div>
+
+
+
+
+
+
+<h5 id="mlflow-model-registry"><a href="https://web.archive.org/web/20220926082702/https://mlflow.org/docs/latest/model-registry.html" target="_blank" rel="noreferrer noopener nofollow"> MLflow model registry </a>是一个模型库，帮助管理MLflow模型的整个生命周期。从模型沿袭、模型版本化、阶段转换和注释，模型注册中心保存所有的信息。当计划使用自己的MLflow服务器时，用户将需要一个后端数据库来存储和访问模型注册表。该模型应该被记录到相应的模型风格中，并且只有在那时才可以使用MLflow UI或API访问该模型注册中心来添加、修改、更新、转换或删除。</h5>
+
+
+
+<p>6. Kubeflow</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60945" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_4" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?fit=1999%2C673&amp;ssl=1" data-orig-size="1999,673" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_4" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?fit=300%2C101&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?fit=1024%2C345&amp;ssl=1" src="../Images/79da2cc21231e3f9a8444f22fb6a8806.png" alt="MLflow: registering model and model stage transitioning" class="wp-image-60945 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?resize=789%2C266&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?resize=789%2C266&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60945" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_4" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?fit=1999%2C673&amp;ssl=1" data-orig-size="1999,673" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_4" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?fit=300%2C101&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?fit=1024%2C345&amp;ssl=1" src="../Images/79da2cc21231e3f9a8444f22fb6a8806.png" alt="MLflow: registering model and model stage transitioning" class="wp-image-60945" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_4.png?resize=789%2C266&amp;ssl=1"/></noscript><figcaption><em>MLflow: registering model and model stage transitioning | <a href="https://web.archive.org/web/20220926082702/https://www.mlflow.org/docs/latest/_images/oss_registry_5_transition.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="1145" data-lbwps-height="200" data-lbwps-srcsmall="https://www.mlflow.org/docs/latest/_images/oss_registry_5_transition.png">Source</a></em></figcaption></figure></div>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60939" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_10" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?fit=1145%2C200&amp;ssl=1" data-orig-size="1145,200" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_10" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?fit=300%2C52&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?fit=1024%2C179&amp;ssl=1" src="../Images/34717e49406e7b2dca07e394563f7130.png" alt="MLflow: registering model and model stage transitioning" class="wp-image-60939 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?resize=802%2C139&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?resize=802%2C139&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60939" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_10" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?fit=1145%2C200&amp;ssl=1" data-orig-size="1145,200" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_10" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?fit=300%2C52&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?fit=1024%2C179&amp;ssl=1" src="../Images/34717e49406e7b2dca07e394563f7130.png" alt="MLflow: registering model and model stage transitioning" class="wp-image-60939" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_10.png?resize=802%2C139&amp;ssl=1"/></noscript><figcaption><em>MLflow: registering model and model stage transitioning | <a href="https://web.archive.org/web/20220926082702/https://www.mlflow.org/docs/latest/_images/oss_registry_5_transition.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="1145" data-lbwps-height="200" data-lbwps-srcsmall="https://www.mlflow.org/docs/latest/_images/oss_registry_5_transition.png">Source</a></em></figcaption></figure></div>
+
+
+
+
+
+
+<h3 id="6-kubeflow"><a href="https://web.archive.org/web/20220926082702/https://www.kubeflow.org/" target="_blank" rel="noreferrer noopener nofollow"> Kubeflow </a>用于在Kubernetes上创建机器学习工作流。这个想法是让用户在任何有kubernetes的系统上利用这些服务。Kubernetes(K8)是一个容器编排工具。在容器和docker图像的帮助下，任何人都可以重新创建相同的环境并运行模型实验。</h3>
+
+
+
+<p>它有一系列不同的功能来支持实验跟踪、创建和管理Jupiter笔记本，还有一个开源的无服务器框架来实时跟踪ML模型。</p>
+
+
+
+<p>优于pagemaker</p>
+
+
+
+<h4 id="advantages-over-sagemaker">在Kubernetes上构建ML应用程序的开源工具，有助于ML生命周期的标准化。</h4>
+
+
+<div class="custom-point-list">
+<ul><li>用于管理和跟踪模型实验、作业和运行的优秀用户界面。</li><li>在使用Kubeflow框架时，用户可以利用sagemaker等其他工具的优势，如果需要，可以轻松地迁移到任何其他平台。</li><li>内置笔记本服务器服务，用户可以轻松创建和管理jupyter笔记本。</li><li>模型跟踪和管理的主要功能</li></ul>
+</div>
+
+
+<h4 id="main-features-for-model-tracking-and-management">库伯弗洛管道公司</h4>
+
+
+
+<h5 id="kubeflow-pipelines"><a href="https://web.archive.org/web/20220926082702/https://www.kubeflow.org/docs/components/pipelines/" target="_blank" rel="noreferrer noopener nofollow"> Kubeflow管道</a>可用于支持机器学习项目的端到端编排。用户可以运行大量实验，并可以轻松管理机器学习模型上的试验或实验。一个解决方案中的解决方案组件可以轻松地重复使用，以创建另一个解决方案，没有任何麻烦。在Kubeflow UI中，用户可以查看管道的运行时执行图，添加或更新管道的输入和输出，如预测结果和准确性指标等。</h5>
+
+
+
+<p>Katib</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60927" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_22" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?fit=1399%2C883&amp;ssl=1" data-orig-size="1399,883" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_22" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?fit=300%2C189&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?fit=1024%2C646&amp;ssl=1" src="../Images/56157ec25557844ce2e519f6b1db7324.png" alt="Kubeflow: runtime execution graph" class="wp-image-60927 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?resize=795%2C500&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?resize=795%2C500&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60927" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_22" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?fit=1399%2C883&amp;ssl=1" data-orig-size="1399,883" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_22" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?fit=300%2C189&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?fit=1024%2C646&amp;ssl=1" src="../Images/56157ec25557844ce2e519f6b1db7324.png" alt="Kubeflow: runtime execution graph" class="wp-image-60927" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_22.png?resize=795%2C500&amp;ssl=1"/></noscript><figcaption><em>Kubeflow: runtime execution graph | <a href="https://web.archive.org/web/20220926082702/https://www.kubeflow.org/docs/images/pipelines-xgboost-graph.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="3584" data-lbwps-height="2240" data-lbwps-srcsmall="https://www.kubeflow.org/docs/images/pipelines-xgboost-graph.png">Source</a></em></figcaption></figure></div>
+
+
+
+<h5 id="katib">Katib是一个针对AutoML的kubernetes-native项目，它支持超参数调优和任何实验的提前停止。在Katib的帮助下，用户无需担心运行训练作业和手动调整超参数以找到最佳值。它还为超参数值的各种组合提供了准确性验证。这些调整参数或提前停止的实验必须在YAML配置文件中定义，以便Katib相应地获取和运行。</h5>
+
+
+
+<p>中央仪表板</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="60933" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_16" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?fit=972%2C880&amp;ssl=1" data-orig-size="972,880" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_16" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?fit=300%2C272&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?fit=972%2C880&amp;ssl=1" src="../Images/ca7516820b9e6df4bfc17fb3ee65cc00.png" alt="Kubeflow: hyperparameters and tuning" class="wp-image-60933 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?resize=768%2C694&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?resize=768%2C694&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60933" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_16" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?fit=972%2C880&amp;ssl=1" data-orig-size="972,880" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_16" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?fit=300%2C272&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?fit=972%2C880&amp;ssl=1" src="../Images/ca7516820b9e6df4bfc17fb3ee65cc00.png" alt="Kubeflow: hyperparameters and tuning" class="wp-image-60933" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_16.png?resize=768%2C694&amp;ssl=1"/></noscript><figcaption><em>Kubeflow: hyperparameters and tuning | <a href="https://web.archive.org/web/20220926082702/https://www.kubeflow.org/docs/components/katib/images/random-example-graph.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="1921" data-lbwps-height="1731" data-lbwps-srcsmall="https://www.kubeflow.org/docs/components/katib/images/random-example-graph.png">Source</a></em></figcaption></figure></div>
+
+
+
+<h5 id="central-dashboard"><a href="https://web.archive.org/web/20220926082702/https://www.kubeflow.org/docs/components/central-dash/" target="_blank" rel="noreferrer noopener nofollow"> Kubeflow central dashboard </a>提供对集群中部署的其他Kubeflow组件的快速访问，例如笔记本电脑、管道、指标等的列表。用户可以轻松管理笔记本服务器、TensorBoards、KFServing模型和实验。如果需要，管理员可以集成第三方应用程序。</h5>
+
+
+
+<p>7.瓦罗海</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60941" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_8" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?fit=1861%2C880&amp;ssl=1" data-orig-size="1861,880" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_8" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?fit=300%2C142&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?fit=1024%2C484&amp;ssl=1" src="../Images/6ea5c8804e103a78151543ac0fa2d906.png" alt="Kubeflow: central dashboard" class="wp-image-60941 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?resize=790%2C373&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?resize=790%2C373&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60941" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_8" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?fit=1861%2C880&amp;ssl=1" data-orig-size="1861,880" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_8" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?fit=300%2C142&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?fit=1024%2C484&amp;ssl=1" src="../Images/6ea5c8804e103a78151543ac0fa2d906.png" alt="Kubeflow: central dashboard" class="wp-image-60941" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_8.png?resize=790%2C373&amp;ssl=1"/></noscript><figcaption><em>Kubeflow: central dashboard | <a href="https://web.archive.org/web/20220926082702/https://www.kubeflow.org/docs/images/central-ui.png" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="1920" data-lbwps-height="912" data-lbwps-srcsmall="https://www.kubeflow.org/docs/images/central-ui.png">Source</a></em></figcaption></figure></div>
+
+
+
+
+
+
+<h3 id="7-valohai"><a href="https://web.archive.org/web/20220926082702/https://valohai.com/" target="_blank" rel="noreferrer noopener nofollow"> Valohai </a>是MLOps平台，帮助企业实现端到端ML管道的自动化。它兼容任何编程语言或框架。它帮助用户从任何地方运行他们的实验，并自动跟踪每个实验。它可以在任何云平台或内部轻松设置。</h3>
+
+
+
+<p>Valohai还提供完整的版本控制、实验比较和可追溯性。用户可以部署不同的模型版本，监控性能指标，并在需要时使用记录的超参数和元数据来重现实验。</p>
+
+
+
+<p>优于pagemaker</p>
+
+
+
+<h4 id="advantages-over-sagemaker">在团队内部以完全透明的方式标准化工作流程。</h4>
+
+
+<div class="custom-point-list">
+<ul><li>一个具有异步超参数扫描功能的笔记本电脑中心。</li><li>以图形或表格的形式可视化实验比较。</li><li>兼容任何编程语言和ML框架。</li><li><strong>版本控制–</strong>valo hai会自动对用户运行的所有内容进行版本控制，例如超参数、库版本和硬件或资源设置。完整的版本控制是实现可再现性和法规遵从性的唯一途径。用户不需要维护单独的模型注册中心或元数据存储。</li></ul>
+</div>
+
+
+<p><strong>模型监控–</strong>它收集并存储流程内部输出的所有内容，无论是错误堆栈跟踪、模型指标还是健康信息。当度量被解析时，可以使用Valohai部署监视UI来可视化它们，用户可以在其中分析任何所选时间范围的日志和度量。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60930" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_19" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?fit=1999%2C1476&amp;ssl=1" data-orig-size="1999,1476" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_19" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?fit=300%2C222&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?fit=1024%2C756&amp;ssl=1" src="../Images/92da3d216e60397b07f00ee1946bf6ab.png" alt="Valohai: model version control" class="wp-image-60930 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?resize=844%2C623&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?resize=844%2C623&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60930" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_19" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?fit=1999%2C1476&amp;ssl=1" data-orig-size="1999,1476" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_19" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?fit=300%2C222&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?fit=1024%2C756&amp;ssl=1" src="../Images/92da3d216e60397b07f00ee1946bf6ab.png" alt="Valohai: model version control" class="wp-image-60930" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_19.png?resize=844%2C623&amp;ssl=1"/></noscript><figcaption><em>Valohai: model version control | <a href="https://web.archive.org/web/20220926082702/https://valohai.com/product/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p><strong>实验比较—</strong>从平台上的执行表中，用户可以选择多个实验/执行，并使用交互式图形和表格比较它们的元数据。用户可以在一个很大程度上分布式的学习运行中轻松地实时可视化超参数调整。也可以在本地下载这些元数据，然后离线比较实验。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60936" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_13" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?fit=1150%2C822&amp;ssl=1" data-orig-size="1150,822" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_13" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?fit=300%2C214&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?fit=1024%2C732&amp;ssl=1" src="../Images/1e7380553587a8943f3772eb493d7d80.png" alt="Valohai: model monitoring" class="wp-image-60936 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?resize=780%2C554&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?resize=780%2C554&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60936" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_13" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?fit=1150%2C822&amp;ssl=1" data-orig-size="1150,822" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_13" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?fit=300%2C214&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?fit=1024%2C732&amp;ssl=1" src="../Images/1e7380553587a8943f3772eb493d7d80.png" alt="Valohai: model monitoring" class="wp-image-60936" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_13.gif?resize=780%2C554&amp;ssl=1"/></noscript><figcaption><em>Valohai: model monitoring | <a href="https://web.archive.org/web/20220926082702/https://docs.valohai.com/howto/deployments/deployment-monitoring/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p><strong>数据字典—</strong>valo hai自动跟踪机器学习模型中使用的每一项数据资产。它的数据树表示从最终结果一直到原始数据的每一步，允许您深入任何中间数据资产并检查它。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60934" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_15" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?fit=1059%2C651&amp;ssl=1" data-orig-size="1059,651" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_15" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?fit=300%2C184&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?fit=1024%2C629&amp;ssl=1" src="../Images/401e8a7dcc51954b26a0a702a0a0d652.png" alt="Valohai: compare executions" class="wp-image-60934 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?resize=808%2C496&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?resize=808%2C496&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60934" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_15" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?fit=1059%2C651&amp;ssl=1" data-orig-size="1059,651" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_15" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?fit=300%2C184&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?fit=1024%2C629&amp;ssl=1" src="../Images/401e8a7dcc51954b26a0a702a0a0d652.png" alt="Valohai: compare executions" class="wp-image-60934" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_15.png?resize=808%2C496&amp;ssl=1"/></noscript><figcaption><em>Valohai: compare executions | <a href="https://web.archive.org/web/20220926082702/https://docs.valohai.com/_images/compare_executions1.png" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>表格对比:Sagemaker vs替代品<em> </em></p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="60943" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_6" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?fit=1600%2C965&amp;ssl=1" data-orig-size="1600,965" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_6" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?fit=300%2C181&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?fit=1024%2C618&amp;ssl=1" src="../Images/7182f11eae9bb5a633cfbcd90efab19e.png" alt="Valohai: auditable data lineage" class="wp-image-60943 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?resize=827%2C498&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?resize=827%2C498&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="60943" data-permalink="https://web.archive.org/web/20220926082702/https://neptune.ai/alternatives-to-amazon-sagemaker-for-experiment-tracking-and-model-management_6" data-orig-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?fit=1600%2C965&amp;ssl=1" data-orig-size="1600,965" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Alternatives to Amazon SageMaker (for Experiment Tracking and Model Management)_6" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?fit=300%2C181&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926082702/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?fit=1024%2C618&amp;ssl=1" src="../Images/7182f11eae9bb5a633cfbcd90efab19e.png" alt="Valohai: auditable data lineage" class="wp-image-60943" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926082702im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Alternatives-to-Amazon-SageMaker-for-Experiment-Tracking-and-Model-Management_6.png?resize=827%2C498&amp;ssl=1"/></noscript><figcaption><em>Valohai: auditable data lineage | <a href="https://web.archive.org/web/20220926082702/https://valohai.com/blog/blog-building-a-data-catalog-for-machine-learning/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<h2 id="table-comparison-sagemaker-vs-alternatives">到目前为止，在本文中，我们已经讨论了AWS SageMaker的替代产品，以及为什么以及何时应该选择它们。让我们快速看一下这些工具在不同方面的不同之处，这样你就可以为你的用例做出正确的选择。</h2>
+
+
+
+<p>最后的想法</p>
+
+
+<p id="block_61e7cc0b8369a" class="separator separator-">当谈到实验跟踪和模型监控时，有大量的工具可供选择。AWS SageMaker是ML工程师中最受欢迎的工具之一，但它有其局限性，这就是为什么企业正在寻找更加开放和简单的集成工具。</p>
+
+
+
+
+
+
+
+<h2 id="final-thoughts">这些替代工具中的大多数都提供了很好的用户界面，并且不局限于某个特定的ML框架或云平台。工具的选择完全取决于个人需求，例如，如果用户只希望跟踪某项实验的性能，他们可能更喜欢独立的工具；如果要求看透模型管道的每一步，他们可以选择端到端平台。</h2>
+
+
+
+<p>在过去的几年中，这些实验跟踪和模型监控等的市场呈指数增长，并且当前可用的工具已经被进一步改进。工具列表并不仅限于上述工具，还有更多类似的工具，可能最适合用户需求，如<a href="https://web.archive.org/web/20220926082702/https://github.com/IDSIA/sacred" target="_blank" rel="noreferrer noopener nofollow">神圣</a>、<a href="https://web.archive.org/web/20220926082702/https://guild.ai/" target="_blank" rel="noreferrer noopener nofollow">公会AI </a>、<a href="https://web.archive.org/web/20220926082702/https://www.tensorflow.org/tensorboard" target="_blank" rel="noreferrer noopener nofollow"> TensorBoard </a>、<a href="https://web.archive.org/web/20220926082702/https://www.verta.ai/" target="_blank" rel="noreferrer noopener nofollow"> Verta.ai </a>等。</p>
+
+
+
+<p>所以继续学习，快乐实验！</p>
+
+
+
+<p>娜塔莎·夏尔马</p>
+
+
+
+<p>埃森哲 <br/>公司的高级软件工程师她从大型机开发人员做起，逐渐掌握了其他编程语言和工具。她拥有格拉斯哥大学的数据科学硕士学位，曾在一家数字分析公司担任数据分析师。她相信不断的学习和知识分享会让她写文章。她一直通过博客为数据科学社区做出贡献，如《走向数据科学》、《心跳》和《数据科学+》。</p>
+
+
+
+
+<div id="author-box-new-format-block_604f3be706ff0" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name"><strong>阅读下一篇</strong></h3>
+    
+          <p class="article__authorContent-text">InstaDeep案例研究:寻找协作功能和所有实验的中心位置</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">5分钟阅读| 2021年11月22日更新</p>
+
+
+
+<h2>InstaDeep Case Study: Looking for Collaboration Features and One Central Place for All Experiments</h2>
+
+
+
+<p class="has-small-font-size">InstaDeep 是提供决策型人工智能产品的EMEA领导者。利用他们在GPU加速计算、深度学习和强化学习方面的广泛知识，他们已经构建了一些产品，如新颖的DeepChain平台，以解决一系列行业中最复杂的挑战。</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10">InstaDeep还与人工智能生态系统的全球领导者建立了合作关系，如谷歌DeepMind、英伟达和英特尔。他们是英特尔AI Builders计划的一部分，也是EMEA仅有的两家英伟达精英服务交付合作伙伴之一。InstaDeep团队由大约155人组成，在伦敦、巴黎、突尼斯、拉各斯、迪拜和开普敦的办事处网络中工作，并且发展迅速。</p>
+
+
+
+<p>关于BioAI团队</p>
+
+
+
+<p>BioAI团队是InstaDeep中生物学与人工智能相遇的地方。在BioAI，他们通过结合生物学和机器学习专业知识，推进医疗保健，并推动医学科学的发展。他们目前正在构建<a href="https://web.archive.org/web/20220926082702/http://www.deepchain.bio/" target="_blank" rel="noreferrer noopener nofollow"> DeepChain </a>，这是他们的蛋白质设计平台。他们还与生物领域的客户合作，在生物信息学和机器学习的帮助下解决最具挑战性的问题。</p>
+
+
+
+<h4>About the BioAI team</h4>
+
+
+
+<p>The BioAI team is the place at InstaDeep where Biology meets Artificial intelligence. At BioAI, they advance healthcare and push the boundaries of medical science through a combination of biology and machine learning expertise. They are currently building <a href="https://web.archive.org/web/20220926082702/http://www.deepchain.bio/" target="_blank" rel="noreferrer noopener nofollow">DeepChain</a>™, their platform for protein design. They are also working with their customers in the bio sector to tackle the most challenging problems with the help of bioinformatics and machine learning.</p>
+
+
+<p id="block_61978e929754b" class="separator separator-10">他们应用DeepChain蛋白质设计平台，使用强化学习和进化算法等复杂的优化技术来设计蛋白质目标的新序列。他们还利用在数百万蛋白质序列上预先训练的语言模型，训练他们自己的内部蛋白质语言模型。最后，他们使用机器学习从序列中预测蛋白质结构。</p>
+
+
+
+
+
+
+<p id="block_6184dfb7f8f17" class="separator separator-5">问题</p>
+
+
+
+<p>构建像蛋白质设计平台DeepChain这样的复杂软件，需要对不同的活动部件进行大量研究。客户需要各种类型的解决方案，每次都需要新的实验和研究。由于要为不同的客户运行几个实验，因此对于任何规模的团队来说，在确保实验保持高效的同时跟踪这些实验都不可避免地令人望而生畏。</p>
+
+
+
+<h2>尼古拉斯和BioAI团队被管理大量实验的想法所困扰，遇到了一系列挑战:</h2>
+
+
+
+<p>Building complex software like DeepChain™, a platform for protein design, requires a lot of research with different moving parts. Customers demand various types of solutions that require new experiments and research every time. With several experiments running for different customers, it will be unavoidably daunting for a team of any size to keep track of the experiments while ensuring they remain productive.</p>
+
+
+
+<p>实验日志到处都是<br/></p>
+
+
+<div class="case-study-numbered-list">
+    <h2>分享实验结果很困难<br/></h2>
+    <ul>
+                    <li>机器学习研究人员正在处理基础设施和运营<br/></li>
+                    <li><span>2</span>It was difficult to share experiment results<br/>
+</li>
+                    <li><span>3</span>Machine learning researchers were dealing with infrastructure and operations<br/>
+</li>
+            </ul>
+</div>
+
+
+<p id="block_61a0e573f1871" class="separator separator-15"/>
+
+
+<a class="button continous-post blue-filled" href="/web/20220926082702/https://neptune.ai/customers/instadeep" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

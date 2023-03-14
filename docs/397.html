@@ -1,0 +1,1132 @@
+<html>
+<head>
+<title>Machine Learning Experiment Management: How to Organize Your Model Development Process </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>机器学习实验管理:如何组织你的模型开发过程</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/experiment-management#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/experiment-management#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>机器学习或深度学习<a href="/web/20220928194919/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>是交付成功结果的关键因素。没有它，你不可能成功。</p>
+
+
+
+<p>我来分享一个听了太多次的故事。</p>
+
+
+
+<blockquote class="wp-block-quote"><p><em>“所以我和我的团队开发了一个机器学习模型，经过几周的大量实验，我们<strong>得到了有希望的结果</strong>……</em></p><p><em>…不幸的是，我们无法确切地说出什么表现最好，因为<strong>我们没有跟踪</strong>功能版本，没有记录参数，并且使用不同的环境来运行我们的模型……</em></p><p><em>…几周后，<strong>我们甚至不确定我们实际尝试了什么</strong>，所以我们需要重新运行几乎所有的东西"</em></p></blockquote>
+
+
+
+<p>听起来很熟悉？</p>
+
+
+
+<p>在这篇文章中，我将向您展示如何跟踪您的机器学习实验，并组织您的模型开发工作，以便这样的故事永远不会发生在您身上。</p>
+
+
+
+<p id="content"><strong>您将了解到:</strong></p>
+
+
+
+
+
+<h2 id="1">什么是机器学习实验管理？</h2>
+
+
+
+<p>机器学习环境中的实验管理是一个<strong>跟踪实验元数据</strong>的过程，例如:</p>
+
+
+<div class="custom-point-list">
+<ul><li>代码版本，</li><li>数据版本，</li><li>超参数，</li><li>环境，</li><li>度量标准，</li></ul>
+</div>
+
+
+<p><strong>以有意义的方式组织它们</strong>，并使它们<strong>可用于在您的组织内访问和协作</strong>。</p>
+
+
+
+<p>在接下来的部分中，您将通过示例和实现看到这到底意味着什么。</p>
+
+
+
+<h2 id="2">如何跟踪机器学习实验</h2>
+
+
+
+<p>我所说的<strong>跟踪是指收集所有关于你的机器学习实验的元信息</strong>,这是为了:</p>
+
+
+<div class="custom-point-list">
+<ul><li>与团队(以及未来的你)分享你的成果和见解，</li><li>重现机器学习实验的结果，</li><li>保持你的结果，这需要很长时间才能产生，安全。</li></ul>
+</div>
+
+
+<p>让我们一个接一个地检查我认为应该被记录下来的所有实验片段。</p>
+
+
+
+<h3 id="3">数据科学的代码版本控制</h3>
+
+
+
+<p>好的，在2022年，我认为几乎每个从事代码工作的人都知道版本控制。未能跟踪您的代码是一个很大的(但明显且容易修复的)疏忽。</p>
+
+
+
+<p>我们应该继续下一部分吗？没那么快。</p>
+
+
+
+<h4>问题1: Jupyter笔记本版本控制</h4>
+
+
+
+<p>很大一部分<strong>数据科学发展发生在Jupyter笔记本</strong>中，它不仅仅是代码。幸运的是，有一些工具可以帮助笔记本版本控制和区分。我知道的一些工具:</p>
+
+
+
+
+
+<p>一旦你有了你的笔记本版本，我会建议你再多做一点，确保它从上到下运行。为此，您可以使用jupytext或nbconvert:</p>
+
+
+
+<pre class="hljs">jupyter nbconvert --to script train_model.ipynb;
+python train_model.py
+</pre>
+
+
+
+<h4>问题2:脏提交实验</h4>
+
+
+
+<p>数据科学人员倾向于不遵循软件开发的最佳实践。你总能发现有人(包括我)会问:</p>
+
+
+
+<p class="is-style-default">但是如何跟踪提交之间的代码呢？如果有人在没有提交代码的情况下运行一个实验会怎么样？”</p>
+
+
+
+<p>一种选择是明确禁止在脏提交(包含修改或未跟踪文件的提交)上运行代码。另一个选择是每当用户进行实验时，给他们一个额外的安全网和快照代码。</p>
+
+
+<div class="note">
+    <h3>注意:</h3>
+    <div class="content">
+                    <div class="wysiwyg_editor">
+                                    <p><span> Neptune </span> <a href="https://web.archive.org/web/20220928194919/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display#git-information" target="_blank" rel="noopener"> <span>记录你的git信息</span> </a> <span>同时跟踪一个</span> <i> <span>运行</span> </i> <span>，并提醒你</span> <i> <span>运行</span> </i> <span>是否在脏回购中启动。</span></p>
+                            </div>
+                    
+                    
+            </div>
+</div>
+
+
+
+<h3 id="4">跟踪超参数</h3>
+
+
+
+<p>大多数像样的机器学习模型和管道都调整了非默认超参数。这些可能是学习率、树的数量或缺失值插补方法。未能跟踪超参数会导致浪费数周时间寻找它们或重新训练模型。</p>
+
+
+
+
+
+
+<p>好的一面是，<strong>跟踪超参数非常简单</strong>。让我们从人们倾向于定义它们的方式开始，然后我们将继续进行超参数跟踪:</p>
+
+
+
+<h4>配置文件</h4>
+
+
+
+<p>通常是一个<em>。yaml </em>文件，包含脚本运行所需的所有信息。例如:</p>
+
+
+
+<pre class="hljs">data:
+    train_path: <span class="hljs-string">'/path/to/my/train.csv'</span>
+    valid_path: <span class="hljs-string">'/path/to/my/valid.csv'</span>
+
+model:
+    objective: <span class="hljs-string">'binary'</span> 
+    metric: <span class="hljs-string">'auc'</span>
+    learning_rate: <span class="hljs-number">0.1</span>
+    num_boost_round: <span class="hljs-number">200</span>
+    num_leaves: <span class="hljs-number">60</span>
+    feature_fraction: <span class="hljs-number">0.2</span></pre>
+
+
+
+<h4>命令行+ argparse</h4>
+
+
+
+<p>您只需将参数作为参数传递给脚本:</p>
+
+
+
+<pre class="hljs">python train_evaluate.py \
+    --train_path <span class="hljs-string">'/path/to/my/train.csv'</span> \
+    --valid_path <span class="hljs-string">'/path/to/my/valid.csv'</span> \
+    -- objective <span class="hljs-string">'binary'</span> \
+    -- metric <span class="hljs-string">'auc'</span> \
+    -- learning_rate <span class="hljs-number">0.1</span> \
+    -- num_boost_round <span class="hljs-number">200</span> \
+    -- num_leaves <span class="hljs-number">60</span> \
+    -- feature_fraction <span class="hljs-number">0.2</span></pre>
+
+
+
+<h4>main.py中的参数字典</h4>
+
+
+
+<p>您将所有参数放在脚本中的字典中:</p>
+
+
+
+<pre class="hljs">TRAIN_PATH = <span class="hljs-string">'/path/to/my/train.csv'</span> 
+VALID_PATH = <span class="hljs-string">'/path/to/my/valid.csv'</span>
+
+PARAMS = {<span class="hljs-string">'objective'</span>: <span class="hljs-string">'binary'</span>,
+          <span class="hljs-string">'metric'</span>: <span class="hljs-string">'auc'</span>,
+          <span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.1</span>,
+          <span class="hljs-string">'num_boost_round'</span>: <span class="hljs-number">200</span>,
+          <span class="hljs-string">'num_leaves'</span>: <span class="hljs-number">60</span>,
+          <span class="hljs-string">'feature_fraction'</span>: <span class="hljs-number">0.2</span>}</pre>
+
+
+
+<h4>水螅</h4>
+
+
+
+<p>Hydra是脸书开源开发的一个配置管理框架。</p>
+
+
+
+<p>其背后的关键理念是:</p>
+
+
+<div class="custom-point-list">
+<ul><li>动态地<strong>创建一个</strong>一个<strong>层次化的</strong> <strong>配置</strong> <strong>由</strong> <strong>组成</strong>，</li><li>需要时通过命令行覆盖它，</li><li>通过CLI传递新参数(配置中没有)——它们将被自动处理</li></ul>
+</div>
+
+
+<p>Hydra使您能够准备和覆盖复杂的配置设置(包括配置组和层次结构)，同时跟踪任何被覆盖的值。</p>
+
+
+
+<p>为了理解它是如何工作的，让我们举一个config.yaml文件的简单例子:</p>
+
+
+
+<pre class="hljs">project: ORGANIZATION/home-credit
+name: home-credit-default-risk
+parameters:
+
+	n_cv_splits: <span class="hljs-number">5</span>
+	validation_size: <span class="hljs-number">0.2</span>
+	stratified_cv: <span class="hljs-keyword">True</span>
+	shuffle: <span class="hljs-number">1</span>
+
+	rf__n_estimators: <span class="hljs-number">2000</span>
+	rf__criterion: gini
+	rf__max_depth: <span class="hljs-number">40</span>
+	rf__class_weight: balanced</pre>
+
+
+
+<p>只需调用hydra decorator，就可以在应用程序中使用这种配置:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> hydra
+<span class="hljs-keyword">from</span> omegaconf <span class="hljs-keyword">import</span> DictConfig
+<span class="hljs-meta">@hydra.main(config_path='config.yaml')</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train</span><span class="hljs-params">(cfg)</span>:</span>
+	print(cfg.pretty())  
+	print(cfg.parameters.rf__n_estimators)  
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>:
+	train()</pre>
+
+
+
+<p>运行上述脚本将产生以下输出:</p>
+
+
+
+<pre class="hljs">name: home-credit-default-risk
+parameters:
+	n_cv_splits: <span class="hljs-number">5</span>
+	rf__class_weight: balanced
+	rf__criterion: gini
+	rf__max_depth: <span class="hljs-number">40</span>
+	rf__n_estimators: <span class="hljs-number">2000</span>
+	shuffle: <span class="hljs-number">1</span>
+	stratified_cv: true
+	validation_size: <span class="hljs-number">0.2</span>
+project: ORGANIZATION/home-credit
+<span class="hljs-number">2000</span>
+</pre>
+
+
+
+<p>要覆盖现有参数或添加新参数，只需将它们作为CLI参数传递即可:</p>
+
+
+
+<pre class="hljs">python hydra-main.py parameters.rf__n_estimators=<span class="hljs-number">1500</span> parameters.rf__max_features=<span class="hljs-number">0.2</span>
+</pre>
+
+
+
+<p><em> <strong>注意:</strong>添加新参数必须关闭严格模式:</em></p>
+
+
+
+<pre class="hljs"><span class="hljs-meta">@hydra.main(config_path='config.yaml', strict=False)</span>
+</pre>
+
+
+
+<p>Hydra的一个缺点是，要共享配置或跨实验跟踪它，您必须手动保存config.yaml文件。</p>
+
+
+
+<p>Hydra正在积极开发中，请务必查看他们的最新文档。</p>
+
+
+
+<h4>到处都是神奇的数字</h4>
+
+
+
+<p>每当你需要传递一个参数时，你只需传递该参数的一个值。</p>
+
+
+
+<pre class="hljs">...
+train = pd.read_csv(<span class="hljs-string">'/path/to/my/train.csv'</span>)
+
+model = Model(objective=<span class="hljs-string">'binary'</span>,
+              metric=<span class="hljs-string">'auc'</span>,
+              learning_rate=<span class="hljs-number">0.1</span>,
+              num_boost_round=<span class="hljs-number">200</span>,
+              num_leaves=<span class="hljs-number">60</span>,
+              feature_fraction=<span class="hljs-number">0.2</span>)
+model.fit(train)
+
+valid = pd.read_csv(<span class="hljs-string">'/path/to/my/valid.csv'</span>)
+model.evaluate(valid)</pre>
+
+
+
+<p>我们有时都会这样做，但这不是一个好主意，尤其是当有人需要接管你的工作时。</p>
+
+
+
+<p>好吧，所以我确实喜欢<em>。yaml </em>从命令行配置和传递参数(选项1和2)，但是除了幻数之外的任何东西都可以。重要的是你<strong>记录每个实验的参数</strong>。</p>
+
+
+
+<p>如果您决定将所有参数作为脚本参数<strong>传递，请确保将它们记录在某个地方</strong>。这很容易忘记，所以使用一个实验管理工具可以自动做到这一点，可以节省你的时间。</p>
+
+
+
+<pre class="hljs">parser = argparse.ArgumentParser()
+parser.add_argument(<span class="hljs-string">'--number_trees'</span>)
+parser.add_argument(<span class="hljs-string">'--learning_rate'</span>)
+args = parser.parse_args()
+
+experiment_manager.create_experiment(params=vars(args))
+...
+
+...</pre>
+
+
+
+
+
+<p>没有什么比<strong/>在一个完美的数据版本上拥有一个完美的脚本来产生完美的指标更痛苦的了，只是<strong>发现你不记得作为参数传递的超参数</strong>是什么了。</p>
+
+
+
+<h4><strong>海王星</strong></h4>
+
+
+
+<p>Neptune通过提供各种选项，使得在运行中跟踪超参数变得非常容易:</p>
+
+
+<div class="custom-point-list">
+<ul><li>单独记录超参数:</li></ul>
+</div>
+
+
+<pre class="hljs">run[<span class="hljs-string">"parameters/epoch_nr"</span>] = <span class="hljs-number">5</span>
+run[<span class="hljs-string">"parameters/batch_size"</span>] = <span class="hljs-number">32</span>
+run[<span class="hljs-string">"parameters/dense"</span>] = <span class="hljs-number">512</span>
+run[<span class="hljs-string">"parameters/optimizer"</span>] = <span class="hljs-string">"sgd"</span>
+run[<span class="hljs-string">"parameters/metrics"</span>] = [<span class="hljs-string">"accuracy"</span>, <span class="hljs-string">"mae"</span>]
+run[<span class="hljs-string">"parameters/activation"</span>] = <span class="hljs-string">"relu"</span>  </pre>
+
+
+<div class="custom-point-list">
+<ul><li>将它们作为字典记录在一起:</li></ul>
+</div>
+
+
+<pre class="hljs">
+params = {
+	<span class="hljs-string">"epoch_nr"</span>: <span class="hljs-number">5</span>,
+	<span class="hljs-string">"batch_size"</span>: <span class="hljs-number">32</span>,
+	<span class="hljs-string">"dense"</span>: <span class="hljs-number">512</span>,
+	<span class="hljs-string">"optimizer"</span>: <span class="hljs-string">"sgd"</span>,
+	<span class="hljs-string">"metrics"</span>: [<span class="hljs-string">"accuracy"</span>, <span class="hljs-string">"binary_accuracy"</span>],
+	<span class="hljs-string">"activation"</span>: <span class="hljs-string">"relu"</span>,
+}
+
+
+run[<span class="hljs-string">"parameters"</span>] = params
+</pre>
+
+
+
+<p>在上述两种情况下，参数都记录在<em>运行</em> UI的<em>所有元数据</em>部分下:</p>
+
+
+
+
+
+
+
+<pre class="hljs">run[<span class="hljs-string">"config_file"</span>].upload(<span class="hljs-string">"config.yaml"</span>)
+</pre>
+
+
+
+<p>该文件将被记录在<em>运行</em>界面的<em>所有元数据</em>部分下:</p>
+
+
+
+
+
+<h3 id="5">数据版本化</h3>
+
+
+
+<p>在实际项目中，数据会随着时间而变化。一些典型的情况包括:</p>
+
+
+<div class="custom-point-list">
+<ul><li>添加新的图像，</li><li>标签得到了改进，</li><li>标签错误/错误的数据被移除，</li><li>发现了新的数据表，</li><li>新的特征被设计和处理，</li><li>验证和测试数据集会发生变化，以反映生产环境。</li></ul>
+</div>
+
+
+<p>每当你的<strong>数据改变</strong>，你的分析、报告或者<strong>实验结果的输出将可能改变</strong>，即使代码和环境没有改变。这就是为什么要确保你在比较苹果和苹果，你需要<strong>跟踪你的数据版本</strong>。</p>
+
+
+
+<p>拥有几乎所有的版本并得到不同的结果是非常令人沮丧的，<strong>可能意味着浪费大量的时间(和金钱)</strong>。可悲的是，事后你对此无能为力。所以，再一次，保持你的实验数据版本化。</p>
+
+
+
+<p>对于绝大多数用例，每当有新数据进来时，您可以<strong>将它保存在一个新位置，并记录这个位置和数据的散列</strong>。即使数据非常大，例如在处理图像时，您也可以创建一个包含图像路径和标签的较小的元数据文件，并跟踪该文件的更改。</p>
+
+
+
+<p>一位智者曾经告诉我:</p>
+
+
+
+<blockquote class="wp-block-quote is-style-default"><p>“存储很便宜，但在一个8 GPU的节点上训练一个模型两周就不便宜了。”</p></blockquote>
+
+
+
+<p>如果你仔细想想，记录这些信息并不一定是火箭科学。</p>
+
+
+
+<pre class="hljs">exp.set_property(<span class="hljs-string">'data_path'</span>, <span class="hljs-string">'DATASET_PATH'</span>)
+exp.set_property(<span class="hljs-string">'data_version'</span>, md5_hash(<span class="hljs-string">'DATASET_PATH'</span>))</pre>
+
+
+
+<p>你可以自己计算散列，使用一个简单的数据版本扩展(T1)或者将散列外包给一个成熟的数据版本工具，比如T2 DVC T3。</p>
+
+
+
+<p>您可以自己计算和记录散列，或者使用成熟的数据版本化工具，该工具为您提供了更强大的版本化功能。阅读以下市场上一些最佳工具的更多信息。</p>
+
+
+
+
+
+
+<p>无论您决定哪个选项最适合您的项目<strong>，请将您的数据</strong>版本化。</p>
+
+
+
+<h3 id="6">跟踪模型性能指标</h3>
+
+
+
+<p>我从来没有发现自己在这种情况下认为我为我的实验记录了太多的指标，你呢？</p>
+
+
+
+<p><strong>在现实世界的项目中，由于新的发现或不断变化的规范，您关心的指标可能会发生变化</strong>,因此记录更多的指标实际上可以在将来为您节省一些时间和麻烦。</p>
+
+
+
+<p>不管怎样，我的建议是:</p>
+
+
+
+<blockquote class="wp-block-quote is-style-default"><p><em>“记录指标，全部记录”</em></p></blockquote>
+
+
+
+<p>通常，指标就像一个简单的数字</p>
+
+
+
+<pre class="hljs">exp.send_metric(<span class="hljs-string">'train_auc'</span>, train_auc)
+exp.send_metric(<span class="hljs-string">'valid_auc'</span>, valid_auc)</pre>
+
+
+
+<p>但我喜欢把它想得更宽泛一些。为了了解你的模型是否有所改进，你可能想看看图表、混淆矩阵或预测分布。在我看来，这些仍然是度量标准，因为它们帮助你衡量实验的表现。</p>
+
+
+
+<pre class="hljs">exp.send_image(<span class="hljs-string">'diagnostics'</span>, <span class="hljs-string">'confusion_matrix.png'</span>)
+exp.send_image(<span class="hljs-string">'diagnostics'</span>, <span class="hljs-string">'roc_auc.png'</span>)
+exp.send_image(<span class="hljs-string">'diagnostics'</span>, <span class="hljs-string">'prediction_dist.png'</span>)</pre>
+
+
+
+
+<div class="note">
+    <h3>注意:</h3>
+    <div class="content">
+                    <div class="wysiwyg_editor">
+                                    <p>在训练和验证数据集上跟踪指标<strong>可以帮助您评估模型在生产中表现不佳的风险。差距越小，风险越低。Jean-Fran ois Puget的kaggle days演讲是一个很好的资源。</strong></p>
+                            </div>
+                    <p class="video"><iframe title="Beyond Feature Engineering and HPO | by Jean-François Puget | Kaggle Days Paris" src="https://web.archive.org/web/20220928194919if_/https://www.youtube.com/embed/VC8Jc9_lNoY?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="">视频</iframe></p>
+            </div>
+</div>
+
+
+
+<p>此外，如果您正在处理在不同时间戳收集的数据，您可以评估模型性能衰减并<strong>建议一个合适的模型再训练方案</strong>。只需跟踪验证数据不同时间段的指标，并查看性能如何下降。</p>
+
+
+
+
+
+
+<h3 id="7">版本化实验环境</h3>
+
+
+
+<p>环境版本控制的大部分问题可以用一句臭名昭著的话来概括:</p>
+
+
+
+<blockquote class="wp-block-quote"><p>“我不明白，它在我的机器上工作。”</p></blockquote>
+
+
+
+<p>有助于解决这个问题的一种方法可以称为<strong> <em>“环境作为代码”</em> </strong>，其中环境可以通过逐步执行指令(<em> bash/yaml/docker </em>)来创建。通过采用这种方法，您可以<strong>从版本化环境切换到版本化环境设置代码</strong>，我们知道如何做。</p>
+
+
+
+<p>据我所知，在实践中有几个选项可以使用(这绝不是一个完整的方法列表)。</p>
+
+
+
+<h4>Docker图像</h4>
+
+
+
+<p>这是首选方案，关于这个主题有很多资源。我特别喜欢的一个是杰夫·黑尔的“学足够多的Docker有用”系列。简而言之，您用一些指令定义docker文件。</p>
+
+
+
+<pre class="hljs">
+FROM continuumio/miniconda3
+
+
+RUN pip install jupyterlab==<span class="hljs-number">0.35</span><span class="hljs-number">.6</span> &amp;&amp; \
+pip install jupyterlab-server==<span class="hljs-number">0.2</span><span class="hljs-number">.0</span> &amp;&amp; \
+conda install -c conda-forge nodejs
+
+
+RUN pip install neptune-client &amp;&amp; \
+pip install neptune-notebooks &amp;&amp; \
+jupyter labextension install neptune-notebooks
+
+
+ARG NEPTUNE_API_TOKEN
+ENV NEPTUNE_API_TOKEN=$NEPTUNE_API_TOKEN
+
+
+ADD . /mnt/workdir
+WORKDIR /mnt/workdir</pre>
+
+
+
+<p>您可以根据这些说明构建您的环境:</p>
+
+
+
+<pre class="hljs">docker build -t jupyterlab \
+    --build-arg NEPTUNE_API_TOKEN=$NEPTUNE_API_TOKEN .</pre>
+
+
+
+<p>您可以通过以下方式在环境中运行脚本:</p>
+
+
+
+<pre class="hljs">docker run \
+    -p <span class="hljs-number">8888</span>:<span class="hljs-number">8888</span> \
+    jupyterlab:latest \
+    /opt/conda/bin/jupyter lab \
+    --allow-root \
+    --ip=<span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span> \
+    --port=<span class="hljs-number">8888</span></pre>
+
+
+
+
+
+
+<h4>康达环境</h4>
+
+
+
+<p>这是一个更简单的选择，在许多情况下，它足以管理您的环境，不会出现任何问题。它不像docker那样给你很多选择或保证，但对你的用例来说已经足够了。环境可以定义为一个<em>。yaml </em>配置文件如下:</p>
+
+
+
+<pre class="hljs">name: salt
+
+dependencies:
+   - pip=<span class="hljs-number">19.1</span><span class="hljs-number">.1</span>
+   - python=<span class="hljs-number">3.6</span><span class="hljs-number">.8</span>
+   - psutil
+   - matplotlib
+   - scikit-image
+
+- pip:
+   - neptune-client==<span class="hljs-number">0.3</span><span class="hljs-number">.0</span>
+   - neptune-contrib==<span class="hljs-number">0.9</span><span class="hljs-number">.2</span>
+   - imgaug==<span class="hljs-number">0.2</span><span class="hljs-number">.5</span>
+   - opencv_python==<span class="hljs-number">3.4</span><span class="hljs-number">.0</span><span class="hljs-number">.12</span>
+   - torch==<span class="hljs-number">0.3</span><span class="hljs-number">.1</span>
+   - torchvision==<span class="hljs-number">0.2</span><span class="hljs-number">.0</span>
+   - pretrainedmodels==<span class="hljs-number">0.7</span><span class="hljs-number">.0</span>
+   - pandas==<span class="hljs-number">0.24</span><span class="hljs-number">.2</span>
+   - numpy==<span class="hljs-number">1.16</span><span class="hljs-number">.4</span>
+   - cython==<span class="hljs-number">0.28</span><span class="hljs-number">.2</span>
+   - pycocotools==<span class="hljs-number">2.0</span><span class="hljs-number">.0</span></pre>
+
+
+
+<p>您可以通过运行以下命令来创建conda环境:</p>
+
+
+
+<pre class="hljs">conda env create -f environment.yaml
+</pre>
+
+
+
+<p>非常酷的是，您总是可以通过运行以下命令将环境状态转储到这样的配置中:</p>
+
+
+
+<pre class="hljs">conda env export &gt; environment.yaml
+</pre>
+
+
+
+<p>简单，完成工作。</p>
+
+
+
+
+
+<h4>生成文件</h4>
+
+
+
+<p>您总是可以在Makefile中显式定义所有bash指令。例如:</p>
+
+
+
+<pre class="hljs">git clone git@github.com:neptune-ml/open-solution-mapping-challenge.git
+cd open-solution-mapping-challenge
+
+pip install -r requirements.txt
+
+mkdir data
+cd data
+curl <span class="hljs-number">-0</span> https://www.kaggle.com/c/imagenet-object-localization-challenge/data/LOC_synset_mapping.txt</pre>
+
+
+
+<p>并通过运行以下命令进行设置:</p>
+
+
+
+<pre class="hljs">source Makefile
+</pre>
+
+
+
+<p>阅读这些文件通常很困难，你放弃了conda和/或docker的大量附加功能，但没有比这更简单的了。</p>
+
+
+
+<p>现在，您已经将您的环境定义为代码，确保<strong>为每个实验</strong>记录环境文件。</p>
+
+
+
+<p>同样，如果您使用的是实验管理器，您可以在创建新实验时对代码进行快照，即使您忘记了git commit:</p>
+
+
+
+<pre class="hljs">experiment_manager.create_experiment(upload_source_files=[<span class="hljs-string">'environment.yml'</span>)
+...
+
+...</pre>
+
+
+
+<p>并将它安全地存储在应用程序中:</p>
+
+
+
+
+
+<h3 id="8">版本化机器学习模型</h3>
+
+
+
+<p>现在，您已经使用模型的最佳超参数对模型进行了训练，并对数据、超参数和环境进行了记录和版本化。但是模型本身呢？在大多数情况下，训练和推理发生在不同的地方(脚本/笔记本)，您需要能够将您训练的模型用于其他地方的推理。</p>
+
+
+
+<p>有两种基本方法可以做到这一点:</p>
+
+
+
+<h4>1.将模型保存为二进制文件</h4>
+
+
+
+<p>您可以将模型导出为二进制文件，并在需要进行推理的地方从二进制文件中加载它。</p>
+
+
+
+<p>有多种方法可以做到这一点——像<a href="https://web.archive.org/web/20220928194919/https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-model-for-inference" target="_blank" rel="noreferrer noopener nofollow"> PyTorch </a>和<a href="https://web.archive.org/web/20220928194919/https://www.tensorflow.org/guide/keras/save_and_serialize" target="_blank" rel="noreferrer noopener nofollow"> Keras </a>这样的库有自己的保存和加载方法，而深度学习之外的<a href="https://web.archive.org/web/20220928194919/https://docs.python.org/3/library/pickle.html" target="_blank" rel="noreferrer noopener nofollow"> Pickle </a>仍然是从文件中保存和加载模型的最流行的方法:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pickle
+
+
+<span class="hljs-keyword">with</span> open(“saved_model.pkl”, “wb”) <span class="hljs-keyword">as</span> f:
+	pickle.dumps(trained_model, f)
+
+
+<span class="hljs-keyword">with</span> open(“saved_model.pkl”, “rb”) <span class="hljs-keyword">as</span> f:
+	model = pickle.load(f)
+</pre>
+
+
+
+<p>由于模型被保存为文件，您可以使用文件版本控制工具，如git，或者将文件上传到实验跟踪器，如Neptune:</p>
+
+
+
+<pre class="hljs">run[“trained_model”].upload(“saved_model.pkl”)
+</pre>
+
+
+
+<h4>2.使用模型注册表</h4>
+
+
+
+<p>模型注册中心是发布和访问模型的中央存储库。在这里，ML开发人员可以将他们的模型推给其他利益相关者或他们自己在以后使用。</p>
+
+
+
+
+
+
+<p>目前可用的一些流行的模型注册中心有:</p>
+
+
+
+<p><strong> a)海王星:</strong></p>
+
+
+
+
+
+<p>Neptune是MLOps 的元数据存储库，为运行大量实验的研究和生产团队而构建。</p>
+
+
+
+<p>它为您提供了一个中心位置来记录、存储、显示、组织、比较和查询机器学习生命周期中生成的所有元数据。</p>
+
+
+
+<p>个人和组织使用Neptune进行实验跟踪和模型注册，以控制他们的实验和模型开发。</p>
+
+
+
+<p>海王星提供:</p>
+
+
+
+
+
+
+
+
+<p><strong> b) MLflow: </strong></p>
+
+
+
+
+
+<p>MLflow模型注册中心是当今市场上为数不多的开源模型注册中心之一。你可以决定在你的基础设施上管理这个T1，或者在像T4数据块T5这样的平台上使用T2完全管理的实现T3。</p>
+
+
+
+<p>MLflow提供:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>注释和描述工具</strong>用于标记模型，提供文档和模型信息，例如模型的注册日期、注册模型的修改历史、模型所有者、阶段、版本等；</li><li><strong>，odel versioning </strong>更新时自动跟踪注册模型的版本；</li><li>一个<strong> API集成</strong>，将机器学习模型作为RESTful APIs，用于在线测试、仪表板更新等；</li><li><strong> CI/CD工作流程集成</strong>记录阶段转换、请求、审查和批准变更，作为CI/CD管道的一部分，以实现更好的控制和治理；</li><li>一个<strong>模型阶段特性</strong>,为每个模型版本分配预设或定制的阶段，如“阶段”和“生产”来代表模型的生命周期；</li><li><strong>促销方案配置</strong>方便在不同阶段之间移动模型。</li></ul>
+</div>
+
+
+<p><strong> c)亚马逊Sagemaker模型注册中心</strong></p>
+
+
+
+
+
+<p>亚马逊SageMaker是一个完全托管的服务，开发者可以在ML开发的每一步使用它，包括模型注册。<a href="https://web.archive.org/web/20220928194919/https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html%5C" target="_blank" rel="noreferrer noopener nofollow">模型注册中心</a>是SageMaker中<a href="https://web.archive.org/web/20220928194919/https://aws.amazon.com/sagemaker/mlops/" target="_blank" rel="noreferrer noopener nofollow">MLOps套件</a>的一部分，该套件通过在整个组织中<strong>自动化</strong>和<strong>标准化</strong> MLOps实践来帮助用户构建和操作机器学习解决方案。</p>
+
+
+
+<p>使用SageMaker模型注册表，您可以执行以下操作:</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>生产用目录型号</strong>；</li><li>管理<strong>型号版本</strong>；</li><li><strong>将元数据</strong>，例如训练度量，与模型相关联；</li><li>管理模型的<strong>审批状态；</strong></li><li>将模型部署到生产中；</li><li>使用CI/CD自动进行模型部署。</li></ul>
+</div>
+
+
+<h2 id="9">如何组织你的模型开发过程？</h2>
+
+
+
+<p>尽管我认为跟踪实验和确保工作的可重复性很重要，但这只是难题的一部分。一旦你跟踪了数百次实验，你将很快面临新的问题:</p>
+
+
+<div class="custom-point-list">
+<ul><li>如何搜索和可视化所有这些实验，</li><li>如何将它们组织成你和你的同事可以消化的东西，</li><li>如何在您的团队/组织内部共享和访问这些数据？</li></ul>
+</div>
+
+
+<p>这就是实验管理工具真正派上用场的地方。他们让你:</p>
+
+
+<div class="custom-point-list">
+<ul><li>过滤/分类/标记/分组实验，</li><li>可视化/比较实验运行，</li><li>共享(应用程序和编程查询API)实验结果和元数据。</li></ul>
+</div>
+
+
+<p>例如，通过发送链接，我可以分享机器学习实验的<a href="https://web.archive.org/web/20220928194919/https://app.neptune.ai/o/common/org/example-project-tensorflow-keras/experiments?compare=GwGgjOkMwgTEA&amp;split=bth&amp;dash=charts&amp;viewId=eccd5adf-42b3-497e-9cc2-9fa2655429b3&amp;query=((%60sys%2Ftags%60%3AstringSet%20CONTAINS%20%22keras%22))%20AND%20(last(%60metrics%2Fepoch%2Faccuracy%60%3AfloatSeries)%20%3E%200.87)&amp;sortBy=%5B%22metrics%2Fepoch%2Fval_accuracy%22%5D&amp;sortDirection=%5B%22descending%22%5D&amp;sortFieldType=%5B%22floatSeries%22%5D&amp;sortFieldAggregationMode=%5B%22last%22%5D&amp;suggestionsEnabled=true&amp;lbViewUnpacked=true">比较以及所有可用的附加信息。</a></p>
+
+
+
+
+
+<p>有了这些，您和您团队中的所有人就能确切地知道在模型开发中会发生什么。它使跟踪进度、讨论问题和发现新的改进想法变得容易。</p>
+
+
+
+<h3 id="10">在创造性迭代中工作</h3>
+
+
+
+<p>像这样的工具非常有用，是对电子表格和笔记的巨大改进。然而，我认为可以让你的机器学习项目更上一层楼的是一种专注的实验方法，我称之为创造性迭代。</p>
+
+
+
+
+
+
+<p>我想从一些伪代码开始，稍后再解释:</p>
+
+
+
+<pre class="hljs">time, budget, business_goal = business_specification()
+
+creative_idea = initial_research(business_goal)
+
+<span class="hljs-keyword">while</span> time <span class="hljs-keyword">and</span> budget <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> business_goal:
+   solution = develop(creative_idea)
+   metrics = evaluate(solution, validation_data)
+   <span class="hljs-keyword">if</span> metrics &gt; best_metrics:
+      best_metrics = metrics
+      best_solution = solution
+   creative_idea = explore_results(best_solution)
+
+   time.update()
+   budget.update()</pre>
+
+
+
+<p>在每个项目中，都有一个创建<strong>业务规范</strong>的阶段，通常需要机器学习项目的<strong>时间框架、预算和目标</strong>。当我说目标时，我指的是一组KPI，业务指标，或者如果你超级幸运的话，机器学习指标。在这个阶段，管理业务预期非常重要，但这是以后的事了。如果你对这些东西感兴趣，我建议你看看凯西·科济尔科夫的一些文章，比如，<a href="https://web.archive.org/web/20220928194919/https://medium.com/hackernoon/ai-reality-checklist-be34e2fdab9" target="_blank" rel="noreferrer noopener">这篇</a>。</p>
+
+
+
+<p>假设你和你的团队知道商业目标是什么，你就可以做<strong>初始研究</strong>并制定一个基线方法，一个第一<strong>创意想法</strong>。然后你<strong>开发</strong>它并提出<strong>解决方案</strong>，你需要<strong>评估</strong>并得到你的第一套<strong>指标</strong>。如前所述，这些数据不一定是简单的数字(通常不是)，也可以是图表、报告或用户研究结果。现在，您应该研究您的<strong>解决方案、指标和explore_results </strong>。</p>
+
+
+
+<p>您的项目可能会在这里结束，因为:</p>
+
+
+<div class="custom-point-list">
+<ul><li>您的第一个解决方案<strong>足够好</strong>来满足业务需求，</li><li>你可以合理地预期<strong>没有办法在先前假定的时间和预算内达到业务目标</strong>，</li><li>你发现在附近的某个地方有一个<strong>低挂水果的问题，你的团队应该把精力集中在那里。</strong></li></ul>
+</div>
+
+
+<p>如果以上都不适用，你列出你的<strong>解决方案</strong>中所有表现不佳的部分，找出哪些可以改进，哪些<strong>创意</strong>可以帮你实现。一旦你有了这个清单，你需要根据预期的<strong>目标</strong>改进和<strong>预算</strong>对它们进行优先排序。如果您想知道如何评估这些改进，答案很简单:<strong>结果探索</strong>。</p>
+
+
+
+<p>你可能已经注意到结果探索出现了很多。这是因为它非常重要，值得拥有自己的一部分。</p>
+
+
+
+
+
+
+<h3 id="11">模型结果探索</h3>
+
+
+
+<p>这是这个过程中极其重要的一部分。您需要<strong>彻底了解当前方法的失败之处</strong>，您距离目标的时间/预算还有多远，在生产中使用您的方法会有什么风险。实际上，这一部分并不容易，但掌握它非常有价值，因为:</p>
+
+
+<div class="custom-point-list">
+<ul><li>它导致对业务问题的理解，</li><li>它导致关注重要的问题，并为团队和组织节省大量时间和精力，</li><li>它导致发现新的商业见解和项目想法。</li></ul>
+</div>
+
+
+<p><strong>目前使用的一些流行的模型解释工具有:</strong></p>
+
+
+
+
+
+<p><strong>SHAP(SHapley Additive explaints)</strong>是一种解释任何机器学习模型输出的博弈论方法。它将最优信用分配与使用博弈论及其相关扩展的经典Shapley值的本地解释联系起来。</p>
+
+
+
+
+
+<p>阅读如何在他们的<a href="https://web.archive.org/web/20220928194919/https://shap.readthedocs.io/en/latest/index.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>中使用SHAP。</p>
+
+
+
+
+
+<p>局部可解释模型不可知解释(LIME)是一篇论文，作者在其中提出了局部代理模型的具体实现。代理模型被训练来近似底层黑盒模型的预测。LIME不是训练一个全局代理模型，而是专注于训练局部代理模型来解释个体预测。当前的<a href="https://web.archive.org/web/20220928194919/https://github.com/marcotcr/lime" target="_blank" rel="noreferrer noopener nofollow"> Python实现</a>支持表格、文本和图像分类器。</p>
+
+
+
+
+
+<p>这是一个用于解释scikit-learn的决策树和随机森林预测的包。允许将每个预测分解成偏差和特征贡献分量。在这里学习用法<a href="https://web.archive.org/web/20220928194919/https://blog.datadive.net/random-forest-interpretation-with-scikit-learn/" target="_blank" rel="noreferrer noopener nofollow">。</a></p>
+
+
+
+<p><strong>我找到的一些关于这个主题的好资源有:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>Gael Varoquaux的PyData演讲“理解和诊断你的机器学习模型”</li></ul>
+</div>
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><p class="wp-block-embed__wrapper"><span class="embed-youtube"> <iframe class="youtube-player" src="https://web.archive.org/web/20220928194919if_/https://www.youtube.com/embed/kbj3llSbaVA?version=3&amp;rel=1&amp;showsearch=0&amp;showinfo=1&amp;iv_load_policy=1&amp;fs=1&amp;hl=en-US&amp;autohide=2&amp;wmode=transparent" allowfullscreen="true" sandbox="allow-scripts allow-same-origin allow-popups allow-presentation">视频</iframe> </span></p></figure>
+
+
+<div class="custom-point-list">
+<ul><li>伊恩·奥斯瓦尔德的《创造正确而有能力的分类器》</li></ul>
+</div>
+
+
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><p class="wp-block-embed__wrapper"><span class="embed-youtube"> <iframe class="youtube-player" src="https://web.archive.org/web/20220928194919if_/https://www.youtube.com/embed/DkLPYccEJ8Y?version=3&amp;rel=1&amp;showsearch=0&amp;showinfo=1&amp;iv_load_policy=1&amp;fs=1&amp;hl=en-US&amp;autohide=2&amp;wmode=transparent" allowfullscreen="true" sandbox="allow-scripts allow-same-origin allow-popups allow-presentation">视频</iframe> </span></p></figure>
+
+
+
+
+
+<p>深入探索结果是另一个故事，也是另一篇博文，但关键的一点是，投入时间<strong>了解您当前的解决方案对您的业务极其有益</strong>。</p>
+
+
+
+
+
+<h2>最后的想法</h2>
+
+
+
+<p>在这篇文章中，我解释道:</p>
+
+
+<div class="custom-point-list">
+<ul><li>什么是实验管理，</li><li>组织您的模型开发过程如何改进您的工作流程。</li></ul>
+</div>
+
+
+<p>对我来说，将<strong>实验管理工具</strong>添加到我的“标准”软件开发最佳实践中是一个<strong>顿悟时刻</strong>，这使得我的机器学习项目更有可能成功。我想，如果你试一试，你会有同样的感觉。</p>
+
+
+
+
+<div id="author-box-new-format-block_605d8dd517661" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">雅各布·查肯</h3>
+    
+          <p class="article__authorContent-text">大部分是ML的人。构建MLOps工具，编写技术资料，在Neptune进行想法实验。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+
+<div id="author-box-new-format-block_6040c278abf08" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">西达丹·萨达特</h3>
+    
+          <p class="article__authorContent-text">我目前是Neptune.ai的一名开发人员，我坚信最好的学习方式是边做边教。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator has-css-opacity"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>真实世界的MLOps示例:超因子中的模型开发</h2>
+
+
+
+<p class="has-small-font-size">6分钟阅读|作者斯蒂芬·奥拉德勒| 2022年6月28日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>在“真实世界的MLOps示例”系列的第一部分中，<a href="https://web.archive.org/web/20220928194919/https://www.linkedin.com/in/jules-belveze" target="_blank" rel="noreferrer noopener">MLOps工程师Jules Belveze </a>将带您了解<a href="https://web.archive.org/web/20220928194919/https://hypefactors.com/" target="_blank" rel="noreferrer noopener"> Hypefactors </a>的模型开发流程，包括他们构建的模型类型、他们如何设计培训渠道，以及您可能会发现的其他有价值的细节。享受聊天！</p>
+
+
+
+<h3 id="company-profile">公司简介</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20220928194919/https://hypefactors.com/" target="_blank" rel="noreferrer noopener"> Hypefactors </a>提供一体化媒体智能解决方案，用于管理公关和沟通、跟踪信任度、产品发布以及市场和金融情报。他们运营着大型数据管道，实时传输世界各地的媒体数据。人工智能用于许多以前手动执行的自动化操作。</p>
+
+
+
+<h3 id="guest-introduction">嘉宾介绍</h3>
+
+
+
+<h4>你能向我们的读者介绍一下你自己吗？</h4>
+
+
+
+<p>嘿，斯蒂芬，谢谢你邀请我！我叫朱尔斯。我26岁。我在巴黎出生和长大，目前住在哥本哈根。</p>
+
+
+
+<h4>嘿朱尔斯！谢谢你的介绍。告诉我你的背景以及你是如何成为催眠师的。</h4>
+
+
+
+<p>我拥有法国大学的统计学和概率学士学位以及普通工程学硕士学位。除此之外，我还毕业于丹麦的丹麦技术大学，主修深度学习的数据科学。我对多语言自然语言处理非常着迷(并因此专攻它)。在微软的研究生学习期间，我还研究了高维时间序列的异常检测。</p>
+
+
+
+<p>今天，我在一家名为Hypefactors的媒体智能技术公司工作，在那里我开发NLP模型，帮助我们的用户从媒体领域获得洞察力。对我来说，目前的工作是有机会从原型一直到产品进行建模。我想你可以叫我书呆子，至少我的朋友是这么形容我的，因为我大部分空闲时间不是编码就是听迪斯科黑胶。</p>
+
+
+
+<h3 id="model-development-at-hypefactors">超因子模型开发</h3>
+
+
+
+<h4>你能详细说明你在Hypefactors建立的模型类型吗？</h4>
+
+
+
+<p>尽管我们也有计算机视觉模型在生产中运行，但我们主要为各种用例构建<a href="https://web.archive.org/web/20220928194919/https://neptune.ai/blog/category/natural-language-processing" target="_blank" rel="noreferrer noopener"> NLP(自然语言处理)</a>模型。我们需要覆盖多个国家和处理多种语言。多语言方面使得用“经典机器学习”方法开发变得困难。我们在<a href="https://web.archive.org/web/20220928194919/https://github.com/huggingface/transformers" target="_blank" rel="noreferrer noopener">变形金刚库</a>的基础上打造深度学习模型。</p>
+
+
+
+<p>我们在生产中运行各种模型，从跨度提取或序列分类到文本生成。这些模型旨在服务于不同的用例，如主题分类、情感分析或总结。</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20220928194919/https://neptune.ai/blog/mlops-examples-model-development-in-hypefactors" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator has-css-opacity"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

@@ -1,0 +1,279 @@
+<html>
+<head>
+<title>Text Classification: All Tips and Tricks from 5 Kaggle Competitions | Neptune Blog</title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>文本分类:来自5场Kaggle比赛的所有提示和技巧</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/text-classification-tips-and-tricks-kaggle-competitions#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/text-classification-tips-and-tricks-kaggle-competitions#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>在本文中，我将讨论一些提高文本分类模型性能的技巧和诀窍。这些技巧是从Kaggle的一些顶级NLP竞赛的解决方案中获得的。</p>
+
+
+
+<p>也就是说，我经历了:</p>
+
+
+
+
+
+<p>发现了很多好主意。</p>
+
+
+
+<p>没有太多的延迟，让我们开始吧。</p>
+
+
+
+<h2>处理更大的数据集</h2>
+
+
+
+<p>你在任何机器学习竞赛中可能面临的一个问题是数据集的大小。如果您的数据量很大，对于Kaggle内核和更基本的笔记本电脑来说是3GB +,您会发现在有限的资源下很难加载和处理。这里是我发现在这种情况下有用的一些文章和内核的链接。</p>
+
+
+
+
+
+<h2>小型数据集和外部数据</h2>
+
+
+
+<p>但是，如果数据集很小，我们该怎么办呢？让我们来看看解决这种情况的一些技巧。</p>
+
+
+
+<p>提高任何机器学习模型的性能的一种方法是使用一些包含一些影响谓词变量的变量的外部数据框架。</p>
+
+
+
+<p>让我们看看一些外部数据集。</p>
+
+
+
+
+
+<h2>数据探索和获得洞察力</h2>
+
+
+
+<p>数据探索总是有助于更好地理解数据并从中获得洞察力。在开始开发机器学习模型之前，顶级竞争对手总是会针对数据阅读/做大量探索性的数据分析。这有助于特征工程和数据清理。</p>
+
+
+
+
+
+<h2>数据清理</h2>
+
+
+
+<p>数据清理是任何自然语言处理问题的重要组成部分之一。文本数据总是需要一些预处理和清理，然后才能以合适的形式表示出来。</p>
+
+
+
+
+
+<h2>文本表示</h2>
+
+
+
+<p>在我们将文本数据输入到神经网络或ML模型之前，文本输入需要以合适的格式表示。这些表示在很大程度上决定了模型的性能。</p>
+
+
+
+
+
+<p>语境嵌入模型</p>
+
+
+<div class="custom-point-list">
+<ul><li>来自变压器的双向编码器表示</li><li><a href="https://web.archive.org/web/20221027163737/https://github.com/openai/finetune-transformer-lm" target="_blank" rel="noreferrer noopener nofollow"> GPT </a></li><li>Roberta 稳健优化的BERT</li><li>一个用于自我监督语言表达学习的Lite BERT</li><li>伯特的一个较轻版本</li><li><a href="https://web.archive.org/web/20221027163737/https://github.com/zihangdai/xlnet/" target="_blank" rel="noreferrer noopener nofollow"> XLNET </a></li></ul>
+</div>
+
+
+<h2>建模</h2>
+
+
+
+<h3>模型架构</h3>
+
+
+
+<p>选择正确的架构对于开发适当的机器学习模型非常重要，像LSTMs、GRUs这样的序列对序列模型在NLP问题中表现良好，总是值得尝试。堆叠两层LSTM/GRU网络是一种常见的方法。</p>
+
+
+
+
+
+<h3>损失函数</h3>
+
+
+
+<p>为你的神经网络模型选择一个合适的损失函数，通过允许它在表面上很好地优化，确实增强了你的模型的性能。</p>
+
+
+
+<p>您可以尝试不同的损失函数，甚至编写一个与您的问题相匹配的自定义损失函数。一些流行的损失函数有</p>
+
+
+
+
+
+<h3>优化者</h3>
+
+
+
+
+
+<h3>回调方法</h3>
+
+
+
+<p>在训练时，回调对于监控模型的性能总是有用的，并触发一些可以增强模型性能的必要操作。</p>
+
+
+
+
+
+<h2>评估和交叉验证</h2>
+
+
+
+<p>选择一个合适的验证策略是非常重要的，以避免模型在私有测试集中的巨大变动或不良性能。</p>
+
+
+
+<p>传统的80:20分割在很多情况下并不适用。在大多数情况下，交叉验证比传统的单一训练验证分割更有效，以评估模型性能。</p>
+
+
+
+<p>k折叠交叉验证有不同的变体，如应相应选择的k折叠组。</p>
+
+
+
+
+
+<h2>运行时技巧</h2>
+
+
+
+<p>您可以执行一些技巧来减少运行时间，并在运行时提高模型性能。</p>
+
+
+
+
+
+<h2>模型组装</h2>
+
+
+
+<p>如果你在竞争环境中，没有集合，你就不会在排行榜上名列前茅。选择合适的组装/堆叠方法对于充分发挥模型的性能非常重要。</p>
+
+
+
+<p>让我们来看看一些在Kaggle比赛中使用的流行组合技术:</p>
+
+
+
+
+
+<h2>最后的想法</h2>
+
+
+
+<p>在本文中，您看到了许多改进NLP分类模型性能的流行而有效的方法。希望你会发现它们对你的项目有用。</p>
+
+
+
+
+<div id="author-box-new-format-block_60545fa1410ba" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">沙胡尔ES</h3>
+    
+          <p class="article__authorContent-text">数据科学家，非常熟悉机器学习、NLP和音频处理领域。他是Kaggle大师，也喜欢做开源。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>自然语言处理的探索性数据分析:Python工具完全指南</h2>
+
+
+
+<p class="has-small-font-size">11分钟阅读|作者Shahul ES |年7月14日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>探索性数据分析是任何机器学习工作流中最重要的部分之一，自然语言处理也不例外。但是<strong>你应该选择哪些工具</strong>来高效地探索和可视化文本数据呢？</p>
+
+
+
+<p>在这篇文章中，我们将<strong>讨论和实现几乎所有的主要技术</strong>，你可以用它们来理解你的文本数据，并给你一个完成工作的Python工具的完整之旅。</p>
+
+
+
+<h2>开始之前:数据集和依赖项</h2>
+
+
+
+<p>在本文中，我们将使用来自Kaggle的百万新闻标题数据集。如果您想一步一步地进行分析，您可能需要安装以下库:</p>
+
+
+
+<pre class="hljs">pip install \
+   pandas matplotlib numpy \
+   nltk seaborn sklearn gensim pyldavis \
+   wordcloud textblob spacy textstat</pre>
+
+
+
+<p>现在，我们可以看看数据。</p>
+
+
+
+<pre class="hljs">news= pd.read_csv(<span class="hljs-string">'data/abcnews-date-text.csv'</span>,nrows=<span class="hljs-number">10000</span>)
+news.head(<span class="hljs-number">3</span>)</pre>
+
+
+
+<figure class="wp-block-image"><img src="../Images/2a9600f07b73110bf3f4adfce45f4598.png" alt="jupyter output" data-lazy-src="https://web.archive.org/web/20221027163737/https://i2.wp.com/neptune.ai/wp-content/uploads/output1.png?fit=979%2C146&amp;ssl=1&amp;is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221027163737im_/https://i2.wp.com/neptune.ai/wp-content/uploads/output1.png?fit=979%2C146&amp;ssl=1"/><noscript><img data-lazy-fallback="1" src="../Images/2a9600f07b73110bf3f4adfce45f4598.png" alt="jupyter output" data-original-src="https://web.archive.org/web/20221027163737im_/https://i2.wp.com/neptune.ai/wp-content/uploads/output1.png?fit=979%2C146&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>数据集只包含两列，发布日期和新闻标题。</p>
+
+
+
+<p>为了简单起见，我将探索这个数据集中的前<strong> 10000行</strong>。因为标题是按<em>发布日期</em>排序的，所以实际上从2003年2月19日<em>到2003年4月7日</em>有<strong>两个月。</strong></p>
+
+
+
+<p>好了，我想我们已经准备好开始我们的数据探索了！</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221027163737/https://neptune.ai/blog/exploratory-data-analysis-natural-language-processing-tools" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

@@ -1,0 +1,1221 @@
+<html>
+<head>
+<title>A Comprehensive Guide to the Backpropagation Algorithm in Neural Networks </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>神经网络反向传播算法综合指南</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/backpropagation-algorithm-in-neural-networks-guide#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/backpropagation-algorithm-in-neural-networks-guide#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>本文是对反向传播算法的全面指导，反向传播算法是用于训练人工神经网络的最广泛使用的算法。我们将从在训练神经网络的过程中定义正向和反向传递开始，然后我们将集中讨论反向传播在反向传递中是如何工作的。我们将研究反向传播算法的详细数学计算。</p>
+
+
+
+<p>此外，我们将基于这个<a href="https://web.archive.org/web/20230103154737/https://github.com/ahmedfgad/IntroDLPython" target="_blank" rel="noreferrer noopener nofollow"> GitHub项目</a>讨论如何使用NumPy从零开始用Python实现一个反向传播神经网络。该项目建立了一个通用的反向传播神经网络，可以与任何架构。</p>
+
+
+
+<p>让我们开始吧。</p>
+
+
+
+<h2 id="overview">神经网络体系结构快速概述</h2>
+
+
+
+<p>在最简单的情况下，神经网络的架构由一些连续的层组成，其中编号为<em> i </em>的层连接到编号为<em> i+1 </em>的层。这些层可以分为3类:</p>
+
+
+
+<ol><li>投入</li><li>隐藏的</li><li>输出</li></ol>
+
+
+
+<p>下图显示了全连接人工神经网络(FCANN)的示例，这是演示反向传播算法如何工作的最简单的网络类型。该网络有一个输入层、两个隐藏层和一个输出层。在图中，网络体系结构是水平显示的，每一层都是从左到右垂直显示的。</p>
+
+
+
+<p>每层由一个或多个用圆圈表示的神经元组成。因为网络类型是全连接的，那么层<em> i </em>中的每个神经元都与层<em> i+1 </em>中的所有神经元相连。如果2个后续层具有<em> X </em>和<em> Y </em>神经元，则中间连接的数量为<em> X*Y </em>。</p>
+
+
+
+<p>对于每个连接，都有一个相关的权重。权重是一个浮点数，用于衡量两个神经元之间连接的重要性。权重越高，联系越重要。权重是网络进行预测的可学习参数。如果权重是好的，那么网络做出准确的预测，误差更小。否则，应该更新权重以减小误差。</p>
+
+
+
+<p>假设在层<em> 1 </em>的一个神经元N <sub> 1 </sub>连接到在层<em> 2 </em>的另一个神经元N <sub> 2 </sub>。还假设N <sub> 2 </sub>的值是根据下一个线性方程计算的。</p>
+
+
+
+<p><em>N<sub>2</sub>= w<sub>1</sub>N<sub>1</sub>+b</em></p>
+
+
+
+<p>如果N <sub> 1 </sub> =4，w <sub> 1 </sub> =0.5(权重)，b=1(偏差)，那么N <sub> 2 </sub>的值就是3。</p>
+
+
+
+<p><em> N <sub> 2 </sub> =0.54+1=2+1=3 </em></p>
+
+
+
+<p>这就是单个重量如何将两个神经元连接在一起。请注意，输入层根本没有可学习的参数。</p>
+
+
+
+<p>层<em> i+1 </em>的每一个神经元对于层<em> i </em>的每一个连接的神经元都有一个权重，但是它只有一个单一的偏向。因此，如果层<em> i </em>具有10个神经元，层<em> i+1 </em>具有6个神经元，则层<em> i+1 </em>的参数总数为:</p>
+
+
+
+<p><em>权重数+偏差数=10×6 +6=66 </em></p>
+
+
+
+<p>输入层是网络中的第一层，它由网络的输入直接连接。网络中只能有一个输入层。例如，如果输入是一个学期的学生成绩，那么这些成绩将连接到输入图层。在我们的图中，输入层有10个神经元(例如，10门课程的分数——一个英雄学生上了10门课程/学期)。</p>
+
+
+
+<p>输出层是返回网络预测输出的最后一层。和输入层一样，只能有一个输出层。如果网络的目标是预测下学期的学生成绩，那么输出层应该返回一个分数。下图中的架构有一个返回下一学期预测分数的神经元。</p>
+
+
+
+<p>在输入层和输出层之间，可能有0个或更多隐藏层。在本例中，有两个隐藏层，分别包含6个和4个神经元。请注意，最后一个隐藏层连接到输出层。</p>
+
+
+
+<p>通常，隐藏层中的每个神经元使用类似sigmoid或整流线性单元(ReLU)的激活函数。这有助于捕捉输入和输出之间的非线性关系。输出层中的神经元也使用类似sigmoid(用于回归)或SoftMax(用于分类)的激活函数。</p>
+
+
+
+
+
+
+
+<p>构建好网络架构后，就该开始用数据训练它了。</p>
+
+
+
+<h2 id="passes">神经网络中的正向和反向传递</h2>
+
+
+
+<p>为了训练神经网络，有两个阶段:</p>
+
+
+
+<ol><li>向前</li><li>向后的</li></ol>
+
+
+
+<p>在前向传递中，我们从将数据输入传播到输入层开始，经过隐藏层，从输出层测量网络的预测，最后根据网络做出的预测计算网络误差。</p>
+
+
+
+<p>该网络误差衡量网络距离做出正确预测还有多远。例如，如果正确的输出是4，网络的预测是1.3，那么网络的绝对误差是4-1.3=2.7。注意，将输入从输入层传播到输出层的过程称为<strong>正向传播</strong>。计算出网络误差后，前向传播阶段结束，后向传递开始。</p>
+
+
+
+<p>下图显示了一个指向向前传播方向的红色箭头。</p>
+
+
+
+<p>在反向传递中，流程是反向的，因此我们从将误差传播到输出层开始，直到通过隐藏层到达输入层。将网络误差从输出层传播到输入层的过程称为<strong>反向传播</strong>，或简单的<strong>反向传播</strong>。反向传播算法是用来更新网络权重以减少网络误差的一组步骤。</p>
+
+
+
+<p>在下图中，蓝色箭头指向向后传播的方向。</p>
+
+
+
+<p>向前和向后的阶段从一些时期开始重复。在每个时期，会发生以下情况:</p>
+
+
+
+<ol><li>输入从输入层传播到输出层。</li><li>计算网络误差。</li><li>误差从输出层传播到输入层。</li></ol>
+
+
+
+
+
+
+
+<p>我们将关注<strong>反向传播阶段</strong>。让我们讨论一下使用反向传播算法的优点。</p>
+
+
+
+<h2 id="why-to-use-it">为什么使用反向传播算法？</h2>
+
+
+
+<p>前面我们讨论过，网络是用两个通道训练的:向前和向后。在正向传递结束时，计算网络误差，该误差应尽可能小。</p>
+
+
+
+<p>如果当前误差较高，则网络没有从数据中正确学习。这是什么意思？这意味着当前的权重集不够精确，不足以减少网络误差并做出准确的预测。因此，我们应该更新网络权重以减少网络误差。</p>
+
+
+
+<p>反向传播算法是负责以减少网络误差为目标更新网络权重的算法之一。挺重要的。</p>
+
+
+
+<p>以下是反向传播算法的一些优点:</p>
+
+
+
+<ul><li>在计算导数时，它是内存高效的，因为与其他优化算法相比，它使用更少的内存，如遗传算法。这是一个非常重要的特性，尤其是对于大型网络。</li><li>反向传播算法速度很快，尤其适用于中小型网络。随着更多层和神经元的加入，随着更多导数的计算，它开始变得更慢。</li><li>这种算法足够通用，可用于不同的网络架构，如卷积神经网络、生成对抗网络、全连接网络等。</li><li>没有参数来调整反向传播算法，因此开销较少。该过程中唯一的参数与梯度下降算法有关，如学习速率。</li></ul>
+
+
+
+<p>接下来，让我们基于一个数学示例来看看反向传播算法是如何工作的。</p>
+
+
+
+<h2 id="how-it-works">反向传播算法如何工作</h2>
+
+
+
+<p>基于一个简单的网络可以很好地解释该算法的工作原理，如下图所示。它只有一个有2个输入的输入层(X <sub> 1 </sub>和X <sub> 2 </sub>)和一个有1个输出的输出层。没有隐藏层。</p>
+
+
+
+<p>输入的权重分别为W <sub> 1 </sub>和W <sub> 2 </sub>。偏差被视为输出神经元的新输入神经元，其具有固定值+1和权重b。权重和偏差都可以被称为<strong>参数</strong>。</p>
+
+
+
+
+
+
+
+<p>假设输出层使用由以下等式定义的sigmoid激活函数:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/26f612020c045b320972e1b7d629364b.png" alt="Backpropagation equation 1" class="wp-image-42326" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-1.png?resize=96%2C33&amp;ssl=1"/></figure>
+
+
+
+<p>其中s是每个输入与其相应重量之间的乘积之和(SOP ):</p>
+
+
+
+<p><em>s = X<sub>1</sub>* W<sub>1</sub>+X<sub>2</sub>* W<sub>2</sub>+b</em></p>
+
+
+
+<p>为了简单起见，本例中只使用了一个训练样本。下表显示了具有输入的单个训练样本及其对应的样本的期望(即正确)输出。在实践中，使用了更多的训练实例。</p>
+
+
+
+<p id="separator-block_61ae603c7f2ee" class="block-separator block-separator--15"> </p>
+
+
+
+
+
+
+
+<p id="separator-block_61ae60367f2ed" class="block-separator block-separator--20"> </p>
+
+
+
+<p>假设权重和偏差的初始值如下表所示。</p>
+
+
+
+<p id="separator-block_61ae60ac7f2f0" class="block-separator block-separator--15"> </p>
+
+
+
+
+
+
+
+<p id="separator-block_605b43ef8aab7" class="block-separator block-separator--20"> </p>
+
+
+
+<p>为简单起见，所有输入、权重和偏差的值都将添加到网络图中。</p>
+
+
+
+
+
+
+
+<p>现在，让我们训练网络，看看网络将如何根据当前参数预测样本的输出。</p>
+
+
+
+<p>正如我们之前讨论的，培训过程有两个阶段，向前和向后。</p>
+
+
+
+<h3>前进传球</h3>
+
+
+
+<p>激活函数的输入将是每个输入与其权重之间的SOP。然后将SOP加到偏置上，返回神经元的输出:</p>
+
+
+
+<p><em>s = X<sub>1</sub>* W<sub>1</sub>+X<sub>2</sub>* W<sub>2</sub>+b</em></p>
+
+
+
+<p><em> s=0.1* 0.5+ 0.3*0.2+1.83 </em></p>
+
+
+
+<p><em> s=1.94 </em></p>
+
+
+
+<p>然后将值1.94应用于激活函数(sigmoid)，得到值0.874352143。</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/26f612020c045b320972e1b7d629364b.png" alt="" class="wp-image-42326" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-1.png?resize=96%2C33&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/8bd47b41ed349bffb9094f7ab4aa97e8.png" alt="Backpropagation equation" class="wp-image-42334" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-2.png?resize=110%2C33&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/6d872d20feb45191bdb394b79cb5b519.png" alt="Backpropagation equation" class="wp-image-42336" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-3.png?resize=151%2C33&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/a606577a0cc9956bdf6c3e50ff51e583.png" alt="Backpropagation equation" class="wp-image-42337" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-4.png?resize=126%2C32&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/4a642158bddd995618032f6237374f26.png" alt="Backpropagation equation" class="wp-image-42338" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-5.png?resize=124%2C16&amp;ssl=1"/></figure>
+
+
+
+<p>来自输出神经元的激活函数的输出反映了样本的预测输出。很明显，期望的输出和期望的输出之间存在差异。但是为什么呢？我们如何使预测输出更接近期望输出？我们稍后会回答这些问题。现在，让我们看看基于误差函数的网络误差。</p>
+
+
+
+<p>误差函数表明预测输出与期望输出有多接近。误差的最佳值是<strong>零</strong>，这意味着根本没有误差，期望的和预测的结果是相同的。误差函数之一是<strong>平方误差函数</strong>，如下式定义:</p>
+
+
+
+<p>注意，值12乘以等式是为了使用反向传播算法简化导数计算。</p>
+
+
+
+<p>基于误差函数，我们可以如下测量网络的误差:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/b360923c3949b183d5f4da1fb75e9218.png" alt="Backpropagation equation" class="wp-image-42340" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-6.png?resize=190%2C32&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/6bf9bcc84d5baa4c7bd350e2b47c6bd0.png" alt="Backpropagation equation" class="wp-image-42341" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-7.png?resize=179%2C32&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/73b2faeeb090fa404aba3957c985955d.png" alt="Backpropagation equation" class="wp-image-42342" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-8.png?resize=146%2C32&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/68c91eeb432c000e2c31aa1c5cfcb337.png" alt="Backpropagation equation" class="wp-image-42343" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-9.png?resize=128%2C32&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/21a56b9bdc601ba5b2e4caf2db0470a3.png" alt="Backpropagation equation" class="wp-image-42344" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-10.png?resize=108%2C11&amp;ssl=1"/></figure>
+
+
+
+<p>结果显示有误差，而且误差很大:(<strong> ~0.357 </strong>)。这个误差只是给了我们一个指示，告诉我们预测的结果离期望的结果有多远。</p>
+
+
+
+<p>知道有错误，我们该怎么办？我们应该把它最小化。为了最小化网络错误，我们必须改变网络中的某些东西。请记住，我们唯一可以改变的参数是权重和偏差。我们可以尝试不同的权重和偏差，然后测试我们的网络。</p>
+
+
+
+<p>我们计算误差，然后正向传递结束，应该开始<strong>反向传递</strong>计算导数，更新参数。</p>
+
+
+
+<p>为了实际感受反向传播算法的重要性，让我们尝试不使用该算法直接更新参数。</p>
+
+
+
+<h3>参数更新方程</h3>
+
+
+
+<p>可以根据下式改变参数:</p>
+
+
+
+<p><em>W<sub>(n+1)</sub>= W(n)+η[d(n)-Y(n)]X(n)</em></p>
+
+
+
+<p>其中:</p>
+
+
+
+<ul><li>n:训练步骤(0，1，2，…)。</li><li>W(n):当前训练步骤中的参数。Wn=[bn，W1(n)，W2(n)，W3(n)，…，Wm(n)]</li><li><em> η </em>:学习率，取值在0.0到1.0之间。</li><li>d(n):期望输出。</li><li>Y(n):预测产量。</li><li>X(n):网络做出错误预测的当前输入。</li></ul>
+
+
+
+<p>对于我们的网络，这些参数具有以下值:</p>
+
+
+
+<ul><li>n: 0</li><li>女(男):[1.83，0.5，0.2]</li><li><em> η </em>:因为是超参数，那么我们可以选择0.01为例。</li><li>d(n): [0.03]。</li><li>Y(n): [0.874352143]。</li><li>X(n): [+1，0.1，0.3]。第一个值(+1)是偏差。</li></ul>
+
+
+
+<p>我们可以如下更新我们的网络参数:</p>
+
+
+
+<p><em>W<sub>(n+1)</sub>= W(n)+η[d(n)-Y(n)]X(n)</em></p>
+
+
+
+<p><em> =[1.83，0.5，0.2]+0.01[0.03-0.874352143][+1，0.1，0.3] </em></p>
+
+
+
+<p><em> =[1.83，0.5，0.2]+0.01[-0.844352143][+1，0.1，0.3] </em></p>
+
+
+
+<p><em> =[1.83，0.5，0.2]+-0.00844352143[+1，0.1，0.3] </em></p>
+
+
+
+<p><em> =[1.83，0.5，0.2]+[-0.008443521，-0.000844352，-0.002533056] </em></p>
+
+
+
+<p><em>=【1.821556479，0.499155648，0.197466943】</em></p>
+
+
+
+<p>下表列出了新参数:</p>
+
+
+
+<p id="separator-block_61ae60d67f2f1" class="block-separator block-separator--15"> </p>
+
+
+
+
+
+
+
+<p id="separator-block_605b44238aab9" class="block-separator block-separator--20"> </p>
+
+
+
+<p>根据新的参数，我们将重新计算预测的产量。新的预测输出用于计算新的网络误差。根据计算的误差更新网络参数。该过程继续更新参数并重新计算预测输出，直到它达到误差的可接受值。</p>
+
+
+
+<p>这里，我们成功地更新了参数，而没有使用反向传播算法。我们还需要那个算法吗？是的。你会明白为什么。</p>
+
+
+
+<p>参数更新方程仅仅依赖于学习率来更新参数。它以与错误相反的方向改变所有参数。</p>
+
+
+
+<p>但是，使用反向传播算法，我们可以知道每个权重如何与误差相关。这告诉我们每个权重对预测误差的影响。也就是我们增加哪些参数，减少哪些参数才能得到最小的预测误差？</p>
+
+
+
+<p>例如，反向传播算法可以告诉我们有用的信息，比如将W1 <strong> </strong>的当前值增加1.0会使网络误差增加0.07。这表明W1值越小，误差越小。</p>
+
+
+
+<h3>偏导数</h3>
+
+
+
+<p>向后传递中使用的一个重要操作是计算导数。在开始计算反向传递中的导数之前，我们可以从一个简单的例子开始，让事情变得简单一些。</p>
+
+
+
+<p>对于一个多元函数，比如Y=X2Z+H，给定变量X的变化对输出Y有什么影响？我们可以使用<strong>偏导数</strong>来回答这个问题，如下所示:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/f3527710c9756792edf6cfeb17f43012.png" alt="Backpropagation equation" class="wp-image-42348" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-11.png?resize=143%2C33&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/0d212f57d87a34d0fb42909900ef0354.png" alt="Backpropagation equation" class="wp-image-42349" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-12.png?resize=103%2C33&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/7962588418d01c137645ddb137ff2d27.png" alt="Backpropagation equation" class="wp-image-42351" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-13.png?resize=77%2C33&amp;ssl=1"/></figure>
+
+
+
+<p>注意，除了X之外的一切都被视为常数。因此，在计算偏导数之后，H被替换为0。在这里，∂X意味着变量x的微小变化，同样，∂Y意味着y的微小变化，y的变化是改变x的结果，通过对x做一个非常微小的改变，对y有什么影响？</p>
+
+
+
+<p>微小的变化可以是微小值的增加或减少。通过代入X的不同值，我们可以发现y相对于X是如何变化的。</p>
+
+
+
+<p>可以遵循相同的过程来学习NN预测误差如何随网络权重的变化而变化。因此，我们的目标是计算∂E/W <sub> 1 </sub>和∂E/W <sub> 2 </sub>，因为我们只有两个权重W <sub> 1 </sub>和W <sub> 2 </sub>。我们来计算一下。</p>
+
+
+
+<h3>预测误差对R.T参数的导数</h3>
+
+
+
+<p>看看这个方程，Y=X <sup> 2 </sup> Z+H，计算偏导数∂Y/∂X似乎很简单，因为有一个方程将y和x联系起来。在我们的例子中，没有直接方程同时存在预测误差和权重。所以，我们要用<strong>多元链式法则</strong>来求Y W r t x的偏导数</p>
+
+
+
+<h4>参数链预测误差</h4>
+
+
+
+<p>让我们试着找出预测误差和权重之间的联系。预测误差根据以下等式计算:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/b360923c3949b183d5f4da1fb75e9218.png" alt="Backpropagation equation" class="wp-image-42340" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-6.png?resize=190%2C32&amp;ssl=1"/></figure>
+
+
+
+<p>这个方程没有任何参数。没问题，我们可以考察前面方程的每一项(<strong>期望</strong> &amp; <strong>预测</strong>)是如何计算的，用它的方程代入，直到达到参数。</p>
+
+
+
+<p>前一个等式中的<strong>所需的</strong>项是一个常数，因此没有机会通过它获得参数。<strong>预测的</strong>项是基于sigmoid函数计算的，如下式所示:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/26f612020c045b320972e1b7d629364b.png" alt="Backpropagation equation" class="wp-image-42326" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-equation-1.png?resize=96%2C33&amp;ssl=1"/></figure>
+
+
+
+<p>同样，用于计算预测输出的等式没有任何参数。但是仍然有变量s (SOP ),它已经依赖于用于其计算的参数，根据这个等式:</p>
+
+
+
+<p><em>s = X<sub>1</sub>* W<sub>1</sub>+X<sub>2</sub>* W<sub>2</sub>+b</em></p>
+
+
+
+<p>一旦我们得出了一个有参数(权重和偏差)的方程，我们就到达了衍生链的末端。下图显示了计算误差对参数的导数所遵循的导数链。</p>
+
+
+
+<p>注意s W.R.T偏差b的导数(∂<sub>s</sub>/w1】<strong/>为0，可以省略。正如我们之前所做的那样，可以使用学习率简单地更新偏差。这留给我们计算2个权重的导数。</p>
+
+
+
+
+
+
+
+<p>根据上图，要知道预测误差如何随参数的变化而变化，我们应该找到以下中间导数:</p>
+
+
+
+<ol><li>预测输出的网络误差。</li><li>SOP下的预测产量。</li><li>SOP W.R.T三个参数中的每一个。</li></ol>
+
+
+
+<p>总共有四个中间偏导数:</p>
+
+
+
+<p><em> ∂E/∂Predicted <strong>，</strong>∂predicted/∂<sub>s</sub>t5】，∂<sub>s</sub>/w<sub>1</sub>t11】和∂<sub>s</sub>/w<sub>2</sub>t17】</em></p>
+
+
+
+<p>要计算误差对重量的导数，只需将误差链中的所有导数与每个重量相乘，如下2个等式所示:</p>
+
+
+
+<p><em>∂e/w<sub>1</sub>=∂e/∂predicted*∂predicted/∂<sub>s</sub>*∂<sub>s</sub>/w<sub>1</sub>T9】</em></p>
+
+
+
+<p><em>∂ew<sub>2</sub>=∂e/∂predicted* ∂predicted/∂s*∂<sub>s</sub>/w<sub>2</sub>T7】</em></p>
+
+
+
+<p><strong>重要提示:</strong>我们使用导数链解决方案，因为没有将误差和参数联系在一起的直接方程。但是，我们可以创建一个将它们联系起来的方程，并对其直接应用偏导数:</p>
+
+
+
+<p><em>E = 1/2(desired-1/(1+E<sup>-(X1 * W1+X2 * W2+b)</sup>)<sup>2</sup></em></p>
+
+
+
+<p>因为这个方程直接计算误差对参数的导数似乎很复杂，所以为了简单起见，最好使用多元链规则。</p>
+
+
+
+<h4>用替换法计算偏导数值</h4>
+
+
+
+<p>让我们计算我们创建的链的每个部分的偏导数。</p>
+
+
+
+<p>对于误差对预测输出的导数:</p>
+
+
+
+<p><em>∂e/∂predicted=∂/∂predicted(1/2(desired-predicted)<sup>2</sup>)</em></p>
+
+
+
+<p><em> =2*1/2(期望-预测)<sup> 2-1 </sup> *(0-1) </em></p>
+
+
+
+<p><em> =(期望-预测)*(-1) </em></p>
+
+
+
+<p><em>=预测-期望</em></p>
+
+
+
+<p>通过替换以下值:</p>
+
+
+
+<p><em>∂e/∂predicted=predicted-desired=0.874352143-0.03</em></p>
+
+
+
+<p><em>∂e/∂predicted=0.844352143</em></p>
+
+
+
+<p>对于预测输出相对于SOP的导数:</p>
+
+
+
+<p><em><sub>s</sub><sub>s</sub>(1/(1+e<sup>【s】</sup>)</em></p>
+
+
+
+<p>记住:商法则可用于计算sigmoid函数的导数，如下所示:</p>
+
+
+
+<p><em>∂predicted/∂s=1/(1+e<sup>-s</sup>)(1-1/(1+e<sup>-s</sup>)</em></p>
+
+
+
+<p>通过替换以下值:</p>
+
+
+
+<p><em>∂predicted/∂s=1/(1+e<sup>-s</sup>)(1-1/(1+e<sup>-s</sup>)</em>=<em>1/(1+e<sup>-1.94</sup>)(1-1/(1+e<sup>-1.94</sup>)</em></p>
+
+
+
+<p><em>= 1/(1+0.143703949)(1-1/(1+0.143703949))</em></p>
+
+
+
+<p><em>= 1/1.143703949(1-1/1.143703949)</em></p>
+
+
+
+<p><em>= 0.874352143(1-0.874352143)</em></p>
+
+
+
+<p><em>= 0.874352143(0.125647857)</em></p>
+
+
+
+<p><em>∂predicted/∂s=0.109860473</em></p>
+
+
+
+<p>对于SOP W.R.T W1的衍生产品:</p>
+
+
+
+<p><em><sub>【s】</sub>/w<sub>【1】</sub>=<em/></em>/<em><sub><sub><sub><sub><sub/></sub></sub></sub></sub></em></p>
+
+
+
+<p><em>= 1 * X<sub>1</sub>*(W<sub>1</sub>)<sup>(1-1)</sup>+0+0</em></p>
+
+
+
+<p><em>= X<sub>1</sub>*(W<sub>1</sub>)【T5(0)</em></p>
+
+
+
+<p><em> =X <sub> 1 </sub> (1) </em></p>
+
+
+
+<p><em>∂<sub>s</sub>/w<sub>1</sub>= x<sub>1</sub>T7】</em></p>
+
+
+
+<p>通过替换以下值:</p>
+
+
+
+<p>∂ <sub> s </sub> /W1=X <sub> 1 </sub> =0.1</p>
+
+
+
+<p>对于SOP W.R.T W2的衍生产品:</p>
+
+
+
+<p><em><sub>【s】</sub>/w<sub>【2】</sub>=<em/></em>/<em><sub/><sub/></em></p>
+
+
+
+<p><em>= 0+1 * X<sub>2</sub>*(W<sub>2</sub>)<sup>(1-1)</sup>+0</em></p>
+
+
+
+<p><em>= X<sub>2</sub>*(W<sub>2</sub>)【T5(0)</em></p>
+
+
+
+<p><em>= X<sub>2</sub>①</em></p>
+
+
+
+<p><em>∂<sub>s</sub>/w<sub>2</sub>= x<sub>2</sub>T7】</em></p>
+
+
+
+<p>通过替换以下值:</p>
+
+
+
+<p><em>∂<sub>s</sub>/w<sub>2</sub>= x<sub>2</sub>= 0.3</em></p>
+
+
+
+<p>在计算了所有链中的各个导数之后，我们可以将它们全部相乘，以计算所需的导数(即误差相对于每个重量的导数)。</p>
+
+
+
+<p>对于误差W.R.T W1的导数:</p>
+
+
+
+<p><em>∂e/w<sub>1</sub>= 0.844352143 * 0.109860473 * 0.1</em></p>
+
+
+
+<p><em>∂e/w<sub>1</sub>= 0.009276093</em></p>
+
+
+
+<p>对于误差W.R.T W2的导数:</p>
+
+
+
+<p><em>∂e/w<sub>2</sub>= 0.844352143 * 0.109860473 * 0.3</em></p>
+
+
+
+<p><em>∂e/w<sub>2</sub>= 0.027828278</em></p>
+
+
+
+<p>最后，有两个值反映预测误差相对于权重如何变化:</p>
+
+
+
+<p><em> 0.009276093为W<sub>1</sub>T3】</em></p>
+
+
+
+<p><em> 0.027828278为W<sub>2</sub>T3】</em></p>
+
+
+
+<p>这些值意味着什么？这些结果需要解释。</p>
+
+
+
+<h3>解释反向传播的结果</h3>
+
+
+
+<p>从最后两个导数中可以得出两个有用的结论。这些结论是基于以下几点得出的:</p>
+
+
+
+<ol><li>导数符号</li><li>导数大小</li></ol>
+
+
+
+<p>如果导数符号是正的，这意味着增加权重会增加误差。换句话说，减少权重会减少误差。</p>
+
+
+
+<p>如果导数符号<strong>为负</strong>，增加权重会减小误差。换句话说，如果它是负的，那么减少权重会增加误差。</p>
+
+
+
+<p>但是误差增加或减少了多少呢？导数的大小回答了这个问题。</p>
+
+
+
+<p>对于正导数，权重增加p会使误差增加DM*p，对于负导数，权重增加p会使误差减少DM*p。</p>
+
+
+
+<p>让我们将此应用到我们的示例中:</p>
+
+
+
+<ul><li>因为∂E/W <sub> 1 </sub>导数的结果是正的，这意味着如果W1增加1，那么总误差增加0.009276093。</li><li>因为∂E/W <sub> 2 </sub>导数的结果是正的，这意味着如果W2增加1，那么总误差增加0.027828278。</li></ul>
+
+
+
+<p>现在让我们根据计算出的导数来更新权重。</p>
+
+
+
+<h3>更新权重</h3>
+
+
+
+<p>在成功地计算出误差相对于每个单独权重的导数之后，我们可以更新权重来改进预测。每个权重基于其导数进行更新:</p>
+
+
+
+<p>对于W <sub> 1 </sub>:</p>
+
+
+
+<p><em>w<sub>1新</sub>= w<sub>1</sub>-η*∂e/w<sub>1</sub></em></p>
+
+
+
+<p><em> =0.5-0.01*0.009276093 </em></p>
+
+
+
+<p><em>W<sub>1新的</sub> =0.49990723907 </em></p>
+
+
+
+<p>对于W <sub> 2 </sub>:</p>
+
+
+
+<p><em>w<sub>2新</sub>= w<sub>2</sub>-η*∂e/w<sub>2</sub>T7】</em></p>
+
+
+
+<p><em> =0.2-0.01*0.027828278 </em></p>
+
+
+
+<p><em>W<sub>2新</sub> = 0.1997217172 </em></p>
+
+
+
+<p>请注意，导数是从重量的旧值中减去(而不是加上)的，因为导数是正的。</p>
+
+
+
+<p>权重的新值为:</p>
+
+
+
+<ul><li><em> W <sub> 1 </sub> =0.49990723907 </em></li><li><em> W <sub> 2 </sub> = 0.1997217172 </em></li></ul>
+
+
+
+<p>除了先前计算的偏差(1.821556479)之外，这两个权重被用于新的前向传递以计算误差。预计新误差将小于当前误差(0.356465271)。</p>
+
+
+
+<p>以下是新的正向传递计算:</p>
+
+
+
+<p><em>s = X<sub>1</sub>* W<sub>1</sub>+X<sub>2</sub>* W<sub>2</sub>+b</em></p>
+
+
+
+<p><em>s = 0.1 * 0.49990723907+0.3 * 0.1997217172+1.821556479</em></p>
+
+
+
+<p><em> s=1.931463718067 </em></p>
+
+
+
+<p><em> f(s)=1/(1+e <sup> -s </sup> ) </em></p>
+
+
+
+<p><em>f(s)= 1/(1+e<sup>-1.931463718067</sup>)</em></p>
+
+
+
+<p><em> f(s)=0.873411342830056 </em></p>
+
+
+
+<p><em>E = 1/2(0.03-0.873411342830056)<sup>2</sup>T3】</em></p>
+
+
+
+<p>E=0.35567134660719907 </p>
+
+
+
+<p>当比较新误差(0.35567134660719907)和旧误差(0.356465271)时，减少了0.0007939243928009043。只要有减少，我们就在朝着正确的方向前进。</p>
+
+
+
+<p>误差减少很小，因为我们使用了一个小的学习率(0.01)。要了解学习率如何影响训练神经网络的过程，<a href="https://web.archive.org/web/20230103154737/https://www.linkedin.com/pulse/learning-rate-useful-artificial-neural-networks-ahmed-gad" target="_blank" rel="noreferrer noopener nofollow">请阅读本文</a>。</p>
+
+
+
+<p>应该重复向前和向后传递，直到误差为0或经过多个时期(即迭代)。这标志着示例的结束。</p>
+
+
+
+<p>下一节讨论如何实现本节讨论的例子的反向传播。</p>
+
+
+
+<h2 id="code">Python中的编码反向传播</h2>
+
+
+
+<p>对于上一节讨论的例子，实现反向传播算法非常容易。在本节中，我们将使用GitHub项目从头开始构建一个具有2个输入和1个输出的网络。</p>
+
+
+
+<p>下一个代码使用NumPy来准备输入(x1=0.1和x2=0.4)，值为<strong> 0.7 </strong>的输出，值为<strong> 0.01 </strong>的学习速率，并为两个权重w1和w2分配初始值。最后，创建两个空列表来保存每个时期的网络预测和误差。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy
+x1=<span class="hljs-number">0.1</span>
+x2=<span class="hljs-number">0.4</span>
+
+target = <span class="hljs-number">0.7</span>
+learning_rate = <span class="hljs-number">0.01</span>
+
+w1=numpy.random.rand()
+w2=numpy.random.rand()
+
+print(<span class="hljs-string">"Initial W : "</span>, w1, w2)
+
+predicted_output = []
+network_error = []</pre>
+
+
+
+<p>接下来的代码构建了一些函数来帮助我们进行计算:</p>
+
+
+
+<ul><li>Sigmoid():应用sigmoid激活函数。</li><li>error():返回平方误差。</li><li>error_predicted_deriv():返回误差对预测输出的导数。</li><li>sigmoid_sop_deriv():返回sigmoid函数相对于sop的导数。</li><li>sop_w_deriv():返回单个权重的SOP W.R.T的导数。</li></ul>
+
+
+
+<p>update_w():更新单个权重。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sigmoid</span><span class="hljs-params">(sop)</span>:</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1.0</span>/(<span class="hljs-number">1</span>+numpy.exp(<span class="hljs-number">-1</span>*sop))
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">error</span><span class="hljs-params">(predicted, target)</span>:</span>
+    <span class="hljs-keyword">return</span> numpy.power(predicted-target, <span class="hljs-number">2</span>)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">error_predicted_deriv</span><span class="hljs-params">(predicted, target)</span>:</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">2</span>*(predicted-target)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sigmoid_sop_deriv</span><span class="hljs-params">(sop)</span>:</span>
+    <span class="hljs-keyword">return</span> sigmoid(sop)*(<span class="hljs-number">1.0</span>-sigmoid(sop))
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sop_w_deriv</span><span class="hljs-params">(x)</span>:</span>
+    <span class="hljs-keyword">return</span> x
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">update_w</span><span class="hljs-params">(w, grad, learning_rate)</span>:</span>
+    <span class="hljs-keyword">return</span> w - learning_rate*grad</pre>
+
+
+
+<p>现在，根据下一个代码，使用“for”循环，我们准备对多个时期进行向前和向后传递计算。循环经过80，000个纪元。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> range(<span class="hljs-number">80000</span>):
+    
+    y = w1*x1 + w2*x2
+    predicted = sigmoid(y)
+    err = error(predicted, target)
+
+    predicted_output.append(predicted)
+    network_error.append(err)
+
+    
+    g1 = error_predicted_deriv(predicted, target)
+
+    g2 = sigmoid_sop_deriv(y)
+
+    g3w1 = sop_w_deriv(x1)
+    g3w2 = sop_w_deriv(x2)
+
+    gradw1 = g3w1*g2*g1
+    gradw2 = g3w2*g2*g1
+
+    w1 = update_w(w1, gradw1, learning_rate)
+    w2 = update_w(w2, gradw2, learning_rate)</pre>
+
+
+
+<p>在正向传递中，执行以下代码行来计算SOP，应用sigmoid激活函数来获得预测输出，并计算误差。这将分别在predicted_output和network_error列表中追加当前网络预测和误差。</p>
+
+
+
+<pre class="hljs">    y = w1*x1 + w2*x2
+    predicted = sigmoid(y)
+    err = error(predicted, target)
+
+    predicted_output.append(predicted)
+    network_error.append(err)
+</pre>
+
+
+
+<p>在向后传递中，执行“for”循环中的剩余行来计算所有链中的导数。误差W.R.T对权重的导数保存在变量gradw1和gradw2中。最后，通过调用update_w()函数来更新权重。</p>
+
+
+
+<pre class="hljs">    g1 = error_predicted_deriv(predicted, target)
+
+    g2 = sigmoid_sop_deriv(y)
+
+    g3w1 = sop_w_deriv(x1)
+    g3w2 = sop_w_deriv(x2)
+
+    gradw1 = g3w1*g2*g1
+    gradw2 = g3w2*g2*g1
+
+    w1 = update_w(w1, gradw1, learning_rate)
+    w2 = update_w(w2, gradw2, learning_rate)</pre>
+
+
+
+<p>完整的代码如下。它在每个时期后打印预测的输出。此外，它使用matplotlib库创建2个图，显示预测输出和误差如何随时间演变。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy
+<span class="hljs-keyword">import</span> matplotlib.pyplot
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sigmoid</span><span class="hljs-params">(sop)</span>:</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1.0</span>/(<span class="hljs-number">1</span>+numpy.exp(<span class="hljs-number">-1</span>*sop))
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">error</span><span class="hljs-params">(predicted, target)</span>:</span>
+    <span class="hljs-keyword">return</span> numpy.power(predicted-target, <span class="hljs-number">2</span>)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">error_predicted_deriv</span><span class="hljs-params">(predicted, target)</span>:</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-number">2</span>*(predicted-target)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sigmoid_sop_deriv</span><span class="hljs-params">(sop)</span>:</span>
+    <span class="hljs-keyword">return</span> sigmoid(sop)*(<span class="hljs-number">1.0</span>-sigmoid(sop))
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sop_w_deriv</span><span class="hljs-params">(x)</span>:</span>
+    <span class="hljs-keyword">return</span> x
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">update_w</span><span class="hljs-params">(w, grad, learning_rate)</span>:</span>
+    <span class="hljs-keyword">return</span> w - learning_rate*grad
+
+x1=<span class="hljs-number">0.1</span>
+x2=<span class="hljs-number">0.4</span>
+
+target = <span class="hljs-number">0.7</span>
+learning_rate = <span class="hljs-number">0.01</span>
+
+w1=numpy.random.rand()
+w2=numpy.random.rand()
+
+print(<span class="hljs-string">"Initial W : "</span>, w1, w2)
+
+predicted_output = []
+network_error = []
+
+old_err = <span class="hljs-number">0</span>
+<span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> range(<span class="hljs-number">80000</span>):
+    
+    y = w1*x1 + w2*x2
+    predicted = sigmoid(y)
+    err = error(predicted, target)
+
+    predicted_output.append(predicted)
+    network_error.append(err)
+
+    
+    g1 = error_predicted_deriv(predicted, target)
+
+    g2 = sigmoid_sop_deriv(y)
+
+    g3w1 = sop_w_deriv(x1)
+    g3w2 = sop_w_deriv(x2)
+
+    gradw1 = g3w1*g2*g1
+    gradw2 = g3w2*g2*g1
+
+    w1 = update_w(w1, gradw1, learning_rate)
+    w2 = update_w(w2, gradw2, learning_rate)
+
+    print(predicted)
+
+matplotlib.pyplot.figure()
+matplotlib.pyplot.plot(network_error)
+matplotlib.pyplot.title(<span class="hljs-string">"Iteration Number vs Error"</span>)
+matplotlib.pyplot.xlabel(<span class="hljs-string">"Iteration Number"</span>)
+matplotlib.pyplot.ylabel(<span class="hljs-string">"Error"</span>)
+
+matplotlib.pyplot.figure()
+matplotlib.pyplot.plot(predicted_output)
+matplotlib.pyplot.title(<span class="hljs-string">"Iteration Number vs Prediction"</span>)
+matplotlib.pyplot.xlabel(<span class="hljs-string">"Iteration Number"</span>)
+matplotlib.pyplot.ylabel(<span class="hljs-string">"Prediction"</span>)
+</pre>
+
+
+
+<p>在下图中，绘制了80，000个历元的误差。请注意误差如何在值3.150953682878443e-13处饱和，该值非常接近0.0。</p>
+
+
+
+
+
+
+
+<p>下图显示了预测的输出是如何随着迭代而变化的。请记住，在我们的示例中，正确的输出值设置为0.7。输出饱和值为0.6999994386664375，非常接近0.7。</p>
+
+
+
+
+
+
+
+<p>GitHub项目也给出了一个更简单的接口来构建<a href="https://web.archive.org/web/20230103154737/https://github.com/ahmedfgad/IntroDLPython/tree/master/Ch09" target="_blank" rel="noreferrer noopener nofollow"> Ch09目录</a>中的网络。有一个例子，建立一个有3个输入和1个输出的网络。在代码的最后，调用函数<strong> predict() </strong>来要求网络预测一个新样本[0.2，3.1，1.7]的输出。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> MLP
+<span class="hljs-keyword">import</span> numpy
+
+x = numpy.array([<span class="hljs-number">0.1</span>, <span class="hljs-number">0.4</span>, <span class="hljs-number">4.1</span>])
+y = numpy.array([<span class="hljs-number">0.2</span>])
+
+network_architecture = [<span class="hljs-number">7</span>, <span class="hljs-number">5</span>, <span class="hljs-number">4</span>]
+
+
+trained_ann = MLP.MLP.train(x=x,
+                            y=y,
+                            net_arch=network_architecture,
+                            max_iter=<span class="hljs-number">500</span>,
+                            learning_rate=<span class="hljs-number">0.7</span>,
+                            debug=<span class="hljs-keyword">True</span>)
+
+print(<span class="hljs-string">"Derivative Chains : "</span>, trained_ann[<span class="hljs-string">"derivative_chain"</span>])
+print(<span class="hljs-string">"Training Time : "</span>, trained_ann[<span class="hljs-string">"training_time_sec"</span>])
+print(<span class="hljs-string">"Number of Training Iterations : "</span>, trained_ann[<span class="hljs-string">"elapsed_iter"</span>])
+
+predicted_output = MLP.MLP.predict(trained_ann, numpy.array([<span class="hljs-number">0.2</span>, <span class="hljs-number">3.1</span>, <span class="hljs-number">1.7</span>]))
+print(<span class="hljs-string">"Predicted Output : "</span>, predicted_output) </pre>
+
+
+
+<p>这段代码使用了一个名为<a href="https://web.archive.org/web/20230103154737/https://github.com/ahmedfgad/IntroDLPython/blob/master/Ch09/MLP.py" target="_blank" rel="noreferrer noopener nofollow"> MLP </a>的模块，这是一个构建反向传播算法的脚本，同时为用户提供了一个简单的界面来构建、训练和测试网络。关于如何构建这个脚本的细节，请参考<a href="https://web.archive.org/web/20230103154737/https://www.elsevier.com/books/introduction-to-deep-learning-and-neural-networks-with-python/gad/978-0-323-90933-4" target="_blank" rel="noreferrer noopener nofollow">这本书</a>。</p>
+
+
+
+<h2 id="types">反向传播的类型</h2>
+
+
+
+<p>反向传播算法有两种主要类型:</p>
+
+
+
+<ol><li><strong>传统的反向传播</strong>一直用于固定输入和固定输出的静态问题，比如预测图像的类别。在这种情况下，输入图像和输出类永远不会改变。</li><li><strong>时间反向传播(BPTT) </strong>针对随时间变化的非静态问题。它应用于时间序列模型，如递归神经网络(RNN)。</li></ol>
+
+
+
+<h2 id="drawbacks">反向传播算法的缺点</h2>
+
+
+
+<p>即使反向传播算法是训练神经网络最广泛使用的算法，它也有一些缺点:</p>
+
+
+
+<ul><li>应该仔细设计网络，以避免<a href="/web/20230103154737/https://neptune.ai/blog/vanishing-and-exploding-gradients-debugging-monitoring-fixing" target="_blank" rel="noreferrer noopener">消失和爆炸梯度</a>影响网络的学习方式。例如，从sigmoid激活函数计算出的梯度可能非常小，接近于零，这使得网络不能更新其权重。结果，没有学习发生。</li><li>反向传播算法平等地考虑网络中的所有神经元，并为每次反向传递计算它们的导数。即使使用了丢弃层，也要计算丢弃的神经元的导数，然后丢弃。</li><li>反向传播依赖于无限效应(偏导数)来执行信用分配。当人们考虑更深和更非线性的函数时，这可能成为一个严重的问题。</li><li>它期望误差函数是凸的。对于非凸函数，反向传播可能会陷入局部最优解。</li><li>误差函数和激活函数必须是可微的，以便反向传播算法能够工作。它不适用于不可微函数。</li><li>在正向传递中，层<em> i+1 </em>必须等待层<em> i </em>的计算完成。在向后通道中，层<em> i </em>必须等待层<em> i+1 </em>完成。这使得网络的所有层都被锁定，等待网络的其余层向前执行并向后传播错误，然后它们才能被更新。</li></ul>
+
+
+
+<h2 id="alternatives">传统反向传播的替代方案</h2>
+
+
+
+<p>传统的反向传播有多种替代方法。以下是四种选择。</p>
+
+
+
+<p>李东贤等人的“差异目标传播”<em>关于数据库中机器学习和知识发现的欧洲联合会议</em>。施普林格，查姆，2015。，主要思想是在每一层计算目标而不是梯度。像渐变一样，它们是向后传播的。目标传播依赖于每层的自动编码器。与反向传播不同，即使当单元交换随机比特而不是实数时，它也可以被应用。</p>
+
+
+
+<p>马、万多·库尔特、J. P .刘易斯和w .巴斯蒂亚安·克莱因。" hsic瓶颈:没有反向传播的深度学习."AAAI人工智能会议记录。第34卷。04号。2020.，他们提出了HSIC (Hilbert-Schmidt独立性准则)瓶颈，用于训练深度神经网络。HSIC瓶颈是传统反向传播的替代方案，具有许多明显的优点。该方法有助于并行处理，并且需要的操作明显较少。它不会遭受爆炸或消失梯度。这在生物学上比反向传播更合理，因为不需要对称反馈。</p>
+
+
+
+<p>在Choromanska，Anna等人的《超越反向投影:带辅助变量的在线交替最小化》中<em>机器学习国际会议</em>。PMLR，2019。，他们提出了一种用于训练深度神经网络的在线(随机/小批量)交替最小化(AM)方法。</p>
+
+
+
+<p>贾德伯格、马克斯等人的“使用合成梯度的去耦神经接口”<em>机器学习国际会议</em>。PMLR，2017。，他们通过解耦模块(即层)打破了锁定层的约束，引入了网络图未来计算的模型。这些模型仅使用局部信息来预测建模的子图将产生什么结果。结果，子图可以独立地和异步地更新。</p>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>希望现在你明白了为什么反向传播是训练人工神经网络最流行的算法。它相当强大，其内部工作方式令人着迷。感谢阅读！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

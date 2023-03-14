@@ -1,0 +1,1764 @@
+<html>
+<head>
+<title>Deploying Your Next Image Classification on Serverless (AWS Lambda, GCP Cloud Function, Azure Automation) </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>在无服务器上部署下一个图像分类(AWS Lambda、GCP云功能、Azure Automation)</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/deploying-image-classification-on-serverless#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/deploying-image-classification-on-serverless#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>可以说，部署ML应用程序从根本上来说是一个基础设施问题，这个问题在很大程度上减缓了ML模型进入生产的速度。配置您的基础设施的想法、您的应用程序在生产中的长期维护、可伸缩性和节约成本都是阻碍许多ML模型进入生产的挑战。</p>
+
+
+
+<p>作为ML工程师，我们的首要任务应该是专注于我们的ML应用，而不是担心如何灭火。事实证明，有一种技术可以为我们做到这一点。输入…无服务器！无服务器使您可以专注于构建您的应用程序，而不必担心底层基础设施，从而提高您构建模型并将其部署到生产环境中的速度。</p>
+
+
+
+<p>在本指南中，您将了解与您作为ML工程师相关的无服务器的核心概念，并且您还将在无服务器平台上部署一个影像分类应用程序，这样您就可以看到它是多么简单和快速。</p>
+
+
+
+<h2 id="what-is-serverless">什么是无服务器？</h2>
+
+
+
+<p>在我们继续定义无服务器的含义之前，让我们了解一下我们是如何做到这一点的:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" src="../Images/3b24eb526b3be34c7a301bb7b8ce27eb.png" alt="What is Serverless?" class="wp-image-53862" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_22.png?resize=588%2C503&amp;ssl=1"/><figcaption><em>Serverless definition | Source: modified and adapted from <a href="https://web.archive.org/web/20221206031244/https://www.youtube.com/watch?v=vxJobGtqKVM&amp;t=77s" target="_blank" rel="noreferrer noopener nofollow">Youtube</a></em></figcaption></figure></div>
+
+
+
+<p>我们首先在托管服务器和数据中心上构建和部署应用程序，并负责配置和管理这些服务器。随着云和其他远程计算平台的出现，出现了虚拟机，你可以按需租用和使用服务器。当容器成为主流时，Kubernetes等应用基础设施的容器编排平台也成为主流。我们现在正在迈向无服务器时代，在这一时代，我们在基础设施的定制化与开发和部署速度之间进行权衡。</p>
+
+
+
+<p>那么什么是无服务器呢？无服务器是构建、部署和管理技术基础设施的全面管理方法。</p>
+
+
+
+<p>为了完全掌握这个定义，让我们来理解当您部署您的机器学习应用程序时，无服务器为您提供了什么。使用无服务器，您可以:</p>
+
+
+
+<ul><li>为您的应用进行计算，无需拥有、维护甚至调配底层服务器。</li><li>复杂的网络和企业级后端集成工具和服务，可根据您的应用程序工作负载自动扩展。</li><li>无需管理备份即可实现持久存储的持久性。</li><li>数据库的托管版本，可以根据应用程序的需求进行扩展。</li></ul>
+
+
+
+<p id="separator-block_6171d8baa6970" class="block-separator block-separator--5">无服务器是如何工作的？</p>
+
+
+
+
+
+
+
+<p id="separator-block_6171d8c5a6971" class="block-separator block-separator--5">无服务器平台允许您构建和运行您的应用程序和服务，而无需考虑服务器。这是一种新的范式，有两个方面:</p>
+
+
+
+<h2 id="how-does-serverless-work">带着你的代码去执行</h2>
+
+
+
+<p>将您的应用程序代码与其他托管后端服务集成在一起。</p>
+
+
+
+<ul><li>对于代码执行，大多数无服务器平台都有一个“功能即服务”( FaaS)产品，它将为您提供在无服务器平台上执行代码的功能。这样，您就可以开发、运行和管理您的应用程序，而不必担心底层的基础设施。您是在功能级别工作，而不是在容器、服务器或虚拟机级别工作。</li><li>在无服务器上运行您的ML应用程序还需要您集成其他后端即服务产品，如数据库、存储、消息传递和API管理服务。</li></ul>
+
+
+
+<p>无服务器模式变化包括:</p>
+
+
+
+<p><strong>无需管理基础设施</strong>:您只需对您的应用负责。基础设施完全由服务提供商管理。</p>
+
+
+
+<p><strong>事件驱动的应用</strong>:你的架构依赖于事件和无状态计算。</p>
+
+
+
+<ul><li><strong>为你使用的东西付费</strong>:当什么都没发生的时候，你什么也不用付。当事情发生时，您可以获得细粒度的计费可见性。</li><li>在您开始计划在任何无服务器计算平台上构建和部署您的ML应用程序之前，让我们先理清一些事情。</li><li>你在“无服务器”里做什么？</li></ul>
+
+
+
+<p>构建无服务器应用程序时，您有责任:</p>
+
+
+
+<h3 id="what-do-you-do-in-serverless"><strong>编写代码，指导您的应用程序如何运行</strong>(服务交互、认证管理、输出转储位置等等)。在大多数情况下，您应该保持代码最少，以避免应用程序中的漏洞。</h3>
+
+
+
+<p><strong>定义触发器一旦有事件</strong>(活动的发生)就立即发挥作用。例如，如果存储服务接收到一个文件，那么它应该启动无服务器服务，该服务将依次获取该文件，在其上运行程序，并将输出转储到另一个存储桶中。</p>
+
+
+
+<ul><li>在“无服务器”中你不做什么？</li><li>构建无服务器应用程序时，您<strong>而不是</strong>负责:</li></ul>
+
+
+
+<h3 id="what-do-you-not-do-in-serverless"><strong>为您的应用运行预配置基础设施</strong>,因为这种麻烦应该由服务提供商来处理。</h3>
+
+
+
+<p><strong>修补和管理基础设施</strong>在基于容器的基础设施管理中很常见。管理由服务提供商负责，您只需要维护您的代码。</p>
+
+
+
+<ul><li><strong>定义扩展策略</strong>，因为服务应该根据您的应用程序的使用情况自动扩展。您也可以决定设置一些计算设置来启用缩放，但在大多数情况下，这是由服务提供商处理的。</li><li>在无服务器环境中构建或部署任何应用程序时，另一个需要注意的要点是，您不要将状态与计算一起存储，因为无服务器环境中的计算是短暂的——您的服务器在事件期间会启动。它们并不总是运行，等待请求。这意味着它的状态存储在其他地方，通常在另一个托管服务中。这也是无服务器应用可以轻松扩展的原因之一——计算是无状态的，允许在引擎盖下添加更多服务器以实现水平可扩展性。</li><li>总结这一节，使用无服务器，您将获得一个环境，在这个环境中，您只需要部署您的代码，将您的应用程序连接到其他后端托管服务，其他一切都由提供商负责。</li></ul>
+
+
+
+<p>什么时候应该考虑在无服务器平台上部署ML模型？</p>
+
+
+
+<p>根据您试图解决的问题，大多数ML应用程序都是动态的，当您了解您的模型哪些做得好，哪些做得不好时，需要不断的更新和改进。这非常适合无服务器的使用情形，因为此类平台:</p>
+
+
+
+<h2 id="when-should-you-consider-deploying-your-ml-models-on-serverless-platforms"><strong>能够处理大量活动</strong>。例如，您的模型可以处理来自客户端的预测请求，并根据请求的数量自动伸缩，因此无论处理的请求数量有多少，周转时间都可以保持较低水平。</h2>
+
+
+
+<p><strong>适合动态工作负载</strong>。您可以将新模型快速部署到平台，而无需配置基础架构或担心扩展问题。这就像是把旧型号拿出来，换上新型号。</p>
+
+
+
+<ul><li><strong>按需提供</strong>相比之下，虚拟机或容器服务即使在没有活动的情况下也始终保持运行。从长远来看，这可以节省你的钱，因为你的ML服务可能不像你的其他服务那样受欢迎。</li><li><strong>非常适合预定任务</strong>。对于您的生产用例，您可能会在特定的时间间隔运行计划的任务，比如模型再训练。借助无服务器工作流，您可以根据时间表自动执行重新培训和数据处理步骤。</li><li>在无服务器上部署ML应用程序的挑战</li><li>在尝试将ML应用程序部署到无服务器环境时，您可能会遇到一些挑战。</li></ul>
+
+
+
+<h2 id="challenges-of-deploying-your-ml-application-on-serverless">功能是短暂的</h2>
+
+
+
+<p><strong>挑战:</strong>部署到无服务器环境意味着您的应用程序将经历冷启动，尤其是当事件被触发时底层服务器还没有托管某个功能时。当您的应用程序想要处理新的预测请求时，这可能会导致延迟问题，尤其是对于在线模型。如果您也想离线运行您的模型，这也可能是一个问题，因为您的离线评分必须在实例仍在运行的时间窗口内结束。</p>
+
+
+
+<h3 id="functions-are-ephemeral"><strong>潜在解决方案:</strong>您可能希望确保FaaS满足您所需的SLA(服务水平协议)。尽管值得注意的是，您的模型总是能够以比服务器冷启动后的启动延迟更低的延迟实时返回预测。在选择无服务器之前，试着理解你在优化什么。你在为实时评分做优化吗？如果是，请尝试理解什么是可接受的延迟。</h3>
+
+
+
+<p>对远程存储的依赖</p>
+
+
+
+<p><strong>挑战:</strong>由于计算是<a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/Stateless_protocol" target="_blank" rel="noreferrer noopener nofollow">无状态的</a>，先前客户端请求的<a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/Session_(computer_science)" target="_blank" rel="noreferrer noopener nofollow">会话</a>不会被保留，因此需要在blob存储、缓存、数据库或事件拦截器中远程存储会话。这可能会导致性能问题，因为该函数需要在每个实例中写入慢速存储并读回。如果您正在运行高性能的机器学习模型，这可能是一个需要注意的问题。</p>
+
+
+
+<h3 id="dependency-on-remote-storage"><strong>潜在的解决方案:</strong>您的函数使用的任何状态都需要存储在外部，最好存储在读写性能相当高的存储器中。</h3>
+
+
+
+<p>输入/输出性能</p>
+
+
+
+<p><strong>挑战:</strong>功能密集打包并共享网络I/O，因此涉及高吞吐量计算的进程可能不适合it。</p>
+
+
+
+<h3 id="i-o-performance"><strong>潜在解决方案:</strong>如果您正在运行高性能的ML应用程序，您可能需要考虑使用另一个计算平台，如虚拟机或容器服务。</h3>
+
+
+
+<p>通用硬件</p>
+
+
+
+<p><strong>挑战:</strong>在大多数无服务器平台中，您可以使用的是驱动底层服务器的基本CPU和计算硬件。你可能找不到通过他们的无服务器平台提供GPU或TPU的提供商。尽管随着AWS <a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/blogs/aws/aws-lambda-functions-powered-by-aws-graviton2-processor-run-your-functions-on-arm-and-get-up-to-34-better-price-performance/" target="_blank" rel="noreferrer noopener nofollow">最近宣布</a>Lambda函数现在由它们的<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/ec2/graviton/" target="_blank" rel="noreferrer noopener nofollow"> Graviton2处理器</a>支持，这种情况开始改变。无论如何，内存大小和处理器类型仍然存在限制。例如，在编写本文时，您可以为一个Lambda函数分配高达10 GB的内存，并访问6个CPU进行计算。</p>
+
+
+
+<h3 id="generic-hardware"><strong>潜在解决方案:</strong>如果您的ML模型需要运行GPU或TPU等硬件加速器，您可能需要考虑使用虚拟机来代替。</h3>
+
+
+
+<p>供应商锁定</p>
+
+
+
+<p>挑战:虽然你可以移植你的代码，但你不能总是移植你的架构。对于无服务器，迁移成为一个挑战，尤其是当您的应用程序与供应商提供的其他服务集成时。在大多数情况下，您可能会发现迁移的唯一方法是重新构建您的生产系统。此外，无服务器是一个新兴领域，过早选择赢家存在风险。</p>
+
+
+
+<h3 id="vendor-lock-in"><strong>潜在解决方案:</strong>在选择供应商之前，请确保您考虑了他们提供的服务、他们服务的<a href="https://web.archive.org/web/20221206031244/https://searchitchannel.techtarget.com/definition/service-level-agreement" target="_blank" rel="noreferrer noopener nofollow">SLA</a>，以及他们是否是您组织的主要供应商，是否也很容易转移您的工作负载。</h3>
+
+
+
+<p>安全风险</p>
+
+
+
+<p><strong>挑战:</strong>虽然无服务器平台是完全托管的，但是将应用程序部署为功能仍然存在安全风险。其中之一就是不安全的配置。让您的服务和外部连接之间的API交互变得脆弱可能会有问题，这可能会导致严重的安全威胁，如数据泄漏、分布式拒绝服务(DDoS)攻击等。</p>
+
+
+
+<h3 id="security-risks">在其他情况下，给予服务和用户比他们需要的更多的访问权限也会带来威胁。虽然在学习过程中这样做可能没问题，但是要确保清理您的架构，并且只给服务或用户提供完成功能应用程序所需的最少特权。对安全和恶意攻击的风险保持敏感的另一个原因是，它们也可能导致高额费用。</h3>
+
+
+
+<p><strong>潜在解决方案:</strong>确保您遵循云安全的最佳实践，来自<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/" target="_blank" rel="noreferrer noopener nofollow"> AWS </a>的行业标准可在本<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>中找到。请确保在您的无服务器平台提供商本机提供的凭据管理服务(推荐)中保护您的凭据。对你的服务和用户来说，始终遵循最小特权原则。</p>
+
+
+
+<p>较少的监控和可观察性</p>
+
+
+
+<p><strong>挑战:</strong>应用程序、模型的可观察性，以及它们对业务目标的贡献至关重要。这对于无服务器应用程序来说是很难做到的，因为为您提供的日志和跟踪工具可能不足以让您对应用程序有一个完整的监督。</p>
+
+
+
+<h3 id="lesser-monitoring-and-observability"><strong>潜在解决方案:</strong>您可能希望与第三方<a href="/web/20221206031244/https://neptune.ai/blog/ml-model-monitoring-best-tools" target="_blank" rel="noreferrer noopener"> ML监控工具</a>集成，以便更有效地监督您的生产应用。</h3>
+
+
+
+<p>其他风险</p>
+
+
+
+<p><strong>挑战:</strong>这里也有ML应用固有的风险，如<a href="/web/20221206031244/https://neptune.ai/blog/adversarial-attacks-on-neural-networks-exploring-the-fast-gradient-sign-method?utm_source=medium&amp;utm_medium=crosspost&amp;utm_campaign=blog-adversarial-attacks-on-neural-networks-exploring-the-fast-gradient-sign-method" target="_blank" rel="noreferrer noopener">对抗性攻击</a>，尤其是计算机视觉应用。虽然这不是无服务器ML应用程序所特有的，但保护模型免受恶意攻击对于无服务器来说是非常困难的，因为你不能控制模型运行的基础设施。例如，攻击可能来自于将恶意输入作为对模型的请求。</p>
+
+
+
+<h3 id="other-risks"><strong>潜在解决方案:</strong>您可能想要尝试使用现有的最佳<a href="https://web.archive.org/web/20221206031244/https://linkinghub.elsevier.com/retrieve/pii/S0031320318302565">学术</a>或<a href="https://web.archive.org/web/20221206031244/https://arxiv.org/pdf/2002.05646">行业</a>方法构建一个更健壮的模型，因为您的安全基础架构应该只是保护您模型的第二层。</h3>
+
+
+
+<p>无服务器平台提供商</p>
+
+
+
+<p>目前市场上有几家<a href="https://web.archive.org/web/20221206031244/https://www.techmagic.co/blog/top-5-serverless-platforms-in-2020/" target="_blank" rel="noreferrer noopener nofollow">无服务器平台提供商。在本指南中，您将了解如何使用</a><a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/" target="_blank" rel="noreferrer noopener nofollow">亚马逊网络服务</a>无服务器平台和服务部署您的应用程序。您还将简要了解其他流行的公共云解决方案，如<a href="https://web.archive.org/web/20221206031244/https://cloud.google.com/" target="_blank" rel="noreferrer noopener nofollow">谷歌云平台</a>无服务器FaaS产品和<a href="https://web.archive.org/web/20221206031244/https://azure.microsoft.com/en-us/" target="_blank" rel="noreferrer noopener nofollow">微软Azure </a>。目前，这是市场上的三个主要参与者。</p>
+
+
+
+<h2 id="serverless-platform-providers">谷歌云托管的FaaS产品叫做云功能。撰写本文时支持的语言包括Node.js、Python、PHP、.NET，Java，Ruby，还有Go。云功能的可用触发器是HTTP请求、通过发布/订阅的消息传递、存储、Firestore、Firebase、调度程序和现代数据服务。</h2>
+
+
+
+<p>一些功能包括:</p>
+
+
+
+
+
+
+
+<p>带有<a href="https://web.archive.org/web/20221206031244/https://cloud.google.com/functions/docs/configuring/max-instances" target="_blank" rel="noreferrer noopener nofollow">“max”选项</a>的自动扩展功能，如果您不想运行太多实例来自动扩展到您的工作负载，您可以选择一个max选项。</p>
+
+
+
+
+
+
+
+<p>您可以在<a href="https://web.archive.org/web/20221206031244/https://cloud.google.com/functions/docs/securing/function-identity" target="_blank" rel="noreferrer noopener nofollow">唯一身份</a>下运行您的每一项功能，帮助您进行更精细的控制。</p>
+
+
+
+<ul><li><a href="https://web.archive.org/web/20221206031244/https://cloud.google.com/blog/products/serverless/cloud-run-bringing-serverless-to-containers" target="_blank" rel="noreferrer noopener nofollow"> Cloud Run可用</a>让你在Google Cloud的无服务器平台上运行任何无状态的请求驱动容器。</li><li>Azure Functions是Azure面向无服务器应用的功能即服务平台。它支持多种语言，包括C#、F#、Java和Node。Azure函数的可用触发器包括Blob存储、Cosmos DB、事件网格、事件中心HTTP请求、服务总线(消息传递系统)、计时器(基于事件时间的系统)。</li><li>一些功能包括:</li></ul>
+
+
+
+
+
+
+
+<p>AWS Lambda是亚马逊网络服务的托管功能即服务(FaaS)平台。可以用Node、Java、C#和Python等多种语言编写函数。Lambda的可用触发器包括Kinesis、DynamoDB、SQS、S3、CloudWatch、Codecommit、Cognito、Lex和API Gateway。</p>
+
+
+
+
+
+
+
+<p>在本指南中，您将学习如何在AWS上将图像分类模型部署到无服务器环境中，以构建无服务器ML应用程序。</p>
+
+
+
+
+
+
+
+
+
+
+
+<p>在无服务器上部署图像分类模型[演示]</p>
+
+
+
+
+
+
+
+<p>了解要部署的模型</p>
+
+
+
+<h2 id="deploying-an-image-classification-model-on-serverless-demo">我们将使用一个预先训练的模型，该模型将主要困扰非洲玉米作物的蛾类物种分为3类:<a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/African_armyworm" target="_blank" rel="noreferrer noopener nofollow">非洲粘虫</a>(AAW)<a href="https://web.archive.org/web/20221206031244/https://entnemdept.ufl.edu/creatures/field/fall_armyworm.htm" target="_blank" rel="noreferrer noopener nofollow">秋粘虫</a>(一汽)和<a href="https://web.archive.org/web/20221206031244/https://www.andermattbiocontrol.com/sites/pests/egyptian-cotton-leafworm.html" target="_blank" rel="noreferrer noopener nofollow">埃及棉叶蝉</a> (ECLW)。</h2>
+
+
+
+<h3 id="understanding-the-model-to-be-deployed">要求</h3>
+
+
+
+<p>这里，我们希望构建一个移动应用程序，它可以查询一个ML模型，并根据上传到外部存储(可能来自其他外部应用程序，如农场中的摄像机)的蛾类物种的新图像返回结果。ML模型需要不断改进，因为这只是收集更多蛾图像数据的第一个版本。后端的ML应用程序应该能够处理非结构化的数据(图像),这些数据可能以批处理和流的形式出现，偶尔也会以突发的形式出现，同时保持尽可能低的成本。</p>
+
+
+
+<h3 id="requirements">你可能已经猜到了，这听起来像是无服务器的工作！</h3>
+
+
+
+<p>模型细节</p>
+
+
+
+<p>该模型使用<a href="https://web.archive.org/web/20221206031244/https://www.tensorflow.org/install" target="_blank" rel="noreferrer noopener nofollow"> Tensorflow 2.4.0 </a>进行训练，它使用ResNet-50模型权重，并添加一些自定义层作为微调的最终层。该模型期望输入图像为<strong> 224×224大小</strong>，输出层根据我们正在解决的问题只返回3个类。</p>
+
+
+
+<h3 id="model-details">这个模型已经被压缩成一个<a href="https://web.archive.org/web/20221206031244/https://www.howtogeek.com/248780/how-to-compress-and-extract-files-using-the-tar-command-on-linux/" target="_blank" rel="noreferrer noopener nofollow">tar.gz</a>档案文件，并上传到S3存储桶中的一个文件夹。为了确保文件可读，对象被授予了<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/premiumsupport/knowledge-center/read-access-objects-s3-bucket/" target="_blank" rel="noreferrer noopener nofollow">公共读取权限</a>。</h3>
+
+
+
+<p>如果您遵循您的模型，您可以在这里学习如何授予公共读取权限<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/premiumsupport/knowledge-center/read-access-objects-s3-bucket/" target="_blank" rel="noreferrer noopener nofollow">。此外，确保您的模型得到正确保存。这个模型是用<strong>`<a href="https://web.archive.org/web/20221206031244/https://www.tensorflow.org/guide/saved_model" target="_blank" rel="noreferrer noopener nofollow">TF . saved _ model . save()</a>`</strong>格式保存的，并压缩成<strong> `.tar` </strong>文件(最好)。</a></p>
+
+
+
+<p>先决条件</p>
+
+
+
+<p>在开始之前，您需要具备几件重要的事情——</p>
+
+
+
+<h3 id="pre-requisites">一个<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/free/" target="_blank" rel="noreferrer noopener nofollow">自由层AWS帐户</a>或一个最多有3美元的活动帐户。截至本指南发布时，跟随它的成本应该不到3美元。</h3>
+
+
+
+<p>使用AWS云的基本经验。</p>
+
+
+
+<ul><li>一个<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html" target="_blank" rel="noreferrer noopener nofollow">完全配置好的</a> <a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/cli/" target="_blank" rel="noreferrer noopener nofollow">命令行界面工具</a>与你的IDE一起工作。你可以在这里安装完整的vs code<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/visualstudiocode/" target="_blank" rel="noreferrer noopener nofollow">AWS工具包。</a></li><li>稍微熟悉一下<a href="https://web.archive.org/web/20221206031244/https://docs.docker.com/get-docker/" target="_blank" rel="noreferrer noopener nofollow"> Docker </a> CLI。</li><li>一个活跃的IAM用户(用于最佳安全实践)。我建议您不要使用root用户来阅读本技术指南。您可以为用户提供对下列服务的访问权限:</li><li>下面是我为该角色创建的附加到用户的策略示例(不包括对DynamoDB的完全访问权限):</li><li>第二个弹性容器注册(ECR)策略是公共策略。如果您希望能够与世界上的任何人共享您的容器软件，您可能希望包含此策略。此外，为了使本指南易于理解，我已经允许该用户拥有所有资源和完全访问权限–如果您要将此应用到您的项目中，您可能只想授予完成项目所需的最低权限，以避免安全问题。</li></ul>
+
+
+
+<p>解决方案概述</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_59" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/dcc09423cefba4b6fc2684ebdf96e37a.png" alt="List of attached policies to the user (DEMO)." class="wp-image-53825" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_59.png?resize=810%2C250&amp;ssl=1"/></a><figcaption><em>List of attached policies to the user | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>对于本技术指南，我们将构建的解决方案将使用两个工作流:<a href="/web/20221206031244/https://neptune.ai/blog/continuous-integration-and-continuous-deployment-in-machine-learning-projects" target="_blank" rel="noreferrer noopener">持续集成/交付(CI/CD) </a>工作流和主部署工作流。这是我们的整个工作流程:</p>
+
+
+
+<h3 id="overview-of-the-solution">我们将使用CI/CD管道在云上构建和打包我们的应用程序。</h3>
+
+
+
+<p>然后，我们将把打包的应用程序部署到一个无服务器的功能中，该功能与其他服务集成在一起，以提供一个完全托管的后端生产系统。</p>
+
+
+
+<ul><li>持续集成/持续交付工作流</li><li>以下是我们的CI/CD架构的外观:</li></ul>
+
+
+
+<h4 id="continuous-integration-continuous-delivery-workflow">以下是我们将在此工作流程中采取的步骤:</h4>
+
+
+
+<p><a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/iam/" target="_blank" rel="noreferrer noopener nofollow"> IAM </a>用户将使用<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/cli/" target="_blank" rel="noreferrer noopener nofollow"> AWS CLI </a>和git客户端将我们的应用程序代码和一些配置文件推送到私有的<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/codecommit/" target="_blank" rel="noreferrer noopener nofollow"> CodeCommit </a>存储库。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_15" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/4d5528d672bb00994976a6479f086f10.png" alt="Continuous Integration/Continuous Delivery Workflow" class="wp-image-53869" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_15.png?resize=818%2C350&amp;ssl=1"/></a><figcaption><em>Continuous integration/ delivery workflow | Source: Author</em></figcaption></figure></div>
+
+
+
+
+
+
+
+<p>这个新的提交将触发<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/codepipeline/" target="_blank" rel="noreferrer noopener nofollow">代码管道</a>从我们的<a href="https://web.archive.org/web/20221206031244/https://docs.docker.com/engine/reference/builder/" target="_blank" rel="noreferrer noopener nofollow">Docker文件</a>为<a href="https://web.archive.org/web/20221206031244/https://www.docker.com/" target="_blank" rel="noreferrer noopener nofollow"> Docker </a>映像创建一个新的构建，并使用<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/codebuild/" target="_blank" rel="noreferrer noopener nofollow">代码构建</a>创建一个指定的构建配置。</p>
+
+
+
+<ol><li>一旦构建完成并成功，Docker映像将被推送到<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/ecr/" target="_blank" rel="noreferrer noopener nofollow"> AWS ECR </a>中的私有注册表中。</li><li>现在，您可以使用Docker映像来创建<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/lambda/latest/dg/welcome.html" target="_blank" rel="noreferrer noopener nofollow"> Lambda函数</a>，它将在生产中充当推理端点。</li><li>虽然在这个管道中运行您的模型测试和验证是很重要的，但是本指南并不包括测试过程。</li><li>部署工作流程</li></ol>
+
+
+
+<p>这是我们的部署架构的样子:</p>
+
+
+
+<h4 id="deployment-workflow">以下是此工作流程中的步骤:</h4>
+
+
+
+<p>客户端通过REST API端点或管理控制台将映像上传到S3存储桶。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_20" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/166366d586df9478b032a1947ff4bb52.png" alt="Serverless backend deployment workflow" class="wp-image-53864" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_20.png?resize=815%2C393&amp;ssl=1"/></a><figcaption><em>Serverless backend deployment workflow | Source: Author</em></figcaption></figure></div>
+
+
+
+<p><a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/eventbridge/" target="_blank" rel="noreferrer noopener nofollow"> Eventbridge </a>触发托管我们模型的Lambda函数。</p>
+
+
+
+<ol><li>该函数将日志流式传输到Amazon Cloudwatch日志。</li><li>该函数还将结果写入DynamoDB。</li><li>您将使用从ECR存储库中构建的Docker映像创建一个Lambda函数推断端点。此时，您将在部署之前测试该功能。部署完成后，您现在可以通过向您将创建的<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/s3/" target="_blank" rel="noreferrer noopener nofollow"> S3 </a>存储桶上传新映像来执行端到端测试，以确保一切按预期运行。</li><li>这是您将在本指南中构建的解决方案的概述。说够了，我们来解决一些问题吧！</li></ol>
+
+
+
+<p>构建解决方案</p>
+
+
+
+<p>为了实现这个解决方案，克隆本指南的<a href="https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app" target="_blank" rel="noreferrer noopener nofollow">库</a>。在我们查看应用程序代码和配置文件之前，让我们设置一些将用于该解决方案的AWS服务。确保您的用户拥有这些服务的必要权限，并且位于正确的区域。</p>
+
+
+
+
+
+
+
+<h3 id="building-the-solution">创建一个S3桶来保存推理图像</h3>
+
+
+
+<p>要使用管理控制台，请前往<a href="https://web.archive.org/web/20221206031244/https://s3.console.aws.amazon.com/s3/" target="_blank" rel="noreferrer noopener nofollow">https://s3.console.aws.amazon.com/s3/</a>。要使用CLI，请查看<a href="https://web.archive.org/web/20221206031244/https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/create-bucket.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>并跟随操作。</p>
+
+
+
+<h4 id="create-an-s3-bucket-to-hold-inference-images">点击屏幕右侧的<strong>创建存储桶</strong>。</h4>
+
+
+
+<ol><li>为您的时段输入描述性名称，并选择适当的区域:</li><li>4.在<strong>阻止该存储桶</strong>的公共访问设置下，取消选中<strong>阻止所有公共访问</strong>并选中复选框以同意以下条款:</li><li>5.接下来，<strong>启用Bucket Versioning </strong>，这样同名的新图像就不会被覆盖(尤其是如果你的应用开发者没有考虑到这一点的话):</li></ol>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_7" target="_blank" rel="noopener"><img decoding="async" src="../Images/9642d2762e41c6add93386bea6d0e45f.png" alt="Create the S3 bucket to hold inference images " class="wp-image-53877" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_7.png?ssl=1"/></a><figcaption><em>Create the S3 bucket to hold inference images | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>5.保留其他默认设置，点击<strong>创建存储桶</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_33" target="_blank" rel="noopener"><img decoding="async" src="../Images/00eb984b7f1978c1db4117a90866f33b.png" alt="Block Public Access settings for the bucket" class="wp-image-53851" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_33.png?ssl=1"/></a><figcaption><em>Block public access settings for the bucket | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>对于本指南，我们将授予<strong>公共读取权限</strong>，以防您希望您的应用程序返回由您的模型预测的图像。由于数据不是敏感的，我们可以不考虑它，但是您可能希望添加经过身份验证的用户或服务来查看数据(出于安全原因)。对于写访问，这取决于您希望哪个设备或用户上传图像以进行推断。如果您有特定的设备，则只授予对它们的访问权限。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_37" target="_blank" rel="noopener"><img decoding="async" src="../Images/adfe5038f370db4b8ea3cc9ad506c092.png" alt=" Enable Bucket Versioning" class="wp-image-53847" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_37.png?ssl=1"/></a><figcaption><em> Enable bucket versioning | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>6.点击<strong>权限</strong>标签:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_36" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/ddb5e454f877d414e77c80a1cdaf715e.png" alt="Create bucket" class="wp-image-53848" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_36.png?resize=840%2C404&amp;ssl=1"/></a><figcaption><em>Create bucket | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>7.在权限选项卡下，转到<strong>存储桶策略</strong>并点击<strong>编辑</strong>:</p>
+
+
+
+<p>8.输入以下策略，并将<strong> ` &lt;替换为您的存储桶的名称&gt; ` </strong>更改为您的存储桶的名称:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_6" target="_blank" rel="noopener"><img decoding="async" src="../Images/6cefbcfed146cff7254e126edb6e5f21.png" alt="Select permissions tab " class="wp-image-53878" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_6.png?ssl=1"/></a><figcaption><em>Go to permissions tab | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>您的策略编辑器现在应该如下所示:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_3" target="_blank" rel="noopener"><img decoding="async" src="../Images/d06174c1c4ffc4b6ee285f18507c6a5e.png" alt="Go to bucket policy to edit" class="wp-image-53881" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_3.png?ssl=1"/></a><figcaption><em>Go to bucket policy to edit | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>9.向下滚动并点击<strong>保存更改</strong>:</p>
+
+
+
+<pre class="hljs">{
+    <span class="hljs-string">"Version"</span>: <span class="hljs-string">"2012-10-17"</span>,
+    <span class="hljs-string">"Statement"</span>: [
+        {
+            <span class="hljs-string">"Sid"</span>: <span class="hljs-string">"PublicRead"</span>,
+            <span class="hljs-string">"Effect"</span>: <span class="hljs-string">"Allow"</span>,
+            <span class="hljs-string">"Principal"</span>: <span class="hljs-string">"*"</span>,
+            <span class="hljs-string">"Action"</span>: [
+                <span class="hljs-string">"s3:GetObject"</span>,
+                <span class="hljs-string">"s3:GetObjectVersion"</span>
+            ],
+            <span class="hljs-string">"Resource"</span>: <span class="hljs-string">"arn:aws:s3:::&lt;REPLACE WITH THE NAME OF YOUR BUCKET&gt;/*"</span>
+        }
+    ]
+}</pre>
+
+
+
+<p>就是这样！bucket中的对象现在应该可以公开访问(读取)了。这对于我们返回图像URL至关重要。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_43" target="_blank" rel="noopener"><img decoding="async" src="../Images/5df97c74d4346157a46d49ce713daf3d.png" alt="Policy editor" class="wp-image-53841" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_43.png?ssl=1"/></a><figcaption><em>Policy editor | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>创建一个DynamoDB表来存储预测</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_2" target="_blank" rel="noopener"><img decoding="async" src="../Images/5b63bca9bec34d9802d87beabb2ed6e3.png" alt="Save the changes" class="wp-image-53882" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_2.png?ssl=1"/></a><figcaption><em>Save the changes | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>在本指南的前面，我们了解到无服务器功能是无状态的。我们需要将我们的预测存储在某个地方，以便更容易与我们的应用程序进行通信。我们将为此使用亚马逊的NoSQL无服务器数据库<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/dynamodb/" target="_blank" rel="noreferrer noopener nofollow"> DynamoDB </a>,因为它伸缩性很好，并且很容易与无服务器功能集成。</p>
+
+
+
+<h4 id="create-a-dynamodb-table-to-store-predictions">与您选择的任何托管服务一样，您必须确保它符合您的应用程序要求。在我们的例子中，我们需要存储以下字段:</h4>
+
+
+
+<p> </p>
+
+
+
+<p>菲尔茨</p>
+
+
+
+<p id="separator-block_6171dee5a6972" class="block-separator block-separator--20">描述</p>
+
+
+
+<div id="medium-table-block_61ae29dc012d0" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner"><div class="c-ceil__inner"> <p>模型做出预测的日期</p> </div></p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">模型做出预测的日期</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">模型预测的蛾的名字</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">当我们在生产中监控和管理我们的模型时，由模型做出的预测的唯一ID将会有所帮助</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">做出预测的时间</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">被预测的图像的公共URL</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">模型的概率得分</td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">在给定预测日期预测的同一类别的数量</td>
+
+                    
+                        <td class="c-ceil"> </td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_61725428a6978" class="block-separator block-separator--15"> </p>
+
+
+
+<p class="has-text-align-center has-small-font-size">要创建一个DynamoDB表，只需要两个字段:主键<strong/>(分区键)和辅键<strong/>(排序键)。测试应用程序时，可以将其他键添加到表中。</p>
+
+
+
+<p id="separator-block_6171deeda6973" class="block-separator block-separator--15">要通过CLI 创建表<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/getting-started-step-1.html" target="_blank" rel="noreferrer noopener nofollow">，请确保CLI配置了正确的帐户详细信息，并使用:</a></p>
+
+
+
+<p>你也可以使用<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/getting-started-step-1.html" target="_blank" rel="noreferrer noopener nofollow">管理控制台</a>或者通过<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.Python.01.html" target="_blank" rel="noreferrer noopener nofollow"> Python SDK </a>以编程方式完成。要检查该表是否处于活动状态，请运行:</p>
+
+
+
+<p>前往<a href="https://web.archive.org/web/20221206031244/https://console.aws.amazon.com/dynamodb/" target="_blank" rel="noreferrer noopener nofollow">https://console.aws.amazon.com/dynamodb/</a>并检查可用的桌子。如果表创建成功，您应该会看到:</p>
+
+
+
+<pre class="hljs">aws dynamodb create-table
+    --table-name PredictionsTable
+    --attribute-definitions
+        AttributeName=PredictionDate,AttributeType=S
+        AttributeName=ClassPredictionID,AttributeType=S
+    --key-schema
+        AttributeName=PredictionDate,KeyType=HASH
+        AttributeName=ClassPredictionID,KeyType=RANGE
+    --provisioned-throughput
+        ReadCapacityUnits=<span class="hljs-number">50</span>,WriteCapacityUnits=<span class="hljs-number">50</span></pre>
+
+
+
+<p>创建一个弹性容器注册库</p>
+
+
+
+<pre class="hljs">aws dynamodb describe-table --table-name PredictionsTable | grep TableStatus</pre>
+
+
+
+<p>要使用CLI创建一个<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/AmazonECR/latest/userguide/Repositories.html" target="_blank" rel="noreferrer noopener nofollow"> ECR私有存储库</a>，请在AWS配置的命令行中输入以下内容，用您项目的区域替换<strong> ` &lt;区域&gt; ` </strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_14" target="_blank" rel="noopener"><img decoding="async" src="../Images/6527d316574ccf1d3732fca70d366571.png" alt="Successful operation view " class="wp-image-53870" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_14.png?ssl=1"/></a><figcaption><em>Successful operation view | Source: Author</em></figcaption></figure></div>
+
+
+
+<h4 id="create-an-elastic-container-registry-repository">您也可以从<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-console.html" target="_blank" rel="noreferrer noopener nofollow">管理控制台</a>创建私有回购。您应该会看到类似下面的输出:</h4>
+
+
+
+<p>检查控制台以确认您新创建的ECR存储库。您应该会看到类似的视图:</p>
+
+
+
+<pre class="hljs">aws ecr create-repository
+    --repository-name image-app-repo
+    --image-scanning-configuration scanOnPush=true
+    --region &lt;REGION&gt;</pre>
+
+
+
+<p>复制您的库URI，并将其保存在某个地方，因为您将在下一节中需要它。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_11" target="_blank" rel="noopener"><img decoding="async" src="../Images/27bc0b614f1cc8364b262bae2a727479.png" alt="Create an Elastic Container Registry repository - output" class="wp-image-53945" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_11.png?ssl=1"/></a><figcaption><em>Output | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>检查应用程序代码和配置文件</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_29" target="_blank" rel="noopener"><img decoding="async" src="../Images/d20070d837b88d424081dadd91bb8b62.png" alt="Confirm the newly created ECR repository " class="wp-image-53855" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_29.png?ssl=1"/></a><figcaption><em>Confirm the newly created ECR repository | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>要继续操作，请确保您处于AWS CLI环境中(您也可以选择创建一个虚拟环境)。完成以下步骤:</p>
+
+
+
+<h4 id="inspect-the-application-code-and-configuration-files">在你的本地电脑上，新建一个文件夹，命名为<strong>` image-classification-app `</strong>。</h4>
+
+
+
+<p>在文件夹中，在该目录下创建一个新的<strong> `requirements.txt` </strong>文件。您将添加一些您的应用程序使用的外部库，这些库不是<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html" target="_blank" rel="noreferrer noopener nofollow"> Lambda Python运行时</a>的本地库。这个函数将使用<strong> `python3.8` </strong>运行时。</p>
+
+
+
+<ol><li>创建一个<strong> `app.py` </strong>脚本，其中包含Lambda函数的代码以及将您的函数与其他服务集成的粘合代码。</li><li>在同一个目录下创建一个<strong> `Dockerfile` </strong>。</li><li>另外，创建一个<strong> `buildspec.yml` </strong>配置文件，CodeBuild将使用它来构建Docker映像。</li><li>下面是<strong> `requirements.txt` </strong>的样子:</li><li>在本应用中，我们将使用<a href="https://web.archive.org/web/20221206031244/https://blog.tensorflow.org/2020/12/whats-new-in-tensorflow-24.html" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow 2.4 </a>，因为我们的模型是用TensorFlow 2版本构建的。我们还将使用<a href="https://web.archive.org/web/20221206031244/https://pypi.org/project/pytz/" target="_blank" rel="noreferrer noopener nofollow"> pytz </a>来确保我们的申请时间格式正确。</li></ol>
+
+
+
+<p>接下来，我们将看看Lambda函数的代码。完整的代码可以在这个<a href="https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app/blob/master/app.py" target="_blank" rel="noreferrer noopener nofollow">库</a>中找到。从lambda函数开始，一旦事件触发了该函数，它就运行这个脚本，从包含用于推理的图像的S3桶中收集事件细节(<strong>`用于推理的图像`</strong>)。此外，如果客户端上传同名图像，对象将使用<strong> `versionId` </strong>进行版本控制，而不是被覆盖。</p>
+
+
+
+<pre class="hljs">tensorflow==<span class="hljs-number">2.4</span><span class="hljs-number">.0</span>
+pytz&gt;=<span class="hljs-number">2013</span>b</pre>
+
+
+
+<p>将类名存储在一个变量中，并编写代码在将图像提供给模型之前对其进行预处理。模型的输入层期望一个大小为<strong> 224×224 </strong>的图像:</p>
+
+
+
+<p>使用模型和概率得分进行预测。也获取预测的类名:</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">lambda_handler</span><span class="hljs-params">(event, context)</span>:</span>
+
+  bucket_name = event[<span class="hljs-string">'Records'</span>][<span class="hljs-number">0</span>][<span class="hljs-string">'s3'</span>][<span class="hljs-string">'bucket'</span>][<span class="hljs-string">'name'</span>]
+  key = unquote(event[<span class="hljs-string">'Records'</span>][<span class="hljs-number">0</span>][<span class="hljs-string">'s3'</span>][<span class="hljs-string">'object'</span>][<span class="hljs-string">'key'</span>])
+
+  versionId = unquote(event[<span class="hljs-string">'Records'</span>][<span class="hljs-number">0</span>][<span class="hljs-string">'s3'</span>][<span class="hljs-string">'object'</span>][<span class="hljs-string">'versionId'</span>])</pre>
+
+
+
+<p>做出预测后，代码检查DynamoDB表，查看当天是否已经做出了相同的预测。如果有，应用程序将更新当天预测类的计数，并用更新后的计数创建一个新条目。请注意，如果您计划在这个数据库中存储大量项目，那么使用<strong> ` <a href="https://web.archive.org/web/20221206031244/https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.scan" target="_blank" rel="noreferrer noopener nofollow"> table.scan </a> ` </strong>可能会成为<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-query-scan.html" target="_blank" rel="noreferrer noopener nofollow">的低效和高成本</a>。您可能需要找到一种方法来用<strong> ` <a href="https://web.archive.org/web/20221206031244/https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.query" target="_blank" rel="noreferrer noopener nofollow"> table.query </a> ` </strong>或其他方式编写您的逻辑，例如`<strong> <a href="https://web.archive.org/web/20221206031244/https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.get_item" target="_blank" rel="noreferrer noopener nofollow"> GetItem </a> ` </strong>和<strong>`<a href="https://web.archive.org/web/20221206031244/https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.batch_get_item" target="_blank" rel="noreferrer noopener nofollow">batch GetItem</a>`</strong>API。</p>
+
+
+
+<pre class="hljs">  class_names = [<span class="hljs-string">'AAW'</span>, <span class="hljs-string">'ECLW'</span>, <span class="hljs-string">'FAW'</span>]
+  image = readImageFromBucket(key, bucket_name).resize((<span class="hljs-number">224</span>, <span class="hljs-number">224</span>))
+  image = image.convert(<span class="hljs-string">'RGB'</span>)
+  image = np.asarray(image)
+  image = image.flatten()
+  image = image.reshape(<span class="hljs-number">1</span>, <span class="hljs-number">224</span>, <span class="hljs-number">224</span>, <span class="hljs-number">3</span>)</pre>
+
+
+
+<p>如果这是当天的第一个预测，代码会将其作为新项添加到表中。</p>
+
+
+
+<pre class="hljs">  prediction = model.predict(image)
+  pred_probability = <span class="hljs-string">"{:2.0f}%"</span>.format(<span class="hljs-number">100</span>*np.max(prediction))
+  index = np.argmax(prediction[<span class="hljs-number">0</span>], axis=<span class="hljs-number">-1</span>)
+  predicted_class = class_names[index]</pre>
+
+
+
+<p>这段代码从桶中读取图像，并将其作为将由Lambda函数使用的<a href="https://web.archive.org/web/20221206031244/https://pillow.readthedocs.io/en/stable/reference/Image.html" target="_blank" rel="noreferrer noopener nofollow">枕头图像</a>返回:</p>
+
+
+
+<pre class="hljs">  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> class_names:
+
+    <span class="hljs-keyword">if</span> predicted_class == i:
+
+      details = table.scan(
+          FilterExpression=Key(<span class="hljs-string">'PredictionDate'</span>).eq(date)
+          &amp; Attr(<span class="hljs-string">"ClassName"</span>).eq(predicted_class),
+          Limit=<span class="hljs-number">123</span>,
+      )
+
+      <span class="hljs-keyword">if</span> details[<span class="hljs-string">'Count'</span>] &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> details[<span class="hljs-string">'Items'</span>][<span class="hljs-number">0</span>][<span class="hljs-string">'ClassName'</span>] == predicted_class:
+
+        event = max(details[<span class="hljs-string">'Items'</span>], key=<span class="hljs-keyword">lambda</span> ev: ev[<span class="hljs-string">'Count_ClassName'</span>])
+
+        current_count = event[<span class="hljs-string">'Count_ClassName'</span>]
+
+        updated_count = current_count + <span class="hljs-number">1</span>
+
+        table_items = table.put_item(
+              Item={
+              <span class="hljs-string">'PredictionDate'</span>: date,
+              <span class="hljs-string">'ClassPredictionID'</span>: predicted_class + <span class="hljs-string">"-"</span> + str(uuid.uuid4()), 
+              <span class="hljs-string">'ClassName'</span>: predicted_class,
+              <span class="hljs-string">'Count_ClassName'</span>: updated_count,
+              <span class="hljs-string">'CaptureTime'</span>: time,
+              <span class="hljs-string">'ImageURL_ClassName'</span>: img_url,
+              <span class="hljs-string">'ConfidenceScore'</span>: pred_probability
+            }
+          )
+        print(<span class="hljs-string">"Updated existing object..."</span>)
+        <span class="hljs-keyword">return</span> table_items</pre>
+
+
+
+<p>完整文件</p>
+
+
+
+<pre class="hljs">      <span class="hljs-keyword">elif</span> details[<span class="hljs-string">'Count'</span>] == <span class="hljs-number">0</span>:
+        new_count = <span class="hljs-number">1</span>
+        table_items = table.put_item(
+              Item={
+                <span class="hljs-string">'PredictionDate'</span>: date,
+                <span class="hljs-string">'ClassPredictionID'</span>: predicted_class + <span class="hljs-string">"-"</span> + str(uuid.uuid4()), 
+                <span class="hljs-string">'ClassName'</span>: predicted_class,
+                <span class="hljs-string">'Count_ClassName'</span>: new_count,
+                <span class="hljs-string">'CaptureTime'</span>: time,
+                <span class="hljs-string">'ImageURL_ClassName'</span>: img_url,
+                <span class="hljs-string">'ConfidenceScore'</span>: pred_probability
+              }
+            )
+        print(<span class="hljs-string">"Added new object!"</span>)
+        <span class="hljs-keyword">return</span> table_items
+
+  print(<span class="hljs-string">"Updated model predictions successfully!"</span>)</pre>
+
+
+
+<p>您完成的代码(也在这个<a href="https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app/blob/master/app.py" target="_blank" rel="noreferrer noopener nofollow">存储库</a>中)应该类似于下面的代码，确保您将<strong> ` &lt;替换为您的表名&gt; ` </strong>替换为您的DynamoDB表名，将<strong> ` &lt;替换为您的推理映像桶&gt; ` </strong>替换为您之前创建的S3桶:</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">readImageFromBucket</span><span class="hljs-params">(key, bucket_name)</span>:</span>
+  <span class="hljs-string">"""
+  Read the image from the triggering bucket.
+  :param key: object key
+  :param bucket_name: Name of the triggering bucket.
+  :return: Pillow image of the object.
+
+  """</span>
+  
+  bucket = s3.Bucket(bucket_name)
+  
+  object = bucket.Object(key)
+  response = object.get()
+  <span class="hljs-keyword">return</span> Image.open(response[<span class="hljs-string">'Body'</span>])</pre>
+
+
+
+<h4 id="complete-file">检查<strong> `Dockerfile` </strong>，用你的名字替换<strong> ` &lt;你的名字&gt; ` </strong>，用你的邮箱替换<strong> ` &lt;你的邮箱&gt; ` </strong>。</h4>
+
+
+
+<p>检查<strong> `buildspec.yml` </strong>文件，将<strong> ` &lt;替换为您的ECR REPO URI &gt; ` </strong> <strong>替换为您在上一节中创建的ECR库的URI</strong>:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">import</span> boto3
+<span class="hljs-keyword">import</span> datetime
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> PIL.Image <span class="hljs-keyword">as</span> Image
+<span class="hljs-keyword">import</span> uuid
+<span class="hljs-keyword">import</span> pytz
+<span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+
+<span class="hljs-keyword">from</span> urllib.parse <span class="hljs-keyword">import</span> unquote
+<span class="hljs-keyword">from</span> pathlib <span class="hljs-keyword">import</span> Path
+<span class="hljs-keyword">from</span> decimal <span class="hljs-keyword">import</span> Decimal
+<span class="hljs-keyword">from</span> botocore.exceptions <span class="hljs-keyword">import</span> ClientError
+<span class="hljs-keyword">from</span> boto3.dynamodb.conditions <span class="hljs-keyword">import</span> Key, Attr
+<span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime <span class="hljs-keyword">as</span> dt
+
+
+
+
+tz = pytz.timezone(<span class="hljs-string">'Africa/Lagos'</span>) 
+date_time = str(dt.now(tz).strftime(<span class="hljs-string">'%Y-%m-%d %H:%M:%S'</span>))
+
+date = date_time.split(<span class="hljs-string">" "</span>)[<span class="hljs-number">0</span>]
+time = date_time.split(<span class="hljs-string">" "</span>)[<span class="hljs-number">1</span>]
+
+timestamp = Decimal(str(dt.timestamp(dt.now())))
+
+
+import_path = <span class="hljs-string">"model/"</span>
+
+
+model = tf.keras.models.load_model(import_path)
+
+
+IMAGE_WIDTH = <span class="hljs-number">224</span>
+IMAGE_HEIGHT = <span class="hljs-number">224</span>
+
+
+IMAGE_SHAPE = (IMAGE_WIDTH, IMAGE_HEIGHT)
+
+
+s3 = boto3.resource(<span class="hljs-string">'s3'</span>)
+dynamodb = boto3.resource(<span class="hljs-string">'dynamodb'</span>)
+
+
+table = dynamodb.Table(<span class="hljs-string">'&lt;REPLACE WITH YOUR TABLE NAME&gt;'</span>)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">lambda_handler</span><span class="hljs-params">(event, context)</span>:</span>
+
+  bucket_name = event[<span class="hljs-string">'Records'</span>][<span class="hljs-number">0</span>][<span class="hljs-string">'s3'</span>][<span class="hljs-string">'bucket'</span>][<span class="hljs-string">'name'</span>]
+  key = unquote(event[<span class="hljs-string">'Records'</span>][<span class="hljs-number">0</span>][<span class="hljs-string">'s3'</span>][<span class="hljs-string">'object'</span>][<span class="hljs-string">'key'</span>])
+
+  
+  
+  versionId = unquote(event[<span class="hljs-string">'Records'</span>][<span class="hljs-number">0</span>][<span class="hljs-string">'s3'</span>][<span class="hljs-string">'object'</span>][<span class="hljs-string">'versionId'</span>])
+  
+  
+  
+  
+  class_names = [<span class="hljs-string">'AAW'</span>, <span class="hljs-string">'ECLW'</span>, <span class="hljs-string">'FAW'</span>]
+
+  
+  print(key)
+
+
+  
+  
+  image = readImageFromBucket(key, bucket_name).resize((<span class="hljs-number">224</span>, <span class="hljs-number">224</span>))
+  image = image.convert(<span class="hljs-string">'RGB'</span>)
+  image = np.asarray(image)
+  image = image.flatten()
+  image = image.reshape(<span class="hljs-number">1</span>, <span class="hljs-number">224</span>, <span class="hljs-number">224</span>, <span class="hljs-number">3</span>)
+
+  
+  
+  prediction = model.predict(image)
+  print(prediction) 
+  pred_probability = <span class="hljs-string">"{:2.0f}%"</span>.format(<span class="hljs-number">100</span>*np.max(prediction))
+  index = np.argmax(prediction[<span class="hljs-number">0</span>], axis=<span class="hljs-number">-1</span>)
+  print(index) 
+  predicted_class = class_names[index]
+
+  
+  print(<span class="hljs-string">'ImageName: {0}, Model Prediction: {1}'</span>.format(key, predicted_class))
+
+  
+  img_url = f<span class="hljs-string">"https://&lt;REPLACE WITH YOUR BUCKET FOR INFERENCE IMAGES&gt;.s3.&lt;REGION&gt;.amazonaws.com/{key}?versionId={versionId}"</span>
+  
+  
+  
+
+  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> class_names:
+
+    <span class="hljs-keyword">if</span> predicted_class == i:
+
+      details = table.scan(
+          FilterExpression=Key(<span class="hljs-string">'PredictionDate'</span>).eq(date)
+          &amp; Attr(<span class="hljs-string">"ClassName"</span>).eq(predicted_class),
+          Limit=<span class="hljs-number">123</span>,
+      )
+
+      <span class="hljs-keyword">if</span> details[<span class="hljs-string">'Count'</span>] &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> details[<span class="hljs-string">'Items'</span>][<span class="hljs-number">0</span>][<span class="hljs-string">'ClassName'</span>] == predicted_class:
+
+        event = max(details[<span class="hljs-string">'Items'</span>], key=<span class="hljs-keyword">lambda</span> ev: ev[<span class="hljs-string">'Count_ClassName'</span>])
+
+        current_count = event[<span class="hljs-string">'Count_ClassName'</span>]
+
+        print(current_count) 
+
+        updated_count = current_count + <span class="hljs-number">1</span>
+
+        table_items = table.put_item(
+              Item={
+              <span class="hljs-string">'PredictionDate'</span>: date,
+              <span class="hljs-string">'ClassPredictionID'</span>: predicted_class + <span class="hljs-string">"-"</span> + str(uuid.uuid4()), 
+              <span class="hljs-string">'ClassName'</span>: predicted_class,
+              <span class="hljs-string">'Count_ClassName'</span>: updated_count,
+              <span class="hljs-string">'CaptureTime'</span>: time,
+              <span class="hljs-string">'ImageURL_ClassName'</span>: img_url,
+              <span class="hljs-string">'ConfidenceScore'</span>: pred_probability
+            }
+          )
+        print(<span class="hljs-string">"Updated existing object..."</span>)
+        <span class="hljs-keyword">return</span> table_items
+
+    
+    
+      <span class="hljs-keyword">elif</span> details[<span class="hljs-string">'Count'</span>] == <span class="hljs-number">0</span>:
+        new_count = <span class="hljs-number">1</span>
+        table_items = table.put_item(
+              Item={
+                <span class="hljs-string">'PredictionDate'</span>: date,
+                <span class="hljs-string">'ClassPredictionID'</span>: predicted_class + <span class="hljs-string">"-"</span> + str(uuid.uuid4()), 
+                <span class="hljs-string">'ClassName'</span>: predicted_class,
+                <span class="hljs-string">'Count_ClassName'</span>: new_count,
+                <span class="hljs-string">'CaptureTime'</span>: time,
+                <span class="hljs-string">'ImageURL_ClassName'</span>: img_url,
+                <span class="hljs-string">'ConfidenceScore'</span>: pred_probability
+              }
+            )
+        print(<span class="hljs-string">"Added new object!"</span>)
+        <span class="hljs-keyword">return</span> table_items
+
+  print(<span class="hljs-string">"Updated model predictions successfully!"</span>)
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">readImageFromBucket</span><span class="hljs-params">(key, bucket_name)</span>:</span>
+  <span class="hljs-string">"""
+  Read the image from the triggering bucket.
+  :param key: object key
+  :param bucket_name: Name of the triggering bucket.
+  :return: Pillow image of the object.
+
+  """</span>
+  
+  bucket = s3.Bucket(bucket_name)
+  object = bucket.Object(key)
+  response = object.get()
+  <span class="hljs-keyword">return</span> Image.open(response[<span class="hljs-string">'Body'</span>])</pre>
+
+
+
+<p>就是这样！确保将您的代码与本指南的<a href="https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app" target="_blank" rel="noreferrer noopener nofollow">库</a>中的代码进行比较。我们现在将设置CI/CD管道来推送我们的应用程序代码和配置文件。</p>
+
+
+
+<pre class="hljs">
+FROM public.ecr.aws/<span class="hljs-keyword">lambda</span>/python:<span class="hljs-number">3.8</span>
+
+
+LABEL maintainer=<span class="hljs-string">"&lt;YOUR NAME&gt; &lt;YOUR EMAIL&gt;"</span>
+LABEL version=<span class="hljs-string">"1.0"</span>
+LABEL description=<span class="hljs-string">"Demo moth classification application for serverless deployment for Neptune.ai technical guide."</span>
+
+
+RUN yum -y install tar gzip zlib freetype-devel
+    gcc
+    ghostscript
+    lcms2-devel
+    libffi-devel
+    libimagequant-devel
+    libjpeg-devel
+    libraqm-devel
+    libtiff-devel
+    libwebp-devel
+    make
+    openjpeg2-devel
+    rh-python36
+    rh-python36-python-virtualenv
+    sudo
+    tcl-devel
+    tk-devel
+    tkinter
+    which
+    xorg-x11-server-Xvfb
+    zlib-devel
+    &amp;&amp; yum clean all
+
+
+COPY requirements.txt ./
+
+
+RUN python3<span class="hljs-number">.8</span> -m pip install -r requirements.txt
+
+RUN pip uninstall -y pillow &amp;&amp; CC=<span class="hljs-string">"cc -mavx2"</span> pip install -U --force-reinstall pillow-simd
+
+
+COPY app.py ./
+
+
+
+
+RUN mkdir model
+RUN curl -L https://sagemaker-mothmodel-artifact.s3.us-east<span class="hljs-number">-2.</span>amazonaws.com/models/resnet_model.tar -o ./model/resnet.tar.gz
+RUN tar -xf model/resnet.tar.gz -C model/
+RUN rm -r model/resnet.tar.gz
+
+CMD [<span class="hljs-string">"app.lambda_handler"</span>]</pre>
+
+
+
+<p>创建代码提交Git存储库</p>
+
+
+
+<pre class="hljs">version: <span class="hljs-number">0.2</span>
+
+phases:
+  install:
+    runtime-versions:
+      python: <span class="hljs-number">3.8</span>
+  pre_build:
+    commands:
+      - echo Logging <span class="hljs-keyword">in</span> to Amazon ECR...
+      - pip install --upgrade awscli==<span class="hljs-number">1.18</span><span class="hljs-number">.17</span>
+      - aws --version
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - REPOSITORY_URI=&lt;REPLACE WITH YOUR ECR REPO URI&gt;
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c <span class="hljs-number">1</span><span class="hljs-number">-7</span>)
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F<span class="hljs-string">":"</span> <span class="hljs-string">'{print $2}'</span>)
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG</pre>
+
+
+
+<p>1.按照页面上的说明<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/codecommit/latest/userguide/setting-up-gc.html" target="_blank" rel="noreferrer noopener nofollow">为CodeCommit创建您的git凭证。</a></p>
+
+
+
+
+
+
+
+<h4 id="create-codecommit-git-repository">2.一旦你创建了你的git证书，在<a href="https://web.archive.org/web/20221206031244/https://console.aws.amazon.com/codesuite/codecommit/home" target="_blank" rel="noreferrer noopener nofollow">https://console.aws.amazon.com/codesuite/codecommit/home</a>打开CodeCommit控制台</h4>
+
+
+
+<p>3.点击<strong>创建存储库</strong>:</p>
+
+
+
+<p>4.输入一个<strong>存储库名称</strong>，一个描述，将其余选项保留为默认，然后单击<strong>创建</strong>:</p>
+
+
+
+<p>在显示的页面上确认您新创建的repo，并查看如何用git克隆您的repo的信息。您应该看到以下内容:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_21" target="_blank" rel="noopener"><img decoding="async" src="../Images/209a5f59690e99b2ac9af6ac18c565a6.png" alt="Create repository" class="wp-image-53863" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_21.png?ssl=1"/></a><figcaption><em>Create repository | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>5.要进行第一次提交，请确保您位于正确的文件夹中，即您之前在指南<strong>` image-class ification-app`</strong>中创建的文件夹，并输入以下内容(假设您遵循了本指南中的命名约定并使用了相同的区域):</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_41" target="_blank" rel="noopener"><img decoding="async" src="../Images/5ec696b7e92b8791b935f6ec019f9aab.png" alt="Add repository details" class="wp-image-53843" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_41.png?ssl=1"/></a><figcaption><em>Add repository details | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>如果成功克隆，您现在应该已经准备好提交代码并将其推送到CI/CD管道。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_46" target="_blank" rel="noopener"><img decoding="async" src="../Images/98c627d98a5bfde3304c4d2099042a9f.png" alt="Clone your repo with git" class="wp-image-53838" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_46.png?ssl=1"/></a><figcaption><em>Clone your repo with git | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>6.在<strong>` image-class ification-app`</strong>文件夹中，使用以下命令查看哪些文件尚未提交:</p>
+
+
+
+<pre class="hljs">git clone
+https://git-codecommit.us-east<span class="hljs-number">-2.</span>amazonaws.com/v1/repos/image-app-repo ../image-classification-app/</pre>
+
+
+
+<p>7.将所有要提交的文件存放在文件夹中:</p>
+
+
+
+<p>8.检查文件是否准备好提交:</p>
+
+
+
+<pre class="hljs">git status</pre>
+
+
+
+<p>您应该会看到类似的输出:</p>
+
+
+
+<pre class="hljs">git add *</pre>
+
+
+
+<p>9.或者，您可能需要为此提交配置您的姓名，您可以用您的详细信息替换下面的标签:</p>
+
+
+
+<pre class="hljs">git status</pre>
+
+
+
+<p>10.提交文件并包含一条消息。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_57" target="_blank" rel="noopener"><img decoding="async" src="../Images/8eaec17ddb7ae6006a374184b147310c.png" alt="Create CodeCommit Git repository - output&#10;" class="wp-image-53947" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_57.png?ssl=1"/></a><figcaption><em>Output | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>您应该会看到类似的输出:</p>
+
+
+
+<pre class="hljs">git config user.email <span class="hljs-string">"&lt;YOUR EMAIL ADDRESS&gt;"</span>
+git config user.name  <span class="hljs-string">"&lt;YOUR NAME&gt;"</span></pre>
+
+
+
+<p>现在，您的代码和配置文件已经准备好被推送到您之前创建的CodeCommit存储库中。要将它们推送到存储库，请遵循以下说明:</p>
+
+
+
+<pre class="hljs">git commit -m <span class="hljs-string">"Initial commit to CodeCommit."</span></pre>
+
+
+
+<p>11.使用以下命令将您的提交推送到主分支上游:</p>
+
+
+
+
+
+
+
+<p>您的命令行或IDE可能会要求您输入之前创建的git凭据。确保您输入了正确的详细信息。如果提交成功，您应该会看到类似的输出:</p>
+
+
+
+<p>使用CodeBuild构建容器映像</p>
+
+
+
+<pre class="hljs">git push -u origin master</pre>
+
+
+
+<p>为了构建我们的容器映像，我们必须用CodeBuild创建一个项目。</p>
+
+
+
+
+
+
+
+<h4 id="build-container-image-with-codebuild">1.前往https://console.aws.amazon.com/codesuite/codebuild/home</h4>
+
+
+
+<p>2.选择<strong>构建项目</strong>，点击<strong>创建构建项目</strong>:</p>
+
+
+
+<p>3.在<strong>项目配置</strong>下，输入您的项目名称和项目描述:</p>
+
+
+
+<p>4.在<strong> Source </strong>下，确认选择了AWS CodeCommit，并选择您的源库(<strong> `image-app-repo` </strong>)。在<strong>参照类型</strong>下，选择<strong>分支</strong>，选择主分支。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_5" target="_blank" rel="noopener"><img decoding="async" src="../Images/b33606e2b803226b5a2fac49f69635dc.png" alt="Create build project" class="wp-image-53879" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_5.png?ssl=1"/></a><figcaption><em>Create build project | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>5.在<strong>环境</strong>下，确保<strong>管理镜像</strong>被选中。在<strong>操作系统</strong>下，选择<strong> Ubuntu。</strong>选择<strong>标准</strong>运行时，选择<strong>标准:5.0 </strong>图像。在<strong>镜像版本</strong>下，确保<strong>始终使用该运行时版本的最新镜像</strong>被选中。在<strong>环境类型</strong>下，选择<strong> Linux </strong>并点击<strong>特权</strong>下的复选框，因为您正在构建Docker映像:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_54" target="_blank" rel="noopener"><img decoding="async" src="../Images/8c6871b72ab987f6073cbe3041410a76.png" alt="Add project details" class="wp-image-53830" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_54.png?ssl=1"/></a><figcaption><em>Add project details | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>6.如果您没有现有的服务角色，请确保选择了<strong>新服务角色</strong>,并将其他角色保留为默认角色，除非您需要其他配置:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_35" target="_blank" rel="noopener"><img decoding="async" src="../Images/fa70c99b294d09b3e30937f5a7e9c71a.png" alt="Add source details " class="wp-image-53849" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_35.png?ssl=1"/></a><figcaption><em>Add source details | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>7.在<strong> Buildspec </strong>下，确保<strong>使用一个Buildspec文件</strong>被选中。其他默认，包括<strong>批量配置</strong>下的选项:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_24" target="_blank" rel="noopener"><img decoding="async" src="../Images/628a3aa0a554a37a89f8ebef3ae39e32.png" alt="Add environment details " class="wp-image-53860" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_24.png?ssl=1"/></a><figcaption><em>Add environment details | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>8.您的应用程序中没有包含任何工件，因此您可以将<strong>工件</strong>下的选项保留为默认值。在<strong>日志</strong>下，确保<strong>云观察日志</strong>被勾选。输入一个描述性的<strong>组名</strong>和<strong>流名</strong>。确认所有选项并选择<strong>创建构建项目</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_44" target="_blank" rel="noopener"><img decoding="async" src="../Images/88e82a92f6bab00853923b4c5b0ab36b.png" alt="Select new service role" class="wp-image-53840" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_44.png?ssl=1"/></a><figcaption><em>Select new service role | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>如果您的项目创建成功，您应该会看到类似如下的页面:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_8" target="_blank" rel="noopener"><img decoding="async" src="../Images/f4a5579d869d082188bc97c9e4bc89a9.png" alt="Ensure use a buildspec file is selected " class="wp-image-53876" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_8.png?ssl=1"/></a><figcaption><em>Ensure use a buildspec file is selected | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>如果您想在构建完成时得到通知，您可以点击<strong>为这个项目</strong>创建一个通知规则。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_1" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/aed15b3b9e5a875bca67a930082ba06d.png" alt="Create build project" class="wp-image-53883" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_1.png?resize=840%2C785&amp;ssl=1"/></a><figcaption><em>Create build project | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>9.在开始项目的构建之前，您需要向您创建的CodeBuild角色附加一个新策略。进入你的<a href="https://web.archive.org/web/20221206031244/https://console.aws.amazon.com/iam/home" target="_blank" rel="noreferrer noopener nofollow"> <strong> IAM </strong>页面</a>，点击<strong>角色</strong>，搜索你创建的代码构建角色:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_42" target="_blank" rel="noopener"><img decoding="async" src="../Images/394518a56c836cb0bbef5f7c06b8ce00.png" alt="Successful new project view " class="wp-image-53842" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_42.png?ssl=1"/></a><figcaption><em>Successful new project view | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>10.点击<strong>附加策略</strong>:</p>
+
+
+
+<p>11.搜索amazone C2 containerregistrypoweruser策略。点击旁边的复选标记，并在页面末尾点击<strong>附加策略</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_27" target="_blank" rel="noopener"><img decoding="async" src="../Images/9cc0aa1ef027a933c3afd97811566655.png" alt="IAM page" class="wp-image-53857" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_27.png?ssl=1"/></a><figcaption><em>Attach new policy | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>12.在下一页上，确认策略确实已添加:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_32" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/be0a80722f3dd28d9a8853642a0b94a1.png" alt="Attach policies" class="wp-image-53852" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_32.png?resize=840%2C264&amp;ssl=1"/></a><figcaption><em>Select attached policies | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>13.返回到您创建的项目的CodeBuild页面，点击<strong> Start build </strong>来测试您的应用程序构建。如果您的应用程序构建是<strong>成功的</strong>，您应该会看到如下页面:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_25" target="_blank" rel="noopener"><img decoding="async" src="../Images/1d92ccdf53a83cd63edf4016bcc67d34.png" alt="Attach AmazonEC2ContainerRegistryPowerUser policy" class="wp-image-53859" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_25.png?ssl=1"/></a><figcaption><em>Attach AmazonEC2ContainerRegistryPowerUser policy | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>如果您的构建失败了，日志对于故障排除非常有帮助。如果您正确地遵循了本指南中的步骤，您应该能够成功地构建应用程序。您可以返回到<strong> `image-app-repo` </strong>(或您创建的ECR repo)的<strong>Elastics Container Registry</strong>页面，以确认Docker映像确实已创建。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_48" target="_blank" rel="noopener"><img decoding="async" src="../Images/46c420bbcbda1134d44af36ba956e0f6.png" alt="Confirm attached policies " class="wp-image-53836" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_48.png?ssl=1"/></a><figcaption><em>Confirm attached policies | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>使用代码管道自动构建应用程序</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_45" target="_blank" rel="noopener"><img decoding="async" src="../Images/f522fcffb10d21965af9a11b0e0fb6e7.png" alt="Successful build status view" class="wp-image-53839" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_45.png?ssl=1"/></a><figcaption><em>Successful build status view | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>您不希望依靠手动步骤来部署无服务器组件。要在将新的提交推送到CodeCommit时自动化构建过程，可以使用CodePipeline。</p>
+
+
+
+<h4 id="automate-application-build-with-codepipeline">1.转到代码管道管理控制台<a href="https://web.archive.org/web/20221206031244/http://console.aws.amazon.com/codesuite/codepipeline/home" target="_blank" rel="noreferrer noopener nofollow">http://console.aws.amazon.com/codesuite/codepipeline/home</a></h4>
+
+
+
+<p>2.确保<strong>管道</strong>被选中，点击<strong>创建管道</strong>:</p>
+
+
+
+<p>3.输入您的<strong>管道名称</strong>。如果您没有现有的服务角色，选择<strong>新服务角色</strong>并输入<strong>角色名称</strong>。保留其他默认设置，点击<strong>下一个</strong>:</p>
+
+
+
+<p>4.在下一步中，选择<strong> AWS CodeCommit </strong>，输入<strong>存储库名称</strong>，选择<strong>主</strong>分支，并将其他选项保留为默认:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_28" target="_blank" rel="noopener"><img decoding="async" src="../Images/3ece5941855debede82fc0c1e3cc02bf.png" alt="Create pipeline" class="wp-image-53856" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_28.png?ssl=1"/></a><figcaption><em>Create pipeline | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>5.在<strong>添加构建阶段</strong>步骤下，选择<strong> AWS CodeBuild </strong>作为构建提供者。确保选择了项目区域和在上一节中创建的CodeBuild项目。其他选项保持默认，点击<strong>下一步</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_39" target="_blank" rel="noopener"><img decoding="async" src="../Images/08d401882e64f06451dca63bc6451d4d.png" alt="Choose pipeline settings" class="wp-image-53845" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_39.png?ssl=1"/></a><figcaption><em>Choose pipeline settings | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>6.因为我们将手动部署我们的映像，我们将不得不<strong>跳过管道中的连续部署步骤</strong>。点击<strong>跳过展开阶段</strong>，当弹出<strong>跳过展开阶段</strong>对话框时，点击<strong>跳过</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_50" target="_blank" rel="noopener"><img decoding="async" src="../Images/4140d89b06c425f9b362d55ba4965db8.png" alt="Add source stage" class="wp-image-53834" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_50.png?ssl=1"/></a><figcaption><em>Add source stage | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>7.最后，检查您的设置并点击<strong>创建管道</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_10" target="_blank" rel="noopener"><img decoding="async" src="../Images/d407ae91b01667e92eba908e0ec4fb47.png" alt="Add build stage" class="wp-image-53874" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_10.png?ssl=1"/></a><figcaption><em>Add build stage | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>8.现在，您应该位于应用程序构建过程已经自动开始的页面上:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_18" target="_blank" rel="noopener"><img decoding="async" src="../Images/edf6cbfc2c593f48761df4f93516c34a.png" alt="Add deploy stage" class="wp-image-53866" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_18.png?ssl=1"/></a><figcaption><em>Add deploy stage | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>5分钟后检查，如果构建成功，您应该会看到一个<strong>成功</strong>的通知。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_19" target="_blank" rel="noopener"><img decoding="async" src="../Images/d56d2c36feb8305af651db234393afcc.png" alt="Create pipeline" class="wp-image-53865" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_19-1779158871-1634765959782.png?ssl=1"/></a><figcaption><em>Create pipeline | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>现在，您的持续集成和交付管道已经完成。现在，您可以对您的应用程序源代码进行最终提交，以确保您的管道按预期工作。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_12" target="_blank" rel="noopener"><img decoding="async" src="../Images/8edc4ce770d91bae73884419f05098ff.png" alt="Successful new pipeline view" class="wp-image-53872" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_12.png?ssl=1"/></a><figcaption><em>Successful new pipeline view | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>确保您仍在项目文件夹中，如果您没有更改代码中的任何内容，请再次暂存代码并添加新的提交消息:</p>
+
+
+
+<p>使用以下方式将您的提交推至代码提交:</p>
+
+
+
+<p>您可能需要输入CodeCommit git凭据。确保您输入了正确的详细信息。</p>
+
+
+
+<pre class="hljs">git add *
+git commit -m <span class="hljs-string">"Final commit"</span></pre>
+
+
+
+<p>主分支的推送成功后，返回到CodePipeline页面，确认您的推送已经触发了管道中的新构建:</p>
+
+
+
+<pre class="hljs">git push</pre>
+
+
+
+<p>构建完成后，进入Elastics容器注册表中的<strong> `image-app-repo` </strong>(您的repo)查看新的映像构建:</p>
+
+
+
+<p>太好了！您现在可以开始部署了。由于这是一个教程，我们将跳过大部分安全和其他漏洞的测试阶段。如果这是您组织的生产应用程序，您肯定应该考虑进行安全检查。您不希望在CI/CD管道中硬编码您的凭证或API密钥。您可以使用凭证管理工具，如<a href="https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html" target="_blank" rel="noreferrer noopener nofollow"> AWS参数存储库</a>。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_23" target="_blank" rel="noopener"><img decoding="async" src="../Images/3cfc94b84aef4847f880d987c143234e.png" alt="Confirm your push has triggered a new build in the pipeline" class="wp-image-53861" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_23.png?ssl=1"/></a><figcaption><em>Confirm your push has triggered a new build in the pipeline | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>将影像分类应用程序部署到AWS Lambda</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_55" target="_blank" rel="noopener"><img decoding="async" src="../Images/6d507f0e713e2cda775bc91260ffa723.png" alt="Open image-app-repo" class="wp-image-53829" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_55.png?ssl=1"/></a><figcaption><em>Open image-app-repo | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>现在，您的应用程序构建已经准备好部署到无服务器功能。要部署它，我们必须设置AWS Lambda，以便在有新事件时运行应用程序构建。在我们的例子中，每当一个新的图像上传到我们的S3桶，它应该触发Lambda函数来运行图像上的应用程序，并将预测和其他细节返回到DynamoDB。</p>
+
+
+
+<h4 id="deploying-your-image-classification-application-to-aws-lambda">使用AWS Lambda创建无服务器功能</h4>
+
+
+
+<p>1.打开Lambda控制台上的<a href="https://web.archive.org/web/20221206031244/https://console.aws.amazon.com/lambda/home#/functions" target="_blank" rel="noreferrer noopener nofollow">功能页面</a>。</p>
+
+
+
+<h4 id="create-serverless-function-with-aws-lambda">2.选择<strong>创建功能</strong>。</h4>
+
+
+
+<p>3.在<strong>创建功能</strong>下，选择<strong>容器图像</strong>。在<strong>基本信息</strong>下，输入您的函数名，选择您创建的ECR库中的镜像，确保选择x86作为微处理器。其他选项保持默认，点击<strong>创建功能</strong>:</p>
+
+
+
+<p>4.一旦你的图像被创建，在<strong>功能概述下，</strong>点击<strong>添加触发器</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_9" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/accc7177f3afa36d502df523a0e6b40d.png" alt="Create function" class="wp-image-53875" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_9.png?resize=840%2C69&amp;ssl=1"/></a><figcaption><em>Create function | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>5.在<strong>触发配置</strong>下，选择<strong> S3 </strong>和您想要触发该功能的铲斗。将其他选项保留为默认选项(假设您没有任何文件夹或需要包含特定的扩展名)。勾选<strong>递归调用</strong>下的复选框，确认信息:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_13" target="_blank" rel="noopener"><img decoding="async" src="../Images/fb76ff489497b75e351053ffed6bcf35.png" alt="Add function details" class="wp-image-53871" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_13.png?ssl=1"/></a><figcaption><em>Add function details | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>添加触发器后，您需要通过为Lambda函数的执行角色设置适当的<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/iam/" target="_blank" rel="noreferrer noopener nofollow"> AWS身份和访问管理(IAM) </a>权限，来允许Lambda函数连接到S3存储桶。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_16" target="_blank" rel="noopener"><img decoding="async" src="../Images/625d3fcded0d8406066fa5a9d4726949.png" alt="Open add trigger view" class="wp-image-53868" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_16.png?ssl=1"/></a><figcaption><em>Open add trigger view | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>6.在您的功能的<strong>权限</strong>选项卡上，选择<strong> IAM角色</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_40" target="_blank" rel="noopener"><img decoding="async" src="../Images/7d6a8cf4f9aac1f8e1b7c529b072639b.png" alt="Add trigger " class="wp-image-53844" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_40.png?ssl=1"/></a><figcaption><em>Add trigger | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>7.选择<strong>附加策略</strong>:</p>
+
+
+
+<p>8.搜索<strong>亚马逊3ReadOnlyAccess </strong>和<strong>亚马逊DynamoDBFullAccess </strong>。将<strong>两个策略</strong>附加到<strong> IAM </strong>角色:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_58" target="_blank" rel="noopener"><img decoding="async" src="../Images/edfcf972a1c5b6f06b8451e9a1dcd988.png" alt="Select IAM role " class="wp-image-53826" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_58.png?ssl=1"/></a><figcaption><em>Select IAM role | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>9.返回到您的<strong>功能页面</strong>。在<strong>配置</strong>选项卡下，确保选择<strong>通用配置</strong>，点击<strong>编辑</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_38" target="_blank" rel="noopener"><img decoding="async" src="../Images/e0155c7ddbe71d5c3238afb9784a0a75.png" alt="" class="wp-image-53846" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_38.png?ssl=1"/></a><figcaption><em>Select attached policies | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>10.将内存大小升级到7000 MB (7 GB ),以确保应用程序运行时有足够的内存可用。另外，将<strong>超时</strong>增加到大约5分钟。其他选项保持默认，点击<strong>保存</strong>:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_4" target="_blank" rel="noopener"><img decoding="async" src="../Images/6e39f9602758cb7b365f2255309ec8f5.png" alt="Attach AmazonS3ReadOnlyAccess and AmazonDynamoDBFullAccess policies " class="wp-image-53880" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_4.png?ssl=1"/></a><figcaption><em>Attach AmazonS3ReadOnlyAccess and AmazonDynamoDBFullAccess policies | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>就是这样！您现在已经准备好测试您的应用程序了。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_52" target="_blank" rel="noopener"><img decoding="async" src="../Images/ee73bc6ecfada1686342569ae7efc427.png" alt="Edit general configuration " class="wp-image-53832" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_52.png?ssl=1"/></a><figcaption><em>Edit general configuration | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>测试应用程序</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_53" target="_blank" rel="noopener"><img decoding="async" src="../Images/6dbfc9c331fecf6f2bfd4ffd10ad215c.png" alt="Edit basic settings" class="wp-image-53831" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_53.png?ssl=1"/></a><figcaption><em>Edit basic settings | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>为了测试您的应用程序，上传一个测试图像到您的推理桶。在我们的例子中，它是<strong>`用于推理的图像`</strong>。这里有一个秋天粘虫(FAW)图像的例子，如果您正在跟踪，您可以使用它来测试这个应用程序:</p>
+
+
+
+<h4 id="testing-your-application">当您将图像上传到bucket时，等待几分钟让您的应用程序启动(我们前面讨论过的冷启动问题)。转到Lambda函数的页面。在我们的例子中，它是<strong> `image-app-func` </strong>。在<strong>监视器</strong>选项卡下，点击<strong>查看CloudWatch </strong>中的日志。检查最新的日志流并查看您的应用程序日志:</h4>
+
+
+
+<p>您可以看到，应用程序返回了正确的预测，它还通知我们，由于没有现有的对象，它已经向数据库添加了一个新对象。周转时间为48705毫秒(或48.75秒)。如果您计划运行实时应用程序，这可能是不可接受的。一旦您在前一次预测的5分钟内运行了其他预测，延迟应该会显著减少，并且更适合于实时任务。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/6d6ed3a55bb3472d0926ea248271fd45.png" alt="Image of Fall armyworm (FAW)" class="wp-image-53828" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_56.png?resize=313%2C313&amp;ssl=1"/><figcaption><em>Image of Fall armyworm (FAW) | Source: Author<br/></em></figcaption></figure></div>
+
+
+
+<p>转到您之前创建的<strong> DynamoDB表</strong>,检查并确认是否有新项目添加到表中:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_26" target="_blank" rel="noopener"><img decoding="async" src="../Images/2036146685d58fa18a4fd69431dd1d25.png" alt="Check the latest log stream and see your application logs" class="wp-image-53858" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_26.png?ssl=1"/></a><figcaption><em>Check the latest log stream and see your application logs | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>干得好！你的应用现在正常工作。您可以检查这个<a href="https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app/tree/master/test_images" target="_blank" rel="noreferrer noopener nofollow">存储库</a>以获得更多的测试图像。</p>
+
+
+
+<p>如果您打算就此打住，请确保删除ECR中以前的映像构建，以避免为此付费。您不需要为其他服务付费，因为它们是按使用付费的。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_31" target="_blank" rel="noopener"><img decoding="async" src="../Images/92e125c3c6f71beb2738b42016223c5b.png" alt="Open DynamoDB table " class="wp-image-53853" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_31.png?ssl=1"/></a><figcaption><em>Open DynamoDB table | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>后续步骤</p>
+
+
+
+<p>祝贺您阅读完本指南！下一步，您可能希望将无服务器API管理服务<a href="https://web.archive.org/web/20221206031244/https://aws.amazon.com/api-gateway/" target="_blank" rel="noreferrer noopener nofollow"> API Gateway </a>连接到您的表，这样您的应用程序就可以从表中获得结果，甚至删除不相关的结果。类似于下图的架构模式:</p>
+
+
+
+<h2 id="next-steps">如果您对此感兴趣，您可以找到Lambda函数的示例代码，该代码将API Gateway与GET和DELETE方法连接到这个<a href="https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app/blob/master/lambda_function.py" target="_blank" rel="noreferrer noopener nofollow">存储库</a>中的DynamoDB表。</h2>
+
+
+
+<p>对Google Cloud serverless应用相同的架构模式</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221206031244/https://neptune.ai/deploying-your-next-image-classification-on-serverless-aws-lambda-gcp-cloud-function-azure-automation_49" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/ae641db38a3fee63f29eed06465ac74d.png" alt="Deployment workflow for serverless ML application " class="wp-image-53835" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206031244im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Deploying-Your-Next-Image-Classification-on-Serverless-AWS-Lambda-GCP-Cloud-Function-Azure-Automation_49.png?resize=840%2C444&amp;ssl=1"/></a><figcaption><em>Deployment workflow for serverless ML application | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>如果您选择将您的图像分类应用程序部署到<a href="https://web.archive.org/web/20221206031244/https://cloud.google.com/serverless" target="_blank" rel="noreferrer noopener nofollow"> Google Cloud无服务器</a>而不是AWS，好消息是这种架构模式可以应用到GCP的大多数无服务器服务，使用以下工具:</p>
+
+
+
+<h3 id="applying-the-same-architectural-pattern-with-google-cloud-serverless"> </h3>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_61725588a6979" class="block-separator block-separator--15">所有这些服务很好地集成在一起，使用本指南中的架构模式，您可以在Google Cloud上构建一个类似的应用程序。</p>
+
+
+
+
+
+
+
+<p id="separator-block_617253d6a6975" class="block-separator block-separator--15">对Azure serverless应用相同的架构模式</p>
+
+
+
+<p>如果您选择将您的图像分类应用程序部署到<a href="https://web.archive.org/web/20221206031244/https://azure.microsoft.com/en-us/solutions/serverless/" target="_blank" rel="noreferrer noopener nofollow"> Azure无服务器</a>，那么在以下服务的帮助下，这种架构模式也可以在这里复制:</p>
+
+
+
+<h3 id="applying-the-same-architectural-pattern-with-azure-serverless">结论</h3>
+
+
+
+<p>这是一篇冗长的技术指南，重点介绍部署影像分类应用程序的最佳无服务器模式。不用说，这种架构也适用于涉及非结构化数据的其他类型的ML应用程序——当然，需要做一些调整。</p>
+
+
+
+<p id="separator-block_617253dba6976" class="block-separator block-separator--15">总结一下，以下是你在使用无服务器ML应用时应该遵循的一些最佳实践:</p>
+
+
+
+
+
+
+
+<p id="separator-block_617253e0a6977" class="block-separator block-separator--10">限制对包的依赖因为在大多数情况下，一个函数的依赖越多，启动时间就越慢，除了管理应用程序的复杂性。</p>
+
+
+
+<h2 id="conclusion"><strong>尽量避免你的应用程序长时间运行的函数</strong>。如果你的应用很复杂，把它分解成不同的功能，然后松散地耦合它们。</h2>
+
+
+
+<p><strong>批量发送和接收数据可能会有所帮助</strong>。使用无服务器函数，当用批处理数据实例化一个函数时，可以获得更好的性能。例如，您可能希望将图像存储在S3桶中，而不是在图像来自客户端时将其发送到您的应用程序，并且只在特定的时间间隔或当一组新的图像上传到桶中时才触发该函数</p>
+
+
+
+<p><strong>考虑您选择的平台中可用的工具生态系统</strong>对无服务器环境中的应用进行可靠的跟踪、监控、审计和故障排除。</p>
+
+
+
+<ul><li><a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/Load_testing" target="_blank" rel="noreferrer noopener nofollow"> <strong>负载测试</strong> </a> <strong>您的应用程序在部署到实际环境之前。</strong>这对于无服务器的ML应用尤为重要。</li><li>考虑用于选择<a href="https://web.archive.org/web/20221206031244/https://thenewstack.io/deployment-strategies/" target="_blank" rel="noreferrer noopener nofollow">部署策略</a>的特性，例如<a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/Blue-green_deployment" target="_blank" rel="noreferrer noopener nofollow">蓝绿色部署</a>、<a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/A/B_testing" target="_blank" rel="noreferrer noopener nofollow"> A/B测试</a>和<a href="https://web.archive.org/web/20221206031244/https://docs.gitlab.com/ee/user/project/canary_deployments.html" target="_blank" rel="noreferrer noopener nofollow">金丝雀部署</a>是否在您选择的平台中可用，并在您的部署工作流中使用它们。</li><li>参考资料和资源</li><li><strong>Consider the ecosystem of tools available in your platform of choice </strong>for robust tracing, monitoring, auditing, and troubleshooting your applications sitting in serverless environments.</li><li><a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/Load_testing" target="_blank" rel="noreferrer noopener nofollow"><strong>Load test</strong></a><strong> your application before deploying it to a live environment.</strong> This is especially crucial for serverless ML applications.</li><li>Consider if features for selecting <a href="https://web.archive.org/web/20221206031244/https://thenewstack.io/deployment-strategies/" target="_blank" rel="noreferrer noopener nofollow">deployment strategies</a> such as <a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/Blue-green_deployment" target="_blank" rel="noreferrer noopener nofollow">blue-green deployment</a>, <a href="https://web.archive.org/web/20221206031244/https://en.wikipedia.org/wiki/A/B_testing" target="_blank" rel="noreferrer noopener nofollow">A/B testing</a>, and <a href="https://web.archive.org/web/20221206031244/https://docs.gitlab.com/ee/user/project/canary_deployments.html" target="_blank" rel="noreferrer noopener nofollow">canary deployment</a> are available in your platform of choice and use them in your deployment workflow.</li></ul>
+
+
+
+<h3 id="references-and-resources">References and resources</h3>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

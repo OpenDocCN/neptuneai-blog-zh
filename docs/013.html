@@ -1,0 +1,1003 @@
+<html>
+<head>
+<title>Hugging Face Pre-trained Models: Find the Best One for Your Task </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>拥抱脸预训练模型:找到最适合你的任务</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/hugging-face-pre-trained-models-find-the-best#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/hugging-face-pre-trained-models-find-the-best#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>当你在处理一个机器学习问题时，调整现有的解决方案并重新利用它可以帮助你更快地找到解决方案。使用现有模型，不仅可以帮助机器学习工程师或数据科学家，还可以帮助公司节省计算成本，因为它需要更少的培训。有许多公司提供包含预训练模型的开源库，拥抱脸就是其中之一。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20230220191807/https://huggingface.co/" target="_blank" rel="noreferrer noopener nofollow">抱脸</a>早在2017年就首次推出了其<a href="https://web.archive.org/web/20230220191807/https://techcrunch.com/2017/03/09/hugging-face-wants-to-become-your-artificial-bff/" target="_blank" rel="noreferrer noopener nofollow">聊天平台</a>。为了规范化NLP并使所有人都可以访问模型，他们创建了一个NLP库，提供各种资源，如数据集、转换器和记号化器等。在发布名为Transformers的NLP库和各种各样的工具后，拥抱脸立即在大型科技公司中变得非常流行。</p>
+
+
+
+<p>拥抱脸专注于自然语言处理(NLP)任务，其想法不仅仅是识别单词，而是理解这些单词的含义和上下文。计算机处理信息的方式与人类不同，这就是为什么我们需要一个管道——处理文本的一系列步骤。</p>
+
+
+
+<p>许多公司现在正在将NLP技术添加到他们的系统中，以增强交互体验，并且使通信尽可能接近人类体验变得比以往更加重要。这就是拥抱脸的由来。在接下来的部分中，我们将通过一些动手练习详细介绍拥抱脸及其变形金刚。</p>
+
+
+
+<h2 id="h-getting-started">入门指南</h2>
+
+
+
+<p>在开始之前，您需要清楚地了解用例及其背后的目的。拥抱脸有多种变形金刚和模型，但它们是针对特定任务的。他们的平台提供了一种简单的方式来搜索模型，你可以通过应用多个过滤器来过滤掉模型列表。</p>
+
+
+
+<p>在他们的网站上，在<a href="https://web.archive.org/web/20230220191807/https://huggingface.co/models" target="_blank" rel="noreferrer noopener nofollow">模型的</a>页面，你会看到一个任务、库、数据集、语言等的列表。</p>
+
+
+
+<p id="separator-block_f9c8dd8a53a6927d733fbf0cac20c25e" class="block-separator block-separator--5"> </p>
+
+
+
+
+
+<p>假设您正在寻找能够满足您的用例的以下需求的模型:<br/></p>
+
+
+
+<ul>
+<li>将文本从一种语言翻译成另一种语言</li>
+
+
+
+<li>支持PyTorch</li>
+</ul>
+
+
+
+<p>一旦您选择了这些过滤器，您将获得如下预训练模型列表:</p>
+
+
+
+<p id="separator-block_f9c8dd8a53a6927d733fbf0cac20c25e" class="block-separator block-separator--5"> </p>
+
+
+
+
+
+<p>您还需要确保您提供的输入格式与预训练模型的训练格式相同。一旦您从列表中选择了一个模型，您就可以开始为它设置环境。</p>
+
+
+
+<h3>设置环境</h3>
+
+
+
+<p>拥抱脸支持超过20个库，其中一些非常受ML工程师的欢迎，如TensorFlow，Pytorch和FastAI等。我们将使用pip命令安装这些库来使用拥抱脸:</p>
+
+
+
+<pre class="hljs">!pip install torch
+</pre>
+
+
+
+<p>安装PyTorch后，我们可以使用下面的命令安装transformer库:</p>
+
+
+
+<pre class="hljs">!pip install transformers</pre>
+
+
+
+<p>有两种方法可以开始使用Hugging Face NLP库:使用pipeline或任何可用的预训练模型，通过重新调整它的用途来处理您的解决方案。这些模型占用了大量的空间，当您第一次运行上面的代码时，模型将被下载。因此，建议最初使用Google Colab或Kaggle笔记本进行实验。在本文的后面，我们将了解如何利用管道和预训练模型。</p>
+
+
+
+
+
+
+
+<h2 id="h-basic-tasks-supported-by-hugging-face">拥抱脸支持的基本任务</h2>
+
+
+
+<p>在我们了解拥抱脸模型如何用于实现NLP解决方案之前，我们需要知道拥抱脸支持哪些<a href="https://web.archive.org/web/20230220191807/https://huggingface.co/course/chapter1/2?fw=pt" target="_blank" rel="noreferrer noopener nofollow">基本NLP任务</a>以及我们为什么关注它们。拥抱脸部模型提供了许多不同的配置，并为各种用例提供了强大的支持，但这里有一些它广泛用于的基本任务:</p>
+
+
+
+<h4>1.序列分类</h4>
+
+
+
+<p>给定一些类别，任务是预测输入序列的类别。这是一个预测建模问题，有着广泛的应用。一些真实世界的用例是——理解评论背后的情绪，检测垃圾邮件，纠正语法错误等。</p>
+
+
+
+<h4>2.问答</h4>
+
+
+
+<p>为给定的上下文问题提供答案。这个想法是建立一个可以自动回答人类提出的问题的系统。问题可以是开放式的，也可以是封闭式的，系统的设计应该兼容这两种情况。答案可以通过查询结构化数据库或搜索非结构化文档集合来构建。</p>
+
+
+
+<h4>3.命名实体识别</h4>
+
+
+
+<p>命名实体识别是将令牌识别为个人、地点或组织的任务。它正被用于自然语言处理的许多领域，并帮助解决许多现实世界的问题。在这种技术中，我们可以扫描文章，提取基本实体，并将它们归类到定义的类别中。</p>
+
+
+
+<h4>4.摘要</h4>
+
+
+
+<p>你记得在学校或大学写总结报告吗？嗯，这个任务是一样的，给定一个文档，在NLP的帮助下，它可以转换成一个简洁的文本。这是一个为较长的文本创造一个简短、连贯和流畅版本的过程。有两种方法可以用于文本摘要-提取和抽象。在提取法中，我们提取重要的句子和短语，而在抽象法中，我们需要解释上下文并再现文本，保持核心信息完整。</p>
+
+
+
+<h4>5.翻译</h4>
+
+
+
+<p>它的任务是将文本从一种语言翻译成另一种语言。替换原子单词是不够的，因为我们想要创建一个能够像人类翻译员一样翻译文本的系统。我们需要一个考虑语音类型、习语翻译等的语料库。进行复杂的翻译。</p>
+
+
+
+<h4>6.语言建模</h4>
+
+
+
+<p>语言建模包括生成文本以理解一系列标记或预测一些可用于完成文本的短语。这些任务可以分为——掩蔽语言建模和随意语言建模。</p>
+
+
+
+<p>NLP的任务不仅仅是处理书面文本，它还涵盖了与语音识别、计算机视觉、生成文本等相关的解决方案。NLP任务很难用机器学习来处理，已经做了大量的研究来提高这些模型的准确性。</p>
+
+
+
+<h2 id="h-hugging-face-transformers-and-how-to-use-them">拥抱面部变形金刚以及如何使用它们</h2>
+
+
+
+<blockquote class="wp-block-quote">
+<p>NLP中的Transformer是一种新颖的架构，旨在解决序列到序列任务，同时轻松处理长期依赖关系。？</p>
+<cite><p><a href="https://web.archive.org/web/20230220191807/https://www.kdnuggets.com/2021/02/hugging-face-transformer-basics.html" target="_blank" rel="noreferrer noopener nofollow"> KDnuggets </a></p></cite></blockquote>
+
+
+
+<p>变形金刚的概念是在2017年提出的，并受到了后来推出几个型号的许多研究人员的影响。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/2011eb54defa92dc72a54a6d4209a8f8.png" alt="Transformer Model Evolution" class="wp-image-56680" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_6.png?ssl=1"/><figcaption class="wp-element-caption"><em>Transformer Model Evolution | <a href="https://web.archive.org/web/20230220191807/https://huggingface.co/course/chapter1/4?fw=pt" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>变形金刚是语言模型，已经在大量文本上以自学的方式进行了训练。<a href="/web/20230220191807/https://neptune.ai/blog/self-supervised-learning" target="_blank" rel="noreferrer noopener">自我监督</a>或转移学习是一种训练，系统在移动中学习，不需要任何标记数据。</p>
+
+
+
+<h3>变压器架构</h3>
+
+
+
+<p>变换器语言模型由编码器-解码器结构组成。这些组件在核心架构中相互连接，但也可以独立使用。</p>
+
+
+
+<ul>
+<li>编码器接收输入，并迭代地处理输入，以生成关于输入的哪些部分彼此相关的信息。该模型将被优化以从输入中获得最佳理解。<br/></li>
+
+
+
+<li>解码器使用来自编码器的表示生成目标序列，并使用上下文信息生成输出。</li>
+</ul>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/87a8a3900e8258b2a8c289f826f449bd.png" alt="The transformer - model architecture" class="wp-image-56687" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_13.png?ssl=1"/><figcaption class="wp-element-caption"><em>The transformer – model architecture | <a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/1706.03762.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>transformer模型架构的一个关键特性是关注层。这一层会告诉模型注意具体的细节和用词。它可以被描述为一个键和一组键值对到输出的映射，其中查询、键、值和输出都是向量。要详细了解变压器架构，请查看关于变压器的论文-<a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/1706.03762.pdf" target="_blank" rel="noreferrer noopener nofollow">注意力是你所需要的全部</a>和<a href="https://web.archive.org/web/20230220191807/http://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noreferrer noopener nofollow">图解变压器</a>博客。</p>
+
+
+
+<p>现在你已经对这个架构有了一个基本的了解，让我们看看拥抱脸是如何使这个过程更简单易用的。</p>
+
+
+
+<h3>变压器和管道介绍</h3>
+
+
+
+<p>拥抱面部变压器库由不同任务的不同模型组成，可通过高级API访问。变压器模型构建起来很复杂，因为它们需要数百亿个参数的微调和高强度的训练。创建拥抱面部变形库是为了通过访问一个API来提供使用这些复杂模型的便利性、灵活性和简单性。可以毫不费力地加载、训练和保存模型。</p>
+
+
+
+<p>典型的NLP解决方案包括从获取数据到微调模型的多个步骤。</p>
+
+
+
+<p id="separator-block_6056e8f14ebf78e39f795958e795ed36" class="block-separator block-separator--30">使用预定义的管道</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/b92c7e2e875559f9ee881ca0ce9e62b9.png" alt="A typical NLP solution consists of multiple steps from getting the data to fine-tuning a model." class="wp-image-56678" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_4.png?ssl=1"/><figcaption class="wp-element-caption"><em>Source: Author</em></figcaption></figure></div>
+
+
+<h4>拥抱面部转换器管道对给定的输入文本数据执行所有预处理和后处理步骤。每个NLP解决方案的整个流程都封装在这些管道中，这些管道是Transformer库中最基本的对象。这有助于将模型与所需的预处理和后处理步骤联系起来，我们只需提供输入文本。</h4>
+
+
+
+<p>使用管道时，您不必担心单独实现这些步骤。您可以选择一个与您的用例相关的管道，并用如下几行代码创建一个机器翻译器:</p>
+
+
+
+
+
+<p>管道是开始熟悉拥抱脸的一个好方法，因为你可以使用预先训练和微调的变压器创建自己的语言模型。拥抱面为上述任务提供了管道，以及一些额外的管道，如这里所提到的<a href="https://web.archive.org/web/20230220191807/https://huggingface.co/transformers/main_classes/pipelines.html" target="_blank" rel="noreferrer noopener nofollow"/>。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> pipeline
+translator = pipeline(<span class="hljs-string">"translation_en_to_de"</span>)
+text = <span class="hljs-string">"Hello world! Hugging Face is the best NLP tool."</span>
+translation = translator(text)
+
+print(translation)</pre>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/daabc745b6396e378140d76025ffbc5f.png" alt="Using pre-defined pipelines (Hugging Face)" class="wp-image-56676" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_2.png?ssl=1"/><figcaption class="wp-element-caption"><em>Source: Author</em></figcaption></figure></div>
+
+
+<p>创建您自己的渠道</p>
+
+
+
+<h4>默认管道仅支持这些基本任务的一些场景，例如，上述翻译管道仅支持英语到德语的翻译，但是如果您想要翻译成不同的语言呢？对于这些场景，您必须使用经过微调的训练模型来创建管道。</h4>
+
+
+
+<p>幸运的是，拥抱脸有一个<a href="https://web.archive.org/web/20230220191807/https://huggingface.co/models" target="_blank" rel="noreferrer noopener nofollow">模型中枢</a>，这是一个预先训练和微调的模型集合，用于上面提到的所有任务。这些模型基于各种变压器架构——GPT、T5、BERT等。如果你过滤<a href="https://web.archive.org/web/20230220191807/https://huggingface.co/models?pipeline_tag=translation&amp;sort=downloads" target="_blank" rel="noreferrer noopener nofollow">翻译</a>，你会看到截至2021年11月有1423个模型。在这一节，我们将看到你如何使用这些模型和翻译文本。让我们创建一个<a href="https://web.archive.org/web/20230220191807/https://huggingface.co/course/chapter2/2?fw=pt" target="_blank" rel="noreferrer noopener nofollow">机器学习翻译器</a>:</p>
+
+
+
+<p>1.导入并初始化标记器</p>
+
+
+
+<h5>Transformer模型不能处理原始文本，需要转换成数字才能理解数据。</h5>
+
+
+
+<p>2.导入模型</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> AutoTokenizer, AutoModelForSeq2SeqLM
+tokenizer = AutoTokenizer.from_pretrained(<span class="hljs-string">"Helsinki-NLP/opus-mt-en-nl"</span>)</pre>
+
+
+
+<h5>我们可以下载预先训练好的模型，就像我们在上面的步骤中下载标记器一样。在这里，我们将实例化一个模型，其中包含一个基本的变压器模块，给定输入，它将产生输出，即高维向量。</h5>
+
+
+
+<p>3.以seq2seq方式标记和编码文本</p>
+
+
+
+<pre class="hljs">model = AutoModelForSeq2SeqLM.from_pretrained(<span class="hljs-string">"Helsinki-NLP/opus-mt-en-nl"</span>)</pre>
+
+
+
+<h5>为了让模型能够理解数据，我们使用了一个标记器，它可以帮助:</h5>
+
+
+
+<p>将文本拆分成单词和子单词</p>
+
+
+
+<ul>
+<li>将每个令牌映射到一个整数</li>
+
+
+
+<li>我们在步骤1中初始化了标记器，并将在这里使用它来获取输入文本的标记。tokenizer的输出是一个包含两个键的字典——输入id和注意屏蔽。输入id是句子中标记的唯一标识符。注意掩码用于将输入序列分批在一起，并指示令牌是否应该由我们的模型处理。注意掩码值为0的令牌表示令牌将被忽略，1表示令牌很重要，将用于进一步处理。</li>
+</ul>
+
+
+
+<p>4.批量翻译和解码元素</p>
+
+
+
+<pre class="hljs">text = <span class="hljs-string">"Hello my friends! How are you doing today?"</span>
+tokenized_text = tokenizer.prepare_seq2seq_batch([text])
+print(tokenized_text)
+</pre>
+
+
+
+<pre class="hljs">{<span class="hljs-string">'input_ids'</span>: [[<span class="hljs-number">16816</span>, <span class="hljs-number">187</span>, <span class="hljs-number">2493</span>, <span class="hljs-number">68</span>, <span class="hljs-number">650</span>, <span class="hljs-number">48</span>, <span class="hljs-number">41</span>, <span class="hljs-number">1531</span>, <span class="hljs-number">950</span>, <span class="hljs-number">31</span>, <span class="hljs-number">0</span>]], <span class="hljs-string">'attention_mask'</span>: [[<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]]}
+</pre>
+
+
+
+<h5>我们将把预处理后的输入输入到模型中，模型生成一个输出向量。</h5>
+
+
+
+<p>正如我们所看到的，除了仅支持英语-德语、英语-法语和英语-罗马尼亚语翻译的简单管道之外，我们可以在HuggingFace中为任何预训练的Seq2Seq模型创建语言翻译管道。让我们看看哪些transformer模型支持翻译任务。</p>
+
+
+
+<pre class="hljs">translation = model.generate(**tokenized_text)
+translated_text = tokenizer.batch_decode(translation, skip_special_tokens=<span class="hljs-keyword">True</span>)[<span class="hljs-number">0</span>]
+print(translated_text)
+</pre>
+
+
+
+<p>语言转换器模型</p>
+
+
+
+<h2 id="h-language-transformer-models"><em>“transformer是一种深度学习模型，它采用注意力机制，对输入数据的每个部分的重要性进行不同的加权。它主要用于自然语言处理领域。？</em></h2>
+
+
+
+<blockquote class="wp-block-quote">
+<p>变压器越来越成为解决NLP问题的首选模型，这也是该领域出现许多发展的原因。许多拥抱脸支持的模型是基于变压器的架构。“翻译有若干？以及“text2text？在拥抱脸和本节中，我们将看看一些流行的语言翻译模型。</p>
+<cite><a href="https://web.archive.org/web/20230220191807/https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)" target="_blank" rel="noreferrer noopener nofollow">Source</a></cite></blockquote>
+
+
+
+<p>在这里，我们将首先了解这些模型，然后获得开发翻译器的实践经验。这些模型中的大多数都支持多任务，并且可以进一步微调，以便为任何其他NLP任务提供支持。我们还将评估他们的表现，并找出哪一个是最好的。所以，让我们开始吧！</p>
+
+
+
+<p>mBART模型</p>
+
+
+
+<h3><a href="https://web.archive.org/web/20230220191807/https://huggingface.co/transformers/model_doc/mbart.html" target="_blank" rel="noreferrer noopener nofollow"> mBART </a>遵循BART的概念，是一个序列到序列去噪自动编码器，在多种语言的大规模单语语料库上进行了预训练。实际的BART通过随机打乱原始句子的顺序并用单个掩码标记替换文本，将损坏的文档映射到它所源自的原始文档。通过破坏文档和优化解码器输出和主文档之间的损失来训练BART。可以使用方向模型对损坏的文档进行编码，并使用自回归解码器产生原始文档。</h3>
+
+
+
+<p>对于输入编码器或转换，它允许您对文档应用任何类型的破坏，如标记屏蔽、删除、填充置换和检测。BART支持各种下游应用，如序列分类、标记分类、序列生成和机器翻译。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/ae2a404425baf4a17038e76e1d030dbc.png" alt="Input encoder &amp; output decoder" class="wp-image-56677" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_3.png?resize=830%2C236&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Input encoder &amp; output decoder | <a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/1910.13461.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>mBART模型是在<a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/2001.08210.pdf" target="_blank" rel="noreferrer noopener nofollow">神经机器翻译的多语言去噪预训练</a>中提出的。虽然以前的模型和方法只关注编码器、解码器和转换部分文本，但研究人员首次提出使用mBART模型可以对多种语言的全文进行去噪。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/637b48ed49afa0bc27eb42576e1b4705.png" alt="Transformations for noising the input" class="wp-image-56682" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_8.png?ssl=1"/><figcaption class="wp-element-caption"><em>Transformations for noising the input | <a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/1910.13461.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>mBART是一个多语言编码器-解码器(序列到序列)模型，主要用于翻译任务。由于模型是多语言的，它期望序列采用不同的格式。在源文本和目标文本中都添加了一个特殊的语言id标记来标识文本的语言。</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_f9c8dd8a53a6927d733fbf0cac20c25e" class="block-separator block-separator--5">该模型针对所有语言训练一次，并提供一组参数，这些参数可以针对有监督的(句子和文档级别)和无监督的机器翻译进行微调，而无需任何任务或语言特定的修改。让我们看看它如何在这些场景中处理机器翻译:</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/3f6fbc984d2b6f77fb4ecbb58905ec27.png" alt="Framework of multilingual denoising pre-training and fine-tuning on downstream" class="wp-image-56685" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_11.png?ssl=1"/><figcaption class="wp-element-caption"><em>Framework of multilingual denoising pre-training and fine-tuning on downstream | <a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/2001.08210.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p><strong>句子级翻译</strong> : mBART在句子级机器翻译任务上进行评估，目标是最小化源和目标句子表示之间的差异。与其他可用的方法相比，mBART的预训练设置提供了显著的性能改进。该模型仅使用双文本(词对齐以识别语言之间的翻译关系)进行预训练，然后与反向翻译结合。</p>
+
+
+
+<ul>
+<li>文档级翻译:这处理学习不同句子之间的依赖关系，然后翻译一个段落或整个文档。对于预处理文档级数据，在每个块中，应该用句子符号分隔句子，并且整个训练示例应该以语言id结束。而翻译模型将在发现语言id时停止，因为它不知道句子的数量。</li>
+</ul>
+
+
+
+<ul start="2">
+<li><strong>无监督翻译</strong> : mBART还支持无监督翻译，即没有可用的双文本。当没有双文本时，模型使用反向翻译，并且当没有双文本可用但是在文档集合中的其他语言对中找到目标语言时，它使用语言转移。</li>
+</ul>
+
+
+
+<ul start="3">
+<li>由于其独特的框架，它不需要跨多种语言的并行数据，但有针对性的方向。这有助于提高语言的可伸缩性，即使我们没有足够的资源或者这些资源是特定于领域的。</li>
+</ul>
+
+
+
+<p>T5型号</p>
+
+
+
+<h3>这个模型是在<a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/1910.10683.pdf" target="_blank" rel="noreferrer noopener nofollow">探索迁移学习的局限性的一篇统一的文本到文本迁移</a>论文中介绍的。研究人员通过引入一个统一的框架，可以将所有基于文本的语言问题转换为文本到文本的格式，从而探索迁移学习的有效性。T5基于编码器-解码器架构，其基本思想是将文本作为输入，并产生新的文本作为输出。</h3>
+
+
+
+<p>它遵循与最初的变形金刚<a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/1706.03762.pdf" target="_blank" rel="noreferrer noopener nofollow">相同的概念。输入文本的标记序列被映射到嵌入序列，以将其传递给编码器。编码器由模块组成，每个模块包括两个部分:自我关注层，后面是一个小的前馈网络。解码器在结构上类似于编码器，除了它在每个关注编码器输出的自关注层之后包括一个标准关注机制。它还使用一种自回归或因果自我关注的形式，允许模型关注过去的输出。</a></p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/56440cc4bb8c7fde4e45c486c3f6a530.png" alt="Diagram of text-to-text framework" class="wp-image-56688" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_14.png?ssl=1"/><figcaption class="wp-element-caption"><em>Diagram of text-to-text framework | <a href="https://web.archive.org/web/20230220191807/https://arxiv.org/pdf/1910.10683.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>T5模型在未标记的数据上进行训练，这些数据是使用更干净版本的<a href="https://web.archive.org/web/20230220191807/https://commoncrawl.org/" target="_blank" rel="noreferrer noopener nofollow">公共爬行</a>、巨大干净爬行语料库(C4)生成的。在文本到文本转换器和新的预训练数据集的帮助下，T5模型有助于调查大量的想法。</p>
+
+
+
+<p>T5模型通过在输入序列前添加任务前缀，可以很好地处理各种现成的任务，例如翻译- <em>将英语翻译成法语</em>和摘要- <em>摘要。</em></p>
+
+
+
+<p>马里亚纳姆模型</p>
+
+
+
+<h3>MarianMT也基于编码器-解码器架构，最初由rg Tiedemann使用Marian库进行训练。Marian 是一个高效且独立的神经机器翻译框架，由一个基于动态计算图的集成自动微分引擎组成。</h3>
+
+
+
+<p>Marian完全是用C++写的。这个库支持更快的训练和翻译。由于它具有最小的依赖性，所以它提供了对优化基于MPI的多节点训练、高效的批量波束搜索、新模型的紧凑实现等的支持。Marian工具包可用于解决许多NLP问题:</p>
+
+
+
+<p><strong>自动后期编辑</strong>:专注于端到端神经模型来自动编辑机器翻译输出，研究人员发现，两个编码器上的双注意力机制能够从原始机器翻译输出中恢复缺失的单词。</p>
+
+
+
+<ul>
+<li>语法错误纠正:玛丽安还被用来制作一套GEC场景的模型。想法是使用低资源神经机器翻译进行自动语法错误纠正(GEC)。这些方法被用作Marian的扩展，以在源文本中引入噪声、指定加权训练目标、预训练嵌入、使用预训练模型的迁移学习等。</li>
+</ul>
+
+
+
+<ul start="2">
+<li>使用Marian框架，可以组合不同的编码器和解码器，并创建Marian MT来减少实现工作。MarianMT 模型在<a href="https://web.archive.org/web/20230220191807/http://opus.nlpl.eu/" target="_blank" rel="noreferrer noopener nofollow">开放平行语料库(OPUS) </a>上进行训练，开放平行语料库是从网络上收集的翻译文本。</li>
+</ul>
+
+
+
+<p>大约有1300种型号支持多种语言对。所有这些模型都遵循相同的命名约定——Helsinki-NLP/opus-mt-{ src }-{ target }，其中src和target是两个字符的语言代码。每个模型在磁盘上大约有298 MB，这意味着它比其他模型小，可以用于实验、微调和集成测试。<a href="https://web.archive.org/web/20230220191807/https://github.com/Helsinki-NLP/Tatoeba-Challenge" target="_blank" rel="noreferrer noopener nofollow">Marian的新型多语言车型</a>需要三字符语言代码。</p>
+
+
+
+<p>创建您自己的机器学习翻译器，并对其进行微调</p>
+
+
+
+<h2 id="h-create-your-own-machine-learning-translator-fine-tune-them">现在，您已经熟悉了一些语言翻译器模型，我们现在将了解如何在相同的数据上使用这些预训练的模型来创建我们自己的机器学习翻译器。我们将开发一个英语到德语文本转换的语言翻译器，并从transformer库中训练/微调预训练模型。</h2>
+
+
+
+<p>在开始之前，我们需要一个数据集，其中包含英语到德语或德语到英语的句子，并可用于教学模型。我们将使用拥抱脸数据集库来寻找我们建模所需的数据。大约有1，800个数据集，并且特定于不同的NLP任务。在本次动手练习中，我们将使用wmt16来培训和调整我们的翻译模型–T5、MarianMT和mBART。</p>
+
+
+
+<p>1.加载数据集</p>
+
+
+
+<h3>我们将使用load_dataset函数下载数据集并将其缓存在笔记本中。</h3>
+
+
+
+<p>您可以看到数据已经分为测试、训练和验证。训练集有大量的数据，因此我们的模型训练和微调需要时间。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> datasets <span class="hljs-keyword">import</span> load_dataset, load_metric
+raw_datasets = load_dataset(<span class="hljs-string">"wmt16"</span>, <span class="hljs-string">"de-en"</span>)
+raw_datasets</pre>
+
+
+
+
+
+<p>2.预处理数据集</p>
+
+
+
+<h3>为了预处理NLP数据，我们需要使用预定义的标记器对其进行标记。</h3>
+
+
+
+<p>现在，我们将创建一个预处理函数，并将其应用于所有数据分割。</p>
+
+
+
+<pre class="hljs">model_marianMT = <span class="hljs-string">"Helsinki-NLP/opus-mt-en-de"</span>
+
+<span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained(model_marianMT,use_fast=<span class="hljs-keyword">False</span>)</pre>
+
+
+
+<pre class="hljs">model_mbart = <span class="hljs-string">'facebook/mbart-large-50-one-to-many-mmt'</span>
+
+<span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> MBart50TokenizerFast
+
+tokenizer = MBart50TokenizerFast.from_pretrained(model_mbart,src_lang=<span class="hljs-string">"en_XX"</span>,tgt_lang = <span class="hljs-string">"de_DE"</span>)</pre>
+
+
+
+<pre class="hljs">model_t5 = <span class="hljs-string">"t5-small"</span>
+<span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained(model_marianMT,use_fast=<span class="hljs-keyword">False</span>)</pre>
+
+
+
+<p>T5模型需要一个特殊的前缀放在输入之前，您应该采用下面的代码来定义前缀。对于mBART和MarianMT，前缀将保持空白。</p>
+
+
+
+<p>3.创建数据集的子集</p>
+
+
+
+<pre class="hljs">prefix = <span class="hljs-string">"translate English to German:"</span> </pre>
+
+
+
+<pre class="hljs">prefix = <span class="hljs-string">""</span> 
+max_input_length = <span class="hljs-number">128</span>
+max_target_length = <span class="hljs-number">128</span>
+source_lang = <span class="hljs-string">"en"</span>
+target_lang = <span class="hljs-string">"de"</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">preprocess_function</span><span class="hljs-params">(examples)</span>:</span>
+   inputs = [prefix + ex[source_lang] <span class="hljs-keyword">for</span> ex <span class="hljs-keyword">in</span> examples[<span class="hljs-string">"translation"</span>]]
+   targets = [ex[target_lang] <span class="hljs-keyword">for</span> ex <span class="hljs-keyword">in</span> examples[<span class="hljs-string">"translation"</span>]]
+   model_inputs = tokenizer(inputs, max_length=max_input_length, truncation=<span class="hljs-keyword">True</span>)
+   
+   <span class="hljs-keyword">with</span> tokenizer.as_target_tokenizer():
+       labels = tokenizer(targets, max_length=max_target_length, truncation=<span class="hljs-keyword">True</span>)
+   model_inputs[<span class="hljs-string">"labels"</span>] = labels[<span class="hljs-string">"input_ids"</span>]
+   <span class="hljs-keyword">return</span> model_inputs
+tokenized_datasets = raw_datasets.map(preprocess_function, batched=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<h3>为了避免训练中的延迟，我们将从标记化的数据集创建小的训练和验证子集，并将使用这些子集来训练和微调模型。</h3>
+
+
+
+<p>4.训练和微调模型</p>
+
+
+
+<pre class="hljs">small_train_dataset = tokenized_datasets[<span class="hljs-string">"train"</span>].shuffle(seed=<span class="hljs-number">42</span>).select(range(<span class="hljs-number">1000</span>))
+small_eval_dataset = tokenized_datasets[<span class="hljs-string">"test"</span>].shuffle(seed=<span class="hljs-number">42</span>).select(range(<span class="hljs-number">1000</span>))</pre>
+
+
+
+<h3><strong/>我们将为T5和MarianMT使用AutoModelForSeq2SeqLM，为mBART使用MBartForConditionalGeneration来缓存或下载模型:</h3>
+
+
+
+<p>为了我们的训练，我们还需要一些东西。首先，定制我们的培训所需的培训属性。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
+
+model = AutoModelForSeq2SeqLM.from_pretrained(model_marianMT)
+</pre>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> MBartForConditionalGeneration
+model = MBartForConditionalGeneration.from_pretrained(model_mbart)</pre>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
+model = AutoModelForSeq2SeqLM.from_pretrained(model_t5)</pre>
+
+
+
+<p>其次，我们将定义一个数据排序器来填充输入并标记它们:</p>
+
+
+
+<pre class="hljs">batch_size = <span class="hljs-number">16</span>
+model_name = model.split(<span class="hljs-string">"/"</span>)[<span class="hljs-number">-1</span>]
+args = Seq2SeqTrainingArguments(
+   f<span class="hljs-string">"{model_name}-finetuned-{source_lang}-to-{target_lang}"</span>,
+   evaluation_strategy = <span class="hljs-string">"epoch"</span>,
+   learning_rate=<span class="hljs-number">2e-5</span>,
+   per_device_train_batch_size=batch_size,
+   per_device_eval_batch_size=batch_size,
+   weight_decay=<span class="hljs-number">0.01</span>,
+   save_total_limit=<span class="hljs-number">3</span>,
+   num_train_epochs=<span class="hljs-number">1</span>,
+   predict_with_generate=<span class="hljs-keyword">True</span>
+)</pre>
+
+
+
+<p>最后一件事是在我们训练模型时计算指标。</p>
+
+
+
+<pre class="hljs">data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)</pre>
+
+
+
+<p>现在，我们可以将所有这些和数据集一起传递给训练器API。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> datasets <span class="hljs-keyword">import</span> load_metric
+metric = load_metric(<span class="hljs-string">"sacrebleu"</span>)
+meteor = load_metric(<span class="hljs-string">'meteor'</span>)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">postprocess_text</span><span class="hljs-params">(preds, labels)</span>:</span>
+   preds = [pred.strip() <span class="hljs-keyword">for</span> pred <span class="hljs-keyword">in</span> preds]
+   labels = [[label.strip()] <span class="hljs-keyword">for</span> label <span class="hljs-keyword">in</span> labels]
+   <span class="hljs-keyword">return</span> preds, labels
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compute_metrics</span><span class="hljs-params">(eval_preds)</span>:</span>
+   preds, labels = eval_preds
+   <span class="hljs-keyword">if</span> isinstance(preds, tuple):
+       preds = preds[<span class="hljs-number">0</span>]
+   decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=<span class="hljs-keyword">True</span>)
+   
+   labels = np.where(labels != <span class="hljs-number">-100</span>, labels, tokenizer.pad_token_id)
+   decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=<span class="hljs-keyword">True</span>)
+   
+   decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+   result = metric.compute(predictions=decoded_preds, references=decoded_labels)
+   meteor_result = meteor.compute(predictions=decoded_preds, references=decoded_labels)
+   prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) <span class="hljs-keyword">for</span> pred <span class="hljs-keyword">in</span> preds]
+   result = {<span class="hljs-string">'bleu'</span> : result[<span class="hljs-string">'score'</span>]}
+   result[<span class="hljs-string">"gen_len"</span>] = np.mean(prediction_lens)
+   result[<span class="hljs-string">"meteor"</span>] = meteor_result[<span class="hljs-string">"meteor"</span>]
+   result = {k: round(v, <span class="hljs-number">4</span>) <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> result.items()}
+   <span class="hljs-keyword">return</span> result</pre>
+
+
+
+<p>在对模型进行微调之后，模型可以保存在目录中，我们应该能够像预训练模型一样使用它。我们还可以将该模式推广到拥抱脸集线器和共享。</p>
+
+
+
+<pre class="hljs">trainer = Seq2SeqTrainer(
+   model,
+   args,
+   train_dataset=small_train_dataset,
+   eval_dataset=small_eval_dataset,
+   data_collator=data_collator,
+   tokenizer=tokenizer,
+   compute_metrics=compute_metrics
+)
+trainer.train()</pre>
+
+
+
+<p>评估和跟踪模型性能–选择最佳模型</p>
+
+
+
+<pre class="hljs">trainer.save_model()</pre>
+
+
+
+<h2 id="h-evaluate-track-model-performance-choose-the-best-model">现在，我们的模型已经根据更多的数据进行了训练和微调，我们需要决定为我们的解决方案选择哪个模型。有几件事我们可以看看:</h2>
+
+
+
+<p>1.预训练vs微调vs谷歌翻译</p>
+
+
+
+<h3>在上一节中，我们将微调后的模型保存在本地目录中。现在，我们将测试这些模型，并将翻译后的文本与预先训练的文本和谷歌翻译进行比较。以下是如何从本地目录访问您的微调模型:</h3>
+
+
+
+<p>马里亚姆特模型</p>
+
+
+
+<h4>MBart50型号</h4>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">for</span> dirname, _, filenames <span class="hljs-keyword">in</span> os.walk(<span class="hljs-string">'/content/opus-mt-en-de-finetuned-en-to-de'</span>):
+   <span class="hljs-keyword">for</span> filename <span class="hljs-keyword">in</span> filenames:
+       print(os.path.join(dirname, filename))
+
+<span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> MarianMTModel, MarianTokenizer
+src_text = [<span class="hljs-string">'USA Today is an American daily middle-market newspaper that is the flagship publication of its owner, Gannett. Founded by Al Neuharth on September 15, 1982.
+'</span>]
+model_name = <span class="hljs-string">'opus-mt-en-de-finetuned-en-to-de'</span>
+tokenizer = MarianTokenizer.from_pretrained(model_name)
+model = MarianMTModel.from_pretrained(model_name)
+translated = model.generate(**tokenizer(src_text, return_tensors=<span class="hljs-string">"pt"</span>, padding=<span class="hljs-keyword">True</span>))
+[tokenizer.decode(t, skip_special_tokens=<span class="hljs-keyword">True</span>) <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> translated]</pre>
+
+
+
+<h4>T5型号</h4>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">for</span> dirname, _, filenames <span class="hljs-keyword">in</span> os.walk(<span class="hljs-string">'/content/mbart-large-50-one-to-many-mmt-finetuned-en-to-de'</span>):
+   <span class="hljs-keyword">for</span> filename <span class="hljs-keyword">in</span> filenames:
+       print(os.path.join(dirname, filename))
+
+<span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> MBart50TokenizerFast, MBartForConditionalGeneration
+src_text = [<span class="hljs-string">"USA Today is an American daily middle-market newspaper that is the flagship publication of its owner, Gannett. Founded by Al Neuharth on September 15, 1982."</span>]
+model_name = <span class="hljs-string">'mbart-large-50-one-to-many-mmt-finetuned-en-to-hi'</span>
+tokenizer = MBart50TokenizerFast.from_pretrained(model_name,src_lang=<span class="hljs-string">"en_XX"</span>)
+model = MBartForConditionalGeneration.from_pretrained(model_name)
+model_inputs = tokenizer(src_text, return_tensors=<span class="hljs-string">"pt"</span>)
+
+generated_tokens = model.generate(
+   **model_inputs,forced_bos_token_id=tokenizer.lang_code_to_id[<span class="hljs-string">"de_DE"</span>])
+translation = tokenizer.batch_decode(generated_tokens, skip_special_tokens=<span class="hljs-keyword">True</span>)
+translation</pre>
+
+
+
+<h4>让我们比较一下MarianMT、mBART和T5型号的翻译文本:</h4>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">for</span> dirname, _, filenames <span class="hljs-keyword">in</span> os.walk(<span class="hljs-string">'/content/t5-small-finetuned-en-to-de'</span>):
+   <span class="hljs-keyword">for</span> filename <span class="hljs-keyword">in</span> filenames:
+       print(os.path.join(dirname, filename))
+
+<span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> AutoModelForSeq2SeqLM, AutoTokenizer
+src_text = [<span class="hljs-string">'USA Today is an American daily middle-market newspaper that is the flagship publication of its owner, Gannett. Founded by Al Neuharth on September 15, 1982.'</span>]
+model_name = <span class="hljs-string">'t5-small-finetuned-en-to-de'</span>
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+translated = model.generate(**tokenizer(src_text, return_tensors=<span class="hljs-string">"pt"</span>, padding=<span class="hljs-keyword">True</span>))
+[tokenizer.decode(t, skip_special_tokens=<span class="hljs-keyword">True</span>) <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> translated]</pre>
+
+
+
+<p><em> <strong>输入文本</strong>—《今日美国》是一份美国中型市场日报，是其所有者Gannett的旗舰出版物。由Al Neuharth于1982年9月15日创立。</em></p>
+
+
+
+<hr class="wp-block-separator has-css-opacity"/>
+
+
+
+<p><em> <strong>【预先训练的MarianMT模型翻译】</strong>——【今天是美国中档日报，是其所有者的旗舰甘尼特。Al Neuharth于9月15日成立<br/>【精调MarianMT模型翻译】—今天，美国一家日报是其所有者的旗舰甘尼特的中产阶级。9月15日Al Neuharth成立【</em></p>
+
+
+
+<p><em> <strong>【预先训练的姆班波特模型翻译】</strong>——【今天是美国一家面向中型市场的日报，是其主人甘尼特的旗舰型出版物。9月15日Al Neuharth成立【</em></p>
+
+
+
+<p><em> <strong>【精调姆班波特】</strong> <strong>【模型翻译】</strong>—美国今天是面向中型市场的美国日报，是其主人甘尼特的旗舰出版物。1982年9月15日Al Neuharth成立。</em></p>
+
+
+
+<p><em> <strong>预培训T5模型翻译</strong>----今天是美国中档报纸《T3》的一期</em></p>
+
+
+
+<p><em/></p>
+
+
+
+<p><em> <strong>【谷歌翻译】</strong>—美国今天是美国面向中产阶级的日报，它是所有者的旗舰甘尼特。1982年9月15日Al Neuharth成立。</em></p>
+
+
+
+<p>使用MarianMT微调模型完成的翻译比预训练的MarianMT模型好，接近Google translator。尽管这三本书的翻译都有一些语法错误。</p>
+
+
+
+<hr class="wp-block-separator has-css-opacity"/>
+
+
+
+<p>与MarianMT和Google translator不同，预训练的mBART能够识别更多的单词，但在他们的翻译文本中没有太多差异。根据计算时间，mBART微调需要很多时间，但当测试微调模型时，翻译结果或多或少与预训练相同。</p>
+
+
+
+<p>T5是所有模型中表现最差的，因为它不能翻译整段。预训练和微调的T5模型都没有正确翻译文本，甚至与其他模型相差甚远。</p>
+
+
+
+<p>2.评估指标–比较模型</p>
+
+
+
+<h3>为了评估我们的模型，我们需要能够验证转换文本的质量及其准确性的指标。这就是原因，我们将采用以下指标进行评估。</h3>
+
+
+
+<p>双语评估替补演员</p>
+
+
+
+<h4>“这是一种算法，用于评估由机器从一种自然语言翻译成另一种自然语言的文本的质量。质量被认为是机器的输出与人类的输出之间的对应关系:“机器翻译越接近专业的人类翻译越好”——这是BLEU背后的中心思想。它是第一个声称与人类质量判断高度相关的指标之一，并且仍然是最受欢迎的自动化和廉价的指标之一。？</h4>
+
+
+
+<blockquote class="wp-block-quote">
+<p><a href="https://web.archive.org/web/20230220191807/https://huggingface.co/metrics/bleu" target="_blank" rel="noreferrer noopener nofollow">拥抱脸指标</a></p>
+<cite><p>流星</p></cite></blockquote>
+
+
+
+<h4>这是一种用于机器翻译评估的自动度量，其基于机器产生的翻译和人类产生的参考翻译之间的单词匹配的一般化概念。？</h4>
+
+
+
+<blockquote class="wp-block-quote">
+<p><a href="https://web.archive.org/web/20230220191807/https://huggingface.co/metrics/meteor" target="_blank" rel="noreferrer noopener nofollow">拥抱脸指标</a></p>
+<cite><p>在本文中，我们将这些指标定义为上面compute_metrics()函数的一部分。我们可以在笔记本或任何其他IDE中运行代码时看到这些指标的值，但它可能很难阅读，也不太用户友好。为了自动跟踪和查看这些指标，清楚地看到最终的评估结果，我们可以使用Neptune。它很容易使用，非常方便用户。</p></cite></blockquote>
+
+
+
+<p>要了解我们选择这些指标的更多原因，请参考这篇<a href="https://web.archive.org/web/20230220191807/https://blog.taus.net/automated-mt-evaluation-metrics" target="_blank" rel="noreferrer noopener nofollow">文章</a>。</p>
+
+
+
+<p>3.跟踪您的模型数据–参数、培训损失、CPU使用率、指标等</p>
+
+
+
+<h3><a href="/web/20230220191807/https://neptune.ai/product" target="_blank" rel="noreferrer noopener"> Neptune </a>提供了一个很棒的用户界面来减轻跟踪模型、它们的训练、CPU和RAM使用以及性能指标的痛苦。现在您已经知道了我们将在Neptune上跟踪和记录什么，让我们看看如何在Neptune平台上创建一个设置:</h3>
+
+
+
+<p>记录指标并在Neptune UI中查看它们:</p>
+
+
+
+
+
+
+
+<pre class="hljs">pip install neptune-client
+<span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+%env NEPTUNE_PROJECT= natasha/pytorch-huggingface
+%env NEPTUNE_API_TOKEN=<span class="hljs-string">"&lt;YOUR_API_TOKEN&gt;"</span>
+
+run=neptune.init(project_qualified_name=NEPTUNE_PROJECT, api_token=NEPTUNE_API_TOKEN)
+
+neptune.create_experiment()</pre>
+
+
+
+<ul>
+<li>为了<a href="https://web.archive.org/web/20230220191807/https://docs.neptune.ai/logging/what_you_can_log/">在Neptune </a>中记录度量值，我们需要调用Neptune . log _ metric("&lt;metric _ name&gt;？).这个函数可以在训练模型的时候调用，但是对于本文，我们将在训练完成或者模型被微调之后记录指标。</li>
+</ul>
+
+
+
+<p>Neptune发布了与HuggingFace Transformers 的集成<a href="https://web.archive.org/web/20230220191807/https://docs.neptune.ai/integrations/transformers/" target="_blank" rel="noopener">，所以你现在可以用它来更快地开始跟踪。</a></p>
+
+
+
+<section id="blog-intext-cta-block_75b51fbe330b5111692256ae930c128e" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>我们首先使用trainer API的方法evaluate获得评估指标。</p>
+    
+    </section>
+
+
+
+<p>让我们看看它在海王星平台上是什么样子:</p>
+
+
+
+<pre class="hljs">evaluate_results = trainer.evaluate()
+neptune.log_metric(<span class="hljs-string">'epoch'</span>,evaluate_results[<span class="hljs-string">'epoch'</span>])
+neptune.log_metric(<span class="hljs-string">'bleu'</span>,evaluate_results[<span class="hljs-string">'eval_bleu'</span>])
+neptune.log_metric(<span class="hljs-string">'meteor'</span>,evaluate_results[<span class="hljs-string">'eval_meteor'</span>])</pre>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_f9c8dd8a53a6927d733fbf0cac20c25e" class="block-separator block-separator--5">在截图中，你可以看到所有预训练模型的bleu和meteor分数。这些指标表明，即使经过微调，T5也无法准确预测。mbart微调的Bleu评分(13)和meteor评分(. 27)表明很难从其翻译中获得要点。对于MarianMT和mBART模型，得分非常接近，这表明他们都产生了可理解的良好翻译。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20230220191807/https://app.neptune.ai/natasha/pytorch-huggingface/experiments?split=tbl&amp;dash=charts&amp;viewId=standard-view" target="_blank" rel="noopener"><img decoding="async" loading="lazy" src="../Images/57a7f45f974b55e68e66b250a74a8eef.png" alt="Standard view of the project and experiments in Neptune.ai" class="wp-image-56681" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_7.png?resize=840%2C271&amp;ssl=1"/></a><figcaption class="wp-element-caption"><em>Standard view of the project and experiments | <a href="https://web.archive.org/web/20230220191807/https://app.neptune.ai/natasha/pytorch-huggingface/experiments?split=tbl&amp;dash=charts&amp;viewId=standard-view" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+<p>我们还可以通过选择任何实验来检查模型的元数据、CPU和RAM的使用情况。</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_f9c8dd8a53a6927d733fbf0cac20c25e" class="block-separator block-separator--5">单击“monitoring”时，您将看到CPU和RAM的使用情况，在“logs”部分，您将看到所有记录的指标。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter"><a href="https://web.archive.org/web/20230220191807/https://app.neptune.ai/natasha/pytorch-huggingface/experiments?split=tbl&amp;dash=charts&amp;viewId=standard-view" target="_blank" rel="noopener"><img decoding="async" src="../Images/ebb43bb1a1df05528e9e72cf0488a113.png" alt="" data-original-src="https://web.archive.org/web/20230220191807im_/https://lh4.googleusercontent.com/0gou5SDerlM17CMv4Wve8BCyMozWqvJBz08HwwgM3gOrDMUBzhNVTDPK5RTJxO1IiJqRy2TIluYiELQDbyQye9L_b-MxAGL9yotWzEgv7b8z7S5NfOrHNYgZIdYgF9IMXditmXRD"/></a><figcaption class="wp-element-caption"><em>Model Metadata – logs and monitoring | <a href="https://web.archive.org/web/20230220191807/https://app.neptune.ai/natasha/pytorch-huggingface/e/PYTOR-48/all" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+<p>您还可以直观显示CPU和RAM的使用情况，如下所示:</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_f9c8dd8a53a6927d733fbf0cac20c25e" class="block-separator block-separator--5">让我们在Neptune中并排比较所有微调的模型，以便在一个地方有一个统一的视图:</p>
+
+
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_f9c8dd8a53a6927d733fbf0cac20c25e" class="block-separator block-separator--5">除了比较这两个指标之外，我们还可以做更多的事情，但就本文而言，查看这些指标和翻译结果，我们可以得出结论，MarianMT和mBART预训练模型和微调模型的性能优于T5。mBART的表现略好于MarianMT，因为它能够识别输入文本中的更多单词，并且通过更多的训练可能会表现得更好。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20230220191807/https://app.neptune.ai/natasha/pytorch-huggingface/experiments?split=tbl&amp;dash=leaderboard&amp;viewId=standard-view" target="_blank" rel="noopener"><img decoding="async" src="../Images/5a38dc139ad26cd49dddec350cca8748.png" alt="Side-by-side model comparison in Neptune.ai" class="wp-image-56686" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230220191807im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Hugging-Face-Pre-trained-Models-How-to-Find-the-Best-One-for-Your-Task_12.png?ssl=1"/></a><figcaption class="wp-element-caption"><em>Side-by-side model comparison |<a href="https://web.archive.org/web/20230220191807/https://app.neptune.ai/natasha/pytorch-huggingface/experiments?compare=CwdgNAjGxA&amp;split=cmp&amp;dash=leaderboard&amp;viewId=standard-view" target="_blank" rel="noreferrer noopener"> Source</a></em></figcaption></figure></div>
+
+
+<p>最后的想法</p>
+
+
+
+
+
+
+
+<h2 id="h-final-thoughts">在这篇文章中，我们看到了拥抱脸是如何使NLP任务更容易集成到系统中的。虽然拥抱脸做了所有繁重的工作，但我们可以利用他们的API来创建NLP解决方案。拥抱脸支持许多自然语言处理任务，我们逐一研究了这些任务。我们还看到了拥抱脸如何为这些任务中的每一个任务提供专用管道，以及在无法使用它们的地方，我们可以使用预先训练的模型创建自己的管道。</h2>
+
+
+
+<p>在本文中，我们主要关注语言翻译任务，并研究了两种流行的模型。我们还看到了如何根据新数据训练和微调这些模型，并提高文本的质量。</p>
+
+
+
+<p>在执行mBart时，我们还意识到CPU和RAM的使用高于MarianMT和T5，并且它们的结果也没有太大的不同。有很大的改进空间，我们可以使用稍微大一点的训练数据来训练模型，增加训练的步骤和次数。你可以看看拥抱脸教程来了解更多关于这些模型和如何<a href="https://web.archive.org/web/20230220191807/https://huggingface.co/course/chapter3/3?fw=pt" target="_blank" rel="noreferrer noopener nofollow">微调</a>。<br/></p>
+
+
+
+<p>这些不是支持NLP翻译任务的唯一模型。拥抱脸模型中心有许多可用的模型，或者可以使用多语言转换器创建。例如，XLM、伯特和T5模型，所有这些模型都被直接或间接地用来改进语言翻译系统，使之接近人工翻译。</p>
+
+
+
+<p>拥抱Face platform为每个人提供了一个机会，通过他们的开源库开始解决NLP问题。他们的网站上也有一些精彩的教程，可以引导你浏览他们的图书馆。</p>
+
+
+
+<p>Hugging Face platform is providing everyone an opportunity through their open source repositories to get started with NLP problems. They also have some brilliant <a href="https://web.archive.org/web/20230220191807/https://huggingface.co/course/chapter1" target="_blank" rel="noreferrer noopener nofollow">tutorials</a> on their website which can guide you through their library.</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

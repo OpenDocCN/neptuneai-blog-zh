@@ -1,0 +1,910 @@
+<html>
+<head>
+<title>Guide to Building Your Own Neural Network [With Breast Cancer Classification Example] </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>构建自己的神经网络指南[以乳腺癌分类为例]</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/neural-network-guide#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/neural-network-guide#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>这是一个关于<a href="https://web.archive.org/web/20230103154737/https://towardsdatascience.com/how-to-build-your-own-neural-network-from-scratch-in-python-68998a08e4f6" target="_blank" rel="noreferrer noopener nofollow">为乳腺癌分类建立自己的神经网络</a>的实践指南。我将从基础开始，然后通过实现。</p>
+
+
+
+<p>准确识别和分类乳腺癌亚型的任务是一项至关重要的临床任务，训练有素的病理学家可能需要数小时才能完成。因此，我们将尝试通过分析乳腺组织学图像，使用图像分类、PyTorch和深度学习来自动进行乳腺癌分类。</p>
+
+
+
+<p>我的重点将是为新的数据科学家或那些想要修改基础知识的人提供指南，并继续构建自己的神经网络。我们将涵盖:</p>
+
+
+
+<ol><li>神经网络是如何工作的？</li><li>卷积神经网络如何工作？</li><li>从零开始用CNN实现乳腺癌分类</li></ol>
+
+
+
+<h2 id="h-what-are-neural-networks-and-how-they-work">什么是神经网络，它们是如何工作的？</h2>
+
+
+
+<p>为了理解神经网络，我们必须从感知机开始。</p>
+
+
+
+<p>感知器或人工神经元是模仿生物神经元的数学模型。像神经元一样，感知器接受几个二进制输入，给出一个二进制输出。简单！</p>
+
+
+
+<p>每个输入的重要性可以通过向输入添加权重来表示。神经元的输出，0或1，取决于加权和是大于还是小于<em>阈值。</em>从数学上讲，它是:</p>
+
+
+
+
+
+
+
+<p>其中<strong> w </strong>是每个输入的权重，<strong> x </strong>是输入。</p>
+
+
+
+<p>通过改变权重和阈值，我们可以得到不同的模型。现在，为了简化我们表达感知机的方式，让我们把阈值移到不等式的另一边，用感知机的偏差b =-阈值来代替。使用偏差代替阈值，感知器规则可以写成:</p>
+
+
+
+
+
+
+
+<p>其中<strong> W </strong>和<strong> x </strong>为向量，其分量分别为权重和输入。</p>
+
+
+
+<p>现在，当这些神经元排列在多个层次上时，它被称为神经网络。神经元并不是一个完整的决策模型，但它说明了神经元如何权衡不同种类的证据以做出决策。一个复杂的神经元网络可以做出非常微妙的决定，这似乎是合理的。</p>
+
+
+
+<p><strong>激活函数</strong>是用来获取神经元输出的函数。有两种类型的激活函数:线性和非线性(上面的函数是线性激活函数)。非线性函数是最常用的，因为它可以使模型更好地概括各种各样的数据——我们将在本文中使用一个。一些最常用的激活功能有:</p>
+
+
+
+<ol><li>Sigmoid函数</li><li>Tanh激活函数</li><li>整流器线性单元或relu</li><li>李奇注意到了</li></ol>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/22c952a8ccd69035034e81e7397f9e20.png" alt="Neural networks equation" class="wp-image-42066" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-3.png?ssl=1"/><figcaption><em>Different activation functions and their graphs | <a href="https://web.archive.org/web/20230103154737/https://medium.com/@shrutijadon10104776/survey-on-activation-functions-for-deep-learning-9689331ba092" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>这是一个简单的神经网络的样子:</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/fc53d10ec8d5aaf48cbf2e7a8a984f74.png" alt="Two layer neural network" class="wp-image-42069" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Two-layer-neural-network.png?ssl=1"/><figcaption><em>Simple two layer Neural Network | <a href="https://web.archive.org/web/20230103154737/https://towardsdatascience.com/coding-neural-network-forward-propagation-and-backpropagtion-ccf8cf369f76" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>第一层称为输入层，最右边的一层是输出层。这两层之间的层称为隐藏层。在这个网络中，第一层感知器通过权衡输入做出决策。输出被馈送到第二层，依此类推，直到最后一层。</p>
+
+
+
+<p>由于每个感知器都是通过权衡来自前一层的输入来做出决策，因此决策的复杂性会随着层的降低而增加。这样，多层感知器网络参与复杂的决策任务。一层的输出用作下一层的输入的神经网络称为<strong>前馈网络</strong>。</p>
+
+
+
+<p>现在，我们知道什么是神经网络，所以让我们讨论它们如何学习给出正确的输出。当我们说网络学习时，这意味着通过计算或遵循一些过程，网络已经找到了正确的权重和偏差集，从而使其损失最小。</p>
+
+
+
+<p>损失是目标和我们从<strong> w </strong>和<strong> b </strong>的值得到的预测输出之间的差异。我们的目标是最小化该误差，以获得最精确的<strong> w </strong>和<strong>b</strong>值。让我们使用均方误差函数来计算我们的误差函数。</p>
+
+
+
+<p>计算均方误差有三个步骤:</p>
+
+
+
+<ol><li>对于给定的x，找出实际y值和预测y值之间的差值(y = wx + b)。</li><li>平方这个差值。</li><li>求x中每个值的平方的平均值。</li></ol>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/f14b82159f284285a2ca6f3852665444.png" alt="Neural networks equation " class="wp-image-42083" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-7.png?resize=191%2C65&amp;ssl=1"/></figure>
+
+
+
+<p>这里yᵢ是实际值，ȳᵢ是预测值。让我们代入ȳᵢ:的值</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/61d7313668a0a2145fdd40ea692ecfdd.png" alt="Neural networks equation " class="wp-image-42082" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-6.png?resize=264%2C65&amp;ssl=1"/></figure>
+
+
+
+<p>所以我们求误差的平方，然后求平均值。因此得名均方误差。</p>
+
+
+
+<p>为什么要引入误差函数？毕竟，我们主要感兴趣的不是网络正确分类的图像数量吗？为什么不尝试直接最大化这个数字，而不是最小化一个像误差函数这样的代理测量？</p>
+
+
+
+<p>问题在于，正确分类的图像数量不是网络中权重和偏差的平滑函数。在大多数情况下，<strong>对权重和偏差进行小的改变根本不会导致正确分类的训练图像的数量发生任何变化</strong>。请进入<a href="https://web.archive.org/web/20230103154737/https://eng.libretexts.org/Bookshelves/Computer_Science/Book%3A_Neural_Networks_and_Deep_Learning_(Nielsen)/01%3A_Using_neural_nets_to_recognize_handwritten_digits/1.06%3A_Learning_with_gradient_descent" target="_blank" rel="noreferrer noopener nofollow">这个博客</a>进一步阅读。</p>
+
+
+
+<p>这使得很难找出如何改变权重和偏差来提高性能。如果我们改为使用平滑的成本函数，如上面定义的误差函数，则很容易找出如何对权重和偏差进行小的改变，以获得成本的改善。这就是为什么我们首先关注最小化误差函数，只有在这之后我们才会检查分类精度。</p>
+
+
+
+<h2 id="h-gradient-descent">梯度下降</h2>
+
+
+
+<p>既然已经定义了损失函数，那就进入有趣的部分——最小化，求<strong> w </strong>和<strong> b. </strong>现在，梯度下降算法是一种求函数最小值的迭代优化算法。这里我们的函数是我们之前定义的误差函数。我将使用标量值解释梯度下降，并在稍后讨论图像分类时跳转到矩阵运算，因为图像基本上是一个矩阵。</p>
+
+
+
+<p>让我们尝试对<strong> w </strong>和<strong> b </strong>应用梯度下降，并逐步接近它:</p>
+
+
+
+<p>1.最初设w = 4，b = 0。设<strong> L </strong>为我们的学习率。这控制了每一步<strong> w </strong>的值变化的程度。<strong> L </strong>可以是0.0001这样的小值，以获得良好的精度。请记住，权重<strong> w </strong>应始终随机初始化，而不是1或0 [ <a href="https://web.archive.org/web/20230103154737/https://stackoverflow.com/questions/20027598/why-should-weights-of-neural-networks-be-initialized-to-random-numbers" target="_blank" rel="noreferrer noopener nofollow">更多详情</a> ]</p>
+
+
+
+<p>2.计算损失函数相对于<strong> w </strong>的偏导数，将x、y、w、b的当前值代入其中，得到导数值<strong> D </strong>。</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/80537f678ffe98de10b6f4c62ef6f6e3.png" alt="Neural networks equation " class="wp-image-42084" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-8.png?resize=338%2C65&amp;ssl=1"/></figure>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/d5c2bae7bc8ffeb1075aedee11b28b4f.png" alt="Neural networks equation " class="wp-image-42086" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-9.png?resize=233%2C65&amp;ssl=1"/></figure>
+
+
+
+<p>现在Dw是相对于<strong> w </strong>计算的值。让我们相对于<strong> b </strong>来计算D，即Db。</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/03878a57362a8b773177103fb24d0a0f.png" alt="Neural networks equation " class="wp-image-42088" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-10.png?resize=206%2C65&amp;ssl=1"/></figure>
+
+
+
+<p>3.现在，我们使用以下等式更新<strong> w </strong>和<strong> b </strong>的当前值:</p>
+
+
+
+<p><em><strong>w = w–L * D<sub>w</sub></strong>T5】</em></p>
+
+
+
+<p><em><strong>b = b–L * D<sub>b</sub></strong>T5】</em></p>
+
+
+
+<p>4.我们重复这个过程，直到我们的损失函数是一个非常小的值或理想的0(这意味着0误差或100%的准确性)。我们现在剩下的<strong> w </strong>和<strong> b </strong>的值将是最佳值。现在有了<strong> w </strong>和<strong> b </strong>的最佳值，我们的模型就可以进行预测了！请注意，找到最佳值的“正确集合”至关重要。请查看本文中的<a href="https://web.archive.org/web/20230103154737/https://machinelearningmastery.com/overfitting-and-underfitting-with-machine-learning-algorithms/">以了解数据的过拟合和欠拟合，它们会干扰找到最佳值的“正确集合”。</a></p>
+
+
+
+<p>为了使梯度下降正确工作，我们需要选择一个足够小的学习速率<strong> L </strong>，以便上面的方程是一个很好的近似，但不能太小，否则梯度下降将工作得太慢。</p>
+
+
+
+<p>梯度下降通常工作得非常好，在神经网络中，我们会发现这是最小化成本函数和帮助网络学习的一种强有力的方法。</p>
+
+
+
+<p>现在，应用梯度下降规则有一个挑战。快速浏览一下误差函数:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/f14b82159f284285a2ca6f3852665444.png" alt="Neural networks equation " class="wp-image-42083" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-7.png?resize=191%2C65&amp;ssl=1"/></figure>
+
+
+
+<p>告诉我们这是单个训练样本误差的平均值。实际上，为了计算梯度<strong> D </strong>，我们需要为每个训练输入x分别计算梯度<strong> D </strong> x，然后将它们平均。不幸的是，当训练输入的数量非常大时，这可能需要很长时间，因此学习发生得很慢。</p>
+
+
+
+<p>为了处理这个问题，可以使用<em>随机梯度下降</em>。这里，不是计算精确的梯度<strong> D，</strong>，而是为随机选择的训练输入的小样本或小批量计算估计的梯度。通过对这个小批量求平均，我们可以很快得到真实梯度的良好估计，这有助于加速梯度下降和学习。</p>
+
+
+
+<p>这与神经网络中的学习有什么联系？让<strong> w </strong>和<strong> b </strong>成为我们网络中的权重和偏差。随机梯度下降的工作原理是挑选出一个随机选择的小批训练输入，并用它们进行训练。然后它随机挑选出另一批，用这些来训练。这一直持续到训练输入被耗尽，也就是说完成了一个<em>时期</em>的训练。此时，一个新的训练时代开始了。</p>
+
+
+
+<p>有一种计算误差函数梯度的快速算法，称为反向传播。</p>
+
+
+
+<p><strong>反向传播</strong>是关于改变网络中的权重和偏差如何改变误差函数。反向传播的目标是计算误差函数<strong> E </strong>相对于网络中任何权重<strong> w </strong>或偏差<strong> b </strong>的偏导数Dw和db。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/84f9840863f0de2b18c9c9d265c942a6.png" alt="Backpropagation visual" class="wp-image-42070" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Backpropagation-visual.png?ssl=1"/><figcaption><em>Visual representation of backpropagation | <a href="https://web.archive.org/web/20230103154737/https://sebastianraschka.com/faq/docs/visual-backpropagation.html" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>为了计算这些，让我引入一个中间值δ<sup>l</sup>T2 j，它将是l <sup>第</sup>层中第j <sup>第</sup>个神经元的误差。反向传播将给我们一个计算δl<sup>t【9】t 10】j的过程，然后将与Dw和Db相关联。</sup></p>
+
+
+
+<p>让我们来理解这个误差是如何影响我们的神经网络的。错误出现在第l <sup>层的第j <sup>个</sup>个神经元上。当神经元的输入进来时，错误扰乱了神经元的操作。它给神经元的加权输入增加了一点变化∏e<sup>l</sup><sub>j</sub>，所以神经元输出的不是y(e<sup>l</sup>T10】j)，而是y(e<sup>l</sup>T14】j+∏e<sup>l</sup>T18】j)。这种变化通过网络中的后续层传播，最终导致总成本变化D<sub>e<sup>l</sup>j</sub>∏e<sup>l</sup><sub>j</sub>。</sup></p>
+
+
+
+<p>反向传播基于四个基本方程:</p>
+
+
+
+<p>1.<strong>输出层错误</strong></p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/7d465102e6e0e749224c201647e6fc46.png" alt="Neural networks equation " class="wp-image-42093" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-11.png?resize=125%2C60&amp;ssl=1"/></figure>
+
+
+
+<p>其中E是误差函数，σ是激活函数。∂e/∂a<sup>l</sup>j测量<strong>t5】误差函数作为j <sup> th </sup>输出激活的函数变化有多快。第二项σ'e <sup> l </sup> <sub> j </sub>，测量激活函数在e<sup>l</sup>T14】j的变化速度。为了简化，让我们把E看作一个向量，重写上面的表达式(等式1):</strong></p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/6b50d680bb9cc5f4059ed59ece8c0485.png" alt="Neural networks equation" class="wp-image-42094" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-12.png?resize=234%2C33&amp;ssl=1"/></figure>
+
+
+
+<p>2.<strong>误差就下一层的误差而言</strong> <strong>(等式2) </strong></p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/9c5598b1452ec1456db5c1f499e99c03.png" alt="Neural networks equation" class="wp-image-42095" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-13.png?resize=279%2C33&amp;ssl=1"/></figure>
+
+
+
+<p>其中(w <sup> l+1 </sup> ) <sup> T </sup>是第(l+1)<sup/>层的权重矩阵w <sup> l+1 </sup>的转置。这看起来很复杂，但是让我来分解一下。假设我们知道第(l+1) <sup>层的误差δ <sup> l+1 </sup>。当我们应用转置权重矩阵时，(w <sup> l+1 </sup> ) <sup> T </sup>，我们可以认为这是通过网络将误差向后移动，从而在第l <sup>层</sup>层的输出端提供某种误差测量。然后我们取点积，O代表点积。这通过层l中的激活函数向后移动误差，给出层l的加权输入中的误差δ <sup> l </sup>。通过组合<strong>(等式1) </strong>和<strong>(等式2) </strong>，我们可以计算网络中任何层的误差δ <sup> l </sup>。我们首先使用<strong> </strong> δ <sup> L-1 </sup>，然后再次使用<strong>(等式2) </strong>来计算<strong> </strong> δ <sup> L-2 </sup>，以此类推，一直通过网络返回。</sup></p>
+
+
+
+<p>3.<strong>误差函数相对于网络中任何偏差的变化率(等式3) </strong></p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/aaa5d221182387006491f31434c70f1f.png" alt="Neural networks equation" class="wp-image-42098" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-15.png?resize=78%2C59&amp;ssl=1"/></figure>
+
+
+
+<p>即误差<strong/>δ<sup><sup>l</sup><sub>j</sub></sup>正好等于变化率∂E / ∂b <sup> l </sup> <sub> j </sub>。<strong>(eq 1)</strong><strong>(eq 2)</strong>已经给了我们δ <sup> l <sub> j </sub> </sup>。我们可以把<strong> (eq 3) </strong>简化为:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/5a83915622e97638e2a387fffab5a305.png" alt="Neural networks equation" class="wp-image-42099" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-16.png?resize=74%2C49&amp;ssl=1"/></figure>
+
+
+
+<p>其中可以理解，δ在与偏差<strong> b. </strong>相同的神经元处被评估</p>
+
+
+
+<p>4.<strong>误差相对于网络中任何权重的变化率(等式4) </strong></p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img decoding="async" loading="lazy" src="../Images/7781f630b26aed8eb2c52b9d080bb580.png" alt="Neural networks equation" class="wp-image-42101" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-networks-equation-17.png?resize=135%2C60&amp;ssl=1"/></figure>
+
+
+
+<p>这显示了如何根据我们已经知道如何计算的量δ <sup> l </sup>和al-1计算偏导数∂e/∂w<sup>l</sup>T2】JK。这里a <sup> l-1 </sup>是神经元输入到权值<strong> w </strong>的激活，δ <sup> l </sup>是神经元输出到权值<strong>w</strong>的误差通过查看<strong> (eq 4)，</strong>我们可以说当<strong> </strong> a <sup> l-1 </sup> ≈ 0时，梯度项也会趋于小，这意味着权值学习得慢，或者梯度换句话说，我们可以说<strong>(等式4) </strong>的结果是低激活神经元输出的权重学习缓慢。<strong> </strong></p>
+
+
+
+<p>总之，现在你已经看到，如果输入神经元是低激活的，或者输出神经元已经饱和，即高或低激活，权重将学习缓慢。</p>
+
+
+
+<p>这四个基本方程适用于任何激活函数，不仅仅是标准的sigmoid函数或我们在开始讨论的感知器。让我们以伪算法的形式写出来:</p>
+
+
+
+<ol><li><strong>输入</strong> x <strong> : </strong>设置输入层对应的激活a <sup> 1 </sup>。</li><li><strong>前馈:</strong>对于每个l = 2，3，…，L计算e<sup>L</sup>= w<sup>L</sup>a<sup>L-1</sup>+b<sup>L</sup>和a <sup> l </sup> =σ(e <sup> l </sup>)。</li><li><strong>输出误差δ <sup> L </sup> : </strong>计算矢量δ<sup>L</sup>=∈<sub>a</sub>EOσ’(e<sup>L</sup>)。</li><li><strong>反向传播误差:</strong>对于每个l=L-1，L-2，…，2计算δ<sup>L</sup>=((w<sup>L+1</sup>)<sup>T</sup>δ<sup>L+1</sup>)oσ'(e<sup>L</sup>)。</li><li><strong>输出:</strong>误差函数的梯度由∂e/∂w<sup>l</sup>T4】JK= a<sup>l-1</sup><sub>k</sub><sup>l</sup><sub>j</sub>和∂e/∂b<sup>l</sup><sub>j</sub>=δ<sup><sup>l</sup><sub>j</sub></sup>给出。</li></ol>
+
+
+
+<p>检查该算法，您可以看到为什么它被称为<em> back </em> propagation。我们从最后一层开始，反向计算误差向量<strong>δ<sup>L</sup>T5】。看起来很奇怪，我们在网络中倒退。但是如果你考虑反向传播的证据，反向传播是成本是网络输出的函数这一事实的结果。为了理解成本如何随着先前的权重和偏差而变化，我们需要重复应用链式法则，通过各层反向工作以获得可用的表达式。如果你不熟悉链式法则，请看看这个由Josh Starmer 制作的<a href="https://web.archive.org/web/20230103154737/https://youtu.be/wl1myxrtQHQ" target="_blank" rel="noreferrer noopener nofollow">视频。</a></strong></p>
+
+
+
+<p>如果你仍然不清楚反向传播的本质，我建议你看看这个<a href="https://web.archive.org/web/20230103154737/https://youtu.be/Ilg3gGewQ5U" target="_blank" rel="noreferrer noopener nofollow">视频</a>和这个<a href="https://web.archive.org/web/20230103154737/https://youtu.be/tIeHLnjs5U8" target="_blank" rel="noreferrer noopener nofollow">视频</a>来了解反向传播演算。</p>
+
+
+
+<p>对于博客的其余部分，我将使用PyTorch的loss.backward()，因为它已经过优化。为了使用它，您需要使用zero_grad()函数清除现有的渐变，否则渐变将会累积。</p>
+
+
+
+<section id="blog-intext-cta-block_61e56ff5c9ff7" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>如何用<a href="https://web.archive.org/web/20230103154737/https://docs.neptune.ai/integrations-and-supported-tools/model-training/pytorch" target="_blank" rel="noreferrer noopener"> Neptune-PyTorch集成</a>跟踪模型训练元数据？</p>
+    
+    </section>
+
+
+
+<p>我们一直专注于前馈神经网络。现在，对于乳腺癌分类的任务，我们来看一个以图像分类闻名的神经网络。</p>
+
+
+
+<h2 id="h-what-are-convolutional-neural-networks-how-do-they-work">什么是卷积神经网络？它们是如何工作的？</h2>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/a4b492391dc8cf82a1870813caca0f06.png" alt="MNIST Data" class="wp-image-42071" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/MNIST-Data.png?ssl=1"/><figcaption><em>MNIST Data flow in CNN | <a href="https://web.archive.org/web/20230103154737/https://github.com/Hvass-Labs/TensorFlow-Tutorials/blob/master/02_Convolutional_Neural_Network.ipynb" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>先说为什么我们需要卷积神经网络(ConvNets，CNN)而不是前馈神经网络。</p>
+
+
+
+<p>考虑一个小图像，大小为100100。对于前馈神经网络，第二层中的每个神经元有10000个权重。这使得网络容易过拟合数据。还有，把图像扁平化，缩小到10000权重，就失去了图像的本质。</p>
+
+
+
+<p>CNN是前馈神经网络(全连接神经网络)的正则化版本。常规的正则化方法包括随着损失函数的最小化而改变权重，同时随机调整连通性。</p>
+
+
+
+<p>CNN利用图像数据中的分层模式；在每一层中，它们捕捉小的局部特征(相对于前一层)，但是随着深度的增加，这些特征相对于输入图像的复杂性增加。因此，这种局部过滤器(在一个小区域上局部连接的神经元)的堆叠使CNN能够捕捉复杂和空间不变的特征，如狗、猫、汽车等。与完全连接的网络相比，具有较少数量的可训练参数。我们可以说，它们在从图像中捕捉相关特征方面比完全连接的网络更有效。要了解更多关于CNN在图像分类中的重要性，请看这个由计算机爱好者制作的<a href="https://web.archive.org/web/20230103154737/https://youtu.be/py5byOOHZM8" target="_blank" rel="noreferrer noopener nofollow">视频。</a></p>
+
+
+
+<p>卷积神经网络是一种特殊类型的神经网络，它在至少一层中使用卷积(滤波器/内核与输入图像卷积以生成激活)而不是常规的矩阵乘法。CNN的架构类似于全连接神经网络的架构。有一个输入层，隐藏层和最终输出层。</p>
+
+
+
+<p>这里，隐藏层执行卷积。接下来是执行其他功能的其他层，如汇集层、全连接层和标准化层。让我们详细看看这些部分。</p>
+
+
+
+<h3>卷积层</h3>
+
+
+
+
+
+
+
+<p>正如我前面提到的，卷积发生在隐藏层中。准确地说，核心或者我们这里称之为滤波器，移动到图像中的不同位置，改变图像上卷积的步幅。对于过滤器的每个位置，计算过滤器和过滤器下的图像像素之间的点积，这导致输出图像中的单个像素。</p>
+
+
+
+<p>因此，在整个输入图像上移动滤波器会产生新的图像。这些图像被称为特征地图。在第一卷积层中生成的特征图被下采样。这些特征图然后通过第二卷积层。这里，对于这些新生成的图像中的每一个，需要滤波器权重。结果图像被进一步下采样。如果你有兴趣深入了解卷积如何作用于图像，可以参考这篇关于执行卷积运算的<a href="https://web.archive.org/web/20230103154737/https://developer.apple.com/library/archive/documentation/Performance/Conceptual/vImage/ConvolutionOperations/ConvolutionOperations.html" target="_blank" rel="noreferrer noopener nofollow">博客。</a></p>
+
+
+
+<h3>汇集层</h3>
+
+
+
+<p>现在，除了通过改变卷积的步幅来进行下采样，还有其他可靠的方法来对图像进行下采样，如使用池层。池层通过将一层的神经元簇的输出合并到下一层的单个神经元中来减少数据维度。本地池合并小型集群，通常为2 x 2。这进一步降低了分辨率。有两种类型的池:</p>
+
+
+
+<ol><li>最大池化–为每个特征图选取前一层的每个神经元簇的最大值</li><li>平均池化–为每个特征图选取每个神经元集群的平均值</li></ol>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/ff348a7ccc62ee5306a8a25815709382.png" alt="Max pooling and average poolin" class="wp-image-42073" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Max-pooling-and-average-poolin.png?ssl=1"/><figcaption><em>Difference between max pooling and average pooling | <a href="https://web.archive.org/web/20230103154737/https://www.researchgate.net/figure/Toy-example-illustrating-the-drawbacks-of-max-pooling-and-average-pooling_fig2_300020038" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>最大池通常是首选，因为它执行去噪和降维。</p>
+
+
+
+<p>汇集有助于提取位置不变的主要特征。此外，维度的减少降低了处理数据所需的计算能力。</p>
+
+
+
+<h3>完全连接的层</h3>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/167757bc8f3384ca625af564bbd21fba.png" alt="Fully connected layers" class="wp-image-42075" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Fully-connected-layers-2.png?resize=628%2C356&amp;ssl=1"/><figcaption><em>A three layer fully connected multilayer perceptron structure that is identical to a fully connected layer in convolutional neural networks with only difference being the input layer | <a href="https://web.archive.org/web/20230103154737/https://www.mdpi.com/1424-8220/10/9/8363/htm" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>最后一层是一个完全连接的层，它对我们的图像进行分类。卷积网络的输出然后被展平成列向量，并被馈送到完全连接的神经网络；反向传播应用于训练的每次迭代。</p>
+
+
+
+<p>在一系列时期内，该模型能够区分图像中的主要和低级特征，并使用<strong> softmax分类</strong>技术对其进行分类。我不会详细介绍softmax，但用几句话来说，softmax分类器给出了每个类别的概率。要了解更多关于softmax分类的信息，请浏览Adrian Rosebrock 的<a href="https://web.archive.org/web/20230103154737/https://www.pyimagesearch.com/2016/09/12/softmax-classifiers-explained/" target="_blank" rel="noreferrer noopener nofollow">博客，他在博客中精彩地解释了softmax分类。</a></p>
+
+
+
+<h2 id="h-cnn-code">CNN代码</h2>
+
+
+
+<p>现在，我们已经完成了基本知识，让我们构建自己的CNN，看看它在MNIST数据集上的表现如何，在Colab中使用Pytorch，使用GPU。</p>
+
+
+
+<p>首先，导入库。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torchvision
+<span class="hljs-keyword">import</span> torchvision.transforms <span class="hljs-keyword">as</span> transforms
+<span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn
+<span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F</pre>
+
+
+
+<p>下载培训和测试数据集。</p>
+
+
+
+<pre class="hljs">transform = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((<span class="hljs-number">0.5</span>,), (<span class="hljs-number">0.5</span>,))]
+    )
+trainset = torchvision.datasets.MNIST(
+    root=<span class="hljs-string">'./data'</span>, train=<span class="hljs-keyword">True</span>, download=<span class="hljs-keyword">True</span>, transform=transform)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=<span class="hljs-number">64</span>,
+                                          shuffle=<span class="hljs-keyword">True</span>, num_workers=<span class="hljs-number">2</span>)</pre>
+
+
+
+<pre class="hljs">testset = torchvision.datasets.MNIST(
+    root=<span class="hljs-string">'./data'</span>, train=<span class="hljs-keyword">False</span>, download=<span class="hljs-keyword">True</span>, transform=transform)
+testloader = torch.utils.data.DataLoader(testset, batch_size=<span class="hljs-number">20</span>,
+                                         shuffle=<span class="hljs-keyword">False</span>, num_workers=<span class="hljs-number">2</span>)</pre>
+
+
+
+<p>让我们想象一下我们将要用作输入的训练图像。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">imshow</span><span class="hljs-params">(img)</span>:</span>
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span>)))
+    plt.show()
+
+dataiter = iter(trainloader)
+images, labels = dataiter.next()
+
+imshow(torchvision.utils.make_grid(images[:<span class="hljs-number">6</span>], nrow=<span class="hljs-number">3</span>))</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/623a00accf3dff203f48cac3bbb5bca4.png" alt="Neural network visualization" class="wp-image-42040" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-network-visualization.png?ssl=1"/></figure>
+
+
+
+<pre class="hljs">device = torch.device(<span class="hljs-string">'cuda'</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> <span class="hljs-string">"cpu"</span>)</pre>
+
+
+
+<p>现在，是时候建立我们的cnn了。</p>
+
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NumClassifyNet</span><span class="hljs-params">(nn.Module)</span>:</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+    super(NumClassifyNet, self).__init__()
+    
+    self.conv1 = nn.Conv2d(<span class="hljs-number">1</span>, <span class="hljs-number">16</span>, kernel_size=<span class="hljs-number">5</span>)
+    self.conv2 = nn.Conv2d(<span class="hljs-number">16</span>, <span class="hljs-number">32</span>, kernel_size=<span class="hljs-number">5</span>)
+    self.pool = nn.MaxPool2d(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>)
+    self.fc1 = nn.Linear(<span class="hljs-number">512</span>, <span class="hljs-number">120</span>)
+    self.fc2 = nn.Linear(<span class="hljs-number">120</span>, <span class="hljs-number">10</span>)
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, x)</span>:</span>
+    x = self.pool(F.relu(self.conv1(x)))
+    x = self.pool(F.relu(self.conv2(x)))
+    x = x.view(<span class="hljs-number">-1</span>, self.flat_features(x))
+    x = F.relu(self.fc1(x))
+    x = self.fc2(x)
+    <span class="hljs-keyword">return</span> x
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">flat_features</span><span class="hljs-params">(self, x)</span>:</span>
+    size = x.size()[<span class="hljs-number">1</span>:]
+    num_features = <span class="hljs-number">1</span>
+    <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> size:
+      num_features *= s
+    <span class="hljs-keyword">return</span> num_features
+
+net = NumClassifyNet()
+net = net.to(device)</pre>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch.optim <span class="hljs-keyword">as</span> optim
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr = <span class="hljs-number">0.001</span>)</pre>
+
+
+
+<p>是时候让模型接受训练了！</p>
+
+
+
+<pre class="hljs">test_data_iter = iter(testloader)
+test_images, test_labels = test_data_iter.next()
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(<span class="hljs-number">10</span>):
+  running_loss = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">for</span> i, data <span class="hljs-keyword">in</span> enumerate(trainloader, <span class="hljs-number">0</span>):
+    input_imgs, labels = data
+    optimizer.zero_grad()
+    input_imgs = input_imgs.to(device)
+    labels = labels.to(device)
+    outputs = net(input_imgs)
+    loss = criterion(outputs, labels)
+    loss.backward()
+    optimizer.step()
+
+    
+    
+    running_loss += loss.item()
+    <span class="hljs-keyword">if</span> i % <span class="hljs-number">1000</span> == <span class="hljs-number">0</span>:
+      print(<span class="hljs-string">'epoch'</span>, epoch+<span class="hljs-number">1</span>, <span class="hljs-string">'loss'</span>, running_loss/<span class="hljs-number">1000</span>)
+      imshow(torchvision.utils.make_grid(test_images[<span class="hljs-number">0</span>].detach()))
+      test_out = net(test_images.to(device))
+      _, predicted_out = torch.max(test_out, <span class="hljs-number">1</span>)
+      print(<span class="hljs-string">'Predicted : '</span>, <span class="hljs-string">' '</span>.join(<span class="hljs-string">'%5s'</span> % predicted_out[<span class="hljs-number">0</span>]))
+print(<span class="hljs-string">'Training finished'</span>)</pre>
+
+
+
+<p>我们上一个巴赫的输出是:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/17f1e1557f2ce10d768fe60d23e5852d.png" alt="Neural network output" class="wp-image-42043" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-network-output.png?ssl=1"/></figure>
+
+
+
+<p>损失少，预测准确，现在可以停止训练，用这个模型做预测了。</p>
+
+
+
+<p>整个测试集达到的精度为:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/bfc0502282b85db3e45110728208cf98.png" alt="Neural network accuracy" class="wp-image-42045" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-network-accuracy.png?ssl=1"/></figure>
+
+
+
+<h2 id="h-breast-cancer-classification-using-cnn">使用CNN的乳腺癌分类</h2>
+
+
+
+<h3>关于数据集的信息:乳腺组织病理学图像</h3>
+
+
+
+<p>乳腺组织病理学图片可以从<a href="https://web.archive.org/web/20230103154737/https://www.kaggle.com/paultimothymooney/breast-histopathology-images" target="_blank" rel="noreferrer noopener nofollow"> Kaggle的网站</a>下载。图像数据由1，77，010个50×50像素的小块组成，提取自以40°扫描的乳腺癌样本的162个完整载片图像。数据包含阴性和阳性样本的图像。</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/64b01a0f5585a40d7c9ac31b511cf53a.png" alt="Breast Histopathology Images" class="wp-image-42077" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Breast-Histopathology-Images.png?ssl=1"/></figure>
+
+
+
+<p>让我们把数据从kaggle下载到我们的硬盘上，这样我们就可以使用它了。我发现文档含糊不清，所以我将用自己的话来解释如何做。希望有帮助。这是一次性设置:</p>
+
+
+
+<p>1.<strong>设置Kaggle API访问:</strong>收集您的Kaggle API访问令牌。导航到您的Kaggle个人资料“帐户”页面。找到“创建您的API令牌”。下载包含用户名和密钥的JSON文件形式的令牌。</p>
+
+
+
+<p>2.<strong>在Drive中保存API令牌:</strong>在你的Google Drive中为Kaggle创建一个文件夹。将API令牌的副本作为私有文件保存在该文件夹中，以便于访问。</p>
+
+
+
+<p>3.将Google Drive安装到Colab :这将确保您不必在每次重启运行时下载数据。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> google.colab <span class="hljs-keyword">import</span> drive
+drive.mount(<span class="hljs-string">'/content/gdrive'</span>)</pre>
+
+
+
+<p>4.<strong>使用操作系统</strong>配置“Kaggle环境”:这将把API键和值存储为操作系统环境对象<a href="https://web.archive.org/web/20230103154737/https://www.geeksforgeeks.org/python-os-environ-object/">t</a>/变量。当您运行Kaggle终端命令时(在下一步中)，您的机器将通过您的API令牌链接到您的帐户。链接到驱动器中的私有目录可以确保您的令牌信息保持隐藏。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> os
+os.environ[<span class="hljs-string">'KAGGLE_CONFIG_DIR'</span>] = <span class="hljs-string">"/content/gdrive/MyDrive/kaggle"</span></pre>
+
+
+
+<p>5.<strong>下载数据</strong></p>
+
+
+
+<pre class="hljs">os.chdir(<span class="hljs-string">'../content/gdrive/MyDrive/kaggle'</span>)
+!kaggle datasets download -d paultimothymooney/breast-histopathology-images</pre>
+
+
+
+<p>现在我们有了数据集，让我们开始构建我们的网络吧！</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torchvision
+<span class="hljs-keyword">from</span> torchvision <span class="hljs-keyword">import</span> transforms
+<span class="hljs-keyword">from</span> torchvision.datasets <span class="hljs-keyword">import</span> ImageFolder
+<span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn
+<span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F
+<span class="hljs-keyword">from</span> torch.utils.data <span class="hljs-keyword">import</span> random_split
+<span class="hljs-keyword">import</span> torch.optim <span class="hljs-keyword">as</span> optim
+<span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> Counter
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np</pre>
+
+
+
+<p>将图像转换为张量。</p>
+
+
+
+<pre class="hljs">data_dir = <span class="hljs-string">"/content/gdrive/MyDrive"</span>
+folder_name = <span class="hljs-string">"kaggle"</span>
+image_folders = os.path.join(data_dir, folder_name)
+
+transform = transforms.Compose([transforms.Resize((<span class="hljs-number">50</span>, <span class="hljs-number">50</span>)), transforms.ToTensor()])
+images = []
+<span class="hljs-keyword">for</span> file <span class="hljs-keyword">in</span> os.listdir(image_folders):
+    <span class="hljs-keyword">try</span>:
+      images.append(ImageFolder(os.path.join(image_folders, file), transform=transform))
+    <span class="hljs-keyword">except</span>:
+      print(file)
+datasets = torch.utils.data.ConcatDataset(images)</pre>
+
+
+
+<p>检查数据集，找出每个类中的样本数。</p>
+
+
+
+<pre class="hljs">i=<span class="hljs-number">0</span>
+<span class="hljs-keyword">for</span> dataset <span class="hljs-keyword">in</span> datasets.datasets:
+    <span class="hljs-keyword">if</span> i==<span class="hljs-number">0</span>:
+        result = Counter(dataset.targets)
+        i += <span class="hljs-number">1</span>
+    <span class="hljs-keyword">else</span>:
+        result += Counter(dataset.targets)
+
+result = dict(result)
+print(<span class="hljs-string">"""Total Number of Images for each Class:
+    Class 0 (No Breast Cancer): {}
+    Class 1 (Breast Cancer present): {}"""</span>.format(result[<span class="hljs-number">0</span>], result[<span class="hljs-number">1</span>]))</pre>
+
+
+
+<p>输出:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/c1e05ef927e9470e66e81f036517003b.png" alt="Neural network output " class="wp-image-42055" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-network-output-2.png?ssl=1"/></figure>
+
+
+
+<p>现在，将数据集分成75%的训练集和25%的测试集。</p>
+
+
+
+<pre class="hljs">random_seed = <span class="hljs-number">42</span>
+torch.manual_seed(random_seed)
+
+test_size = int(<span class="hljs-number">0.25</span>*(result[<span class="hljs-number">0</span>]+result[<span class="hljs-number">1</span>]))
+print(test_size)
+train_size = len(datasets) - test_size
+train_dataset, test_dataset = random_split(datasets, [train_size, test_size])</pre>
+
+
+
+<pre class="hljs">trainloader = torch.utils.data.DataLoader(train_dataset, batch_size=<span class="hljs-number">128</span>,
+                                          shuffle=<span class="hljs-keyword">True</span>, num_workers=<span class="hljs-number">2</span>)
+testloader = torch.utils.data.DataLoader(test_dataset, batch_size=<span class="hljs-number">64</span>,
+                                         shuffle=<span class="hljs-keyword">False</span>, num_workers=<span class="hljs-number">2</span>)</pre>
+
+
+
+<p>现在，看看我们的数据集。</p>
+
+
+
+<pre class="hljs">
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">imshow</span><span class="hljs-params">(img)</span>:</span>
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span>)))
+    plt.show()
+
+
+dataiter = iter(trainloader)
+images, labels = dataiter.next()
+
+imshow(torchvision.utils.make_grid(images[:<span class="hljs-number">6</span>], nrow=<span class="hljs-number">3</span>))
+
+labels[:<span class="hljs-number">6</span>]</pre>
+
+
+
+<p>输出:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/e0a0926b556fc9dcd234cb7416b45189.png" alt="Neural network output " class="wp-image-42058" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-network-output-3.png?ssl=1"/></figure>
+
+
+
+<p>使用GPU。</p>
+
+
+
+<pre class="hljs">device = torch.device(<span class="hljs-string">'cuda'</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> <span class="hljs-string">"cpu"</span>)</pre>
+
+
+
+<p>建立乳腺癌分类神经网络。</p>
+
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BreastCancerClassifyNet</span><span class="hljs-params">(nn.Module)</span>:</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+    super(BreastCancerClassifyNet, self).__init__()
+    self.conv1 = nn.Conv2d(<span class="hljs-number">3</span>, <span class="hljs-number">64</span>, kernel_size=<span class="hljs-number">3</span>)
+    self.conv2 = nn.Conv2d(<span class="hljs-number">64</span>, <span class="hljs-number">128</span>, kernel_size=<span class="hljs-number">3</span>)
+    self.conv3 = nn.Conv2d(<span class="hljs-number">128</span>, <span class="hljs-number">256</span>, kernel_size=<span class="hljs-number">3</span>)
+    self.pool = nn.MaxPool2d(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>)
+    self.fc1 = nn.Linear(<span class="hljs-number">4096</span>, <span class="hljs-number">1024</span>)
+    self.fc2 = nn.Linear(<span class="hljs-number">1024</span>, <span class="hljs-number">512</span>)
+    self.fc3 = nn.Linear(<span class="hljs-number">512</span>, <span class="hljs-number">1</span>)
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, x)</span>:</span>
+    x = self.pool(F.relu(self.conv1(x)))
+    x = self.pool(F.relu(self.conv2(x)))
+    x = self.pool(F.relu(self.conv3(x)))
+    x = x.view(<span class="hljs-number">-1</span>, self.flat_features(x))
+    x = F.relu(self.fc1(x))
+    x = F.relu(self.fc2(x))
+    x = self.fc3(x)
+    x = F.log_softmax(x)
+    <span class="hljs-keyword">return</span> x
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">flat_features</span><span class="hljs-params">(self, x)</span>:</span>
+    size = x.size()[<span class="hljs-number">1</span>:]
+    num_features = <span class="hljs-number">1</span>
+    <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> size:
+      num_features *= s
+    <span class="hljs-keyword">return</span> num_features
+
+net = BreastCancerClassifyNet()
+net = net.to(device)</pre>
+
+
+
+<p>使用二元交叉熵损失，就像我们做二元分类一样。</p>
+
+
+
+<pre class="hljs">criterion = nn.BCELoss()
+optimizer = optim.SGD(net.parameters(), lr = <span class="hljs-number">0.001</span>)</pre>
+
+
+
+<p>该训练了！</p>
+
+
+
+<pre class="hljs">test_data_iter = iter(testloader)
+test_images, test_labels = test_data_iter.next()
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(<span class="hljs-number">20</span>):
+  running_loss = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">for</span> i, data <span class="hljs-keyword">in</span> enumerate(trainloader, <span class="hljs-number">0</span>):
+    input_imgs, labels = data
+    input_imgs = input_imgs.to(device)
+    labels = labels.to(device)
+    optimizer.zero_grad()
+    outputs = net(input_imgs)
+    labels = labels.unsqueeze(<span class="hljs-number">1</span>).float()
+    loss = criterion(outputs, labels)
+    loss.backward()
+    optimizer.step()
+
+    
+    running_loss += loss.item()
+    <span class="hljs-keyword">if</span> i % <span class="hljs-number">10000</span> == <span class="hljs-number">0</span>:
+      print(<span class="hljs-string">'epoch'</span>, epoch+<span class="hljs-number">1</span>, <span class="hljs-string">'loss'</span>, running_loss/<span class="hljs-number">10000</span>)
+      imshow(torchvision.utils.make_grid(test_images[<span class="hljs-number">0</span>].detach()))
+      test_out = net(test_images.to(device))
+      _, predicted_out = torch.max(test_out, <span class="hljs-number">1</span>)
+      print(<span class="hljs-string">'Predicted : '</span>, <span class="hljs-string">' '</span>.join(<span class="hljs-string">'%5s'</span> % predicted_out[<span class="hljs-number">0</span>]))
+print(<span class="hljs-string">'Training finished'</span>)</pre>
+
+
+
+<p>最后，在所有数据集上测试我们训练的模型并计算准确性。</p>
+
+
+
+<pre class="hljs">correct = <span class="hljs-number">0</span>
+total = <span class="hljs-number">0</span>
+<span class="hljs-keyword">with</span> torch.no_grad():
+  <span class="hljs-keyword">for</span> data <span class="hljs-keyword">in</span> testloader:
+    test_images, test_labels = data
+    test_out = net(test_images.to(device))
+    _, predicted = torch.max(test_out.data, <span class="hljs-number">1</span>)
+    total += test_labels.size(<span class="hljs-number">0</span>)
+    <span class="hljs-keyword">for</span> _id, out_pred <span class="hljs-keyword">in</span> enumerate(predicted):
+      <span class="hljs-keyword">if</span> int(out_pred) == int(test_labels[_id]):
+        correct += <span class="hljs-number">1</span>
+
+print(<span class="hljs-string">'Accuracy of the network on the 44252 test images: %d %%'</span> % (
+        <span class="hljs-number">100</span> * correct / total))</pre>
+
+
+
+<p>输出:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/da91a446fc999354d888c44a740ce8ef.png" alt="Neural network accuracy " class="wp-image-42062" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230103154737im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neural-network-accuracy-2.png?ssl=1"/></figure>
+
+
+
+<p>现在，这个精度似乎比我们之前达到的要低，但是请注意，我们使用了一个更复杂的数据集，并且我们从头开始构建了这个模型。尽管如此，我们仍然达到了20个时期的良好精度。</p>
+
+
+
+<p>为了实现更高的准确性，您可以使用在数百万数据集上训练的预训练网络作为基础，并在此基础上构建您的分类模型，即通过应用迁移学习。</p>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>我们从定义神经网络发展到建立自己的乳腺癌分类神经网络。让我们回顾一下我们所学的内容:</p>
+
+
+
+<ul><li>我们首先研究了神经网络的定义。神经元代表什么，它们是如何形成网络的？</li><li>然后转到他们是如何工作的。简要了解激活函数后，我们进入误差函数，以及梯度下降如何帮助减少误差。</li><li>我们进一步研究了反向传播，我对它的数学做了简单的解释。</li><li>然后我们转向CNN及其每一层，然后从头开始构建我们自己的CNN来对MNIST数据集进行分类。</li><li>凭借我们对神经网络的集体知识，我们为<strong>乳腺癌分类</strong>建立了自己的神经网络。</li></ul>
+
+
+
+<h3>资源</h3>
+
+
+
+
+
+
+
+<p>我向您展示了如何构建自己的乳腺癌分类网络，但我希望这篇博客将有助于为任何数据集构建自己的分类神经网络。</p>
+
+
+
+<p>我希望你喜欢这次旅行！感谢阅读。</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

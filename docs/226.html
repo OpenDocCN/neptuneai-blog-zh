@@ -1,0 +1,790 @@
+<html>
+<head>
+<title>How to Make Your TensorBoard Projects Easy to Share and Collaborate On </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何让您的TensorBoard项目易于共享和协作</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/how-to-make-your-tensorboard-projects-easy-to-share-and-collaborate-on#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/how-to-make-your-tensorboard-projects-easy-to-share-and-collaborate-on#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>我们都知道团队合作是每个机器学习项目的重要组成部分。尽管每个工程师都有自己的项目工作，但他们仍然需要与团队分享他们的成果，并对合作持开放态度。</p>
+
+
+
+<p>因此，在本文中，您将学习如何使您的ML项目易于共享和协作，以及使之成为可能的工具。</p>
+
+
+
+<p>我们将重点关注TensorFlow/Keras框架，该框架被全球的机器学习工程师广泛接受。我们将探讨<a href="https://web.archive.org/web/20221206012644/https://www.tensorflow.org/tensorboard" target="_blank" rel="noreferrer noopener nofollow"> TensorBoard </a>的利弊，这是一种用于结果跟踪的基本工具。我们还会将其与更先进、更强大的竞争对手进行比较，看看他们能否帮助我们克服TensorBoard的局限性。</p>
+
+
+
+<p>到本文结束时，您会知道:</p>
+
+
+
+<ul>
+<li>为什么只需不到一分钟的时间就能与队友分享您的整个ML工作流程；</li>
+
+
+
+<li>如何扩展可以共享的东西，开始记录和共享模型属性(参数、检查点)、输入数据、图像、度量、图表、硬件消耗等很多有趣的东西；</li>
+
+
+
+<li>如果您的项目在Jupyter笔记本中，您如何共享和协作；</li>
+
+
+
+<li>如何让您的同事访问您的实验运行结果，并让他们以编程方式下载您的项目结果、数据或模型属性，以便他们能够独立工作。</li>
+</ul>
+
+
+
+
+
+
+
+<p>你想知道更多吗？拿起你的爆米花，继续阅读！</p>
+
+
+
+
+
+
+
+<h2 id="h-logging-via-tensorboard">通过TensorBoard记录</h2>
+
+
+
+<p>回归基础总是好的，在我们的情况下，它是tensor board——我们大多数人都喜欢使用的古老、但仍然可靠和方便的工具。</p>
+
+
+
+<p>让我告诉你<strong>这不会是另一篇关于TensorBoard及其功能</strong>的 <s>无聊</s> <strong>文章。我们都知道TensorBoard是什么。我不会再重复了。</strong></p>
+
+
+
+<p>相反，我想分享我在TensorBoard工作中获得的经验和知识，并向您展示使用它的最佳案例以及局限性。</p>
+
+
+
+<p>为了让它更有趣，我将把我的推理基于现实生活中的机器学习项目:让我们建立一个图像分类器，它告诉我们图像的方向输入。有四个选项可用，如下图所示:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/b81fbefa0b5690d73746fd64831d6471.png" alt="Image orientation options" class="wp-image-34393" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Image-orientation-options.png?ssl=1"/><figcaption class="wp-element-caption"><em>Four potential orientation options of an image.<br/>We want to build a classifier to predict orientation.</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>我们有很多方法可以做到这一点。为了简单起见，我决定微调基于ResNet50的模型来解决这个问题。由于我们使用TensorFlow/Keras框架，我使用下面的代码片段创建了我的模型架构:</p>
+
+
+
+<pre class="hljs">
+backbone = ResNet50(include_top = <span class="hljs-keyword">False</span>,
+                    input_shape = input_shape,
+                    pooling = <span class="hljs-string">'avg'</span>)
+
+
+n_classes = <span class="hljs-number">4</span>
+
+model = Sequential()
+model.add(backbone)
+
+dense_count = <span class="hljs-number">256</span>
+model.add(Dense(dense_count))
+model.add(LeakyReLU())
+model.add(BatchNormalization())
+
+model.add(Dense(n_classes))
+model.add(Softmax())</pre>
+
+
+
+<p class="has-text-align-center"><em>在我定义模型架构的地方截取代码</em></p>
+
+
+
+<p>我不会花太多时间解释我选择模型参数的理由，因为它不在今天的议程上(如果你真的感兴趣，请参考<a href="https://web.archive.org/web/20221206012644/https://arxiv.org/abs/1902.02771" target="_blank" rel="noreferrer noopener nofollow">这篇文章</a>)。</p>
+
+
+
+<p><strong>快速提醒:</strong>如何启用TensorBoard并让其负责跟踪模型日志？</p>
+
+
+
+<p>首先，我定义了一个目录的路径，我的日志将存储在这个目录中。然后我创建一个<a href="https://web.archive.org/web/20221206012644/https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/TensorBoard" target="_blank" rel="noreferrer noopener nofollow"> TensorBoard回调</a>对象。它会将日志存储在先前指定的目录中。</p>
+
+
+
+<pre class="hljs">logdir = <span class="hljs-string">'./logs_import/'</span>
+os.makedirs(logdir, exist_ok = <span class="hljs-keyword">True</span>)
+
+tbCallBack = keras.callbacks.TensorBoard(log_dir = logdir,
+                                         histogram_freq = <span class="hljs-number">0</span>,
+                                         write_graph = <span class="hljs-keyword">False</span>,
+                                         write_images = <span class="hljs-keyword">False</span>)</pre>
+
+
+
+<p class="has-text-align-center"><em>发起张量板回调</em></p>
+
+
+
+<p>有了上面的代码片段，我未来的模型日志将被存储在<code>./logs_import/</code>，这是我刚刚通过<code>.makedirs()</code>函数创建的，可以在os库中找到。</p>
+
+
+
+<p>为了启动TensorBoard，我打开了一个新的<em>终端</em>窗口，并导航到我的项目目录。从那里，我执行以下命令:</p>
+
+
+
+<pre class="hljs">tensorboard --logdir=./logs_import</pre>
+
+
+
+<p>TensorBoard现在将在我默认的网络浏览器的新标签页中自动启动。它现在是空的，因为我们还没有开始伐木。为了开始日志记录，我拟合了模型并开始训练工作，如下面的代码片段所示。</p>
+
+
+
+<pre class="hljs">model.fit_generator(generator = train_generator,
+                    steps_per_epoch = training_steps_per_epoch,
+                    epochs = <span class="hljs-number">100</span>,
+                    validation_data = validation_generator,
+                    validation_steps = validation_steps_per_epoch,
+                    callbacks = [rLrCallBack,
+                                 tbCallBack,
+                                 mcCallBack_loss,
+                                 mcCallBack_acc,
+                                 esCallBack],
+                    use_multiprocessing = <span class="hljs-keyword">True</span>,
+                    workers = <span class="hljs-number">8</span>
+                   )</pre>
+
+
+
+<p class="has-text-align-center"><em>安装我的模型开始训练</em></p>
+
+
+
+<p>请注意，之前启动的TensorBoard回调是作为参数在其他回调中传递的。</p>
+
+
+
+<p>在GPU上运行了大约一个小时和20个周期后，我的模型完成了训练。让我们看看TensorBoard为我们准备了什么。为此，我返回到之前打开的浏览器选项卡，我看到记录了5个<strong>标量</strong>:</p>
+
+
+
+<ul>
+<li><em> epoch_loss </em>和<em> epoch_val_loss </em>分别是训练集和验证集的模型损失函数值；</li>
+
+
+
+<li><em>epoch _ spare _ categorial _ accuracy</em>和<em>epoch _ val _ spare _ categorial _ accuracy</em>分别是训练集和验证集的模型度量值；</li>
+
+
+
+<li><em> epoch_lr </em>是优化器在整个训练过程中使用的学习率值。因为它会随时间变化，所以会被记录下来。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/3d33d712d194f27823fe4ca8fc6e44ca.png" alt="Tensorboard logs" class="wp-image-34397" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Tensorboard-logs-1.png?ssl=1"/><figcaption class="wp-element-caption"><em>Outlined in red are logs that TensorBoard keeps track of and displays in its UI.</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>除了标量，我们还可以用TensorBoard跟踪其他一些东西。看看下面的TensorBoard用户界面截图，看看我们还能追踪什么:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/cee772fca0fd90a4a9fad6c0d763f425.png" alt="Tensorboard tracking" class="wp-image-34398" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Tensorboard-tracking.png?ssl=1"/><figcaption class="wp-element-caption"><em>Outlined in red are things you can track with TensorBoard.</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>这是一个简短的提醒，告诉你可以用TensorBoard做什么。现在我们来看看它在结果分享方面是否有局限性。</p>
+
+
+
+<h2 id="h-problem-statement">问题陈述</h2>
+
+
+
+
+
+<p>你有没有想过用TensorBoard和你的团队分享和讨论工作进展？有几种方法可以做到这一点。</p>
+
+
+
+<p>首先，TensorFlow有自己的工具包(<a href="https://web.archive.org/web/20221206012644/https://blog.tensorflow.org/2019/12/introducing-tensorboarddev-new-way-to.html" target="_blank" rel="noreferrer noopener nofollow"> TensorBoard.dev </a>)用于TensorBoard分享。这是一个值得考虑的好选择，但是请记住<strong>你的TensorBoard将会公开可见，</strong>并且你无法管理对它的访问。此警告来自TensorBoard官方文档:</p>
+
+
+
+<p><em>"……</em><a href="https://web.archive.org/web/20221206012644/https://blog.tensorflow.org/2019/12/introducing-tensorboarddev-new-way-to.html" target="_blank" rel="noreferrer noopener nofollow"><em>您上传的TensorBoard将公开可见，因此请勿上传敏感数据。</em></a><em/></p>
+
+
+
+<p>所以对于任何非开源的项目，你可能需要一个更安全的选择。</p>
+
+
+
+<p>其次，我们过去可以使用一种叫做Aughie Boards的第三方服务。这篇文章的<a href="https://web.archive.org/web/20221206012644/https://medium.com/@org.aughie/how-to-share-your-tensorboard-online-4ed7c2d3941c" target="_blank" rel="noreferrer noopener nofollow">中描述了它的分享方式，但不幸的是，这项服务被暂停，不可用。</a></p>
+
+
+
+<p>第三，<a href="https://web.archive.org/web/20221206012644/https://docs.neptune.ai/you-should-know/collaboration-in-neptune" target="_blank" rel="noreferrer noopener"> Neptune.ai有一个完善的共享实验结果的解决方案</a>——你只需复制一个链接。您可以通过管理访问限制来控制隐私。与我们选择的框架(TensorFlow/Keras)的集成是完全支持的，所以没有必要改变我们已经建立的工作流程。</p>
+
+
+
+<p>海王星似乎是解决我们的进步共享问题的最合理的选择。让我们看看如何将它集成到我们的项目中。</p>
+
+
+
+<h2 id="h-neptune-integration">海王星集成</h2>
+
+
+
+<p>幸运的是，与海王星融合是一个平稳的过程。有两个选项可以考虑:</p>
+
+
+
+<ol>
+<li>通过<a href="https://web.archive.org/web/20221206012644/https://docs.neptune.ai/integrations-and-supported-tools/experiment-tracking/tensorboard" target="_blank" rel="noreferrer noopener nofollow">直接导入</a>张量板日志:</li>
+</ol>
+
+
+
+<p>这个<strong>选项</strong> <strong>在你的模型已经被训练过</strong>并且所有必要的日志都已经存储在你的日志目录中的时候特别方便。我们只是想上传我们的结果，让他们可以分享。</p>
+
+
+
+<p>当我把我的日志转换成海王星实验时，我得到了以下结果:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/66de40d262860b6846f26a18365ce6d5.png" alt="Tensorboard Neptune import logs" class="wp-image-34400" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Tensorboard-Neptune-import-logs-1.png?ssl=1"/><figcaption class="wp-element-caption"><em>Logs imported to Neptune</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>看一看，我的项目空间里出现了两行(实验)。当我们仔细观察时，我们看到第一行代表训练集日志，第二行代表验证日志。从实验<strong> ID </strong>旁边的<strong>标签</strong>、<strong>T3】或/和<strong> tf/run/path </strong>属性可以看出这一点。</strong></p>
+
+
+
+<p>让我们检查一下我的导入是否成功。为此，我单击所选实验的ID <strong> </strong>。这是里面的内容:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/1a4b8864b31b9bf40a1836643ec6de45.png" alt="Tensorboard Neptune display logs" class="wp-image-34401" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Tensorboard-Neptune-display-logs.png?ssl=1"/><figcaption class="wp-element-caption"><em>Training scalar logs imported to Neptune and displayed as plots</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>描述每个训练时期的模型损失和准确性(选定指标)的两个图表。</p>
+
+
+
+<p>有几种方法可以检查图表。我可以改变轴刻度:在y轴的线性或对数刻度之间切换，或者/和在x轴的时间或历元数之间交换。TensorBoard的常见功能，如图表平滑和缩放，也是可用的。</p>
+
+
+
+<p>海王星为我们的日志扮演一个主人的角色。如果这是您想要的，让我向您展示如何将您的日志导入到Neptune。有几个简单的步骤:</p>
+
+
+
+
+
+
+
+<ul>
+<li>获取Python 3.x和以下库:<ul>
+<li>海王星-张量板；</li>
+
+
+
+<li>张量板。</li>
+</ul>
+</li>
+</ul>
+
+
+
+<p>通过执行以下bash命令来安装它们:</p>
+
+
+
+<pre class="hljs">pip install tensorboard==<span class="hljs-number">2.4</span><span class="hljs-number">.0</span> neptune-tensorboard==<span class="hljs-number">0.5</span><span class="hljs-number">.1</span></pre>
+
+
+
+<ul>
+<li><a href="https://web.archive.org/web/20221206012644/https://docs.neptune.ai/getting-started/installation#authentication-neptune-api-token" target="_blank" rel="noreferrer noopener">获取您的API令牌</a>并将其设置为NEPTUNE_API_TOKEN:<ul>
+<li>对于Linux/iOS用户，用于api令牌设置的bash命令是:</li>
+</ul>
+</li>
+</ul>
+
+
+
+<pre class="hljs">export NEPTUNE_API_TOKEN=<span class="hljs-string">'YOUR_API_TOKEN'</span></pre>
+
+
+
+
+
+
+
+<pre class="hljs">set NEPTUNE_API_TOKEN=<span class="hljs-string">"YOUR_API_TOKEN"</span></pre>
+
+
+
+<ul>
+<li>在海王星托管您的TensorBoard日志:<ul>
+<li>导航到您的TensorBoard日志目录并运行:</li>
+</ul>
+</li>
+</ul>
+
+
+
+<pre class="hljs">neptune tensorboard --project USER_NAME/PROJECT_NAME</pre>
+
+
+
+<ul>
+<li>或者，您可以将Neptune指向您的TensorBoard日志目录:</li>
+</ul>
+
+
+
+<pre class="hljs">neptune tensorboard /PATH/TO/TensorBoard_logdir
+--project  USER_NAME/PROJECT_NAME
+</pre>
+
+
+
+<p>如果你需要更多的细节，你可以观看Jakub Czakon的视频指南(点击下图获得视频链接),了解如何将TensorBoard日志导入Neptune:</p>
+
+
+
+<figure class="wp-block-embed aligncenter is-type-video is-provider-loom wp-block-embed-loom wp-embed-aspect-4-3 wp-has-aspect-ratio"><p class="wp-block-embed__wrapper">  </p></figure>
+
+
+
+<p><a href="https://web.archive.org/web/20221206012644/https://www.loom.com/share/4c1f3c0546ac48df8fced27d711bda8c"/></p>
+
+
+
+<ol start="2">
+<li>通过<a href="https://web.archive.org/web/20221206012644/https://docs.neptune.ai/integrations-and-supported-tools/model-training/tensorflow-keras" target="_blank" rel="noreferrer noopener">与TensorFlow/Keras框架的集成</a>:</li>
+</ol>
+
+
+
+<p>刚刚开始你的项目，你想把Neptune整合到你的工作流程中？我强烈建议使用这种集成方法。</p>
+
+
+
+<p>这个方法只需要几行额外的代码就可以提供更高级的功能。你会喜欢你的实验/日志是如何被组织、存储和分享的。</p>
+
+
+
+<p>让我们从头开始我的分类项目，但现在我将借助第二种积分方法积分海王星。集成后，与第一种方法相比，我项目的实验页面发生了有趣的变化:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/645c036ff1e72e10c7516f4677446320.png" alt="Neptune Tensorboard integration" class="wp-image-34404" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-Tensorboard-integration.png?ssl=1"/><figcaption class="wp-element-caption"><em>Experiment results displayed after using the second integration method</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>看看它有多方便，不仅可以看到实验及其结果，还可以看到从实验<strong> ID </strong>向右走的一些参数(像<em> dense_layer </em>、<em>骨干</em>、<em> batch_size </em>等参数……)。</p>
+
+
+
+<p>如果你展示十几个实验会怎么样？在我个人的实践中，当处理多个实验，试图比较它们或找到一个特殊的实验时，每个实验旁边的这种详细信息可以节省时间。</p>
+
+
+
+<p>点击实验<strong> ID </strong>显示出与我们之前看到的几乎相同的图表，但是现在我们在一个实验<strong> ID </strong>下有训练和验证图。保持这种方式很方便，因为验证和训练图都引用一个特定的运行。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/246f34ec776a593a0920c754fb076182.png" alt="Tensorflow Neptune integration charts" class="wp-image-34405" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Tensorflow-Neptune-integration-charts.png?ssl=1"/><figcaption class="wp-element-caption"><em>Charts for the experiment created by integrating Neptune with TensorFlow/Keras</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>除了图表，我们还可以在海王星做其他事情。让我们看看<strong>参数</strong>选项卡:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/7276de4b0a03cd29ae575921470fac33.png" alt="Neptune Tensorflow parameters" class="wp-image-34407" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-Tensorflow-parameters.png?ssl=1"/><figcaption class="wp-element-caption"><em>Parameters of a model associated with a given experiment. Also hosted at Neptune</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>海王星已经存储了一些与当前实验相关的模型参数。这些确切的参数显示在我们之前看到的实验<strong> ID </strong>旁边。</p>
+
+
+
+<p>海王星是如何捕捉到这些参数的？稍后我会告诉你细节，现在我只想给你一个工具的高级概述。</p>
+
+
+
+<p>让我们继续，打开<strong>监控</strong>选项卡:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/80bb21efef7a26018d54b28f111dfdc0.png" alt="Neptune Tensorflow resource utilization" class="wp-image-34408" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-Tensorflow-resource-utilization.png?ssl=1"/><figcaption class="wp-element-caption"><em>Resource utilization displayed within Neptune for the training job associated with a given experiment</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center"/>
+
+
+
+<p>CPU和GPU利用率显示为一个示例。</p>
+
+
+
+<p>我们可以监视整个实验过程中资源利用率是如何变化的。我们可以观察CPU和GPU负载，以及内存消耗。当你的模型正在训练时，这种信息流动是实时的，所有这些信息都可以在一个单独的实验页面上看到，非常简洁。</p>
+
+
+
+<p>让我向您展示我是如何获得上述信息的，以及实际的集成是如何工作的，这样您就可以自己完成了:</p>
+
+
+
+<ul>
+<li>和以前一样，<a href="/web/20221206012644/https://neptune.ai/register" target="_blank" rel="noreferrer noopener">在Neptune.ai注册一个账户</a></li>
+</ul>
+
+
+
+<ul>
+<li>开始之前，安装Python 3.x和以下库:</li>
+</ul>
+
+
+
+<p>您可以通过执行以下bash命令轻松安装它们:</p>
+
+
+
+<pre class="hljs">pip install tensorflow==<span class="hljs-number">2.3</span><span class="hljs-number">.1</span> neptune-contrib==<span class="hljs-number">0.4</span><span class="hljs-number">.129</span> neptune-client==<span class="hljs-number">0.25</span><span class="hljs-number">.0</span></pre>
+
+
+
+<ul>
+<li>通过向您工作的脚本或Jupyter笔记本添加初始化代码片段来初始化Neptune。下面是我的项目中初始化是如何完成的:</li>
+</ul>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> neptune
+<span class="hljs-keyword">import</span> neptune_tensorboard <span class="hljs-keyword">as</span> neptune_tb
+
+token = <span class="hljs-string">'**********'</span> 
+
+neptune.init(project_qualified_name=<span class="hljs-string">'anton-morgunov/image-orientation-detection-method'</span>,
+             api_token=token)
+
+neptune_tb.integrate_with_tensorflow()</pre>
+
+
+
+<p class="has-text-align-center"><em>在项目</em>中初始化Neptune的代码片段</p>
+
+
+
+<p>请注意，我故意模糊了我的令牌，因为它是我的帐户的私有令牌。当您在Neptune网站上注册帐户时，您的<a href="https://web.archive.org/web/20221206012644/https://docs.neptune.ai/getting-started/installation#authentication-neptune-api-token" target="_blank" rel="noreferrer noopener">个人令牌</a>将出现在您的个人资料页面中。</p>
+
+
+
+<p>此外，请注意我在第10行中应用的<code>.integrate_with_tensorflow()</code>方法，它在我的工作空间中实现了与TensorFlow/Keras的实际集成。</p>
+
+
+
+<ul>
+<li>我的项目代码的其余部分和以前一样，除了我拟合模型的方式。现在看起来是这样的:</li>
+</ul>
+
+
+
+<pre class="hljs">params = {
+    <span class="hljs-string">'backbone'</span>: backbone.name,
+    <span class="hljs-string">'dense_layer'</span>: dense_count,
+    <span class="hljs-string">'batch_size_train'</span>: batch_train,
+    <span class="hljs-string">'lr'</span>: learning_rate,
+    <span class="hljs-string">'input_shape'</span>: input_shape
+}
+
+
+<span class="hljs-keyword">with</span> neptune.create_experiment(name=<span class="hljs-string">'resnet50_finetuning'</span>, params=params):
+    model.fit_generator(generator = train_generator,
+                        steps_per_epoch = training_steps_per_epoch,
+                        epochs = <span class="hljs-number">100</span>,
+                        validation_data = validation_generator,
+                        validation_steps = validation_steps_per_epoch,
+                        callbacks = [rLrCallBack,
+                                     tbCallBack,
+                                     mcCallBack_loss,
+                                     mcCallBack_acc,
+                                     esCallBack],
+                        use_multiprocessing = <span class="hljs-keyword">True</span>,
+                        workers = <span class="hljs-number">8</span>
+                       )</pre>
+
+
+
+<p class="has-text-align-center"><em>当您需要与Neptune集成时模型拟合的代码片段</em></p>
+
+
+
+<p>您可以看到，在我的Jupyter笔记本的第一个单元格中，我创建了一个字典来指定一组与当前实验相关的参数。在下一个单元格中，我在创建实验时传递了这些参数。这就是Neptune如何将一组参数与给定的实验运行相关联。</p>
+
+
+
+<p>模型拟合与我们通常在TensorFlow/Keras中所做的相似，唯一的区别是在第2行，我们指定了一个实验创建。</p>
+
+
+
+<p>这就是在项目中集成Neptune和TensorFlow/Keras所需了解的全部内容。相当简单的过程，只需要你一点点时间。</p>
+
+
+
+<h2 id="h-sharing-your-work">分享您的作品</h2>
+
+
+
+
+
+<p>现在，当你把你的实验上传到海王星的时候，我们可以讨论结果共享。</p>
+
+
+
+<p>根据您为项目设置的隐私级别，共享方法会有所不同。Neptune有两个项目隐私选项:<strong>公开</strong>和<strong>私有</strong>。</p>
+
+
+
+<h3>共享公共项目:</h3>
+
+
+
+<p>鉴于你的项目没有任何限制，Neptune提供了分享你的结果的最简单的方法:从你想要分享的网页上复制一个URL。</p>
+
+
+
+<p>以下是您可以通过URL分享的内容:</p>
+
+
+
+<ul>
+<li>你实验的细节，包括图表和二进制模型；</li>
+
+
+
+<li>为要比较的不同实验覆盖的比较图表；</li>
+
+
+
+<li>Jupyter笔记本，包括多个笔记本版本之间的检查点和差异。例如，为我分享的项目检查一个<a href="https://web.archive.org/web/20221206012644/https://ui.neptune.ai/anton-morgunov/image-orientation-detection-method/n/image-orientation-detection-method-tf1-rn50-99ec8679-9311-4a1a-a7b0-c323e0abcfa7" target="_blank" rel="noreferrer noopener">完整的笔记本。</a></li>
+</ul>
+
+
+
+<p>您可以在帐户的“项目”选项卡中找到您的项目隐私级别:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/362d07a84476f27c7f7841e313454cf5.png" alt="Neptune project privacy" class="wp-image-34411" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-project-privacy.png?ssl=1"/><figcaption class="wp-element-caption"><em>Project privacy level outlined in red for each of the projects in my workspace.<br/>Some of them are public, some are private.</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center">共享私人项目:</p>
+
+
+
+<h3>要对您的项目启用受限访问，您可以将其设置为私有。如果你想让你的工作保密，海王星让你管理谁有权访问和他们能做什么。</h3>
+
+
+
+<p>为此，您可以邀请队友加入您的团队工作区。受邀成员将被称为工作区内的“团队”。每个成员可以有一个选择的角色:<strong>所有者</strong>、<strong>贡献者</strong>或<strong>查看者</strong>。</p>
+
+
+
+<p>To do that, you can invite teammates to your teamworkspace. Invited members will be called a “team” within the workspace. Each member can have one of the selected roles: <strong>owner</strong>, <strong>contributor</strong> or <strong>viewer</strong>. </p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/52fd83cdd26785955a4b53fa4e4ecde3.png" alt="Neptune private projects" class="wp-image-34412" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-private-projects.png?ssl=1"/><figcaption class="wp-element-caption"><em>New team member invitation and role assignment within the workspace in Neptun</em>e</figcaption></figure></div>
+
+
+<p class="has-text-align-center">根据您分配给团队成员的访问级别，您可以限制给定用户可以执行的操作，从监控项目工作流到在同一工作区内启动他们自己的实验。</p>
+
+
+
+<p>要了解更多细节，请观看一个简短的<a href="https://web.archive.org/web/20221206012644/https://www.youtube.com/watch?v=uYqT8aHsiQY&amp;t=2s&amp;ab_channel=NeptuneAI" target="_blank" rel="noreferrer noopener">介绍视频</a>，了解一个有组织的团队工作空间是什么样子的。</p>
+
+
+
+<p>研究和非营利组织可以免费使用Neptune团队计划，但每个人都可以尝试一下。记住，你可以随心所欲地使用海王星个人计划(工作、研究、个人项目)。</p>
+
+
+
+<section id="blog-intext-cta-block_4ee8f9f6f36f4913bbfb98e1c59a4836" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>你可以记录和分享的其他事情</p>
+    
+    </section>
+
+
+
+<h2 id="h-other-things-you-can-log-and-share">机器学习工程师通常会测试多种方法来解决特定的技术任务。</h2>
+
+
+
+
+
+<p>每次训练是如何结束的？我们有最好的模型检查点，在单独的数据集上的性能结果，我特别喜欢做的是构建一些图表，帮助我直观地了解我的模型的功能。</p>
+
+
+
+<p>将这些信息保存在一个与实验运行相关的地方不是很好吗？听起来是我理想的工作场所。</p>
+
+
+
+<p>幸运的是，所有这些在海王星都有。因此，让我们利用它，并在我们的实验运行中包含一些额外的信息。</p>
+
+
+
+<p>首先，我想上传我的模型的最佳检查点。方法如下:</p>
+
+
+
+<p><em>将特定实验运行的模型最佳检查点上传到Neptune </em></p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn.metrics <span class="hljs-keyword">import</span> confusion_matrix
+<span class="hljs-keyword">import</span> scikitplot <span class="hljs-keyword">as</span> skplt
+<span class="hljs-keyword">from</span> itertools <span class="hljs-keyword">import</span> chain
+<span class="hljs-keyword">import</span> seaborn <span class="hljs-keyword">as</span> sns
+<span class="hljs-keyword">import</span> warnings
+warnings.simplefilter(action=<span class="hljs-string">'ignore'</span>, category=FutureWarning)
+
+path2best_ckpt = <span class="hljs-string">'./checkpoints/epoch_16-val_loss-0.0019-val_acc_1.0000_import.hdf5'</span>
+best_ckpt_basename = os.path.basename(path2best_ckpt)
+neptune.log_artifact(path2best_ckpt,
+                     os.path.join(<span class="hljs-string">'model_checkpoints/'</span>, best_ckpt_basename)
+                    )</pre>
+
+
+
+<p class="has-text-align-center">现在，在我的项目工作区的“<strong>工件”</strong>选项卡中，我看到了一个上传的检查点:</p>
+
+
+
+<p>Now, within the “<strong>Artifacts” </strong>tab of my project workspace, I see an uploaded checkpoint:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/0f3ac2df3ba85ffb177f1a7ac136e5d2.png" alt="Neptune Tensorboard artifacts" class="wp-image-34416" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-Tensorboard-artifacts.png?ssl=1"/><figcaption class="wp-element-caption"><em>Uploaded checkpoint displayed and available within the Artifacts tab of my project workspace</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center">现在，我将在测试集上评估我的训练模型。为此，我简单地做了以下事情:</p>
+
+
+
+<p>在测试集上评估我的训练模型</p>
+
+
+
+<pre class="hljs">p = eval_model.predict_generator(test_generator)</pre>
+
+
+
+<p>由于我在研究一个分类器，我想通过观察混淆矩阵和ROC-AUC曲线来评估它。让我们创建它们并将其附加到我们的实验中:</p>
+
+
+
+<p>Since I worked on a classifier, I’d like to evaluate it by looking at the confusion matrix and at the ROC-AUC curve. Let’s create them and attach them to our experiment:</p>
+
+
+
+<pre class="hljs">fig_roc, ax = plt.subplots(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)
+skplt.metrics.plot_roc_curve(y_true, np.flip(p, axis=<span class="hljs-number">0</span>), ax=ax)
+
+fig_cm = plt.figure()
+sns.heatmap(conf_matrix, annot=<span class="hljs-keyword">True</span>)
+
+neptune.log_image(<span class="hljs-string">'confusion matrix'</span>, fig_cm, image_name=<span class="hljs-string">'conf_matrix'</span>)
+neptune.log_image(<span class="hljs-string">'roc_auc'</span>, fig_roc, image_name=<span class="hljs-string">'roc_auc'</span>)</pre>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/8d8dfe1fe89836e768c74687a30cf76f.png" alt="Neptune Tensorboard confusion matrix" class="wp-image-34432" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-Tensorboard-confusion-matrix.png?resize=392%2C548&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Evaluating Models via ROC-AUC and Confusion Matrix plots</em><br/><em>Uploading them to the workspace</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center">以下是上传到我的工作空间的图:</p>
+
+
+
+<p>Here are the plots uploaded to my workspace:</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/7adf6d16d93bffd8bd1759e52452319a.png" alt="Neptune Tensorboard plots" class="wp-image-34417" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206012644im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-Tensorboard-plots.png?ssl=1"/><figcaption class="wp-element-caption"><em>Plots uploaded to the workspace become available at Logs tab</em></figcaption></figure></div>
+
+
+<p class="has-text-align-center">有很多事情你可以记录、跟踪，并在以后分享。检查<a href="https://web.archive.org/web/20221206012644/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display" target="_blank" rel="noreferrer noopener">该页面</a>以查看还支持什么。</p>
+
+
+
+<p>更酷的是，你的队友<strong>可以通过编程获取</strong>你上传的所有数据，<a href="https://web.archive.org/web/20221206012644/https://docs.neptune.ai/you-should-know/querying-and-downloading-metadata" target="_blank" rel="noreferrer noopener">以一种简单方便的方式</a>！</p>
+
+
+
+<p>结论</p>
+
+
+
+<h2 id="h-conclusions">TensorFlow和Keras框架被广泛传播，工作共享和协作的问题对于我们这些在ML团队中工作的人来说是非常重要的。像TensorBoard这样的基本工具做得很好，但主要是针对独立工作。其他解决方案要么停止，要么缺乏适当的隐私管理。</h2>
+
+
+
+<p>Neptune开发的解决方案很好地集成了TensorFlow/Keras，并为我们的<a href="/web/20221206012644/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>提供了丰富的功能。我们可以用我们选择的日志来补充每个实验，所以它被很好地描述并且容易理解。</p>
+
+
+
+<p>我相信这个工具将有助于许多机器学习工程师寻找一个方便的实验跟踪和结果共享的解决方案。这对我很有帮助。</p>
+
+
+
+<p>I believe that this tool will be helpful for many machine learning engineers looking for a convenient solution for experiment tracking and result sharing. It definitely helps me.</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

@@ -1,0 +1,596 @@
+<html>
+<head>
+<title>How to Organize Your XGBoost Machine Learning (ML) Model Development Process: Best Practices </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何组织你的XGBoost机器学习(ML)模型开发过程:最佳实践</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/how-to-organize-your-xgboost-machine-learning-ml-model-development-process#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/how-to-organize-your-xgboost-machine-learning-ml-model-development-process#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>XGBoost 是一个顶级的渐变增强库，可以在Python、Java、C++、R和Julia中使用。</p>
+
+
+
+<p>该库支持GPU培训、分布式计算、并行化和缓存优化。开发人员也喜欢它的执行速度、准确性、效率和可用性。</p>
+
+
+
+<p>然而，当你<a href="https://web.archive.org/web/20221206005417/https://towardsdatascience.com/machine-learning-general-process-8f1b510bd8af" target="_blank" rel="noreferrer noopener nofollow">在任何框架中开发机器学习模型</a>时，包括XGBoost，你可能最终会尝试一堆参数配置和功能版本，以获得满意的性能。使用电子表格和命名约定来管理所有这些配置确实令人头疼。</p>
+
+
+
+<p>有一些工具可以帮助开发人员组织他们的机器学习模型开发过程。本文将重点向您展示如何在顶级ML实验管理工具之一的Neptune中实现这一点。</p>
+
+
+
+<figure class="wp-block-video aligncenter"><video controls="" src="https://web.archive.org/web/20221206005417im_/https://neptune.ai/wp-content/uploads/logging_main-1.mp4"/></figure>
+
+
+
+<p>让我向您展示如何在您当前的模型开发设置之上添加实验管理。</p>
+
+
+
+<section id="blog-intext-cta-block_61a4b00e889b3" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>如何跟踪XGBoost模型训练:<a href="https://web.archive.org/web/20221206005417/https://docs.neptune.ai/integrations-and-supported-tools/model-training/xgboost" target="_blank" rel="noreferrer noopener">海王星+ XGBoost集成</a></p>
+    
+    </section>
+
+
+<h2 id="h-how-ml-model-development-with-xgboost-typically-looks-like">使用XGBoost进行ML模型开发通常是什么样子</h2>
+
+
+
+<h3><strong>准备好数据集</strong></h3>
+
+
+
+<p>在训练任何模型之前，我们需要一个数据集。对于这个示例，我们将使用Scikit-learn生成一个分类数据集。在现实生活中，你可能已经准备好了一些特性，你将会加载它们。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn.datasets <span class="hljs-keyword">import</span> make_classification
+<span class="hljs-keyword">from</span> sklearn.model_selection <span class="hljs-keyword">import</span> train_test_split
+
+X, y = make_classification(n_samples=<span class="hljs-number">100000</span>,n_features=<span class="hljs-number">10</span>, n_redundant=<span class="hljs-number">0</span>, n_informative=<span class="hljs-number">8</span>,random_state=<span class="hljs-number">1</span>)
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+X = pd.DataFrame(X,columns=[<span class="hljs-string">"F1"</span>,<span class="hljs-string">"F2"</span>,<span class="hljs-string">"F3"</span>,<span class="hljs-string">"F4"</span>,<span class="hljs-string">"F5"</span>,<span class="hljs-string">"F6"</span>,<span class="hljs-string">"F7"</span>,<span class="hljs-string">"F8"</span>,<span class="hljs-string">"F9"</span>,<span class="hljs-string">"F10"</span>])
+y = pd.DataFrame(y,columns=[<span class="hljs-string">"Target"</span>])
+
+X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=<span class="hljs-number">0.33</span>, random_state=<span class="hljs-number">42</span>)
+</pre>
+
+
+
+<h3><strong>训练XGBoost模型</strong></h3>
+
+
+
+<p>接下来，我们将导入XGBoost，设置我们的<a href="https://web.archive.org/web/20221206005417/https://xgboost.readthedocs.io/en/latest/parameter.html" target="_blank" rel="noreferrer noopener nofollow">参数</a>。由于这是一个二元分类，我们使用<code>logistic</code>目标。之后，我们用这些参数初始化分类器。您也可以使用YAML文件传入参数。</p>
+
+
+
+<pre class="hljs">params = {<span class="hljs-string">"objective"</span>:<span class="hljs-string">"binary:logistic"</span>,<span class="hljs-string">'colsample_bytree'</span>: <span class="hljs-number">0.3</span>,<span class="hljs-string">'learning_rate'</span>: <span class="hljs-number">0.1</span>,
+                <span class="hljs-string">'max_depth'</span>: <span class="hljs-number">5</span>, <span class="hljs-string">'alpha'</span>: <span class="hljs-number">10</span>}
+classification = xgb.XGBClassifier(**params)</pre>
+
+
+
+<p>下一步是用训练测试来训练模型。</p>
+
+
+
+<pre class="hljs">classification.fit(X_train, y_train)
+</pre>
+
+
+
+<p>培训之后，我们需要保存模型，以便在部署过程中使用它。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn.externals <span class="hljs-keyword">import</span> joblib
+joblib.dump(classification, <span class="hljs-string">'classifier.pkl'</span>)</pre>
+
+
+
+<p>接下来，我们在测试集上评估模型，并显示分类报告。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn.metrics <span class="hljs-keyword">import</span> classification_report
+
+print(classification_report(predictions,y_test))
+</pre>
+
+
+
+<p>最后，我们将获得的预测转换成数据帧，并保存为csv文件以供将来参考，或者进行一些<a href="/web/20221206005417/https://neptune.ai/blog/deep-dive-into-error-analysis-and-model-debugging-in-machine-learning-and-deep-learning" target="_blank" rel="noreferrer noopener">深层错误分析</a>。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+pd.DataFrame(predictions, columns=[<span class="hljs-string">"Predictions"</span>]).to_csv(<span class="hljs-string">"predict.csv"</span>)</pre>
+
+
+
+<p>现在，让我向您展示如何对所有这些进行版本控制，并通过Neptune轻松管理。</p>
+
+
+
+
+
+
+
+<p id="separator-block_5fedc435be1c1" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-organizing-ml-development-in-neptune">在Neptune组织ML开发</h2>
+
+
+
+<h3>安装软件包并设置Neptune</h3>
+
+
+
+<p>我们将在Jupyter笔记本中使用<a href="https://web.archive.org/web/20221206005417/https://docs.neptune.ai/integrations-and-supported-tools/ide-and-notebooks/jupyter-lab-and-jupyter-notebook" target="_blank" rel="noreferrer noopener"> Neptune，所以我们需要Neptune客户端和Neptune Jupyter扩展。</a></p>
+
+
+
+<p>在您的终端中运行以下命令来安装Neptune:</p>
+
+
+
+<pre class="hljs">pip install neptune-client
+</pre>
+
+
+
+<p>为Jupyter笔记本配置Neptune是必不可少的，因为它使我们能够将笔记本检查点保存到Neptune。如果您不使用笔记本电脑，可以跳过这一部分。</p>
+
+
+
+<p>接下来，设置笔记本扩展:</p>
+
+
+
+<pre class="hljs">pip install neptune-notebooks
+</pre>
+
+
+
+<p>安装后，您必须启用扩展，以便与您的Jupyter笔记本电脑集成:</p>
+
+
+
+<pre class="hljs">jupyter nbextension enable --py neptune-notebooks
+</pre>
+
+
+
+<p>如果你在JupyterLab上工作，你可以毫无问题地安装<a href="https://web.archive.org/web/20221206005417/https://docs.neptune.ai/integrations-and-supported-tools/ide-and-notebooks/jupyter-lab-and-jupyter-notebook" target="_blank" rel="noreferrer noopener">扩展。</a></p>
+
+
+
+<p>因为我们正在安装软件包，所以让我们也把Neptune Contrib软件包去掉。它包含一个回调函数，让我们在训练XGBoost模型时记录度量、模型和特性对Neptune的重要性。</p>
+
+
+
+<pre class="hljs">pip install neptune-contrib[monitoring]</pre>
+
+
+
+<h3>将您的脚本连接到海王星</h3>
+
+
+
+<p>此时，您需要一个免费的<a href="/web/20221206005417/https://neptune.ai/register" target="_blank" rel="noreferrer noopener"> Neptune AI帐户</a>来初始化Jupyter笔记本中的Neptune。为此，您需要一个Neptune API密钥。</p>
+
+
+
+<p>登录后，您可以通过单击您的个人资料图像来获取密钥。</p>
+
+
+
+
+
+
+
+<p>都准备好了吗？让我们跳到Jupyter笔记本上进行初始化。</p>
+
+
+
+<p>第一步是通过点击Neptune图标将我们的笔记本连接到Neptune。</p>
+
+
+
+
+
+
+
+<p>现在将提示您输入API令牌。一旦连接成功，你可以通过点击上传按钮上传你的笔记本到Neptune。</p>
+
+
+
+
+
+
+
+<p>之后，我们使用‘neptune . init’来初始化通信，并将当前脚本/笔记本与您在Neptune中的项目连接起来。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune
+
+neptune.init(project_qualified_name=<span class="hljs-string">'mwitiderrick/sandbox'</span>, api_token=<span class="hljs-string">'YOUR_API_KEY'</span>)
+</pre>
+
+
+
+<p>在这种情况下，我使用的是在你注册时自动创建的“沙盒”项目。但是，您可以在“项目”标签中创建新项目。</p>
+
+
+
+
+
+
+
+<h3>创建实验并保存超参数</h3>
+
+
+
+<p>开始登录Neptune的第一件事是创建一个实验。这是一个命名空间，您可以在其中记录度量、预测、可视化和任何其他内容(<a href="https://web.archive.org/web/20221206005417/https://docs.neptune.ai/logging-and-managing-experiment-results/logging-experiment-data.html#what-you-can-log" target="_blank" rel="noreferrer noopener">参见您可以在Neptune </a>中记录和显示的元数据类型的完整列表)。</p>
+
+
+
+<p>让我们创建一个实验并记录模型超参数。</p>
+
+
+
+<pre class="hljs">experiment = neptune.create_experiment(name=<span class="hljs-string">'xgb'</span>, tags=[<span class="hljs-string">'train'</span>], params=params)</pre>
+
+
+
+<p>运行<code>neptune.create_experiment</code>输出海王星实验的链接。</p>
+
+
+
+<p>可以点开看看训练过程直播。</p>
+
+
+
+<p>现在，没有记录太多，但是我们可以在参数部分看到超参数。</p>
+
+
+
+<p>“参数”选项卡显示用于训练XGBoost模型的参数。</p>
+
+
+
+
+
+
+
+<p>在笔记本上工作时，一旦你完成了运行实验，确保你的运行<code>neptune.stop()</code>完成当前的工作(在脚本中实验自动停止)。</p>
+
+
+
+<h3>创建Neptune回调并将其传递给“fit”</h3>
+
+
+
+<p>为了将训练指标记录到Neptune，我们使用了来自neptune-contrib库的现成回调。这很酷，因为这是我们在训练阶段唯一需要添加的东西。</p>
+
+
+
+<p>有了回调设置，海王星照顾其余的。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> neptunecontrib.monitoring.xgboost <span class="hljs-keyword">import</span> neptune_callback</pre>
+
+
+
+<p>我们通过调用<code>fit</code>方法并传入我们之前定义的参数来训练模型，包括Neptune回调。</p>
+
+
+
+<pre class="hljs">classification.fit(X_train, y_train,callbacks=[neptune_callback()],eval_set=[(X_test, y_test)])</pre>
+
+
+
+<p>一旦训练完成，回到海王星，检查日志。</p>
+
+
+
+<p>登录后，您可以单击当前正在进行的项目来查看您的所有实验。</p>
+
+
+
+
+
+
+
+<p>在monitoring选项卡上，会实时显示CPU和RAM的使用情况。</p>
+
+
+
+
+
+
+
+<p>单击单个实验将显示该特定实验的日志。在图表部分，您可以看到培训和验证图表。</p>
+
+
+
+
+
+
+
+<p>使用Neptune，您还可以放大培训的各个部分，对其进行详细分析。</p>
+
+
+
+
+
+
+
+<p>“日志”部分显示了用于生成这些图形的日志。</p>
+
+
+
+<p>注意使用Neptune回调后我们自动得到的特性重要性图。</p>
+
+
+
+
+
+
+
+<p>一旦你的项目中有了几个实验，就可以对它们进行比较。你可以通过选择实验并点击比较按钮来完成。</p>
+
+
+
+
+
+
+
+<h3>版本数据集</h3>
+
+
+
+<p>在Neptune中对数据集哈希进行版本控制也非常有用。这将使您能够在执行实验时跟踪数据集的不同版本。这可以借助Python的<code>hashlib</code>模块和Neptune的<code>set_property</code>函数来完成。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> hashlib
+neptune.set_property(<span class="hljs-string">'x_train_version'</span>, hashlib.md5(X_train.values).hexdigest())
+neptune.set_property(<span class="hljs-string">'y_train_version'</span>, hashlib.md5(y_train.values).hexdigest())
+neptune.set_property(<span class="hljs-string">'x_test_version'</span>, hashlib.md5(X_test.values).hexdigest())
+neptune.set_property(<span class="hljs-string">'y_test_version'</span>, hashlib.md5(y_test.values).hexdigest())
+</pre>
+
+
+
+<p>之后，您可以在项目的details选项卡下看到版本。</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/b7381b040627767157663c09f9f26c61.png" alt="Neptune versions" class="wp-image-33895" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206005417im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Neptune-versions.png?ssl=1"/></figure>
+
+
+
+<h3>版本模型二进制</h3>
+
+
+
+<p>您也可以使用<code>neptune.log_artifact()</code>将模型的各种版本保存到Neptune，但是，由于我们使用的是<code>neptune_callback()</code>,所以模型会在最后一次增强迭代后自动登录到Neptune。</p>
+
+
+
+
+
+
+
+<p>我们还可以记录我们之前保存的模型。</p>
+
+
+
+<pre class="hljs">neptune.log_artifact(<span class="hljs-string">'classifier.pkl'</span>)
+</pre>
+
+
+
+
+
+
+
+<h3>你认为你还需要的任何版本</h3>
+
+
+
+<p>Neptune还提供了记录其他东西的能力，比如模型解释器和交互式图表，比如ROC曲线。</p>
+
+
+
+<p>记录<a href="https://web.archive.org/web/20221206005417/https://modeloriented.github.io/DALEX/" target="_blank" rel="noreferrer noopener nofollow">解释者</a>是使用<code>log_explainer</code>函数完成的。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> neptunecontrib.api <span class="hljs-keyword">import</span> log_explainer, log_global_explanations
+<span class="hljs-keyword">import</span> dalex <span class="hljs-keyword">as</span> dx
+
+expl = dx.Explainer(classification, X, y, label=<span class="hljs-string">"XGBoost"</span>)
+
+log_global_explanations(expl, numerical_features=[<span class="hljs-string">"F1"</span>,<span class="hljs-string">"F2"</span>,<span class="hljs-string">"F3"</span>,<span class="hljs-string">"F4"</span>,<span class="hljs-string">"F5"</span>,<span class="hljs-string">"F6"</span>,<span class="hljs-string">"F7"</span>,<span class="hljs-string">"F8"</span>,<span class="hljs-string">"F9"</span>,<span class="hljs-string">"F10"</span>])
+
+log_explainer(<span class="hljs-string">'explainer.pkl'</span>, expl)
+
+</pre>
+
+
+
+<p>这样做之后，实验的工件部分将会有经过腌制的解释器和图表。</p>
+
+
+
+
+
+
+
+
+
+
+
+<p id="separator-block_5fedca97be1c2" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-organize-experiments-in-a-dashboard">在仪表板中组织实验</h2>
+
+
+
+<p>海王星允许你选择你想在仪表盘上看到什么。您可以添加或删除列。通过单击管理列，您可以向仪表板添加新列。</p>
+
+
+
+
+
+
+
+<p>如果您想删除某一列，只需单击它旁边的x按钮。您也可以使用某列旁边的向上和向下箭头按该列进行筛选。这些按钮指示您是按升序还是降序进行过滤。</p>
+
+
+
+
+
+
+
+<p>该平台还允许您将实验分组到视图中。例如，您可以选择带有特定标签的实验，并将这些实验保存为新视图。一旦你这样做了，你就可以随时访问新的视图。</p>
+
+
+
+
+
+
+
+<p id="separator-block_5fedca9ebe1c3" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-collaborate-on-ml-experiments-with-your-team">与您的团队合作进行ML实验</h2>
+
+
+
+<p>你可以通过邀请你的团队合作来分享你的Neptune实验。</p>
+
+
+
+
+
+
+
+<p>您还可以通过公开项目来与全世界共享项目。一旦项目公开，你可以自由地与任何人分享链接。</p>
+
+
+
+
+
+
+
+<section id="note-block_5fedcad4be1c4" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/3f03ea1b3d505c784ed642752454aa52.png" data-src="https://web.archive.org/web/20221206005417/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20221206005417/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>使用团队计划时，您可以与队友分享您的私人项目。该团队计划对研究、非营利组织和Kagglers也是免费的。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+
+
+
+<p id="separator-block_600eee03c8ec9" class="block-separator block-separator--5"> </p>
+
+
+
+<p>你在Neptune app里做什么都可以分享，比如我发个<a href="https://web.archive.org/web/20221206005417/https://ui.neptune.ai/mwitiderrick/sandbox/compare?shortId=%5B%22SAN-62%22%2C%22SAN-61%22%2C%22SAN-60%22%2C%22SAN-57%22%5D&amp;viewId=022622fe-6fb1-4a9f-82b5-789bded35fb7" target="_blank" rel="noreferrer noopener nofollow">链接</a>就可以分享我的实验对比。</p>
+
+
+
+
+
+
+
+
+
+
+
+<p id="separator-block_5fedcae8be1c7" class="block-separator block-separator--5"> </p>
+
+
+
+<h2 id="h-download-model-artifacts-programmatically">以编程方式下载模型工件</h2>
+
+
+
+<p>使用Neptune，您可以从您的实验中下载文件，甚至直接从您的python代码中下载单个项目。例如，您可以使用<code>download_artifact</code>方法下载单个文件。我们可以通过获取实验对象并下载该实验的所有文件来下载模型。在这种情况下，我们下载之前上传的分类器。分类器存储在我们当前工作目录的模型文件夹中。</p>
+
+
+
+<pre class="hljs">project = neptune.init(<span class="hljs-string">'mwitiderrick/sandbox'</span>,api_token=<span class="hljs-string">'YOUR_TOKEN'</span>,
+)
+my_exp = project.get_experiments(id=<span class="hljs-string">'SAN-21'</span>)[<span class="hljs-number">0</span>]
+experiment.download_artifact(<span class="hljs-string">"classifier.pkl"</span>,<span class="hljs-string">"model"</span>))
+</pre>
+
+
+
+<p>当你想操作你的模型并从你的实验报告中直接获取它们时，这是很有用的。但是将模型投入生产是另外一个故事🙂</p>
+
+
+
+<p id="separator-block_5fedcb10be1c8" class="block-separator block-separator--5">结论</p>
+
+
+
+<h2 id="h-conclusion">希望这已经向您展示了使用Neptune向XGBoost训练脚本添加<a href="/web/20221206005417/https://neptune.ai/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>和模型版本控制是多么容易。</h2>
+
+
+
+<p>具体来说，我们讲述了如何:</p>
+
+
+
+<p>设置海王星</p>
+
+
+
+<ul><li>使用Neptune回调来记录我们的XGBoost培训课程</li><li>分析和比较海王星的实验</li><li>海王星上各种项目版本</li><li>与团队成员协作</li><li>从海王星下载你的神器</li><li>希望有了这些信息，XGBoost模型现在会更清晰，更易于管理。</li></ul>
+
+
+
+<p>感谢阅读！</p>
+
+
+
+<p>Thanks for reading!</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

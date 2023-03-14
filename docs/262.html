@@ -1,0 +1,1429 @@
+<html>
+<head>
+<title>The Best Tools for Reinforcement Learning in Python You Actually Want to Try </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>Python中强化学习的最佳工具是你真正想尝试的</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/the-best-tools-for-reinforcement-learning-in-python#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/the-best-tools-for-reinforcement-learning-in-python#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>如今，<a href="https://web.archive.org/web/20230306225449/https://medium.com/ai%C2%B3-theory-practice-business/reinforcement-learning-part-1-a-brief-introduction-a53a849771cf" target="_blank" rel="noreferrer noopener nofollow">深度强化学习</a> (RL)是数据科学界最热门的话题之一。快速开发的快速发展导致了对易于理解和方便使用的快速开发工具的需求不断增长。</p>
+
+
+
+<p>近年来，大量的RL库被开发出来。这些库被设计成拥有实现和测试<strong>强化学习</strong>模型的所有必要工具。</p>
+
+
+
+<p>尽管如此，他们还是有很大的不同。这就是为什么选择一个快速、可靠、与你的RL任务相关的库是很重要的。</p>
+
+
+
+<p>在本文中，我们将涵盖:</p>
+
+
+
+<ul>
+<li>选择<strong>深度强化学习</strong>库的标准，</li>
+
+
+
+<li>RL库:<strong> Pyqlearning </strong>，<strong> KerasRL </strong>，<strong> Tensorforce </strong>，<strong>RL _蔻驰</strong>，<strong> TFAgents </strong>，<strong> MAME RL </strong>，<strong> MushroomRL </strong>。</li>
+</ul>
+
+
+
+
+
+<h2 id="h-python-libraries-for-reinforcement-learning">用于强化学习的Python库</h2>
+
+
+
+<p>有很多RL库，因此为您的情况选择正确的库可能是一项复杂的任务。我们需要形成标准来评估每个库。</p>
+
+
+
+<h3><strong>标准</strong></h3>
+
+
+
+<p>本文中的每个RL库都将基于以下标准进行分析:</p>
+
+
+
+<ol>
+<li>实施的<strong>最先进的</strong>(<strong>【SOTA】)</strong>RL算法的数量——我认为最重要的一个</li>
+
+
+
+<li>官方<strong>文档、简单教程</strong>和示例的可用性</li>
+
+
+
+<li><strong>易于定制的可读代码</strong></li>
+
+
+
+<li>支持环境的<strong>数量——这是<strong>强化学习</strong>库的关键决定因素</strong></li>
+
+
+
+<li><strong>记录和跟踪工具</strong>支持——例如Neptune或TensorBoard</li>
+
+
+
+<li><strong>矢量化环境</strong> ( <strong> VE </strong>)特征——进行多进程训练的方法。使用并行环境，你的代理将会经历比单一环境更多的情况</li>
+
+
+
+<li><strong>定期更新</strong>–RL发展非常迅速，您希望使用最新技术</li>
+</ol>
+
+
+
+<p>我们将讨论以下库:</p>
+
+
+
+<h2 id="KerasRL">角膜的</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20230306225449/https://github.com/keras-rl/keras-rl" target="_blank" rel="noreferrer noopener nofollow"> <strong> KerasRL </strong> </a>是一个<strong>深度强化学习</strong> Python库。它实现了一些最先进的RL算法，并与<strong>深度学习</strong>库<strong> <a href="/web/20230306225449/https://neptune.ai/integrations/keras" target="_blank" rel="noreferrer noopener"> Keras </a> </strong>无缝集成。</p>
+
+
+
+<p>此外，<strong> KerasRL </strong>与<a href="https://web.archive.org/web/20230306225449/https://gym.openai.com/" target="_blank" rel="noreferrer noopener nofollow"> OpenAI Gym </a>开箱即用。这意味着你可以很容易地评估和使用不同的算法。</p>
+
+
+
+<p>要安装<strong> KerasRL </strong>，只需使用一个pip命令:</p>
+
+
+
+<pre class="hljs">pip install keras-rl</pre>
+
+
+
+<p>让我们看看<strong> KerasRL </strong>是否符合标准:</p>
+
+
+
+<ol>
+<li>实施的<strong> SOTA </strong> RL算法的数量</li>
+</ol>
+
+
+
+<p>到今天<strong>为止，KerasRL </strong>已经实现了以下算法:</p>
+
+
+
+<ul>
+<li><strong>深度Q-Learning </strong> ( <strong> DQN </strong>)及其改进(<strong>双</strong>和<strong>对决</strong>)</li>
+
+
+
+<li><strong>深度确定性政策梯度</strong> ( <strong> DDPG </strong>)</li>
+
+
+
+<li><strong>连续DQN </strong> ( <strong> CDQN </strong>或<strong> NAF </strong>)</li>
+
+
+
+<li><strong>交叉熵方法</strong> ( <strong> CEM </strong>)</li>
+
+
+
+<li><strong>深SARS</strong></li>
+</ul>
+
+
+
+<p>你可能已经注意到了，<strong> KerasRL </strong>忽略了两个重要因素:行动者批评方法和邻近政策优化(PPO)。</p>
+
+
+
+<ol start="2">
+<li>官方文档、教程和示例的可用性</li>
+</ol>
+
+
+
+<p>代码很容易阅读，并且充满了注释，这非常有用。尽管如此，文档似乎不完整，因为它错过了参数和教程的解释。此外，实际例子也有许多不足之处。</p>
+
+
+
+<ol start="3">
+<li>易于定制的可读代码</li>
+</ol>
+
+
+
+<p>非常容易。您需要做的就是按照示例创建一个新的代理，然后将其添加到<strong> rl.agents </strong>。</p>
+
+
+
+<ol start="4">
+<li>支持的环境数量</li>
+</ol>
+
+
+
+<p>KerasRL 被要求只与<strong>开放健身馆</strong>合作。因此，如果要使用任何其他环境，您需要修改代理。</p>
+
+
+
+<ol start="5">
+<li>日志和跟踪工具支持</li>
+</ol>
+
+
+
+<p>未实现日志和跟踪工具支持。不过，你可以用<a href="https://web.archive.org/web/20230306225449/https://docs.neptune.ai/how-to-guides/experiment-tracking" target="_blank" rel="noreferrer noopener"> <strong>海王星</strong>来追踪你的实验</a>。</p>
+
+
+
+<ol start="6">
+<li>矢量化环境特征</li>
+</ol>
+
+
+
+<p>包括矢量化的环境特征。</p>
+
+
+
+<ol start="7">
+<li>定期更新</li>
+</ol>
+
+
+
+<p>该库似乎不再维护，因为上次更新是在一年多以前。</p>
+
+
+
+<p>综上所述，<strong> KerasRL </strong>有一套很好的实现。不幸的是，它错过了有价值的点，如可视化工具，新的架构和更新。你应该使用另一个图书馆。</p>
+
+
+
+<h2 id="Pyqlearning">Pyqlearning</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20230306225449/https://pypi.org/project/pyqlearning/" target="_blank" rel="noreferrer noopener nofollow"> Pyqlearning </a>是实现RL的Python库。重点介绍了<strong> Q-Learning </strong>和<strong>多智能体深度Q-Network。</strong> <br/> <br/> <strong> Pyqlearning </strong>为设计师提供组件，而不是为最终用户提供最先进的黑匣子。因此，这个库很难使用。你可以用它来设计信息搜索算法，比如GameAI或者web crawlers。</p>
+
+
+
+<p>要安装<strong> Pyqlearning </strong>，只需使用一个pip命令:</p>
+
+
+
+<pre class="hljs">pip install pyqlearning</pre>
+
+
+
+<p>让我们看看<strong> Pyqlearning </strong>是否符合标准:</p>
+
+
+
+<ol>
+<li>实施的<strong> SOTA </strong> RL算法的数量</li>
+</ol>
+
+
+
+<p>到今天<strong>为止，Pyqlearning </strong>已经实现了以下算法:</p>
+
+
+
+<ul>
+<li><strong>深度Q学习</strong> ( <strong> DQN </strong>)及其改进(<strong>ε贪心</strong>和<strong>玻尔兹曼</strong>)</li>
+</ul>
+
+
+
+<p>您可能已经注意到，<strong> Pyqlearning </strong>只有一个重要的代理。这个图书馆还有许多需要改进的地方。</p>
+
+
+
+<ol start="2">
+<li>官方文档、教程和示例的可用性</li>
+</ol>
+
+
+
+<p><strong> Pyqlearning </strong>有几个不同任务的例子和两个由<strong> Deep Q-Network </strong>开发的迷宫解决和追逃游戏教程。你可以在<a href="https://web.archive.org/web/20230306225449/https://code.accel-brain.com/Reinforcement-Learning/" target="_blank" rel="noreferrer noopener nofollow">官方文件</a>中找到它们。文档似乎不完整，因为它关注的是数学，而不是库的描述和使用。</p>
+
+
+
+<ol start="3">
+<li>易于定制的可读代码</li>
+</ol>
+
+
+
+<p>Pyqlearning是一个开源库。源代码可以在<a href="https://web.archive.org/web/20230306225449/https://github.com/chimera0/accel-brain-code/tree/master/Reinforcement-Learning" target="_blank" rel="noreferrer noopener nofollow"> Github </a>上找到。代码缺少注释。定制它可能是一项复杂的任务。不过，教程可能会有所帮助。</p>
+
+
+
+<ol start="4">
+<li>支持的环境数量</li>
+</ol>
+
+
+
+<p>因为这个库是不可知的，所以添加到任何环境都相对容易。</p>
+
+
+
+<ol start="5">
+<li>日志和跟踪工具支持</li>
+</ol>
+
+
+
+<p>作者在教程中使用了一个简单的<strong>日志</strong>包。<strong> Pyqlearning </strong>不支持其他测井和跟踪工具，例如<strong> <a href="/web/20230306225449/https://neptune.ai/vs/tensorboard" target="_blank" rel="noreferrer noopener"> TensorBoard </a> </strong>。</p>
+
+
+
+<ol start="6">
+<li>矢量化环境特征</li>
+</ol>
+
+
+
+<p>Pyqlearning不支持矢量化环境功能。</p>
+
+
+
+<ol start="7">
+<li>定期更新</li>
+</ol>
+
+
+
+<p>图书馆得到了维护。最后一次更新是在两个月前。尽管如此，开发过程似乎是一个缓慢的过程。</p>
+
+
+
+<p>总而言之，学习还有许多不足之处。这不是一个你通常会用到的库。因此，您可能应该使用其他东西。</p>
+
+
+
+<h2 id="Tensorforce">张量力</h2>
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20230306225449/https://github.com/tensorforce/tensorforce" target="_blank" rel="noreferrer noopener nofollow"> Tensorforce </a>是一个基于谷歌<strong> Tensorflow </strong>框架构建的开源<strong>深度</strong> RL库。它的用法很简单，有可能成为最好的强化学习库之一。</p>
+
+
+
+<p><strong> Tensorforce </strong>拥有与其他RL库不同的关键设计选择:</p>
+
+
+
+<ul>
+<li>基于组件的模块化设计:最重要的是，功能实现往往尽可能地具有通用性和可配置性。</li>
+
+
+
+<li>RL算法与应用的分离:算法不知道输入(状态/观察)和输出(动作/决策)的类型和结构，以及与应用环境的交互。</li>
+</ul>
+
+
+
+<p>要安装<strong> Tensorforce </strong>，只需使用一个pip命令:</p>
+
+
+
+<pre class="hljs">pip install tensorforce</pre>
+
+
+
+<p>让我们看看<strong> Tensorforce </strong>是否符合标准:</p>
+
+
+
+<ol>
+<li>实施的<strong> SOTA </strong> RL算法的数量</li>
+</ol>
+
+
+
+<p>截至今天，<strong> Tensorforce </strong>已经实施了以下算法:</p>
+
+
+
+<ul>
+<li><strong>深度Q-Learning </strong> ( <strong> DQN </strong>)及其改进(<strong>双</strong>和<strong>对决</strong>)</li>
+
+
+
+<li><strong>香草政策梯度</strong> ( <strong> PG </strong></li>
+
+
+
+<li><strong>深度确定性政策梯度</strong> ( <strong> DDPG </strong>)</li>
+
+
+
+<li><strong>连续DQN </strong> ( <strong> CDQN </strong>或<strong> NAF </strong>)</li>
+
+
+
+<li><strong>演员评论家</strong> ( <strong> A2C和A3C </strong>)</li>
+
+
+
+<li><strong>信任区域政策优化</strong> ( <strong> TRPO </strong></li>
+
+
+
+<li><strong>近端策略优化</strong> ( <strong> PPO </strong>)</li>
+</ul>
+
+
+
+<p>你可能已经注意到了，<strong> Tensorforce </strong>错过了<strong>软演员评论家</strong> ( <strong> SAC </strong>)实现。此外，它是完美的。</p>
+
+
+
+<ol start="2">
+<li>官方文档、教程和示例的可用性</li>
+</ol>
+
+
+
+<p>由于有各种简单的例子和教程，开始使用<strong> Tensorforce </strong>非常容易。<a href="https://web.archive.org/web/20230306225449/https://tensorforce.readthedocs.io/en/latest/index.html" target="_blank" rel="noreferrer noopener nofollow">官方文档</a>看起来很完整，浏览起来也很方便。</p>
+
+
+
+<ol start="3">
+<li>易于定制的可读代码</li>
+</ol>
+
+
+
+<p><strong> Tensorforce </strong>得益于其模块化设计。架构的每个部分，例如网络、模型、转轮都是不同的。因此，您可以轻松地修改它们。然而，代码缺少注释，这可能是一个问题。</p>
+
+
+
+<ol start="4">
+<li>支持的环境数量</li>
+</ol>
+
+
+
+<p><strong> Tensorforce </strong>与多种环境协同工作，例如<strong> OpenAI Gym </strong>、<strong> OpenAI Retro </strong>和<strong> DeepMind Lab </strong>。它也有帮助您插入其他环境的文档。</p>
+
+
+
+<ol start="5">
+<li>日志和跟踪工具支持</li>
+</ol>
+
+
+
+<p>该库支持<strong> TensorBoard </strong>和其他测井/跟踪工具。</p>
+
+
+
+<ol start="6">
+<li>矢量化环境特征</li>
+</ol>
+
+
+
+<p><strong> Tensorforce </strong>支持矢量化环境特征。</p>
+
+
+
+<ol start="7">
+<li>定期更新</li>
+</ol>
+
+
+
+<p><strong> Tensorforce </strong>定期更新。最近一次更新是在几周前。</p>
+
+
+
+<p>综上所述，<strong> Tensorforce </strong>是一款强大的RL工具。它是最新的，并且拥有开始使用它所需的所有文档。</p>
+
+
+
+<h2 id="RL_Coach">蔻驰RL</h2>
+
+
+
+
+
+<p>英特尔AI Lab的<a href="https://web.archive.org/web/20230306225449/https://github.com/NervanaSystems/coach" target="_blank" rel="noreferrer noopener nofollow">强化学习蔻驰</a> ( <strong>蔻驰</strong>)是一个Python RL框架，包含许多最先进的算法。</p>
+
+
+
+<p>它公开了一组易于使用的API，用于试验新的RL算法。该库的组件，例如算法、环境、神经网络架构是模块化的。因此，扩展和重用现有的组件是相当容易的。</p>
+
+
+
+<p>要安装<strong>蔻驰</strong>只需使用一个pip命令。</p>
+
+
+
+<pre class="hljs">pip install rl_coach</pre>
+
+
+
+<p>尽管如此，你还是应该查看官方安装教程，因为需要一些先决条件。</p>
+
+
+
+<p>让我们看看<strong>蔻驰</strong>是否符合标准:</p>
+
+
+
+<ol>
+<li>实施的<strong> SOTA </strong> RL算法的数量</li>
+</ol>
+
+
+
+<p>截至今天，<strong>RL _蔻驰</strong>已经实施了以下一组算法:</p>
+
+
+
+
+
+
+
+<p>你可能已经注意到了，<strong>RL _蔻驰</strong>有多种算法。这是本文涵盖的所有库中最完整的一个。</p>
+
+
+
+<ol start="2">
+<li>官方文档、教程和示例的可用性</li>
+</ol>
+
+
+
+<p><a href="https://web.archive.org/web/20230306225449/https://nervanasystems.github.io/coach/index.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>已完成。还有，<strong>RL _蔻驰</strong>有一套很有价值的<a href="https://web.archive.org/web/20230306225449/https://github.com/NervanaSystems/coach/tree/master/tutorials" target="_blank" rel="noreferrer noopener nofollow">教程</a>。新人开始使用它会很容易。</p>
+
+
+
+<ol start="3">
+<li>易于定制的可读代码</li>
+</ol>
+
+
+
+<p><strong>RL _蔻驰</strong>是开源库。它受益于模块化设计，但代码缺乏注释。定制它可能是一项复杂的任务。</p>
+
+
+
+<ol start="4">
+<li>支持的环境数量</li>
+</ol>
+
+
+
+<p><strong>蔻驰</strong>支持以下环境:</p>
+
+
+
+<ul>
+<li><strong> OpenAI健身房</strong></li>
+
+
+
+<li><strong> ViZDoom </strong></li>
+
+
+
+<li><strong>职业学校</strong></li>
+
+
+
+<li><strong>体操伸展运动</strong></li>
+
+
+
+<li><strong>子弹</strong></li>
+
+
+
+<li><strong>卡拉</strong></li>
+
+
+
+<li><strong>和其他</strong></li>
+</ul>
+
+
+
+<p>更多信息，包括安装和使用说明，请参考<a href="https://web.archive.org/web/20230306225449/https://github.com/NervanaSystems/coach#supported-environments" target="_blank" rel="noreferrer noopener nofollow">官方文档</a>。</p>
+
+
+
+<ol start="5">
+<li>日志和跟踪工具支持</li>
+</ol>
+
+
+
+<p><strong>蔻驰</strong>支持各种日志和跟踪工具。它甚至有自己的<a href="https://web.archive.org/web/20230306225449/https://nervanasystems.github.io/coach/dashboard.html" target="_blank" rel="noreferrer noopener nofollow">可视化仪表盘</a>。</p>
+
+
+
+<ol start="6">
+<li>矢量化环境特征</li>
+</ol>
+
+
+
+<p><strong>RL _蔻驰</strong>支持矢量化环境特征。有关使用说明，请参考<a href="https://web.archive.org/web/20230306225449/https://nervanasystems.github.io/coach/dist_usage.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>。</p>
+
+
+
+<ol start="7">
+<li>定期更新</li>
+</ol>
+
+
+
+<p>图书馆似乎得到了维护。然而，上一次重大更新几乎是在一年前。</p>
+
+
+
+<p>总而言之，<strong>RL _蔻驰</strong>实现了一套完美的最新算法。而且是新人友好的。我强烈推荐<strong>蔻驰</strong>。</p>
+
+
+
+<h2 id="TFAgents">切线</h2>
+
+
+
+<p>TFAgents是一个Python库，旨在简化RL算法的实现、部署和测试。它具有模块化结构，并提供了经过充分测试的组件，可以很容易地修改和扩展。</p>
+
+
+
+<p>TFAgents 目前正在积极开发中，但即使是目前的组件集也使其成为最有希望的RL库<strong> </strong>。</p>
+
+
+
+<p>要安装<strong> TFAgents </strong>，只需使用一个pip命令:</p>
+
+
+
+<pre class="hljs">pip install tf-agents</pre>
+
+
+
+<p>让我们看看<strong> TFAgents </strong>是否符合标准:</p>
+
+
+
+<ol>
+<li>实施的<strong> SOTA </strong> RL算法的数量</li>
+</ol>
+
+
+
+<p>到今天为止，<strong> TFAgents </strong>已经实现了以下算法集:</p>
+
+
+
+<ul>
+<li><strong>深度Q-Learning </strong> ( <strong> DQN </strong>)及其改进(<strong>双</strong>)</li>
+
+
+
+<li><strong>深度确定性政策梯度</strong> ( <strong> DDPG </strong>)</li>
+
+
+
+<li><strong> TD3 </strong></li>
+
+
+
+<li><strong>加固</strong></li>
+
+
+
+<li><strong>近端策略优化</strong> ( <strong> PPO </strong>)</li>
+
+
+
+<li><strong>软演员评论家</strong> ( <strong>囊</strong>)</li>
+</ul>
+
+
+
+<p>总的来说，<strong> TFAgents </strong>已经实现了一套很好的算法。</p>
+
+
+
+<ol start="2">
+<li>官方文档、教程和示例的可用性</li>
+</ol>
+
+
+
+<p>TFAgents 有一系列关于每个主要组件的教程。尽管如此，<a href="https://web.archive.org/web/20230306225449/https://www.tensorflow.org/agents/api_docs/python/tf_agents" target="_blank" rel="noreferrer noopener nofollow">官方文件</a>似乎不完整，我甚至可以说没有。然而，教程和简单的例子完成了它们的工作，但是缺少写得好的文档是一个主要的缺点。</p>
+
+
+
+<ol start="3">
+<li>易于定制的可读代码</li>
+</ol>
+
+
+
+<p>代码充满了注释，实现非常简洁。<strong> TFAgents </strong>似乎有最好的库代码。</p>
+
+
+
+<ol start="4">
+<li>支持的环境数量</li>
+</ol>
+
+
+
+<p>图书馆是不可知论者。这就是为什么它很容易插入到任何环境中。</p>
+
+
+
+<ol start="5">
+<li>日志和跟踪工具支持</li>
+</ol>
+
+
+
+<p>支持日志记录和跟踪工具。</p>
+
+
+
+<ol start="6">
+<li>矢量化环境特征</li>
+</ol>
+
+
+
+<p>支持矢量化环境。</p>
+
+
+
+<ol start="7">
+<li>定期更新</li>
+</ol>
+
+
+
+<p>如上所述，<strong> TFAgents </strong>目前正在积极开发中。最近一次更新是在几天前。</p>
+
+
+
+<p>综上所述，<strong> TFAgents </strong>是一个非常有前途的库。它已经有了开始使用它的所有必要工具。不知道开发结束后会是什么样子？</p>
+
+
+
+<h2 id="Stable-Baselines">稳定基线</h2>
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20230306225449/https://github.com/hill-a/stable-baselines" target="_blank" rel="noreferrer noopener nofollow">稳定基线</a>是基于<a href="https://web.archive.org/web/20230306225449/https://github.com/openai/baselines" rel="nofollow"> OpenAI基线</a>的<strong>强化学习</strong> (RL)算法的一组改进实现。OpenAI基线库不太好。这就是为什么<strong>稳定基线</strong>被创造出来。</p>
+
+
+
+<p><strong>稳定的基线</strong>为所有算法提供了统一的结构、可视化工具和优秀的文档。</p>
+
+
+
+<p>要安装<strong>稳定基线</strong>，只需使用一个pip命令。</p>
+
+
+
+<pre class="hljs">pip install story-baselines</pre>
+
+
+
+<p>尽管如此，你还是应该查看官方安装教程，因为需要一些先决条件。</p>
+
+
+
+<p>让我们看看<strong>稳定基线</strong>是否符合标准:</p>
+
+
+
+<ol>
+<li>实施的<strong> SOTA </strong> RL算法的数量</li>
+</ol>
+
+
+
+<p>截至今天，<strong>稳定基线</strong>已经实施了以下一组算法:</p>
+
+
+
+<ul>
+<li><strong> A2C </strong></li>
+
+
+
+<li><strong> ACER </strong></li>
+
+
+
+<li><strong>背包</strong></li>
+
+
+
+<li><strong> DDPG </strong></li>
+
+
+
+<li><strong> DQN </strong></li>
+
+
+
+<li><strong>她的</strong></li>
+
+
+
+<li><strong>盖尔</strong></li>
+
+
+
+<li><strong> PPO1 </strong>和<strong> PPO2 </strong></li>
+
+
+
+<li>袋</li>
+
+
+
+<li><strong> TD3 </strong></li>
+
+
+
+<li><strong> TRPO </strong></li>
+</ul>
+
+
+
+<p>总的来说，<strong>稳定基线</strong>已经实现了一套很好的算法。</p>
+
+
+
+<ol start="2">
+<li>官方文档、教程和示例的可用性</li>
+</ol>
+
+
+
+<p><a href="https://web.archive.org/web/20230306225449/https://stable-baselines.readthedocs.io/en/master/guide/rl.html" target="_blank" rel="noreferrer noopener nofollow">文件</a>完整且优秀。这套教程和例子也真的很有帮助。</p>
+
+
+
+<ol start="3">
+<li>易于定制的可读代码</li>
+</ol>
+
+
+
+<p>另一方面，修改代码可能很棘手。但是因为<strong>稳定基线</strong>在代码和令人敬畏的文档中提供了许多有用的注释，修改过程将会不那么复杂。</p>
+
+
+
+<ol start="4">
+<li>支持的环境数量</li>
+</ol>
+
+
+
+<p><strong>稳定的基线</strong>提供了良好的<a href="https://web.archive.org/web/20230306225449/https://stable-baselines.readthedocs.io/en/master/guide/custom_env.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>关于如何插入到您的定制环境中，然而，您需要使用<strong> OpenAI Gym </strong>来完成。</p>
+
+
+
+<ol start="5">
+<li>日志和跟踪工具支持</li>
+</ol>
+
+
+
+<p><strong>稳定基线</strong>已实现<strong>张量板</strong>支持。</p>
+
+
+
+<ol start="6">
+<li>矢量化环境特征</li>
+</ol>
+
+
+
+<p>大多数算法都支持矢量化环境特征。如果您想了解更多信息，请查看<a href="https://web.archive.org/web/20230306225449/https://stable-baselines.readthedocs.io/en/master/guide/algos.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>。</p>
+
+
+
+<ol start="7">
+<li>定期更新</li>
+</ol>
+
+
+
+<p>最近一次主要更新是在大约两年前，但是由于文档定期更新，该库得到了维护。</p>
+
+
+
+<p>综上所述，<strong>稳定基线</strong>是一个拥有一套很棒的算法和很棒的文档的库。你应该考虑把它作为你的RL工具。</p>
+
+
+
+<h2 id="MushroomRL">蘑菇RL</h2>
+
+
+
+<p><a href="https://web.archive.org/web/20230306225449/http://mushroomrl.readthedocs.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow"> MushroomRL </a>是一个Python <strong>强化学习</strong>库，它的模块化允许你使用众所周知的Python库进行张量计算和RL基准测试。</p>
+
+
+
+<p>它支持RL实验，提供经典RL算法和深度RL算法。MushroomRL背后的想法包括提供大多数RL算法，提供一个公共接口，以便在不做太多工作的情况下运行它们。</p>
+
+
+
+<p>要安装<strong> MushroomRL </strong>只需使用一个pip命令。</p>
+
+
+
+<pre class="hljs">pip install mushroom_rl</pre>
+
+
+
+<p>让我们看看<strong> MushroomRL </strong>是否符合标准:</p>
+
+
+
+<ol>
+<li>实施的<strong> SOTA </strong> RL算法的数量</li>
+</ol>
+
+
+
+<p>到今天为止，<strong> MushroomRL </strong>已经实现了以下一组算法:</p>
+
+
+
+<ul>
+<li><strong>Q-学习</strong></li>
+
+
+
+<li>萨尔萨</li>
+
+
+
+<li><strong> FQI </strong></li>
+
+
+
+<li><strong> DQN </strong></li>
+
+
+
+<li><strong> DDPG </strong></li>
+
+
+
+<li>袋</li>
+
+
+
+<li><strong> TD3 </strong></li>
+
+
+
+<li><strong> TRPO </strong></li>
+
+
+
+<li><strong> PPO </strong></li>
+</ul>
+
+
+
+<p>总的来说，<strong> MushroomRL </strong>拥有你完成RL任务所需的一切。</p>
+
+
+
+<ol start="2">
+<li>官方文档、教程和示例的可用性</li>
+</ol>
+
+
+
+<p>官方文件似乎不完整。它错过了有价值的教程，简单的例子也有很多不足之处。</p>
+
+
+
+<ol start="3">
+<li>易于定制的可读代码</li>
+</ol>
+
+
+
+<p>代码缺少注释和参数描述。定制起来真的很难。虽然<strong> MushroomRL </strong>从来没有把自己定位为一个容易定制的库。</p>
+
+
+
+<ol start="4">
+<li>支持的环境数量</li>
+</ol>
+
+
+
+<p><strong> MushroomRL </strong>支持以下环境:</p>
+
+
+
+<ul>
+<li><strong> OpenAI健身房</strong></li>
+
+
+
+<li><strong> DeepMind控制套件</strong></li>
+
+
+
+<li>MuJoCo </li>
+</ul>
+
+
+
+<p>更多信息，包括安装和使用说明，请参考<a href="https://web.archive.org/web/20230306225449/https://mushroomrl.readthedocs.io/en/latest/source/mushroom_rl.environments.html" target="_blank" rel="noreferrer noopener nofollow">官方文档</a>。</p>
+
+
+
+<ol start="5">
+<li>日志和跟踪工具支持</li>
+</ol>
+
+
+
+<p>MushroomRL支持各种日志和跟踪工具。我会推荐使用TensorBoard作为最受欢迎的一款。</p>
+
+
+
+<ol start="6">
+<li>矢量化环境特征</li>
+</ol>
+
+
+
+<p>支持矢量化环境特征。</p>
+
+
+
+<ol start="7">
+<li>定期更新</li>
+</ol>
+
+
+
+<p>图书馆得到了维护。最近一次更新是在几周前。</p>
+
+
+
+<p>综上所述，<strong> MushroomRL </strong>实现了一套很好的算法。尽管如此，它错过了教程和例子，这些在你开始使用一个新的库时是至关重要的。</p>
+
+
+
+<h2 id="RLlib">RLlib</h2>
+
+
+
+<p>“RLlib是一个用于强化学习的开源库，它为各种应用程序提供了高可扩展性和统一的API。RLlib原生支持TensorFlow、TensorFlow Eager和PyTorch，但它的大部分内部是框架不可知的。？~ <a href="https://web.archive.org/web/20230306225449/https://docs.ray.io/en/master/rllib.html" target="_blank" rel="noreferrer noopener nofollow">网站</a></p>
+
+
+
+<ol>
+<li>实施了许多先进的(SOTA) RL算法<br/> RLlib全部实施了这些算法！<em> PPO？</em>它就在那里。<em> A2C和A3C？</em>是的。<em> DDPG，TD3，沈飞？</em>当然！<em> DQN、彩虹、APEX？？？是的，有各种形状和味道！<em>进化策略，黑斑羚，</em> <em>梦想家，R2D2，APPO，AlphaZero，SlateQ，LinUCB，LinTS，MADDPG，QMIX，… </em>住手！我不确定这些缩写是不是你编的。尽管如此，是的，RLlib有他们所有人。点击查看完整列表<a href="https://web.archive.org/web/20230306225449/https://docs.ray.io/en/master/rllib-algorithms.html#available-algorithms-overview">。</a></em></li>
+
+
+
+<li>官方文档、简单教程和示例的可用性<br/> RLlib拥有包含许多示例的全面文档。它的代码也得到了很好的评论。</li>
+
+
+
+<li>易于定制的可读代码<br/>用回调来定制RLlib是最容易的。虽然RLlib是开源的，并且您可以编辑代码，但这不是一件简单的事情。RLlib代码库相当复杂，因为它的大小和许多层的抽象。<a href="https://web.archive.org/web/20230306225449/https://docs.ray.io/en/master/rllib-concepts.html">这里的</a>是一个指南，如果你想添加一个新的算法，它会帮助你。</li>
+
+
+
+<li>支持的环境数量<br/> RLlib可以与几种不同类型的环境一起工作，包括OpenAI Gym、用户定义、多代理以及批处理环境。<a href="https://web.archive.org/web/20230306225449/https://docs.ray.io/en/master/rllib-env.html" target="_blank" rel="noreferrer noopener nofollow">在这里</a>你会发现更多。</li>
+
+
+
+<li>日志和跟踪工具支持<br/> RLlib具有广泛的日志功能。RLlib将日志打印到标准输出(命令行)。您还可以在<a href="https://web.archive.org/web/20230306225449/https://docs.ray.io/en/master/ray-dashboard.html" target="_blank" rel="noreferrer noopener nofollow"> Ray Dashboard </a>中访问日志(并管理作业)。在<a href="/web/20230306225449/https://neptune.ai/blog/logging-in-reinforcement-learning-frameworks" target="_blank" rel="noreferrer noopener">这篇文章</a>中，我描述了如何扩展RLlib日志来发送指标到Neptune。它还描述了不同的日志记录技术。强烈推荐阅读！</li>
+
+
+
+<li>矢量化环境(VE)特性<br/>是的，看这里的<a href="https://web.archive.org/web/20230306225449/https://docs.ray.io/en/master/rllib-env.html#vectorized" target="_blank" rel="noreferrer noopener nofollow"/>。此外，可以将训练分布在多个计算节点上，例如在集群上。</li>
+
+
+
+<li>定期更新<br/> RLlib得到维护和积极开发。</li>
+</ol>
+
+
+
+<p>从我的经验来看，RLlib是一个非常强大的框架，它涵盖了许多应用程序，同时仍然非常易于使用。也就是说，因为有很多抽象层，所以很难用你的代码来扩展，因为你甚至很难找到你应该把你的代码放在哪里！这就是为什么我会向那些寻求为生产而训练模型的开发人员推荐它，而不是那些必须快速改变算法和实现新功能的研究人员。</p>
+
+
+
+<h2 id="Dopamine">多巴胺</h2>
+
+
+
+<p>“多巴胺是强化学习算法快速原型化的研究框架。它旨在满足用户对一个小的、容易搜索的代码库的需求，在这个代码库中，用户可以自由地试验各种大胆的想法(推测性的研究)。？~ <a href="https://web.archive.org/web/20230306225449/https://github.com/google/dopamine" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a></p>
+
+
+
+<ol>
+<li>实施了大量先进的(SOTA) RL算法<br/>它专注于支持先进的单GPU DQN、彩虹、C51和IQN代理。他们的Rainbow代理实现了Hessel等人认为最重要的三个组件:<ol>
+<li>n步贝尔曼更新(参见Mnih等人，2016年)</li>
+
+
+
+<li>优先体验回放(Schaul等人，2015年)</li>
+
+
+
+<li>分布式强化学习(C51贝勒马尔等人，2017年)</li>
+</ol>
+</li>
+
+
+
+<li>官方文档、简单教程和示例的可用性<br/>在GitHub repo <a href="https://web.archive.org/web/20230306225449/https://github.com/google/dopamine/tree/master/docs" target="_blank" rel="noreferrer noopener nofollow">这里</a>有简明的文档。它不是一个非常流行的框架，所以它可能缺少教程。然而，作者提供了许多训练和可视化的例子。</li>
+
+
+
+<li>易于定制的可读代码<br/>作者的设计原则是:<ol>
+<li>轻松实验:让新用户能够轻松运行基准实验。</li>
+
+
+
+<li>灵活的开发:让新用户很容易尝试研究想法。</li>
+
+
+
+<li>紧凑而可靠:为一些久经考验的算法提供实现。</li>
+
+
+
+<li>可再现性:促进结果的再现性。特别是，它们的设置遵循了Machado等人(2018)给出的建议。</li>
+</ol>
+</li>
+
+
+
+<li>支持的环境数量<br/>主要是为了Atari 2600游戏。它支持OpenAI健身房。</li>
+
+
+
+<li>日志记录和跟踪工具支持<br/>它支持TensorBoard日志记录，并提供一些其他可视化工具，在<a href="https://web.archive.org/web/20230306225449/https://github.com/google/dopamine/tree/master/dopamine/colab" target="_blank" rel="noreferrer noopener nofollow"> colabs </a>中提供，如录制代理播放的视频和seaborn绘图。</li>
+
+
+
+<li>矢量化环境(VE)功能<br/>不支持矢量化环境。</li>
+
+
+
+<li>定期更新<br/>多巴胺得以维持。</li>
+</ol>
+
+
+
+<p>如果你在寻找一个基于DQN算法的可定制框架，那么这可能是你的选择。在引擎盖下，它使用TensorFlow或JAX运行。</p>
+
+
+
+<h2 id="SpinningUp">旋转起来</h2>
+
+
+
+<p>“虽然garage、Baselines和rllib等奇妙的回购协议使已经在该领域的研究人员更容易取得进展，但他们将算法构建到框架中的方式涉及许多非显而易见的选择和权衡，这使得他们很难借鉴。[……]正在加速运行的repo中的算法实现旨在:</p>
+
+
+
+<ul>
+<li>尽可能简单，同时仍然相当好，</li>
+
+
+
+<li>并且彼此高度一致，以揭示算法之间的基本相似性。</li>
+</ul>
+
+
+
+<p>它们几乎是完全自包含的，实际上它们之间没有共享的公共代码(除了日志记录、保存、加载和MPI实用程序)，因此感兴趣的人可以单独研究每个算法，而不必挖掘无休止的依赖链来了解事情是如何完成的。实现被模式化，以使它们尽可能接近伪代码，从而最小化理论和代码之间的差距。？~ <a href="https://web.archive.org/web/20230306225449/https://spinningup.openai.com/en/latest/user/introduction.html#what-this-is" target="_blank" rel="noreferrer noopener nofollow">网站</a></p>
+
+
+
+<ol>
+<li>实施最先进(SOTA) RL算法的数量<br/> VPG、PPO、TRPO、DDPG、TD3、SAC</li>
+
+
+
+<li>官方文档、简单教程和示例的可用性<br/>包含多个示例的优秀文档和教育材料。</li>
+
+
+
+<li>易于定制的可读代码<br/>这段代码可读性很高。根据我的经验，这是你能在那里找到的可读性最强的框架。每个算法都包含在它自己的两个注释良好的文件中。正因为如此，修改它也变得非常容易。另一方面，因为同样的原因更难维持。如果你添加一些东西到一个算法中，你也必须手动添加到其他算法中。</li>
+
+
+
+<li>支持的环境数量<br/>它支持开箱即用的OpenAI Gym环境，并依赖于其API。因此您可以扩展它以使用符合该API的其他环境。</li>
+
+
+
+<li>日志和跟踪工具支持<br/>它有一个光记录器，可以将度量打印到标准输出(cmd)并保存到一个文件中。我已经写了关于如何给SpinUp增加Neptune支持的<a href="https://web.archive.org/web/20230306225449/https://neptune.ai/blog/logging-in-reinforcement-learning-frameworks">帖子</a>。</li>
+
+
+
+<li>矢量化环境(VE)功能<br/>不支持矢量化环境。</li>
+
+
+
+<li>保持定期更新<br/> SpinningUp。</li>
+</ol>
+
+
+
+<p>虽然它是作为教育资源而创建的，但代码的简单性和最先进的结果使它成为快速原型化您的研究想法的完美框架。我在自己的研究中使用它，甚至使用相同的代码结构在其中实现新的算法。你可以在这里找到一个我和我的同事从AwareLab转到TensorFlow v2的端口。</p>
+
+
+
+<h2 id="garage">车库</h2>
+
+
+
+<p>garage是一个用于开发和评估强化学习算法的工具包，以及一个附带的使用该工具包构建的最新实现库。[……]garage最重要的特性是其全面的自动化单元测试和基准测试套件，这有助于确保garage中的算法和模块在软件变化时保持最先进的性能。？~ <a href="https://web.archive.org/web/20230306225449/https://github.com/rlworkgroup/garage" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a></p>
+
+
+
+<ol>
+<li>实施的最先进(SOTA) RL算法的数量<br/>所有主要RL算法(VPG、PPO、TRPO、DQN、DDPG、TD3、SAC、…)，以及它们的多任务版本(MT-PPO、MT-TRPO、MT-SAC)、元RL算法(任务嵌入、MAML、PEARL、RL2、…)、进化策略算法(CEM、CMA-ES)和行为克隆。</li>
+
+
+
+<li>官方文档、简单教程和示例的可用性<br/>包含许多示例和一些教程的全面文档，例如如何添加新环境或实施新算法。</li>
+
+
+
+<li>易于定制的可读代码<br/>它是一种灵活的结构化工具，用于开发、试验和评估算法。它为添加新方法提供了一个支架。</li>
+
+
+
+<li>支持的环境数量<br/> Garage支持各种不同RL训练目的的外部环境库，包括OpenAI Gym、DeepMind DM Control、MetaWorld、PyBullet等。你应该可以很容易地<a href="https://web.archive.org/web/20230306225449/https://garage.readthedocs.io/en/latest/user/implement_env.html" target="_blank" rel="noreferrer noopener nofollow">添加你自己的环境</a>。</li>
+
+
+
+<li>日志和跟踪工具支持<br/>车库日志支持许多输出，包括std。输出(cmd)、纯文本文件、CSV文件和TensorBoard。</li>
+
+
+
+<li>矢量化环境(VE)功能<br/>它支持矢量化环境，甚至允许在集群上分布培训。</li>
+
+
+
+<li>定期更新<br/>车库被维护。</li>
+</ol>
+
+
+
+<p>车库类似于RLlib。这是一个具有分布式执行的大框架，支持像Docker这样的许多附加功能，这超出了简单的培训和监控。如果这样一个工具是你所需要的，比如在生产环境中，那么我会建议你将它与RLlib进行比较，选择你更喜欢的一个。</p>
+
+
+
+<h2 id="Acme">顶点</h2>
+
+
+
+<p>“Acme是强化学习(RL)代理和代理构建块的库。Acme致力于公开简单、高效和可读的代理，既作为流行算法的参考实现，又作为强大的基线，同时还提供足够的灵活性来进行新的研究。Acme的设计还试图提供不同复杂程度的RL问题的多个入口点。？~ <a href="https://web.archive.org/web/20230306225449/https://github.com/deepmind/acme" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a></p>
+
+
+
+<ol>
+<li>实施的最新(SOTA) RL算法数量<br/>包括连续控制算法(DDPG、D4PG、MPO、分布式MPO、多目标MPO)、离散控制算法(DQN、英帕拉、R2D2)、示范学习算法(DQfD、R2D3)、规划和学习算法(AlphaZero)以及行为克隆。</li>
+
+
+
+<li>官方文档、简单教程和示例的可用性<br/>文档相当稀少，但是报告中有许多示例和jupyter笔记本教程。</li>
+
+
+
+<li>易于定制的可读代码<br/>代码易于阅读，但需要先学习其结构。很容易定制和添加您自己的代理。</li>
+
+
+
+<li>支持的环境数量<br/>Acme环境循环假设一个实现DeepMind环境API的环境实例。因此，DeepMind的任何环境都可以完美运行(例如DM控制)。它还提供了OpenAI Gym环境和OpenSpiel RL环境循环的包装。如果你的环境实现了OpenAI或者DeepMind API，那么你应该不会有问题。</li>
+
+
+
+<li>记录和跟踪工具支持<br/>它包括一个基本的记录器，并支持打印到标准输出(cmd)和保存到CSV文件。我已经写了关于如何给Acme增加Neptune支持的<a href="/web/20230306225449/https://neptune.ai/blog/logging-in-reinforcement-learning-frameworks" target="_blank" rel="noreferrer noopener">帖子</a>。</li>
+
+
+
+<li>矢量化环境(VE)功能<br/>不支持矢量化环境。</li>
+
+
+
+<li>定期更新<br/> Acme得到维护和积极发展。</li>
+</ol>
+
+
+
+<p>Acme就像SpinningUp一样简单，但是如果涉及到抽象的使用，就更高级了。它使维护变得更容易——代码更容易重用——但另一方面，在修改算法时，更难找到实现中应该改变的确切位置。它支持TensorFlow v2和JAX，第二个是一个有趣的选择，因为最近<a href="https://web.archive.org/web/20230306225449/https://deepmind.com/blog/article/using-jax-to-accelerate-our-research" target="_blank" rel="noreferrer noopener nofollow"> JAX获得了牵引力</a>。</p>
+
+
+
+<h1 id="coax">哄</h1>
+
+
+
+<p>“Coax是一个模块化强化学习(RL) python包，用于使用基于JAX的函数逼近器来解决OpenAI健身房环境。[…]将coax与其他包区分开来的主要原因是，它的设计符合核心RL概念，而不是代理的高级概念。这使得同轴电缆对于RL研究人员和实践者来说更加模块化和用户友好。？~ <a href="https://web.archive.org/web/20230306225449/https://coax.readthedocs.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow">网站</a></p>
+
+
+
+<ol>
+<li>实施的最先进(SOTA) RL算法数量<br/>它实施了经典RL算法(SARSA、Q-Learning)、基于价值的深度RL算法(软Q-Learning、DQN、优先化经验重放DQN、Ape-X DQN)和策略梯度方法(VPG、PPO、A2C、DDPG、TD3)。</li>
+
+
+
+<li>官方文档，简单教程和示例的可用性<br/>清晰，如果有时令人困惑，有许多代码示例和算法解释的文档。它还包括Pong、Cartpole、ForzenLake和Pendulum环境下的跑步训练教程。</li>
+
+
+
+<li>易于定制的可读代码<br/>其他RL框架通常隐藏您(RL实践者)感兴趣的结构。同轴电缆使网络体系结构占据了中心位置，因此您可以定义自己的转发功能。此外，同轴电缆的设计不知道你的训练循环的细节。您可以决定如何以及何时更新您的函数逼近器。</li>
+
+
+
+<li>支持的环境数量<br/> Coax主要关注开放的健身房环境。但是，您应该能够将它扩展到实现该API的其他环境。</li>
+
+
+
+<li>日志和跟踪工具支持<br/>它利用了Python日志模块。</li>
+
+
+
+<li>矢量化环境(VE)功能<br/>不支持矢量化环境。</li>
+
+
+
+<li>定期更新<br/>同轴保持。</li>
+</ol>
+
+
+
+<p>我建议出于教育目的使用同轴电缆。如果你想即插即用RL算法的细节，这是一个很好的工具。它也是围绕JAX建造的，这本身可能是一个优势(<a href="https://web.archive.org/web/20230306225449/https://moocaholic.medium.com/jax-a13e83f49897" target="_blank" rel="noreferrer noopener nofollow">因为围绕它的炒作</a>)。</p>
+
+
+
+<h2 id="SURREAL">离奇的</h2>
+
+
+
+<p>“我们的目标是让每个人都能获得深度强化学习。我们介绍了超现实，一个开源的，可复制的，可扩展的分布式强化学习框架。超现实为构建分布式强化学习算法提供了高层抽象。？~ <a href="https://web.archive.org/web/20230306225449/https://surreal.stanford.edu/" target="_blank" rel="noreferrer noopener nofollow">网站</a></p>
+
+
+
+<ol>
+<li>实施了大量先进的(SOTA) RL算法<br/>它侧重于分布式深度RL算法。目前，作者实现了他们的PPO和DDPG的分布式变体。</li>
+
+
+
+<li>官方文档、简单教程和示例的可用性<br/>它提供了安装、运行和定制算法的基本文档。但是，它缺少代码示例和教程。</li>
+
+
+
+<li>易于定制的可读代码<br/>代码结构会把人吓跑，这对新手来说不是什么好事。也就是说，代码包含文档字符串，是可读的。</li>
+
+
+
+<li>支持的环境数量<br/>它支持OpenAI Gym和DM控制环境，以及机器人套件。Robosuite是一个标准化的、可访问的机器人操作基准，具有MuJoCo物理引擎。</li>
+
+
+
+<li>日志记录和跟踪工具支持<br/>它包括用于分布式环境的专用日志记录工具，也允许您记录代理播放的视频。</li>
+
+
+
+<li>矢量化环境(VE)功能<br/>不支持矢量化环境。但是，它允许用户在集群上分发培训。</li>
+
+
+
+<li>定期更新<br/>好像不再维护了。</li>
+</ol>
+
+
+
+<p>我把这个框架放在列表中主要是为了参考。如果你开发一个分布式RL算法，你可以从这个repo中学到一两件事，比如如何管理集群上的工作。尽管如此，还是有更好的选项可以开发，比如RLlib或garage。</p>
+
+
+
+<h2 id="h-final-thoughts">最后的想法</h2>
+
+
+
+<p>在这篇文章中，我们已经弄清楚了在选择RL工具时要注意什么，有哪些RL库，以及它们有哪些特性。</p>
+
+
+
+<p>据我所知，最好的公共可用库是<strong> Tensorforce </strong>、<strong>稳定基线</strong>和<strong>RL _蔻驰</strong>。你应该考虑选择其中一个作为你的RL工具。它们都可以被认为是最新的，实现了一组很好的算法，并提供了有价值的教程和完整的文档。如果你想尝试不同的算法，你应该使用<strong>RL _蔻驰</strong>。对于其他任务，请考虑使用<strong>稳定基线</strong>或<strong> Tensorforce </strong>。</p>
+
+
+
+<p>希望有了这些信息，你在为下一个项目选择RL库时不会有任何问题。</p>
+
+
+
+<section id="note-block_d2c31b43d167a50fe5a52d9719b6ca73" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/2bc6a2b56bced9ebe96ad6ce83a59616.png" data-src="https://web.archive.org/web/20230306225449/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20230306225449/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>Vladimir Lyashenko介绍了图书馆KerasRL、Tensorforce、Pyqlearning、RL _蔻驰、TFAgents、稳定基线和MushroomRL。</p>
+                                    </div>
+
+            </div>
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/2bc6a2b56bced9ebe96ad6ce83a59616.png" data-src="https://web.archive.org/web/20230306225449/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20230306225449/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>Piotr Januszewski描述了库RLlib、Dopamine、SpinningUp、garage、Acme、coax和超现实。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+        </div>
+        
+    </div>    
+</body>
+</html>

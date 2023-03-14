@@ -1,0 +1,1320 @@
+<html>
+<head>
+<title>Visualizing Machine Learning Models: Guide and Tools </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>可视化机器学习模型:指南和工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/visualizing-machine-learning-models#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/visualizing-machine-learning-models#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>为什么我们需要可视化机器学习模型？</p>
+
+
+
+<blockquote class="wp-block-quote">
+<p>如果你拒绝将决策权交给你并不完全了解其流程的人，那为什么还要雇人来工作呢？没有人知道人类的大脑(拥有一千亿个神经元！)做决定。”–<a href="https://web.archive.org/web/20221201170702/https://medium.com/hackernoon/explainable-ai-wont-deliver-here-s-why-6738f54216be" target="_blank" rel="noreferrer noopener nofollow"><em>卡西科兹尔科夫</em> </a></p>
+</blockquote>
+
+
+
+<p>这句话被一些人用来批评最近对可解释人工智能的推动。起初，这听起来像是一个有效的观点，对吗？但是它没有考虑到我们不想复制人类的大脑。我们想建造更好的东西。</p>
+
+
+
+<p>机器学习模型正在用万亿字节的数据进行训练，目标是在提高效率的同时做出正确的决策，这一点人类做得相当好。</p>
+
+
+
+<p>我们赋予ML模型的责任意味着我们需要使它们尽可能透明，否则，我们无法信任它们。</p>
+
+
+
+
+
+<p>为此，我们需要可视化ML模型。为了理解这一点，让我们进入可视化的5 W:为什么，谁，什么，何时，何地。</p>
+
+
+
+
+
+
+
+<h2 id="h-the-5-ws-of-model-visualization-in-machine-learning">机器学习中模型可视化的5 W</h2>
+
+
+
+<h3>1.为什么我们要可视化模型？</h3>
+
+
+
+<p>虽然我们已经在概述中对此进行了一些讨论，但让我们试着深入细节。</p>
+
+
+
+<p><strong>可解释性</strong></p>
+
+
+
+<p>我们需要了解模型的决策过程。在神经网络的情况下，这个问题的程度变得特别明显。</p>
+
+
+
+<p>真实世界的神经网络模型具有数百万个参数和极端的内部复杂性，因为它们在训练期间使用许多非线性变换。可视化这种复杂的模型将有助于我们建立对自动驾驶汽车、帮助医生诊断的医学成像模型或卫星图像模型的信任，这些模型在救援规划或安全工作中可能至关重要。</p>
+
+
+
+
+
+
+
+<p><strong>调试&amp;改进</strong></p>
+
+
+
+<p>构建机器学习模型是一个充满实验的迭代过程。寻找超参数的最佳组合可能相当具有挑战性。可视化可以加速这个过程。</p>
+
+
+
+<p>反过来，这可以加速整个开发过程，即使模型在开发过程中遇到一些问题。</p>
+
+
+
+<p><strong>对比&amp;选择</strong></p>
+
+
+
+<p>从一组表现良好的模型中选择最佳模型的行为可以简单地简化为可视化模型中提供最高精度或最低损失的部分，同时确保模型不会过度拟合。</p>
+
+
+
+<p>框架可以被设计成在单个模型随时间训练时比较单个模型的不同快照，即，比较n1个时期之后的模型和n2个时期的训练时间之后的相同模型。</p>
+
+
+
+
+
+
+
+<p><strong>教学理念</strong></p>
+
+
+
+<p>也许教学是可视化最有用的地方，用于教育新手关于机器学习的基本概念。</p>
+
+
+
+<p>可以设计交互式平台，用户可以在其中摆弄多个数据集并切换参数，以观察对模型中间状态和输出的影响。这将有助于对模型如何工作建立直觉。</p>
+
+
+
+<h3>2.谁应该使用可视化？</h3>
+
+
+
+<p><strong>数据科学家/机器学习工程师</strong></p>
+
+
+
+<p>主要专注于开发、试验和部署模型的人将从可视化中受益最多。</p>
+
+
+
+<p>许多从业者已经使用的一些著名工具包括TensorBoard、DeepEyes或Blocks。所有这些工具都为用户提供了对超参数调整、修剪不必要的层等事情的扩展控制，从而允许他们的模型实现更好的性能。</p>
+
+
+
+<p><strong>模型用户</strong></p>
+
+
+
+<p>可视化可能对其他涉众有好处，可能有一些技术背景，但主要是通过API处理模型服务的消费。</p>
+
+
+
+<p>例如Activis，这是一个由脸书开发的可视化分析系统，供他们自己的工程师探索内部部署的神经网络。</p>
+
+
+
+<p>这种可视化工具对于那些只希望使用预训练模型来预测自己任务的人来说非常有用。</p>
+
+
+
+<p><strong>新手用户</strong></p>
+
+
+
+<p>在“为什么”部分，我提到了可视化如何帮助新学生学习什么是机器学习——这一点在这里也是正确的。</p>
+
+
+
+<p>这个群体还可以进一步扩大，包括好奇的消费者，他们由于害怕隐私侵犯而不愿使用ML驱动的应用程序。</p>
+
+
+
+<p>一些基于web的JavaScript框架，如ConvNetJS &amp; TensorFlow.js，使开发人员能够为模型创建高度交互式的可探索解释。</p>
+
+
+
+<h3>3.我们能想象什么？</h3>
+
+
+
+<p><strong>模型架构</strong></p>
+
+
+
+<p>您可以想象的第一件也是最主要的事情是模型架构。它告诉我们有多少层，它们的位置顺序，等等。</p>
+
+
+
+<p>这一部分还包括计算图形，它定义了一个模型在历元迭代后如何训练、测试、保存到磁盘和检查点。</p>
+
+
+
+<p>所有这些都可以帮助开发人员更好地理解他们的模型内部发生了什么。</p>
+
+
+
+<p><strong>学习参数</strong></p>
+
+
+
+<p>在训练的反向传播阶段调整的参数属于这一类。</p>
+
+
+
+<p>可视化权重和偏差可能有助于理解模型学到了什么。同样，在卷积神经网络中，我们可以看看学习过的过滤器，看看模型学习了什么样的图像特征。</p>
+
+
+
+<p><strong>模型指标</strong></p>
+
+
+
+<p>每个时期计算的诸如损失、准确性和其他误差度量的汇总统计可以表示为模型训练过程中的时间序列。</p>
+
+
+
+<p>通过一组数字来表示模型可能看起来有点抽象，但是，它们有助于在训练时跟踪模型的进展。</p>
+
+
+
+<p>这些指标不仅描述了单个模型的性能，而且对于同时比较多个模型也是至关重要的。</p>
+
+
+
+<h3>4.什么时候可视化最相关？</h3>
+
+
+
+<p><strong>训练期间</strong></p>
+
+
+
+<p>训练时使用可视化是监控和跟踪模型性能的好方法。有很多工具正好可以做到这一点(neptune.ai、weights和biases等)，我们稍后将讨论它们。</p>
+
+
+
+<p>例如，<a href="https://web.archive.org/web/20221201170702/https://arxiv.org/pdf/1909.09154.pdf" target="_blank" rel="noreferrer noopener nofollow"> Deep View </a>使用其自身的监测指标(如辨别力和密度指标)来可视化模型，这有助于通过在训练阶段早期简单地观察神经元密度来检测过度拟合。</p>
+
+
+
+<p>另一个工具<a href="https://web.archive.org/web/20221201170702/https://ieeexplore.ieee.org/document/8019872" target="_blank" rel="noreferrer noopener nofollow"> Deep Eyes </a>，可以识别稳定和不稳定的层和神经元，因此用户可以修剪他们的模型以加快训练速度。</p>
+
+
+
+<p><strong>训练后</strong></p>
+
+
+
+<p>有一些技术，如属性可视化，用于重新生成一个突出显示重要区域的图像，以及特征可视化，用于生成一个全新的图像，该图像被认为是同一类别的代表。它们通常在训练模型之后在计算机视觉领域中执行。</p>
+
+
+
+<p>一些工具，如<a href="https://web.archive.org/web/20221201170702/https://projector.tensorflow.org/" target="_blank" rel="noreferrer noopener nofollow">嵌入投影仪</a>，专门用于可视化由训练过的神经网络产生的2D和3D嵌入。</p>
+
+
+
+<p>同样，如前所述，ActiVis、RNNVis、LSTMVis等工具也是在培训后使用的，用于可视化甚至比较不同的模型。</p>
+
+
+
+<h3>5.可视化应用在哪里？</h3>
+
+
+
+<p><strong>应用领域&amp;型号</strong></p>
+
+
+
+<p>可视化已经在自动驾驶、城市规划、医学成像等领域大量使用，以增加用户对模型的信任。</p>
+
+
+
+<p>视觉分析系统正在被开发，以更多地了解更难的网络类型，如GANs，这种网络仅出现了几年，但在数据生成方面取得了显著的成果。</p>
+
+
+
+<p>例子包括DGMTracker和GANViz，它们专注于理解GANs的训练动态，以帮助模型开发者更好地训练这些复杂的模型。</p>
+
+
+
+<p><strong>研究&amp;发展</strong></p>
+
+
+
+<p>将可视化与研究相结合，创造了模型可解释性和民主化的工具和框架。这一快速发展领域的另一个结果是，新的作品立即被公开和开源，而不必等待它在某个会议上“正式”发表。</p>
+
+
+
+<p>例如，用于实现神经网络的最流行的库是开源的，并且对改进代码库的所有方面都有一致的贡献。</p>
+
+
+
+<p>到目前为止，我们已经讨论了进行可视化的所有理论方面，现在让我们来看看最重要的一个方面。</p>
+
+
+
+<h2 id="h-how-can-we-visualize-models">我们如何可视化模型？</h2>
+
+
+
+<p>当我们谈论可视化模型时，我们实际上是在谈论绘制一幅允许模型学习和得出推论的关键组件的图片。如果我们想象一下，我们就能很好地看到里面:</p>
+
+
+
+<h3>1.模型架构</h3>
+
+
+
+<p>模型的设计给出了一个很好的关于数据如何在模型内部流动的想法。将它可视化有助于跟踪在哪个阶段应用了什么操作。</p>
+
+
+
+<p>一种流行的方法，特别是在神经网络中，是用一个<strong>节点链接图</strong>，其中神经元被显示为节点，边权重被显示为链接。由于Tensorboard越来越受欢迎，这种方法也正在成为标准。</p>
+
+
+
+<p>除此之外，如果你想窥视内部，某些机器学习算法有内置的规定。我们将在下一节中看看这方面的例子。</p>
+
+
+
+<h3>2.模特培训</h3>
+
+
+
+<p>监控和观察一个时期接一个时期计算的多个度量(如损失和准确性)有助于在训练阶段跟踪模型进展。</p>
+
+
+
+<p>这可以通过将指标视为时间序列并绘制成线图来实现，这一步不需要外部帮助。</p>
+
+
+
+<p>另一种方法是使用Tensorboard等专门为此目的设计的复杂工具。使用框架的好处是它们非常灵活，交互性强，并且节省你大量的时间。</p>
+
+
+
+<h3>3.模型推理</h3>
+
+
+
+<p>推理是从训练好的模型中得出结论的过程。可视化结果有助于解释和追溯模型如何生成其估计值。有几种方法可以做到这一点:</p>
+
+
+
+<ul>
+<li>可视化实例级观察，对单个数据实例在整个网络中的转换过程及其最终输出进行深入分析和审查。</li>
+
+
+
+<li>借助混淆矩阵或热图，这可以进一步扩展到识别和分析错误分类的实例。这将允许我们了解特定实例何时会失败以及它是如何失败的。</li>
+
+
+
+<li>这个阶段的可视化是进行交互式实验的好方法——用输入数据或超参数进行实验，看看它如何影响结果。Tensorflow游乐场就是一个很好的例子。</li>
+</ul>
+
+
+
+<p>到目前为止，我们已经研究了进入可视化世界所需的所有先决条件。现在，是时候将“如何做”部分扩展到实用性，并检查一些工具来完成这项工作。</p>
+
+
+
+
+
+
+
+<h3>模型架构可视化</h3>
+
+
+
+
+
+
+
+<p>由于决策树的树状结构，它是容易解释的模型。您可以简单地检查分支上的条件，并在模型预测出来时跟踪流程。</p>
+
+
+
+<p>有几种方法可以可视化决策树。先说sklearn自己提供的。</p>
+
+
+
+<p>进行所需的进口。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">from</span> sklearn <span class="hljs-keyword">import</span> tree
+<span class="hljs-keyword">from</span> sklearn.datasets <span class="hljs-keyword">import</span> load_iris
+</pre>
+
+
+
+<p>如你所见，在这个例子中，我们将使用著名的虹膜数据集。</p>
+
+
+
+<p>下一步是定义树并使之适合数据。</p>
+
+
+
+<pre class="hljs">iris = load_iris()
+X, y = iris.data, iris.target
+clf = tree.DecisionTreeClassifier(max_depth=<span class="hljs-number">4</span>)
+clf = clf.fit(x, y)
+</pre>
+
+
+
+<p>现在让我们画出拟合的树。</p>
+
+
+
+<pre class="hljs">plt.figure(figsize=(<span class="hljs-number">12</span>,<span class="hljs-number">8</span>))
+tree.plot_tree(clf, filled=<span class="hljs-keyword">True</span>, fontsize=<span class="hljs-number">10</span>)
+plt.show()
+</pre>
+
+
+
+<p>这是它从另一端出来的方式。</p>
+
+
+
+
+
+<ul>
+<li>我们的数据集中有4个特征，萼片长度、萼片宽度、花瓣长度、花瓣宽度，顺序相同。根节点根据花瓣长度分割整个种群。</li>
+
+
+
+<li>这导致具有分类样本的叶节点，而剩余的在花瓣宽度上再次分裂，因为相关联的基尼杂质指数仍然很高。</li>
+
+
+
+<li>这个循环继续下去，直到我们获得具有低Gini杂质指数的同质节点，或者达到MAX_DEPTH。</li>
+
+
+
+<li>总而言之，我们对分类决策树模型的架构有了一个相当不错的想法。</li>
+</ul>
+
+
+
+<p>另一种可视化决策树的方法是使用dTreeViz库。它不仅适用于scikit-learn树，还支持XGBoost、Spark MLlib和LightGBM树。</p>
+
+
+
+<p>我们来看看它和sklearn的功能有什么不同。</p>
+
+
+
+<p>首先，库需要通过pip或conda安装，你可以在这里找到说明<a href="https://web.archive.org/web/20221201170702/https://github.com/parrt/dtreeviz#install" target="_blank" rel="noreferrer noopener nofollow">。</a></p>
+
+
+
+<p>安装完成后，就可以进行所需的导入了。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> sklearn <span class="hljs-keyword">import</span> tree
+<span class="hljs-keyword">from</span> sklearn.datasets <span class="hljs-keyword">import</span> load_iris
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+<span class="hljs-keyword">from</span> dtreeviz.trees <span class="hljs-keyword">import</span> *
+</pre>
+
+
+
+<p>定义、拟合和绘制树。</p>
+
+
+
+<pre class="hljs">classifier = tree.DecisionTreeClassifier(max_depth=<span class="hljs-number">4</span>)
+iris = load_iris()
+classifier.fit(iris.data, iris.target)
+viz = dtreeviz(classifier, iris.data, iris.target,
+target_name=<span class="hljs-string">'variety'</span>,
+feature_names= iris.feature_names,
+class_names=[<span class="hljs-string">"setosa"</span>, <span class="hljs-string">"versicolor"</span>, <span class="hljs-string">"virginica"</span>])
+
+viz.view()
+</pre>
+
+
+
+<p>这就是我们得到的。</p>
+
+
+
+
+
+<ul>
+<li>所获得的图传达了与sklearn非常相似的含义，但是对于每个决策节点，它更具有直方图的描述性。</li>
+
+
+
+<li>您可以通过设置参数fancy=False来关闭这些图。</li>
+
+
+
+<li>类似地，在这个库的帮助下，您还可以可视化回归树、特征-目标空间热图和决策边界。</li>
+</ul>
+
+
+
+
+
+
+
+<p>如果您正在处理一个需要可视化的神经网络模型，这可能是一种方法。让我们来看看如何利用它。</p>
+
+
+
+<p>与dVizTree类似，这个库也依赖于需要安装的graphviz。你可以在这里找到安装说明<a href="https://web.archive.org/web/20221201170702/https://github.com/RedaOps/ann-visualizer#Installation">。</a></p>
+
+
+
+<p>进行所需的进口。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> keras
+<span class="hljs-keyword">from</span> keras.models <span class="hljs-keyword">import</span> Sequential
+<span class="hljs-keyword">from</span> keras.layers <span class="hljs-keyword">import</span> Dense
+<span class="hljs-keyword">from</span> ann.visualizer.visualize <span class="hljs-keyword">import</span> ann_viz
+</pre>
+
+
+
+<p>现在让我们定义我们的神经网络。</p>
+
+
+
+<pre class="hljs">network = Sequential()
+network.add(Dense(units=<span class="hljs-number">6</span>, activation=<span class="hljs-string">'relu'</span>,
+kernel_initializer=<span class="hljs-string">'uniform'</span>, input_dim=<span class="hljs-number">7</span>))
+network.add(Dense(units=<span class="hljs-number">4</span>, activation=<span class="hljs-string">'relu'</span>,
+kernel_initializer=<span class="hljs-string">'uniform'</span>))
+network.add(Dense(units=<span class="hljs-number">1</span>, activation=<span class="hljs-string">'sigmoid",
+kernel_initializer='</span>uniform<span class="hljs-string">'))
+</span></pre>
+
+
+
+<p>绘制网络。</p>
+
+
+
+<pre class="hljs">ann_viz(network, view=<span class="hljs-keyword">True</span>, title=’Example ANN’)
+</pre>
+
+
+
+<p>这就是输出。</p>
+
+
+
+
+
+<ul>
+<li>这很好地概述了我们定义的神经网络模型的架构。</li>
+
+
+
+<li>我们可以用代码计算每一层中神经元的数量，并看到它正如我们所希望的那样出现。</li>
+
+
+
+<li>这个库唯一的缺点是它只能和Keras一起工作。</li>
+</ul>
+
+
+
+<p>我们刚刚看到了一个如何可视化人工神经网络架构的例子，但这并不是这个库所能做的全部。我们也可以使用这个库来可视化一个卷积神经网络。让我们看看怎么做。</p>
+
+
+
+<p>首先，像往常一样，我们来定义一下CNN。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">build_cnn_model</span><span class="hljs-params">()</span>:</span>
+model=keras.models.Sequential()
+
+model.add(Conv2D(<span class="hljs-number">32</span>, (<span class="hljs-number">3</span>, <span class="hljs-number">3</span>), padding=<span class="hljs-string">"same"</span>,
+input_shape=(<span class="hljs-number">32</span>, <span class="hljs-number">32</span>, <span class="hljs-number">3</span>), activation=<span class="hljs-string">"relu"</span>))
+
+model.add(Conv2D(<span class="hljs-number">64</span>, (<span class="hljs-number">3</span>, <span class="hljs-number">3</span>), padding=<span class="hljs-string">"same"</span>,
+input_shape=(<span class="hljs-number">32</span>, <span class="hljs-number">32</span>, <span class="hljs-number">3</span>),activation=<span class="hljs-string">"relu"</span>))
+
+model.add(MaxPooling2D(pool_size=(<span class="hljs-number">2</span>, <span class="hljs-number">2</span>)))
+
+model.add(Flatten())
+model.add(Dense(<span class="hljs-number">512</span>, activation=<span class="hljs-string">"relu"</span>))
+model.add(Dropout(<span class="hljs-number">0.2</span>))
+model.add(Dense(<span class="hljs-number">10</span>, activation=<span class="hljs-string">"softmax"</span>))
+
+<span class="hljs-keyword">return</span> model
+</pre>
+
+
+
+<p>出于可视化的目的，我们保持网络的规模较小。现在让我们画出来，看看我们会得到什么。</p>
+
+
+
+
+
+<ul>
+<li>这确实为我们的CNN的设计描绘了一幅很好的图画，所有的层次都描述得很好。</li>
+
+
+
+<li>您只需要修改网络代码来获得新的可视化。</li>
+</ul>
+
+
+
+
+
+
+
+<p>正如其创造者所描述的那样，Netron是深度学习和机器学习模型的查看器工具，可以为模型的架构生成漂亮的描述性可视化。</p>
+
+
+
+<p>它是一个跨平台的工具，可以在Mac、Linux和Windows上工作，支持多种框架和格式，如Keras、TensorFlow、Pytorch、Caffe等。我们如何利用这个工具？</p>
+
+
+
+<p>作为一个独立于操作系统的工具，你可以按照<a href="https://web.archive.org/web/20221201170702/https://github.com/lutzroeder/netron#install" target="_blank" rel="noreferrer noopener nofollow">这些</a>的说明将它安装在你的机器上，或者简单地使用他们的web应用程序，我们将在这里使用。</p>
+
+
+
+<p>让我们想象一下我们为最后一个工具定义的CNN。我们需要做的就是保存模型，并以. h5格式或任何其他支持的格式上传保存的文件。这是我们得到的结果:</p>
+
+
+
+
+
+<ul>
+<li>起初，它可能看起来类似于我们用ANN visualizer得到的结果，但两者之间有一个很大的区别——Netron的交互性更强。</li>
+
+
+
+<li>我们可以根据自己的方便将图表的方向更改为水平或垂直。</li>
+
+
+
+<li>不仅如此，所有带颜色的节点都是可扩展的，单击它们可以查看各自节点的属性并获得更好的理解。例如，当我们单击max_pooling2d时，我们会得到这样的结果:</li>
+</ul>
+
+
+
+
+
+<ul>
+<li>我们可以看到许多属性，如数据类型、步幅大小、可训练性等。可以由此推断出被点击的节点，使它比我们以前的工具好一点。</li>
+</ul>
+
+
+
+
+
+
+
+<p>这个工具主要用于参数化地说明神经网络(NN ),并将这些图形导出到可缩放矢量图形(SVG ),因此得名NN-SVG。</p>
+
+
+
+<p>该工具可以生成三种类型的图形:</p>
+
+
+
+<ul>
+<li>经典的全连接神经网络(FCNN)图，</li>
+
+
+
+<li>卷积神经网络(CNN)数字，以及</li>
+
+
+
+<li>深度神经网络遵循AlexNet论文中介绍的风格。</li>
+</ul>
+
+
+
+<p>这个工具是托管的，所以不需要任何安装。以下是借助该工具创建的简单神经网络架构的示例:</p>
+
+
+
+
+
+<ul>
+<li>我们有很多选择，比如:</li>
+</ul>
+
+
+
+<ol>
+<li>边缘宽度与边缘重量成比例，</li>
+
+
+
+<li>边缘不透明度与边缘权重成比例，</li>
+
+
+
+<li>边缘颜色与边缘重量成比例，</li>
+
+
+
+<li>层间距，</li>
+
+
+
+<li>操纵建筑和重量。</li>
+</ol>
+
+
+
+<ul>
+<li>所有这些选项都可以让您非常快速地创建直观的插图。</li>
+</ul>
+
+
+
+<p>如上所述，我们还可以使用该工具创建卷积神经网络的设计，如下例所示:</p>
+
+
+
+
+
+<ul>
+<li>我们在CNN也有一系列的选择，就像我们在神经网络上做的一样。</li>
+
+
+
+<li>你可以简单地在那里操作架构来得到一个新的输出，这个工具非常具有交互性，是一个非常好的选择。</li>
+
+
+
+<li>这个工具在为研究和出版物创建网络图方面非常流行。</li>
+</ul>
+
+
+
+
+
+
+
+<p>没有TensorFlow的开源可视化工具包TensorBoard，任何模型可视化教程都是不完整的。我把它留到了最后，因为它很大。在这里，我们将只讨论它在模型架构中的使用，我们将在下一节中继续讨论它。</p>
+
+
+
+<p>因此，首先，TensorBoard安装可以通过这两个命令中的任何一个来完成。</p>
+
+
+
+<pre class="hljs">pip install tensorboard
+
+conda install -c conda-forge tensorboard
+</pre>
+
+
+
+<p>现在让我们通过在单元格中运行这个命令来将TensorBoard加载到我们的笔记本中。</p>
+
+
+
+<pre class="hljs">%load_ext tensorboard
+</pre>
+
+
+
+<p>加载后，我们必须创建一个日志目录，TensorBoard将在其中存储所有日志并从中读取，以显示各种可视化效果，之后TensorBoard必须重新加载更改。</p>
+
+
+
+<pre class="hljs">log_folder=’logs’
+%reload_ext tensorboard
+</pre>
+
+
+
+<p>现在让我们进行所需的导入并定义我们的模型。在这个练习中，我们将使我们的模型适合MNIST数据集。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+<span class="hljs-keyword">from</span> tensorflow.keras.callbacks <span class="hljs-keyword">import</span> TensorBoard
+
+mnist = tf.keras.datasets.mnist
+
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+X train, X_test = X_train / <span class="hljs-number">255.0</span>, X_test / <span class="hljs-number">255.0</span>
+
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Flatten(input_shape=(<span class="hljs-number">28</span>, <span class="hljs-number">28</span>)),
+  tf.keras.layers.Dense(<span class="hljs-number">512</span>, activation=<span class="hljs-string">'relu'</span>),
+  tf.keras.layers.Dropout(<span class="hljs-number">0.2</span>),
+  tf.keras.layers.Dense(<span class="hljs-number">10</span>, activation=<span class="hljs-string">'softmax'</span>)])
+
+model.compile(optimizer=<span class="hljs-string">'sgd'</span>,
+  loss=<span class="hljs-string">'sparse_categorical_crossentropy'</span>,
+  metrics=[<span class="hljs-string">'accuracy'</span>])
+</pre>
+
+
+
+<p>现在我们需要创建一个TensorBoard回调，它负责记录所有的事件，然后指定我们创建的日志目录。</p>
+
+
+
+<pre class="hljs">callbacks = [TensorBoard(log_dir=log_folder, histogram_freq=<span class="hljs-number">1</span>,
+ write_graph=<span class="hljs-keyword">True</span>, write_images=<span class="hljs-keyword">True</span>,
+ update_freq=<span class="hljs-string">'epoch'</span>, profile_batch=<span class="hljs-number">2</span>)]
+</pre>
+
+
+
+<p>最后，我们使模型适合我们的数据，并传入回调，以便以后可以可视化所有内容。</p>
+
+
+
+<pre class="hljs">model.fit(X_train, y_train, epochs=<span class="hljs-number">5</span>,
+    validation_split=<span class="hljs-number">0.15</span>, callbacks=callbacks)
+</pre>
+
+
+
+<p>现在，让我们通过运行以下命令将TensorBoard窗口直接加载到jupyter笔记本中:</p>
+
+
+
+<pre class="hljs">%tensorboard --logdir={log_folder}
+</pre>
+
+
+
+<p>接下来，如果导航到graphs选项卡，我们将看到以下输出:</p>
+
+
+
+
+
+<p>这就是我们如何用TensorBoard看到模型的架构。</p>
+
+
+
+<p>我们已经探索了可视化模型架构的工具和框架，现在让我们进入下一部分——培训可视化。</p>
+
+
+
+<h3>模型训练可视化</h3>
+
+
+
+
+
+
+
+<p>从我们停止的地方继续，在上一节中，我们已经将我们的神经网络拟合到MNIST数据集，并检查了“图形”选项卡。但是，事实证明TensorBoard中还有许多其他选项卡可供探索。</p>
+
+
+
+<p>让我们从“标量”开始。</p>
+
+
+
+<p>如下图所示，该选项卡处理一个又一个历元的损失和精度计算图。</p>
+
+
+
+
+
+<p>下一个选项卡是“图像”。</p>
+
+
+
+<p>该选项卡显示权重和偏差。每个图像都有一个滑块，我们可以调整它来显示不同时期的参数。</p>
+
+
+
+
+
+<p>接下来是“分发”选项卡。</p>
+
+
+
+<p>它显示了每个历元上某个密集层的权重和偏差的分布。</p>
+
+
+
+
+
+<p>“直方图”选项卡的功能与“分布”选项卡类似，只是借助了直方图。</p>
+
+
+
+
+
+<p>最有趣的选项卡是“投影仪”。它可以可视化任何类型的向量表示，无论是单词嵌入还是图像的numpy数组表示。</p>
+
+
+
+<p>默认情况下，它使用主成分分析(PCA)将这种可视化绘制到3D空间中，但也有其他降维方法的选项，如UMAP或T-SNE。事实上，您可以定义自己的自定义方法。</p>
+
+
+
+<p>用PCA看起来是这样的。</p>
+
+
+
+
+
+<p>我们已经讨论了所有的选项卡，但是我们仍然可以使用TensorBoard做很多事情，比如可视化训练数据、绘制混淆矩阵或超参数调整，但是它们超出了本文的范围。</p>
+
+
+
+<p>让我们看看另一个工具。</p>
+
+
+
+
+
+
+
+<p>Neptune是一个<a href="/web/20221201170702/https://neptune.ai/product#what-is-metadata-store" target="_blank" rel="noreferrer noopener">元数据存储库</a>，可以免费用于个人项目，也可以作为API服务使用。</p>
+
+
+
+<p>虽然编码部分可以在任何地方完成，但只要代码连接到Neptune，持续的跟踪和日志记录就会在<a href="https://web.archive.org/web/20221201170702/https://docs.neptune.ai/you-should-know/core-concepts#web-interface-neptune-ui" target="_blank" rel="noreferrer noopener"> Neptune的UI </a>中持续进行，从而简化项目管理。</p>
+
+
+
+<p>让我们从安装所需的东西开始:</p>
+
+
+
+<pre class="hljs">!pip install -q neptune-client
+!pip install -q neptune-contrib
+</pre>
+
+
+
+<p>我们将使用与上述示例相似的模型和MNIST数据集，因此我们不会重复这一部分。</p>
+
+
+
+<p>为了在每个批次和时期之后记录度量，让我们创建一个NeptuneLogger回调。这部分类似于我们在前面的例子中创建的TensorBoard回调。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow.keras.callbacks <span class="hljs-keyword">import</span> Callback
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NeptuneLogger</span><span class="hljs-params">(Callback)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_batch_end</span><span class="hljs-params">(self, batch, logs={})</span>:</span>
+        <span class="hljs-keyword">for</span> log_name, log_value <span class="hljs-keyword">in</span> logs. items():
+            run[<span class="hljs-string">"batch/{}"</span>.format(log_name)].log(log_value)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on</span> <span class="hljs-title">epoch_end</span><span class="hljs-params">(self, epoch, logs={})</span>:</span>
+        <span class="hljs-keyword">for</span> log_name, log_value <span class="hljs-keyword">in</span> logs.items():
+            run[<span class="hljs-string">"epoch/{}"</span>.format(log_name)].log(log_value)
+</pre>
+
+
+
+<p>为了将我们的代码连接到Neptune应用程序，我们需要一个API令牌。要获得API令牌，您需要<a href="https://web.archive.org/web/20221201170702/https://docs.neptune.ai/getting-started/installation" target="_blank" rel="noreferrer noopener">向Neptune注册</a>并创建一个项目。那个项目的名字将违背参数<em>项目</em>和对应的API令牌违背<em> api_token。</em></p>
+
+
+
+<p>现在让我们初始化API。</p>
+
+
+
+<pre class="hljs">run = neptune.init(project=YOUR_PROJECT_NAME,  api_token=YOUR_API_TOKEN)
+</pre>
+
+
+
+<p>现在让我们来处理我们想要记录的任何内容。</p>
+
+
+
+<pre class="hljs">EPOCHS = <span class="hljs-number">5</span>
+BATCH_SIZE = <span class="hljs-number">32</span>
+
+
+run[<span class="hljs-string">"parameters/epochs"</span>] = EPOCHS
+run[<span class="hljs-string">"parameters/batch_size"</span>] = BATCH_SIZE
+
+
+run[ <span class="hljs-string">"sys/name"</span>] = <span class="hljs-string">"metrics"</span>
+run[ <span class="hljs-string">"sys/tags"</span>].add(<span class="hljs-string">"demo"</span>)</pre>
+
+
+
+<p>太好了！现在剩下要做的就是将我们的NeptuneLogger作为keras回调函数传递。</p>
+
+
+
+<pre class="hljs">history = model.fit(x=x_train, y=y_train,
+      epochs=EPOCHS, batch_size=BATCH_SIZE,
+      validation_data=(x_test, y_test),
+      callbacks=[NeptuneLogger()])
+</pre>
+
+
+
+<p>一旦执行完最后一个代码单元，我们就可以进入Neptune应用程序的UI来可视化我们记录的任何内容。</p>
+
+
+
+<p>针对批次绘制的训练准确度/损失。</p>
+
+
+
+
+
+<p>训练准确度/损失相对于时期绘制。</p>
+
+
+
+
+
+<p>验证准确度/损失对时期作图。</p>
+
+
+
+
+
+<p>除了损失和准确性之类的简单指标，您还可以轻松地绘制其他东西，如混淆矩阵或AUC-ROC曲线(<a href="https://web.archive.org/web/20221201170702/https://app.neptune.ai/common/project-cv/e/PROJCV-103/all?path=model&amp;attribute=visualization" target="_blank" rel="noreferrer noopener">参见此处的示例</a>)。</p>
+
+
+
+<p>虽然这只是一个有限日志记录的演示，但是您可以想象当处理一个涉及一致的再训练和更新的项目时，这个工具使模型的不同方面可视化是多么容易。</p>
+
+
+
+<section id="blog-intext-cta-block_54865a812599d8fb6ff500e9a078ef9f" class="block-blog-intext-cta  c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+            
+    
+            <p>如果你正在自己运行一些实验，并且正在寻找一个可视化工具，TensorBoard是一个不错的选择。海王星更适合那些寻找复杂工具的研究人员，这将使他们能够更深入地研究实验过程。它还提供团队协作功能。</p>
+<p><a href="/web/20221201170702/https://neptune.ai/vs/tensorboard" target="_blank" rel="noopener">查看海王星和张量板的详细对比。</a></p>
+    
+    </section>
+
+
+
+
+
+
+
+<p>就像Neptune一样，这个工具也有助于跟踪、监控和可视化ML模型和项目。</p>
+
+
+
+<p>首先，在他们的<a href="https://web.archive.org/web/20221201170702/https://wandb.ai/" target="_blank" rel="noreferrer noopener nofollow">网站</a>上注册，然后通过以下命令安装&amp;登录:</p>
+
+
+
+<pre class="hljs">pip install wandb
+wandb login
+</pre>
+
+
+
+<p>输入API密钥后，您应该就一切就绪了。现在，让我们为Keras模型创建所需的导入。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> wandb
+<span class="hljs-keyword">from</span> wandb.keras <span class="hljs-keyword">import</span> WandbCallback
+</pre>
+
+
+
+<p>让我们初始化wandb并开始我们的项目。</p>
+
+
+
+<pre class="hljs">wandb.init(project=’blog-demo’)
+</pre>
+
+
+
+<p>现在我们需要做的就是训练我们目前使用的模型，并将WandbCallback传递给log metrics。</p>
+
+
+
+<pre class="hljs">model.fit(X_train, y_train, validation_data=(X_test, y_test),
+    callbacks=[WandbCallback()], epochs=<span class="hljs-number">5</span>)
+</pre>
+
+
+
+<p>现在我们可以进入UI，看看记录了什么。</p>
+
+
+
+
+
+<p>这只是看一看它可能是什么样子。然而，就像Neptune一样，这可以扩展到绘制许多不同的东西，以及基于这些记录的指标比较不同的模型。</p>
+
+
+
+
+
+
+
+<p>TensorWatch是微软研究院提供的数据科学调试和可视化工具。大多数当前可用的工具遵循“所见即所得”(WYSIWYL)的方法，该方法使用许多预定义的可视化来表示结果。</p>
+
+
+
+<p>这可能会导致模型不断变化的问题。TensorWatch通过将一切都视为流来解决这一问题。对其工作原理的简单描述是:</p>
+
+
+
+<ul>
+<li>在TensorWatch流中写入内容时，值会被序列化并发送到TCP/IP套接字，其中包括您指定的文件。</li>
+
+
+
+<li>在Jupyter笔记本中，以前记录的值将从文件中加载，然后TCP-IP套接字将监听任何其他未来的值。</li>
+
+
+
+<li>然后，可视化器监听流，并在值到达时呈现它们。</li>
+</ul>
+
+
+
+<p>使用TensorWatch的唯一缺点是目前只支持PyTorch框架。</p>
+
+
+
+<p>让我们从安装开始吧。</p>
+
+
+
+<pre class="hljs">pip install tensorwatch
+</pre>
+
+
+
+<p>接下来，我们需要安装一个名为regim的Python包，它允许我们获取PyTorch模型文件，并使用少量代码在指定的数据集上运行训练和测试时期。</p>
+
+
+
+<p id="block-bb1c3cc5-de07-4dfb-ba59-6d251fbb266a">使用regim包，我们可以使用训练数据集来训练一个跨时期的模型，维护一些指标，并对事件进行回调。在每个时期之后，它可以在测试数据集上运行到目前为止训练好的模型，并在其上维护度量。</p>
+
+
+
+<p id="block-5222a22f-4db3-475f-8e8d-ce67762d0940">它为训练和测试周期维护了单独的观察器，所以我们可以分别看到每个周期的度量。port参数指定其套接字相对于基线端口的偏移量。</p>
+
+
+
+<pre class="hljs">git clone https://github.com/sytelus/regim.git
+cd regim
+pip install -e .
+</pre>
+
+
+
+<p>然后，从安装regim的文件夹中运行您的培训脚本。</p>
+
+
+
+<pre class="hljs">python mnist_main.py
+</pre>
+
+
+
+<p>通过regim包，我们可以使用训练数据集来训练一个跨时期的模型，维护一些指标，并对事件进行回调。在每个时期之后，它可以在测试数据集上运行到目前为止训练好的模型，并在其上维护度量。</p>
+
+
+
+<p>它为训练和测试周期维护了单独的观察器，所以我们可以分别看到每个周期的度量。port参数指定其套接字相对于基线端口的偏移量。</p>
+
+
+
+<pre class="hljs">train = tw.WatcherClient(port=<span class="hljs-number">0</span>)
+test = tw.WatcherClient(port=<span class="hljs-number">1</span>)
+</pre>
+
+
+
+<p>现在，让我们绘制几个指标，如训练损失、训练准确性、测试损失和测试准确性。</p>
+
+
+
+<pre class="hljs">loss_stream = train.create_stream(expr=<span class="hljs-string">'lambda d:
+                                 (d.metrics.epochf,
+                                 d.metrics.batch_loss)'</span>, event_name=<span class="hljs-string">'batch'</span>)
+loss_plot = tw.Visualizer(loss_stream, vis_type=<span class="hljs-string">'line'</span>,
+                                 xtitle=<span class="hljs-string">'Epoch'</span>, ytitle=<span class="hljs-string">'Train Loss'</span>)
+
+acc_stream = train.create_stream(expr=<span class="hljs-string">'lambda d:
+                                 (d.metrics.epochf, d.metrics.batch_accuracy)'</span>, event_name=<span class="hljs-string">'batch'</span>)
+acc_plot = tw.Visualizer(acc_stream, vis_type=<span class="hljs-string">'line'</span>,
+                                 host=loss_plot, xtitle=<span class="hljs-string">'Epoch'</span>, ytitle=<span class="hljs-string">'Train Accuracy'</span>, yrange=(<span class="hljs-number">0</span>,))
+
+test loss_stream = test.create_stream(expr=<span class="hljs-string">'lambda d:
+                                 (d.metrics.epochf, d.metrics.batch_loss)'</span>, event_name=<span class="hljs-string">'batch'</span>)
+test_loss_plot = tw.Visualizer(test_loss_stream, vis_type=<span class="hljs-string">'line'</span>,
+                                 host=loss_plot, xtitle= <span class="hljs-string">'Epoch'</span>, ytitle=<span class="hljs-string">'Test Loss'</span>, yrange=(<span class="hljs-number">0</span>,))
+
+test_acc_stream = test.create_stream(expr=<span class="hljs-string">'lambda d:
+                                 (d.metrics.epochf,
+                                 d.metrics.batch_accuracy)'</span>, event_name=<span class="hljs-string">'batch'</span>)
+test_acc_plot = tw.Visualizer(test_acc_stream, vis type=<span class="hljs-string">'line'</span>,
+                                 host=loss_plot, xtitle=<span class="hljs-string">'Epoch'</span>, ytitle=<span class="hljs-string">'Test Accuracy'</span>,yrange=(<span class="hljs-number">0</span>,))
+
+test_acc_plot.show()</pre>
+
+
+
+<p>这是我们得到的结果:</p>
+
+
+
+
+
+<p>类似地，我们也可以通过以下方式绘制每层的平均重量梯度:</p>
+
+
+
+<pre class="hljs">grads_stream = train.create_stream(expr=<span class="hljs-string">'lambda
+                                 d:grads_abs_mean(d.model)'</span>,
+                                 event_name=<span class="hljs-string">'batch'</span>, throttle=<span class="hljs-number">1</span>)
+
+grads_plot = tw.Visualizer(grads_stream, vis_type=<span class="hljs-string">'line'</span>,
+                                 title=<span class="hljs-string">"Weight Gradients"</span>,
+                                 clear_after_each=<span class="hljs-keyword">True</span>,
+                                 xtitle=<span class="hljs-string">"Layer"</span>,
+                                 ytitle=<span class="hljs-string">"Abs Mean Gradient', history_len=20)
+
+grads_plot.show()</span></pre>
+
+
+
+<p>下面是渐变的样子。在这一点上，很明显，这些只是我们可以用这个工具做的一小部分事情，还有更多要探索的。由于这个工具仍在开发中，一旦它开始支持更广泛的框架，我们肯定会看到更多。</p>
+
+
+
+
+
+
+
+
+
+<p>这个工具是一个荣誉称号，因为它在学习和教育非专家用户关于神经网络的内部机制方面有更多的用途。</p>
+
+
+
+<p>这是谷歌提供的基于Tensorflow的开源工具。您可以在浏览器中模拟小型神经网络，并在使用它们时观察结果。</p>
+
+
+
+<p>看起来是这样的:</p>
+
+
+
+
+
+<ul>
+<li>您可以在分类和回归之间切换问题类型，并修改网络和问题的每个可能方面，从激活函数到多个隐藏层，从使用纯数据集到有噪声的数据集。</li>
+</ul>
+
+
+
+<ul>
+<li>一旦一切都设置好了，只需点击播放按钮就可以开始训练，之后您可以观察形成的决策边界(模型如何分隔不同的类)。</li>
+</ul>
+
+
+
+<ul>
+<li>模型训练看起来很有趣，并且给你这个黑箱背后的直觉。</li>
+</ul>
+
+
+
+<p>我们已经介绍了相当多的可视化训练工具，让我们进入可视化的最后一部分。</p>
+
+
+
+<h3>模型推理可视化</h3>
+
+
+
+<p>这主要涉及解释模型生成的预测，并收集关于它们最初是如何和为什么达到的想法。</p>
+
+
+
+<p>我在这个博客的另一篇文章中广泛讨论了这个问题。它涵盖了相当多的工具，可以成为您的<a href="/web/20221201170702/https://neptune.ai/blog/best-mlops-tools" target="_blank" rel="noreferrer noopener"> MLOps工具</a>库的一个很好的补充。</p>
+
+
+
+<h2 id="h-wrapping-up">包扎</h2>
+
+
+
+<p>在本文中，我们涉及了很多领域，从寻找为什么我们首先需要可视化模型的答案开始，到获得大量可以帮助我们创建可视化的工具的实践经验。</p>
+
+
+
+<p>我希望这篇文章能帮助你更好地理解可视化，并且下次当你遇到可视化就是答案的问题时，你会利用这里讨论的工具和获得的知识。</p>
+
+
+
+<h3>未来方向</h3>
+
+
+
+<p>这里讨论的工具和框架只是所有工具中最流行的。随着研究的快速发展，你应该时刻留意新的工具。</p>
+
+
+
+<p>除此之外，始终积极寻找可视化的新用例，在这些用例中，展示模型的图片或插图可能会解决手头的问题。</p>
+
+
+
+<p>目前就这些。感谢阅读！</p>
+
+
+
+<h3>资源</h3>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

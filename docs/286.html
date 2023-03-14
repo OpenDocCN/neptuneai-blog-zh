@@ -1,0 +1,513 @@
+<html>
+<head>
+<title>Sentiment Analysis in Python: TextBlob vs Vader Sentiment vs Flair vs Building It From Scratch </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>Python中的情感分析:TextBlob vs Vader情感vs天赋vs从头构建</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/sentiment-analysis-python-textblob-vs-vader-vs-flair#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/sentiment-analysis-python-textblob-vs-vader-vs-flair#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>情感分析是最广为人知的自然语言处理(NLP)任务之一。这篇文章的目的是让读者对情感分析有一个非常清晰的理解，以及在NLP中实现情感分析的不同方法。所以让我们开始吧。</p>
+
+
+
+<p>在过去的五年里，自然语言处理领域有了很大的发展，像Spacy、TextBlob等开源包。为NLP提供随时可用的功能，如情感分析。有这么多免费的软件包，让你不知道该为你的应用程序使用哪一个。</p>
+
+
+
+<p>在本文中，我将讨论最流行的NLP情感分析包:</p>
+
+
+
+
+
+
+
+<p>最后，我还将在一个公共数据集上比较它们各自的性能。</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">什么是情感分析？</p>
+
+
+
+<h2 id="h-what-is-sentiment-analysis">情感分析是确定自然语言中给定表达的情感值的任务。</h2>
+
+
+
+<p>它本质上是一个多类文本分类文本，其中给定的输入文本被分类为积极、中性或消极情绪。类别的数量可以根据训练数据集的性质而变化。</p>
+
+
+
+<p>比如有时候会公式化为1为正面情感，0为负面情感标签的二元分类问题。</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">情感分析的应用</p>
+
+
+
+<h2 id="h-application-of-sentiment-analysis">情感分析在很多领域都有应用，包括分析用户评论、推特情感等。让我们来看看其中的一些:</h2>
+
+
+
+<p><strong>电影评论:</strong>分析在线电影评论，以获得观众对电影的见解。</p>
+
+
+
+<ul>
+<li><strong>新闻舆情分析:</strong>针对特定机构分析新闻舆情，获取洞察。</li>
+
+
+
+<li><strong>社交媒体情绪分析:</strong>分析脸书帖子、twitter推文等的情绪。</li>
+
+
+
+<li><strong>在线美食评论:</strong>从用户反馈中分析美食评论的情感。</li>
+
+
+
+<li>python中的情感分析</li>
+</ul>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">python中有许多可用的包，它们使用不同的方法来进行情感分析。在下一节中，我们将介绍一些最流行的方法和软件包。</p>
+
+
+
+<h2 id="h-sentiment-analysis-in-python">基于规则的情感分析</h2>
+
+
+
+<p>基于规则的情感分析是计算文本情感的基本方法之一。这种方法只需要很少的前期工作，而且思想非常简单，不需要使用任何机器学习来理解文本情感。例如，我们可以通过计算用户在他/她的推文中使用“悲伤”这个词的次数来计算出一个句子的情感。</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">现在，让我们看看一些使用这种方法的python包。</p>
+
+
+
+<h2 id="h-rule-based-sentiment-analysis"><strong>文本块</strong></h2>
+
+
+
+<p>这是一个简单的python库，提供了对不同NLP任务的API访问，如情感分析、拼写纠正等。</p>
+
+
+
+<p><a href="https://web.archive.org/web/20230214174832/https://textblob.readthedocs.io/en/dev/" target="_blank" rel="noreferrer noopener nofollow"> Textblob </a>情感分析器返回给定输入句子的两个属性:</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5"><strong>极性</strong>是介于[-1，1]之间的浮点数，-1表示消极情绪，+1表示积极情绪。</p>
+
+
+
+<h3><strong>主观性</strong>也是一个位于[0，1]范围内的浮点数。主观句一般指个人观点、情感或判断。</h3>
+
+
+
+<p>让我们看看如何使用Textblob:</p>
+
+
+
+<p>Textblob将忽略它不认识的单词，它将考虑它可以分配极性的单词和短语，并进行平均以获得最终分数。</p>
+
+
+
+<ul>
+<li> </li>
+
+
+
+<li><strong> VADER情绪</strong></li>
+</ul>
+
+
+
+<p>用于情感推理的效价感知词典(VADER) 是另一个流行的基于规则的情感分析器。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> textblob <span class="hljs-keyword">import</span> TextBlob
+
+testimonial = TextBlob(<span class="hljs-string">"The food was great!"</span>)
+print(testimonial.sentiment)</pre>
+
+
+
+<pre class="hljs"> Sentiment(polarity=<span class="hljs-number">1.0</span>, subjectivity=<span class="hljs-number">0.75</span>)
+</pre>
+
+
+
+<p>它使用一系列词汇特征(例如单词)来计算文本情感，这些词汇特征根据它们的语义取向被标记为正面或负面。</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">Vader情感返回给定输入句子被</p>
+
+
+
+<h3>积极、消极和中立。</h3>
+
+
+
+<p>例如:</p>
+
+
+
+<p>“食物棒极了！”<br/>阳性:99% <br/>阴性:1% <br/>中性:0% </p>
+
+
+
+<p>这三个概率加起来是100%。</p>
+
+
+
+<p>让我们看看如何使用VADER:</p>
+
+
+
+<p>Vader针对社交媒体数据进行了优化，当与来自twitter、facebook等的数据一起使用时，可以产生良好的结果。</p>
+
+
+
+<p>基于规则的情感分析方法的主要缺点是，该方法只关心单个单词，而完全忽略了使用它的上下文。</p>
+
+
+
+<p>例如，<em>“the party wave”</em>在被任何基于令牌的算法考虑时都将是否定的。</p>
+
+
+
+<p>嵌入型模型</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> vaderSentiment.vaderSentiment <span class="hljs-keyword">import</span> SentimentIntensityAnalyzer
+analyzer = SentimentIntensityAnalyzer()
+sentence = <span class="hljs-string">"The food was great!"</span>
+vs = analyzer.polarity_scores(sentence)
+print(<span class="hljs-string">"{:-&lt;65} {}"</span>.format(sentence, str(vs)))</pre>
+
+
+
+<pre class="hljs">{<span class="hljs-string">'compound'</span>: <span class="hljs-number">0.6588</span>, <span class="hljs-string">'neg'</span>: <span class="hljs-number">0.0</span>, <span class="hljs-string">'neu'</span>: <span class="hljs-number">0.406</span>, <span class="hljs-string">'pos'</span>: <span class="hljs-number">0.594</span>}
+</pre>
+
+
+
+<p>文本嵌入是NLP中单词表示的一种形式，其中同义词相似的单词使用相似的向量来表示，当在n维空间中表示时，这些向量将彼此接近。</p>
+
+
+
+<p>基于嵌入的python包使用这种形式的文本表示来预测文本情感。这导致NLP中更好的文本表示，并产生更好的模型性能。</p>
+
+
+
+<p>其中一个就是天赋。</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5"><strong>天赋</strong></p>
+
+
+
+<h2 id="h-embedding-based-models">Flair是一个简单易用的NLP框架。</h2>
+
+
+
+<p>它提供了各种功能，例如:</p>
+
+
+
+
+
+<p>预先训练的情感分析模型，</p>
+
+
+
+<p>文本嵌入，</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">NER，</p>
+
+
+
+<h3>还有更多。</h3>
+
+
+
+<p>让我们看看如何使用flair非常简单有效地进行情感分析。</p>
+
+
+
+<p>Flair预训练情感分析模型在IMDB数据集上进行训练。要加载并使用它进行预测，只需:</p>
+
+
+
+<ul>
+<li>如果您喜欢为您的领域定制一个情感分析器，可以使用flair使用您的数据集训练一个分类器。</li>
+
+
+
+<li>使用flair预训练模型进行情感分析的缺点是，它是在IMDB数据上训练的，并且该模型可能不会很好地概括来自twitter等其他领域的数据。</li>
+
+
+
+<li> </li>
+
+
+
+<li>从头开始构建情感分析模型</li>
+</ul>
+
+
+
+<p>在本节中，您将学习何时以及如何使用TensorFlow从头开始构建情感分析模型。所以，我们来检查一下怎么做。</p>
+
+
+
+<p> </p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> flair.models <span class="hljs-keyword">import</span> TextClassifier
+<span class="hljs-keyword">from</span> flair.data <span class="hljs-keyword">import</span> Sentence
+
+classifier = TextClassifier.load(<span class="hljs-string">'en-sentiment'</span>)
+sentence = Sentence(<span class="hljs-string">'The food was great!'</span>)
+classifier.predict(sentence)
+
+
+print(<span class="hljs-string">'Sentence above is: '</span>, sentence.labels)
+</pre>
+
+
+
+<pre class="hljs">[POSITIVE (<span class="hljs-number">0.9961</span>)
+</pre>
+
+
+
+<p><strong>为什么要定制型号？</strong></p>
+
+
+
+<p>我们先来了解一下你什么时候会需要一个定制的<strong>情绪分析</strong>模型。例如，您有一个利基应用程序，如分析航空公司评论的情绪。</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">通过构建自定义模型，您还可以对输出进行更多的控制。</p>
+
+
+
+<h2 id="h-building-sentiment-analysis-model-from-scratch"><strong> TFhub  </strong></h2>
+
+
+
+<p><a href="https://web.archive.org/web/20230214174832/https://www.tensorflow.org/hub" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow Hub </a>是一个训练有素的机器学习模型库，可随时进行微调，并可部署在任何地方。</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">出于我们的目的，我们将使用通用语句编码器，它将文本编码为高维向量。您还可以使用任何您喜欢的文本表示模型，如GloVe、fasttext、word2vec等。</p>
+
+
+
+<h3><strong>型号</strong></h3>
+
+
+
+<p>因为我们使用一个通用的句子编码器来矢量化我们的输入文本，所以在模型中不需要嵌入层。如果你计划使用任何其他的嵌入模型，比如GloVe，请随意关注我之前的<a href="https://web.archive.org/web/20230214174832/https://neptune.ai/blog/document-classification-small-datasets" target="_blank" rel="noreferrer noopener nofollow">帖子</a>来获得一步一步的指导。在这里，我将为我们的目的构建一个简单的模型。</p>
+
+
+
+<p><strong>数据集</strong></p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">对于我们的例子，我将使用来自Kaggle的twitter情感分析数据集。这个数据集包含140万条带标签的推文。</p>
+
+
+
+<h3>你可以从<a href="https://web.archive.org/web/20230214174832/https://www.kaggle.com/kazanova/sentiment140" target="_blank" rel="noreferrer noopener nofollow">这里</a>下载数据集。</h3>
+
+
+
+<p>要在Colab中运行示例，只需在笔记本提示时上传Kaggle API密钥，它就会自动为您下载数据集。</p>
+
+
+
+<p> </p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">要在Colab中运行示例，只需在笔记本提示时上传Kaggle API密钥，它就会自动为您下载数据集。</p>
+
+
+
+<h3> </h3>
+
+
+
+<p><strong>示例:使用Python进行Twitter情感分析</strong></p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">这是Colab笔记本的链接。</p>
+
+
+
+<h3><a href="https://web.archive.org/web/20230214174832/https://colab.research.google.com/drive/1tUr5t0ZJ-I4Ni40dkbjku92HAU5SyR_2?usp=sharing" target="_blank" rel="noreferrer noopener nofollow"> <strong>举例:用Python进行Twitter情感分析。</strong>T3】</a></h3>
+
+
+
+<p>在同一个笔记本里，<strong>我实现了我们上面讨论的所有算法。</strong></p>
+
+
+
+<p>比较结果</p>
+
+
+
+<section id="note-block_e03602cbee2ca640e4521e8ce281f47f" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/0690b683e16f056b3a108bcd4221c261.png" data-src="https://web.archive.org/web/20230214174832/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20230214174832/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>现在，让我们比较笔记本上的结果。</p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5"> </p>
+
+
+
+<p>你可以看到我们的定制模型没有任何<a href="/web/20230214174832/https://neptune.ai/blog/hyperparameter-tuning-in-python-a-complete-guide-2020" target="_blank" rel="noreferrer noopener">超参数调整</a>产生最好的结果。</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">我只在Twitter数据上训练了使用模型，其他的都是现成的。</p>
+
+
+
+<h3> </h3>
+
+
+
+<p>你可以看到上面的包没有一个能很好地概括twitter数据，我一直在做一个很酷的开源项目来开发一个专门针对twitter数据的包，这个项目正在积极开发中。</p>
+
+
+
+<p>请随意查看我在GitHub上的<a href="https://web.archive.org/web/20230214174832/https://github.com/shahules786/Twitter-Sentiment" target="_blank" rel="noreferrer noopener">项目。</a></p>
+
+
+
+<p>最后的想法</p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">在本文中，我讨论了情感分析以及用python实现它的不同方法。</p>
+
+
+
+<h2 id="h-comparing-results">我还在一个公共数据集上比较了它们的性能。</h2>
+
+
+
+<p>希望你会发现它们在你的一些项目中有用。</p>
+
+
+
+
+
+
+
+<p id="separator-block_191ecfe14113e40b5ffb352404ef30ee" class="block-separator block-separator--10">
+</p>
+
+
+
+<p>You can see that our custom model without any <a href="/web/20230214174832/https://neptune.ai/blog/hyperparameter-tuning-in-python-a-complete-guide-2020" target="_blank" rel="noreferrer noopener">hyperparameter tuning</a> yields the best results. </p>
+
+
+
+<section id="note-block_fd80ed12d724b43affccf7c0caeab217" class="block-note c-box c-box--default c-box--dark c-box--no-hover c-box--standard ">
+
+    
+
+    <div class="block-note__content">
+                    <div class="c-item c-item--text">
+
+                <img decoding="async" loading="lazy" alt="" class="c-item__arrow lazyload" src="../Images/0690b683e16f056b3a108bcd4221c261.png" data-src="https://web.archive.org/web/20230214174832/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg" data-original-src="https://web.archive.org/web/20230214174832/https://neptune.ai/wp-content/themes/neptune/img/blocks/note/list-arrow.svg"/>
+
+                <div class="c-item__content">
+
+                                            <p>I have only trained the Use model on the Twitter data, the other ones come out-of-the-box. </p>
+                                    </div>
+
+            </div>
+            </div>
+
+
+</section>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">
+</p>
+
+
+
+<p>You can see that none of the above packages are generalizing well on twitter data, I have been working on a cool open source project to develop a package especially for twitter data and this is under active contribution. </p>
+
+
+
+<p>Feel free to check out my <a href="https://web.archive.org/web/20230214174832/https://github.com/shahules786/Twitter-Sentiment" target="_blank" rel="noreferrer noopener">project on GitHub.</a></p>
+
+
+
+<p id="separator-block_8f30da36b798dbf8e68fb58bda182fa4" class="block-separator block-separator--5">
+</p>
+
+
+
+<h2 id="h-final-thoughts">Final thoughts</h2>
+
+
+
+<p>In this article, I discussed sentiment analysis and different approaches to implement it in python. </p>
+
+
+
+<p>I also compared their performance on a common dataset. </p>
+
+
+
+<p>Hopefully, you will find them useful in some of your projects.</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

@@ -1,0 +1,533 @@
+<html>
+<head>
+<title>Data Augmentation in NLP: Best Practices From a Kaggle Master </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>NLP中的数据扩充:来自Kaggle Master的最佳实践</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/data-augmentation-nlp#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/data-augmentation-nlp#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>NLP中有许多任务，从文本分类到问题回答，但是无论您做什么，您必须训练模型的数据量都会严重影响模型的性能。</p>
+
+
+
+<p>你能做些什么来扩大你的数据集？</p>
+
+
+
+<p>简单的选项-&gt;获取更多数据:)。</p>
+
+
+
+<p>但是获取和标记额外的观察值可能是一个昂贵且耗时的过程。</p>
+
+
+
+<p>你能做些什么呢？</p>
+
+
+
+<p>对文本数据应用数据扩充。</p>
+
+
+
+<p>数据扩充技术用于<strong>使用您已有的数据生成额外的合成数据。</strong>增强方法在计算机视觉应用中非常流行，但它们对自然语言处理同样有效。</p>
+
+
+
+<p>在本文中，我们将介绍NLP的所有主要数据扩充方法，您可以使用这些方法来增加文本数据集的大小并提高模型性能。</p>
+
+
+
+<h2 id="h-data-augmentation-for-vision-vs-nlp">视觉与自然语言处理的数据增强</h2>
+
+
+
+<p>在计算机视觉应用中，数据扩充几乎无处不在，以获得更大的训练数据，并使模型更好地泛化。</p>
+
+
+
+<p>使用的主要方法包括:</p>
+
+
+
+<ul><li>裁剪，</li><li>翻转，</li><li>缩放，</li><li>旋转，</li><li>噪声注入，</li><li>和许多其他人。</li></ul>
+
+
+
+<p>在<strong>计算机视觉</strong>中，这些转换是使用数据生成器在移动中完成的<strong>。当一批数据被输入你的神经网络时，它会被随机转换(增强)。训练前不需要准备任何东西。</strong></p>
+
+
+
+<p>这与<strong> NLP </strong>的情况不同，由于文本的语法结构，数据扩充应该小心进行。这里讨论的方法都是训练前使用的<strong>。</strong>预先生成一个新的扩充数据集，然后输入数据加载器来训练模型。</p>
+
+
+
+
+
+
+
+<h2 id="h-data-augmentation-methods">数据扩充方法</h2>
+
+
+
+<p>在本文中，我将主要关注以下项目中提供的NLP数据扩充方法:</p>
+
+
+
+
+
+
+
+<p>所以，让我们深入了解每一个问题。</p>
+
+
+
+<h3><strong>反向翻译</strong></h3>
+
+
+
+<p>在这个方法中，我们<strong>将文本数据翻译成某种语言，然后再翻译回原来的</strong>语言。这可以帮助生成具有不同单词的文本数据，同时保留文本数据的上下文。</p>
+
+
+
+<p>像google translate、Bing、Yandex这样的语言翻译API用于执行翻译。例如，给出这样一句话:</p>
+
+
+
+
+
+
+
+<p>你可以看到，这些句子是不一样的，但回译后它们的内容保持不变。如果您想对数据集尝试这种方法，您可以使用这个<a href="https://web.archive.org/web/20221119001251/https://www.kaggle.com/miklgr500/how-to-use-translators-for-comments-translation" target="_blank" rel="noreferrer noopener nofollow">笔记本</a>作为参考。</p>
+
+
+
+<h3><strong>简单的数据扩充</strong></h3>
+
+
+
+<p>简易数据扩充使用传统且非常简单的数据扩充方法。EDA包括<strong>四个简单的操作，在防止过度拟合和帮助训练更健壮的模型方面做得出奇的好</strong>。</p>
+
+
+
+
+
+
+
+<p>从句子中随机选择<em> n </em>个不是停用词的单词。用随机选择的同义词替换这些单词。</p>
+
+
+
+<p>例如，给出这样一句话:</p>
+
+
+
+<p class="c-box"><em>这篇<strong>文章</strong>将重点总结自然语言处理中的数据增强<strong>技术</strong>。</em></p>
+
+
+
+<p>方法随机选取n个单词(说两个)，单词<em>文章</em>和<em>技法</em>，分别用<em>写法</em>和<em>方法</em>代替。</p>
+
+
+
+<p class="c-box"><em>这篇<strong>文章</strong>将重点总结NLP中的数据扩充<strong>方法</strong>。</em></p>
+
+
+
+
+
+
+
+<p>找出句子中不是停用词的随机词的随机同义词。将同义词插入句子中任意位置。这样做<em> n </em>次。</p>
+
+
+
+<p>例如，给出这样一句话:</p>
+
+
+
+<p class="c-box"><em>这篇<strong>文章</strong>将重点总结自然语言处理中的数据增强<strong>技术</strong>。</em></p>
+
+
+
+<p>方法随机选取n个单词(比如两个)，将单词<em>文章</em>和<em>技巧</em>分别找到同义词为<em>写作</em>和<em>方法</em>。然后将这些同义词插入句子中的任意位置。</p>
+
+
+
+<p class="c-box"><em>本文将关注<strong>综述</strong>NLP<strong>方法</strong>中的数据扩充技术。</em></p>
+
+
+
+
+
+
+
+<p>随机选择句子中的两个单词，交换位置。这样做<em> n </em>次。</p>
+
+
+
+<p>例如，给定一个句子</p>
+
+
+
+<p class="c-box"><em>这篇<strong>文章</strong>将重点总结自然语言处理中的数据增强<strong>技术</strong>。</em></p>
+
+
+
+<p>该方法随机选择n个单词(比如两个)，单词<em>文章</em>和<em>技巧</em>并交换它们来创建一个新句子。</p>
+
+
+
+<p class="c-box"><em>本<strong>技巧</strong>将重点总结NLP中的数据增强<strong>文章</strong>。</em></p>
+
+
+
+
+
+
+
+<p>以概率<em> p </em>随机去掉句子中的每个单词。</p>
+
+
+
+<p>例如，给定一个句子</p>
+
+
+
+<p class="c-box"><em>这篇<strong>文章</strong>将重点总结自然语言处理中的数据增强<strong>技术</strong>。</em></p>
+
+
+
+<p>该方法选择n个单词(比如说两个)，单词<em>将</em>和<em>技术</em>，并将它们从句子中移除。</p>
+
+
+
+<p class="c-box"><em>这篇</em> <em> <strong>文章</strong>重点总结NLP中的数据增强。</em></p>
+
+
+
+<p>如果您想将这些技术应用到您的项目中，您可以访问这个<a href="https://web.archive.org/web/20221119001251/https://github.com/jasonwei20/eda_nlp" target="_blank" rel="noreferrer noopener nofollow">库</a>。</p>
+
+
+
+<h3><strong> NLP蛋白沉淀</strong></h3>
+
+
+
+<p>之前，我们讨论了计算机视觉数据增强和NLP数据增强之间的差异。但是在本节中，我们将看到如何在NLP中应用CV数据扩充中使用的一些思想。</p>
+
+
+
+<p>为此，我们将使用<a href="https://web.archive.org/web/20221119001251/https://github.com/albumentations-team/albumentations" target="_blank" rel="noreferrer noopener nofollow">白蛋白</a>包。</p>
+
+
+
+<p>让我们来看看这里的一些技术。</p>
+
+
+
+<ul><li><strong>混排句子变换</strong></li></ul>
+
+
+
+<p>在这种转换中，如果给定的文本样本包含多个句子，这些句子将被打乱以创建一个新的样本。</p>
+
+
+
+<p>例如:</p>
+
+
+
+<p class="c-box">文本= ' &lt;句子1 &gt;。&lt;句子2 &gt;。第四句&gt;。第四句&gt;。第五句&gt;。‘句子5&gt;’</p>
+
+
+
+<p>被转换为:</p>
+
+
+
+<p class="c-box">文本= ' &lt;句子2 &gt;。&lt;句子3 &gt;。第一句&gt;。句子5 &gt;。第五句&gt;。&lt;句子4 &gt;</p>
+
+
+
+<ul><li><strong>排除重复转换</strong></li></ul>
+
+
+
+<p>在这种转换中，如果给定的文本样本包含具有重复句子的多个句子，则这些重复句子被移除以创建新的样本。</p>
+
+
+
+<p>例如给定样本，</p>
+
+
+
+<p class="c-box">文本= ' &lt;句子1 &gt;。&lt;句子2 &gt;。第四句&gt;。第四句&gt;。第五句&gt;。‘句子5&gt;’</p>
+
+
+
+<p>我们将其转化为:</p>
+
+
+
+<p class="c-box"><strong>’&lt;句子1 &gt;。&lt;句子2 &gt;。第四句&gt;。‘句子5&gt;’</strong></p>
+
+
+
+<p>您可以使用这个库尝试许多其他转换。你可以查看这个精彩的<a href="https://web.archive.org/web/20221119001251/https://www.kaggle.com/shonenkov/nlp-albumentations" target="_blank" rel="noreferrer noopener nofollow">笔记本</a>来看看完整的实现。</p>
+
+
+
+<h3><strong> NLPAug库</strong></h3>
+
+
+
+<p>到目前为止，我们已经讨论了在NLP中使用数据扩充的许多方法。</p>
+
+
+
+<p>但是从头开始有效地实现这些方法需要做大量的工作。</p>
+
+
+
+<p>在这一节中，我将向您介绍一个<strong> python包，它可以让您轻松地完成所有这些数据扩充</strong>，并且您可以使用各种参数来调整您需要的扩充级别。</p>
+
+
+
+<p>NLPAug 帮助你为你的机器学习项目增加NLP。让我们看看如何使用这个库来执行数据扩充。</p>
+
+
+
+<p>NLPAug提供三种类型的增强:</p>
+
+
+
+<ul><li>字符级增强</li><li>单词级增强</li><li>句子层次扩充</li></ul>
+
+
+
+<p>在每个级别中，NLPAug都提供了前面章节中讨论的所有方法，例如:</p>
+
+
+
+<ul><li>随机删除，</li><li>随机插入，</li><li>洗牌，</li><li>同义词替换，</li><li>等等。</li></ul>
+
+
+
+<p>根据我的经验，最常用和有效的技术是通过单词嵌入替换同义词。</p>
+
+
+
+<p>我们将n个单词替换为它的同义词(接近这些单词的单词嵌入)，以获得具有相同含义但不同单词的句子。</p>
+
+
+
+<p>在执行同义词替换时，我们可以选择应该使用哪种预训练嵌入来查找给定单词的同义词。</p>
+
+
+
+<p>使用NLPaug，我们可以选择非上下文嵌入，例如:</p>
+
+
+
+
+
+
+
+<p>或者上下文嵌入，比如:</p>
+
+
+
+
+
+
+
+<p>例如:</p>
+
+
+
+<pre class="hljs">aug = naw.ContextualWordEmbsAug(
+    model_path=<span class="hljs-string">'bert-base-uncased'</span>, action=<span class="hljs-string">"insert"</span>)
+augmented_text = aug.augment(text)</pre>
+
+
+
+<p>原件:</p>
+
+
+
+<p class="c-box">敏捷的棕色狐狸跳过懒惰的狗</p>
+
+
+
+<p>扩充文本:</p>
+
+
+
+<p class="c-box"><em>即使是敏捷的棕色狐狸<strong>通常</strong>也会跳过懒狗</em></p>
+
+
+
+<h2 id="h-things-to-keep-in-mind-while-doing-nlp-data-augmentation">进行NLP数据扩充时要记住的事情</h2>
+
+
+
+<p>正如我在介绍中所说的，在NLP中进行增强时，我们需要注意一些事情。</p>
+
+
+
+<p>在对扩充数据进行训练时面临的主要问题是算法，如果做得不正确，就会严重过度拟合扩充的训练数据。</p>
+
+
+
+<p>一些需要记住的事情:</p>
+
+
+
+<ul><li>不要使用扩充数据进行验证。</li><li>如果你正在进行K-fold交叉验证，请始终将原始样本和扩充样本放在同一个fold中，以避免过度拟合。</li><li>总是尝试不同的增强方法，并检查哪个效果更好。</li><li>混合使用不同的增强方法也是值得的，但是不要过度。</li><li>通过实验来确定要增加的最佳样本数，以获得最佳结果。</li><li>请记住，NLP中的数据扩充并不总是有助于提高模型性能。</li></ul>
+
+
+
+<h2 id="h-data-augmentation-workflow">数据扩充工作流程</h2>
+
+
+
+<p>在本节中，我们将在<a href="https://web.archive.org/web/20221119001251/https://www.kaggle.com/c/nlp-getting-started" target="_blank" rel="noreferrer noopener nofollow">上尝试数据增强，真实与否？在Kaggle上举办的NLP与灾难推文</a>竞赛。</p>
+
+
+
+<p>在<a href="/web/20221119001251/https://neptune.ai/blog/document-classification-small-datasets" target="_blank" rel="noreferrer noopener">我之前的一篇文章</a>中，我使用了这次比赛的数据来尝试不同的非上下文嵌入方法。在这里，我将使用我在那里使用的完全相同的分类管道，但是我将添加数据扩充，以查看它是否提高了模型性能。</p>
+
+
+
+<p>首先，让我们加载训练数据集并检查目标类分布。</p>
+
+
+
+<pre class="hljs">…
+x=tweet.target.value_counts()
+sns.barplot(x.index,x)
+plt.gca().set_ylabel(<span class="hljs-string">'samples'</span>)</pre>
+
+
+
+
+
+
+
+<p>我们可以看到这里有一个小的阶级不平衡。</p>
+
+
+
+<p>让我们用同义词替换法生成一些正样本。</p>
+
+
+
+<p>在数据扩充之前，我们将数据分为训练集和验证集，以便验证集中没有样本用于数据扩充。</p>
+
+
+
+<pre class="hljs">train,valid=train_test_split(tweet,test_size=<span class="hljs-number">0.15</span>)</pre>
+
+
+
+<p>现在，我们可以对训练数据集进行数据扩充。我已经选择从正类中生成300个样本。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">augment_text</span><span class="hljs-params">(df,samples=<span class="hljs-number">300</span>,pr=<span class="hljs-number">0.2</span>)</span>:</span>
+    aug_w2v.aug_p=pr
+    new_text=[]
+
+    
+    df_n=df[df.target==<span class="hljs-number">1</span>].reset_index(drop=<span class="hljs-keyword">True</span>)
+
+    
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> tqdm(np.random.randint(<span class="hljs-number">0</span>,len(df_n),samples)):
+
+            text = df_n.iloc[i][<span class="hljs-string">'text'</span>]
+            augmented_text = aug_w2v.augment(text)
+            new_text.append(augmented_text)
+
+
+    
+    new=pd.DataFrame({<span class="hljs-string">'text'</span>:new_text,<span class="hljs-string">'target'</span>:<span class="hljs-number">1</span>})
+    df=shuffle(df.append(new).reset_index(drop=<span class="hljs-keyword">True</span>))
+    <span class="hljs-keyword">return</span> df
+
+train = augment_text(train)</pre>
+
+
+
+<p>我们现在可以使用这些扩充的文本数据来训练模型。</p>
+
+
+
+<p>如果你对学习如何从NLP的数据准备、训练分类器和运行推理中构建整个管道感兴趣，你可以查看我的另一篇文章。</p>
+
+
+
+<p>那么，用同义词替换进行数据扩充有效吗？</p>
+
+
+
+
+<table class="tg">
+<colgroup>
+<col/>
+<col/>
+<col/>
+</colgroup>
+<thead>
+  <tr>
+    <th class="tg-rmtc">没有数据扩充</th>
+    <th class="tg-11cv">用数据<br/>增强</th>
+    <th class="tg-11cv">ROC AUC得分</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-5tdu">0.775</td>
+    <td class="tg-5isw">0.785</td>
+    <td class="tg-5isw"><strong>通过数据扩充，我们在模型性能(AUC)方面得到了很好的提升</strong>。</td>
+  </tr>
+</tbody>
+</table>
+
+
+
+<p id="separator-block_60be20d9d53fb" class="block-separator block-separator--20">使用不同的技术和<a href="/web/20221119001251/https://neptune.ai/blog/hyperparameter-tuning-in-python-a-complete-guide-2020" target="_blank" rel="noreferrer noopener">调整数据扩充方法的超参数</a>可以进一步改善结果，但我现在将把它放在一边。</p>
+
+
+
+<p>如果你想这么做，我准备了一个笔记本，你可以在上面玩东西。</p>
+
+
+
+<p>最后的想法</p>
+
+
+
+<p>在本文中，我们讨论并实现了文本数据的不同数据扩充方法。</p>
+
+
+
+<h2 id="h-final-thoughts">据我所知，这些是完成这项任务的最好的公开技术和软件包。</h2>
+
+
+
+<p>希望你会发现它们对你的项目有用。</p>
+
+
+
+<p>To my knowledge, these are the best publically available techniques and packages to do the task.</p>
+
+
+
+<p>Hopefully, you will find them useful in your projects.</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

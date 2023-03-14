@@ -1,0 +1,387 @@
+<html>
+<head>
+<title>5 Model Deployment Mistakes That Can Cost You a Lot </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>可能让您付出巨大代价的5个模型部署错误</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/model-deployment-mistakes#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/model-deployment-mistakes#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>在数据科学项目中，模型部署可能是整个生命周期中<strong>最关键的</strong>和<strong>复杂的</strong>部分。</p>
+
+
+
+<p>运营或任务关键型ML需要全面的设计。您必须考虑工件传承和跟踪、避免人为错误的自动部署、测试和质量检查、模型在线时的功能可用性…以及许多其他事情。</p>
+
+
+
+<p>在本文中，我们整理了一份通常发生在生命周期最后阶段的常见错误列表。这些更关注软件架构，但在处理推理服务时扮演着非常重要的角色<em>。</em></p>
+
+
+
+<h2 id="h-mistake-1-deploying-your-models-manually">错误1:手动部署您的模型</h2>
+
+
+
+<p>手动部署推理服务有很大的风险。大多数ML服务需要执行多个命令才能部署。假设我们正在部署一个FastAPI web服务，它是在线推理的标准。以下是成功部署需要执行的典型步骤:</p>
+
+
+
+<div id="case-study-numbered-list-block_62b301375125f" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item">执行测试套件并获得代码覆盖率</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 2 </span>获取Docker注册表的凭证</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>构建推理服务映像</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 4 </span>调用Kubernetes从Docker注册中心获取图像并部署服务</li>
+            </ul>
+</div>
+
+
+
+<p>想象一下手动执行这些步骤(以及您需要的所有设置)。很有可能发生人为错误——您可能忘记从您的模型注册中心更新模型路径，您可能忘记运行测试，您可能没有首先进入预生产环境就直接部署到生产环境中，等等。</p>
+
+
+
+
+
+
+
+<h3>您可以尝试的:自动持续集成和部署</h3>
+
+
+
+<p id="separator-block_62b32cae98d0b" class="block-separator block-separator--10">持续集成工具</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img decoding="async" src="../Images/6c4d772ca970c52ce3f10a23aae12a32.png" alt="Model Deployment - CI/CD Pipelines" class="wp-image-67680" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161359im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/5-Model-Deployment-Mistakes-That-Can-Really-Cost-You_9.png?resize=827%2C261&amp;ssl=1"/><figcaption><em>Model deployment – CI/CD pipelines I <a href="https://web.archive.org/web/20221201161359/https://hackernoon.com/understanding-the-basic-concepts-of-cicd-fw4k32s1" target="_blank" rel="noreferrer noopener nofollow">Source</a> </em></figcaption></figure></div>
+
+
+<p id="separator-block_62b32cba98d0c" class="block-separator block-separator--10">幸运的是，有各种各样的工具可以用来自动化这些步骤。Github动作、<a href="https://web.archive.org/web/20221201161359/https://www.jenkins.io/" target="_blank" rel="noreferrer noopener nofollow">詹金斯</a>和<a href="https://web.archive.org/web/20221201161359/https://docs.gitlab.com/ee/ci/" target="_blank" rel="noreferrer noopener nofollow"> Gitlab CI/CD </a>就是很好的例子。你可以在这篇文章中读到更多关于它们的信息<a href="/web/20221201161359/https://neptune.ai/blog/continuous-integration-continuous-deployment-tools-for-machine-learning" target="_blank" rel="noreferrer noopener">。</a></p>
+
+
+
+<h4>这些工具允许您定义基于服务代码库中发生的某些事件触发的<strong>工作流。当将一个分支合并到开发中时，您可以部署到集成环境中，当新特性到达主分支时，您可以部署到生产中。</strong></h4>
+
+
+
+<p>持续部署工具</p>
+
+
+
+<p>对于持续部署步骤，有像<a href="https://web.archive.org/web/20221201161359/https://argo-cd.readthedocs.io/en/stable/" target="_blank" rel="noreferrer noopener nofollow"> ArgoCD </a>、<a href="https://web.archive.org/web/20221201161359/https://jenkins-x.io/" target="_blank" rel="noreferrer noopener nofollow"> Jenkins-X </a>或<a href="https://web.archive.org/web/20221201161359/https://fluxcd.io/" target="_blank" rel="noreferrer noopener nofollow"> Flux </a>这样的工具，它们是基于GitOps的Kubernetes pods部署器(如果你不知道那是什么，Gitlab提供了一篇非常全面的文章解释它是什么<a href="https://web.archive.org/web/20221201161359/https://about.gitlab.com/topics/gitops/" target="_blank" rel="noreferrer noopener nofollow">这里是</a>)。这些工具将负责将您的变更发布到生产中。</p>
+
+
+
+<h4>本质上，这些CI/CD管道是UNIX命令集<strong>,它们自动执行上面定义的所有步骤</strong>,并且总是在容器化的环境中执行。这保证了每个部署都是可重复的和确定的。</h4>
+
+
+
+<p>错误2:忽视部署策略的使用</p>
+
+
+
+<p>最简单的ML模型部署策略基本上是通过更新运行API的容器映像，将旧服务转换为新服务。这通常被称为<strong> <em>重建部署模式</em> </strong>，这是一个非常过时的策略，很少有公司还在使用。这种部署的主要缺点是它<strong>会导致服务停机</strong>一段特定的时间(只要服务需要启动)，这在某些应用中是不可接受的。除此之外，如果你没有一个更复杂的策略，你将无法利用一些强大的技术来提高可靠性、跟踪和实验。</p>
+
+
+
+
+
+
+
+<h2 id="h-mistake-2-neglecting-the-use-of-a-deployment-strategy">您可以尝试的:使用一种部署策略</h2>
+
+
+
+<p>蓝绿色部署</p>
+
+
+
+<h3>该部署策略包括同时在生产环境中部署服务的两个版本(旧版本和新版本)。当部署新版本时，消费者的<strong>流量通过负载均衡器逐渐被重定向</strong>到这个版本。如果新服务产生任何类型的错误，流量负载将立即重定向到旧版本(作为一种自动回滚)。</h3>
+
+
+
+<h4>蓝绿色部署的好处是，您可以在很早的阶段发现错误，同时仍然为大多数消费者提供服务。它有一个嵌入式的灾难恢复功能，可以切换回之前的工作版本。在ML空间中，这种技术特别有用，因为模型容易由于各种原因产生错误。</h4>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/11bffaa50b53e08af71560c6875a7034.png" alt="Blue-green model deployment" class="wp-image-67675" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161359im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/5-Model-Deployment-Mistakes-That-Can-Really-Cost-You_4-1795347404-1655909627601.png?resize=779%2C463&amp;ssl=1"/><figcaption><em>Blue-green model deployment | <a href="https://web.archive.org/web/20221201161359/https://martinfowler.com/bliki/BlueGreenDeployment.html" target="_blank" rel="noreferrer noopener nofollow">Source</a> </em></figcaption></figure></div>
+
+
+<p>查看这个<a href="https://web.archive.org/web/20221201161359/https://martinfowler.com/bliki/BlueGreenDeployment.html" target="_blank" rel="noreferrer noopener nofollow"> Martin Fowler对蓝绿部署的解释</a>来了解更多关于这个策略的信息。</p>
+
+
+
+<p>金丝雀部署</p>
+
+
+
+<p>金丝雀部署类似于蓝绿色部署。主要区别在于，新旧版本之间的流量平衡不是基于百分比完成的，而是基于向新用户逐渐增加的模型版本。</p>
+
+
+
+<h4>基本上，该模型首先发布给特定的生产用户群体，以便在早期捕捉错误和问题(您甚至可以在向公众推出之前向内部员工发布)。在确认该服务对他们有效后，该服务逐渐推广到越来越多的用户。部署受到密切监控，以捕捉潜在的问题，如错误、不良行为、高延迟、CPU或RAM的过度使用等。这通常是一个缓慢的过程，但比其他类型的部署风险更小。如果出现问题，回滚相当容易。</h4>
+
+
+
+<p>影子部署</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/c1d40e6db72e851e670e8dd16da7b5f2.png" alt="Canary model deployment" class="wp-image-67677" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161359im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/5-Model-Deployment-Mistakes-That-Can-Really-Cost-You_6.png?resize=843%2C473&amp;ssl=1"/><figcaption><em>Canary model deployment | <a href="https://web.archive.org/web/20221201161359/https://gowrishankar.info/blog/istio-service-mesh-canary-release-routing-strategies-for-ml-deployments-in-a-kubernetes-cluster/" target="_blank" rel="noreferrer noopener nofollow">Source</a> </em></figcaption></figure></div>
+
+
+<p>这种部署不像以前的那样常见，而且被低估了。它提供了一个巨大的好处，不必直接将模型放归自然。</p>
+
+
+
+<h4>它的工作方式是通过<strong>将传入的请求</strong>复制到另一个sidecar服务，该服务包含ML模型的新版本。这个新模型不会对消费者产生任何影响，也就是说，响应来自于唯一存在的稳定版本。</h4>
+
+
+
+<p>例如，如果您刚刚为在线交易构建了一个新的欺诈检测模型，但您不太愿意在没有使用真实数据进行测试的情况下将其发布到产品中，您可以将其部署为影子服务。旧的服务仍将与不同的系统交互，但您将能够实时评估新版本。如果您有一个定义良好的ML监控架构(<a href="/web/20221201161359/https://neptune.ai/blog/ml-model-monitoring-best-tools" target="_blank" rel="noreferrer noopener">进行ML模型监控的最佳工具</a>)，您将能够通过引入一个具有基本事实的反馈回路来评估模型的准确性。对于这个用例，这意味着知道交易最终是否是欺诈性的。</p>
+
+
+
+<p>这种类型的部署还需要配置负载平衡器，以便一次将请求复制到两个版本。根据使用案例，还可以将生产负载流量异步重放到影子版本中，以避免影响负载平衡器的性能。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/700b0c311acafe00e96a70c865cd8ef8.png" alt="Shadow model deployment" class="wp-image-67673" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161359im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/5-Model-Deployment-Mistakes-That-Can-Really-Cost-You_2-2187425529-1655909762241.png?resize=701%2C455&amp;ssl=1"/><figcaption><em>Shadow model deployment | <a href="https://web.archive.org/web/20221201161359/https://christophergs.com/machine%20learning/2019/03/30/deploying-machine-learning-applications-in-shadow-mode/" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>错误#3:没有启用自动化(预测)服务回滚</p>
+
+
+
+<p>想象一下，你有一个生产模型，负责你的应用程序主要服务的动态定价。高度依赖这种模式的公司有优步、Bolt AirBnB、亚马逊、Shopify等等。,</p>
+
+
+
+
+
+
+
+<h2 id="h-mistake-3-not-enabling-automated-prediction-service-rollback">然后，假设数据科学团队创建了ML模型的一个新的改进版本。但是部署失败了(由于任何原因)。应用程序将不得不切换到备用价格，因为模型API不会响应。现在，价格不是个性化的(在最好的情况下)，当然也不是动态的。</h2>
+
+
+
+<p>这个问题可能会导致收入大幅下降，直到服务得到解决，新模式得到部署。</p>
+
+
+
+<p>您可以尝试的:为您的部署启用自动回滚</p>
+
+
+
+<p>如果您的ML模型服务于您的应用程序的一个非常重要的特性，那么拥有一个健壮的回滚系统是至关重要的。回滚系统允许<strong>将服务切换回之前的版本</strong>，并减少应用程序运行不良的时间。正如我们之前已经看到的，这是蓝绿部署的重要部分。如果在渐进版本中没有出现任何错误，新版本只能接收100%的流量。</p>
+
+
+
+<h3>手动回滚触发器</h3>
+
+
+
+<p>回滚到以前版本的另一种简便方法是启用<strong>手动回滚触发器。</strong>这对于在生产中部署的ML模型特别有用。有时ML服务不会失败，但是它们会开始返回异常输出，由于低效的模型编译和许多其他原因，需要很长时间来响应。这类问题通常不会被自动检测到，过一会儿就会被发现。通常，客户支持票开始到达，您会收到问题通知。</p>
+
+
+
+<p id="separator-block_62b32e1a98d0e" class="block-separator block-separator--10">可以通过多种方式部署手动回滚触发器。比如Github允许设置<a href="https://web.archive.org/web/20221201161359/https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch" target="_blank" rel="noreferrer noopener nofollow"> <em>工作流调度</em> </a>事件。这些允许您通过提供一些输入，从您的服务存储库中手动运行Github工作流。您可以设置要回滚到的提交、标记或分支。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/f583488dab6812b28d56cbb16dad3fd6.png" alt="Kubernetes deployment" class="wp-image-67672" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161359im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/5-Model-Deployment-Mistakes-That-Can-Really-Cost-You_1.png?resize=835%2C284&amp;ssl=1"/><figcaption><em>Kubernetes deployment | <a href="https://web.archive.org/web/20221201161359/https://www.nclouds.com/blog/kubernetes-deployment-using-jenkins-with-auto-rollback-for-continuous-delivery/" target="_blank" rel="noreferrer noopener nofollow">Source</a> </em></figcaption></figure></div>
+
+
+<h4>错误4:忽略推理服务中的负载测试！</h4>
+
+
+
+<p>ML服务往往比典型的后端服务要慢。ML模型在做出预测时并不总是很快。这真的取决于你建立的模型的类型。例如，如果您使用一个<a href="https://web.archive.org/web/20221201161359/https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer noopener nofollow">转换器模型</a>进行文本分类，那么根据输入序列的长度，推断时间可能会花费一些时间。一般来说，神经网络也是高度CPU密集型的，在某些情况下，它们也会占用大量RAM内存。</p>
+
+
+
+<p>你可以尝试的:想想交通高峰！做压力测试，把自动缩放策略</p>
+
+
+
+<h2 id="h-mistake-4-neglecting-load-testing-in-your-inference-services">由于这些潜在的性能问题，设计一个<strong>高效的硬件</strong>基础设施对于及时返回响应至关重要。有必要了解哪种配置策略是根据硬件使用情况自动扩展系统、设置服务主机的基本内存和CPU能力、设置服务主机的初始数量等的最佳配置策略。</h2>
+
+
+
+<p>所有这些都可以在你的<a href="https://web.archive.org/web/20221201161359/https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/" target="_blank" rel="noreferrer noopener nofollow"> Kubernetes配置YAMLs </a>中定义，如果你正在部署一个web服务，或者在你的<a href="https://web.archive.org/web/20221201161359/https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html" target="_blank" rel="noreferrer noopener nofollow"> Lambda配置</a>中定义，如果你正在AWS中部署一个无服务器架构。(GCP和Azure的无服务器<em>功能</em>也有类似选项)。获得这些数字的最好方法是进行压力和负载测试。您也可以跳过这一步，在服务已经投入生产的情况下校准配置，但是这样风险更大。</p>
+
+
+
+<h3>什么是负载测试？</h3>
+
+
+
+<p>负载测试由<strong>模拟临时环境中的真实流量负载</strong>组成。也就是说，尝试估计服务每秒将接收多少请求(也包括峰值),并从外部主机或云本地执行测试。有几个开源和付费的工具可以用来做这件事，比如<a href="https://web.archive.org/web/20221201161359/https://locust.io/" target="_blank" rel="noreferrer noopener nofollow">蝗虫</a>(如果你使用Python就很容易使用)或者<a href="https://web.archive.org/web/20221201161359/https://jmeter.apache.org/" target="_blank" rel="noreferrer noopener nofollow"> Apache JMeter </a>。你可以在这里找到更多选项<a href="https://web.archive.org/web/20221201161359/https://www.softwaretestinghelp.com/performance-testing-tools-load-testing-tools/" target="_blank" rel="noreferrer noopener nofollow">。</a></p>
+
+
+
+<p>您必须定义每秒请求数和以特定速率产生的用户数，以模拟您的服务。这些工具还允许您<a href="https://web.archive.org/web/20221201161359/https://docs.locust.io/en/stable/custom-load-shape.html" target="_blank" rel="noreferrer noopener nofollow">定义定制负载</a>。例如，您可以模拟在一天的高峰时段有较高的流量，而在周末有较低的负载。</p>
+
+
+
+<p id="separator-block_62b32e1398d0d" class="block-separator block-separator--10">负载测试结果将显示服务返回503错误或返回高延迟响应的比率。你甚至可以用自己的监控系统来复查这种行为(<a href="https://web.archive.org/web/20221201161359/https://www.datadoghq.com/" target="_blank" rel="noreferrer noopener nofollow"> Datadog </a>、<a href="https://web.archive.org/web/20221201161359/https://grafana.com/" target="_blank" rel="noreferrer noopener nofollow"> Grafana </a>等)。</p>
+
+
+
+
+
+<h4> </h4>
+
+
+
+<p>负载测试结果将如何帮助您优化您的架构？</p>
+
+
+
+<p>这些测试结果将允许您定义在正常的请求/秒速率下您需要有多少个pod，并估计您的T2服务需要扩展多少。然后，您将能够设置CPU和RAM阈值来触发水平自动扩展策略。它还将为您提供延迟分布的感觉，并决定它对于手头的用例是否足够，或者在投入生产之前是否需要应用任何必要的优化。</p>
+
+
+
+<p>然而，模拟真实行为总是困难的，极端的交通高峰也不总是可预测的。这将我们引向下一点，拥有一个健壮的和定义良好的监控系统将允许团队在任何问题发生时得到早期通知。您需要有警报来监控延迟、错误、日志模式中的异常等。</p>
+
+
+
+<p id="separator-block_62b32e3498d0f" class="block-separator block-separator--10">错误5:没有监控你的ML系统！</p>
+
+
+
+
+
+<h4>很明显，在您的生产模型上没有一个适当的监控层是一个很大的错误。这在过去几年变得更加重要，因为云环境中的技术堆栈越来越多。许多不同的组件相互作用，使得根本原因分析更加困难。当其中一个组件出现故障时，非常有必要准确地了解问题是如何发生的。</h4>
+
+
+
+<p>此外，在处理ML系统时，我们还有一个额外的挑战。机器学习模型依赖于它们接受训练的数据，但它们在生产中使用从未见过的数据。这提出了一个明显的问题，ML模型本质上是<strong>错误的，</strong>但是正如常见的统计学格言所说，“……<em>有些是有用的”</em>。因此，随着时间的推移，监控我们的模型有多错误是至关重要的。</p>
+
+
+
+<p>您可以尝试的:实现一个监控层</p>
+
+
+
+<h2 id="h-mistake-5-not-monitoring-your-ml-system">ML系统<strong>非常复杂，难以监控</strong>。为了获得完整的可观测性图层，您需要设置多个监控级别。这些是硬件&amp;服务监控、反馈回路和模型退化。</h2>
+
+
+
+<p>硬件和服务监控</p>
+
+
+
+<p>硬件和服务监控是绝对必须实施的，包括:CPU和RAM使用情况、网络吞吐量、响应延迟、完整的端到端跟踪和日志记录。这将允许足够快地补救技术问题，以避免对用户体验以及公司的最终收入产生负面影响。这可以通过一些已经提到的工具很好的解决，比如<a href="https://web.archive.org/web/20221201161359/https://www.datadoghq.com/" target="_blank" rel="noreferrer noopener nofollow">Datadog</a><strong/><a href="https://web.archive.org/web/20221201161359/https://grafana.com/" target="_blank" rel="noreferrer noopener nofollow">Grafana</a><strong/>或者其他的比如<a href="https://web.archive.org/web/20221201161359/https://newrelic.com/" target="_blank" rel="noreferrer noopener nofollow"> New Relic </a>或者<a href="https://web.archive.org/web/20221201161359/https://www.dynatrace.com/" target="_blank" rel="noreferrer noopener nofollow"> Dynatrace </a>。</p>
+
+
+
+<h3> </h3>
+
+
+
+<p>还值得一提的是Neptune如何帮助监控训练指标和硬件消耗(在<a href="https://web.archive.org/web/20221201161359/https://docs.neptune.ai/how-to-guides/model-monitoring/monitor-model-training-live" target="_blank" rel="noreferrer noopener">文档</a>中阅读更多相关信息)。如果您的模型需要定期重新训练，或者是您的生产服务的一部分(例如:训练+预测发生在同一作业中)，这将特别有用。</p>
+
+
+
+<h4>​​</h4>
+
+
+
+<p>反馈回路</p>
+
+
+
+<p id="separator-block_62b32e3f98d10" class="block-separator block-separator--10">离线评估中使用的传统ML指标也可以在生产中进行评估，但前提是有实际数据可用。这就是通常所说的<a href="https://web.archive.org/web/20221201161359/https://www.clarifai.com/blog/closing-the-loop-how-feedback-loops-help-to-maintain-quality-long-term-ai-results" target="_blank" rel="noreferrer noopener nofollow"> <strong> <em>反馈回路</em> </strong> </a>。计算这些非常依赖于地面真实数据出现的方式。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/f81f3acae3031fff9ac17e940b97ff97.png" alt="Monitoring dashboard in Datadog" class="wp-image-67681" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161359im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/5-Model-Deployment-Mistakes-That-Can-Really-Cost-You_10.png?resize=815%2C451&amp;ssl=1"/><figcaption><em>Monitoring dashboard in Datadog | <a href="https://web.archive.org/web/20221201161359/https://www.capterra.es/software/135453/datadog-cloud-monitoring" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>在一些用例中，您需要等待一段特定的时间，直到您得到预测的真实结果(欺诈检测)，在另一些用例中，您得到一个模糊的结果(语法错误纠正)，在另一些用例中，它们甚至不可用。但大多数时候，你可以得出一个用户行为结果，作为检查模型是否支持你试图优化的业务指标的代理。</p>
+
+
+
+<p id="separator-block_62b32e4c98d11" class="block-separator block-separator--10">模型退化</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221201161359/https://app.neptune.ai/common/quickstarts/e/QUI-28177/monitoring" target="_blank" rel="noreferrer noopener"><img decoding="async" loading="lazy" src="../Images/206ce80bec21c38ab1b3cf4901578c7f.png" alt="Hardware monitoring in Neptune " class="wp-image-67674" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221201161359im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/5-Model-Deployment-Mistakes-That-Can-Really-Cost-You_3.png?resize=807%2C477&amp;ssl=1"/></a><figcaption><em>Hardware monitoring in Neptune | <a href="https://web.archive.org/web/20221201161359/https://app.neptune.ai/common/quickstarts/e/QUI-28177/monitoring" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+<p>除了这两个(硬件、服务和反馈回路)，ML模型暴露了一个新的基本复杂性。这叫<strong> <em>型号退化</em> </strong>。这种效应不会在系统中产生错误，但意味着预测的质量会逐渐下降，如果没有复杂的ML友好监控层，很难检测到这一点。</p>
+
+
+
+<h4>模型退化主要是由<strong><em/></strong><em>的数据漂移引起的。</em>这意味着你输入在线算法的数据相对于训练数据已经发生了某种程度的变化。这通常通过比较生产数据与训练数据的分布来进行统计测试。在<a href="https://web.archive.org/web/20221201161359/https://arxiv.org/abs/1810.11953" target="_blank" rel="noreferrer noopener nofollow"><em/></a><em/>的论文中，你可以读到更多关于这种效果的细节。</h4>
+
+
+
+<p>由于MLOps完全是自动化，因此检测这种类型的问题对公司来说是一个巨大的工程挑战。大多数提供MLOps工具的公司已经解决了监控培训阶段的问题，但是生产模型退化监控仍然是一个难以概括解决的概念(<a href="https://web.archive.org/web/20221201161359/https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html" target="_blank" rel="noreferrer noopener nofollow"> SageMaker </a>、<a href="https://web.archive.org/web/20221201161359/https://whylabs.ai/?section=model-health" target="_blank" rel="noreferrer noopener nofollow"> Whylabs </a>和<a href="https://web.archive.org/web/20221201161359/https://www.aporia.com/" target="_blank" rel="noreferrer noopener nofollow"> Aporia </a>是少数几个已经提出了通用用例解决方案的工具)。</p>
+
+
+
+<p>将web服务日志移动到一个数据存储区，在那里它们可以被批量提取和分析，这通常是通过使用一个<strong>流管道</strong>将记录放入一个流中来解决的，这些记录稍后将被写入对象存储区。例如，您可以使用Kafka主题和Lambda函数来接收要素和预测记录，并将它们保存在S3。稍后，您可以设置一个定期的气流作业，提取S3的所有这些数据，并将它们与训练数据进行比较。如果差异很大，你可以向ML工程团队发送一个延迟通知。如果降级对您的系统至关重要，您可以触发模型训练并自动部署新模型。</p>
+
+
+
+
+
+<h4>结束了！</h4>
+
+
+
+<p>在本文中，我们介绍了ML工程师在部署他们的第一个模型时犯的一些关键错误。所有这些对于基于ML的生产系统的长期成功都是至关重要的。作为一个提示，小心过度设计！迭代是解决ML项目的最佳方式，因为实现所有这些建议的成本和工作量都很高。您的模型用例ROI需要支持它。</p>
+
+
+
+<p>如果您想了解更多关于本文中出现的所有主题的信息，请查看以下文章:</p>
+
+
+
+
+
+<p>参考</p>
+
+
+
+
+
+
+
+<p>Moving web services logs to a data store where they can be extracted and analyzed in bulk is usually solved by using a<strong> streaming pipeline</strong> to put records in a stream which are later written in object storage. For example, you could use a Kafka topic and a Lambda function to receive features and prediction records and save them in S3. Later on, you can set up a periodic Airflow job that extracts all these data in S3 and compare them against the training data. If there’s a big difference, you could send a Slack notification to the ML engineering team. And if the degradation is critical for your system, you can trigger model training and deploy the new model automatically.</p>
+
+
+
+<h2 id="h-wrapping-up">Wrapping up!</h2>
+
+
+
+<p>In this article, we introduced some of the key mistakes that ML engineers make when deploying their first models. All of these are critical for the long-term success of an ML-based production system. And just as a note, beware of over-engineering! Iteration is the best way to solve ML projects because the cost and effort of implementing all of these suggestions are high. Your model use case ROI needs to support it. </p>
+
+
+
+<p>If you want to know more about all the topics surfaced in this article, check out these articles:</p>
+
+
+
+
+
+
+
+<h3>References</h3>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

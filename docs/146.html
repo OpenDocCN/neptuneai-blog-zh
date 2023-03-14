@@ -1,0 +1,1365 @@
+<html>
+<head>
+<title>Best MLOps Tools For Your Computer Vision Project Pipeline </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>计算机视觉项目管道的最佳MLOps工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/best-mlops-tools-for-computer-vision-project#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/best-mlops-tools-for-computer-vision-project#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>应用或软件系统的生命周期(也称为<a href="https://web.archive.org/web/20230117104424/https://www.tutorialspoint.com/sdlc/sdlc_overview.htm" target="_blank" rel="noreferrer noopener nofollow"> SDLC </a>)有几个主要阶段:</p>
+
+
+
+<ul>
+<li>策划，</li>
+
+
+
+<li>发展，</li>
+
+
+
+<li>测试，</li>
+
+
+
+<li>部署，</li>
+</ul>
+
+
+
+<p>然后，根据需要返回到包含特性、更新和/或修复的新版本。</p>
+
+
+
+<p>为了执行这些过程，软件开发依赖于DevOps来简化开发，同时持续交付新版本并保持质量。</p>
+
+
+
+<p>计算机视觉模型或任何机器学习模型的工作流程也遵循类似的模式。它与传统软件开发的不同之处在于它运行的环境。</p>
+
+
+
+<p>例如，<a href="https://web.archive.org/web/20230117104424/https://towardsdatascience.com/everything-you-ever-wanted-to-know-about-computer-vision-heres-a-look-why-it-s-so-awesome-e8a58dfb641e" target="_blank" rel="noreferrer noopener nofollow">计算机视觉</a>主要是数据驱动的，因此在行为上是不确定的。此外，正如最近的全球事件所表明的那样，我们的世界在不断变化，因此CV从业者必须预期驱动其模型的真实世界数据也将不可避免地发生变化。</p>
+
+
+
+<p>因此，ML实践者已经接受了ML模型的DevOps实践，并提出了MLOps。在维基百科的术语中，<em> MLOps是将实验机器学习模型投入生产的过程</em>。[ <a href="https://web.archive.org/web/20230117104424/https://en.wikipedia.org/wiki/MLOps" target="_blank" rel="noreferrer noopener nofollow">来源</a></p>
+
+
+
+<p>Gartner将MLOps定义为<a href="https://web.archive.org/web/20230117104424/https://www.gartner.com/en/information-technology/glossary/modelops" target="_blank" rel="noreferrer noopener nofollow"> ModelOps </a>的子集。MLOps专注于ML模型的可操作性，而ModelOps涵盖所有类型的AI模型的可操作性。[ <a href="https://web.archive.org/web/20230117104424/https://www.gartner.com/document/3987104" target="_blank" rel="noreferrer noopener nofollow">来源</a></p>
+
+
+
+
+
+
+
+<p>在这篇博客中，我们主要关注的是计算机视觉中的模型运算(<em>如果你对模型运算的重要性更感兴趣，你可以看看这篇博客</em><a href="https://web.archive.org/web/20230117104424/https://www.forbes.com/sites/cognitiveworld/2020/03/31/modelops-is-the-key-to-enterprise-ai/?sh=765f135f6f5a"><em/></a><em>)</em></p>
+
+
+
+<p>MLOps和DevOps的主要区别是什么？</p>
+
+
+
+
+
+
+
+<p id="separator-block_27929e72e028e156b4ccfd29f7978a74" class="block-separator block-separator--15"> </p>
+
+
+
+<p>MLOps比DevOps要复杂一些。所有这些值得做吗？</p>
+
+
+
+<h2 id="h-why-should-you-do-mlops-and-not-just-focus-on-creating-a-better-ml-model">你为什么要做MLOps，而不仅仅是专注于创造一个更好的ML模型？</h2>
+
+
+
+<p>您可以在没有MLOps的情况下实现和训练具有良好性能和准确性的模型。然而，真正的挑战是建立一个集成的ML系统，使其在生产中持续运行。</p>
+
+
+
+<p>下图显示了真实ML系统中只有一小部分是由L代码组成的。所需的周围元素是巨大而复杂的。</p>
+
+
+
+
+
+<p>上图显示了你在CV项目中应该遵循的步骤。现在，<strong>这些步骤的自动化水平定义了CV项目的成熟度</strong>。</p>
+
+
+
+<p>什么叫成熟？让我们来看看谷歌在“<a href="https://web.archive.org/web/20230117104424/https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning#devops_versus_mlops" target="_blank" rel="noreferrer noopener nofollow"> MLOps:机器学习中的连续交付和自动化管道</a>”中简要规定的三个层次的MLOps:</p>
+
+
+
+<ol>
+<li><strong>m lops 0级</strong></li>
+</ol>
+
+
+
+<p>在这里，开发人员手动控制从收集数据到构建模型和部署模型的所有步骤。这个过程通常是通过在笔记本上编写和执行实验代码来实现的，直到产生一个可行的模型。在这个级别，一个经过训练的模型被部署为一个生产服务。</p>
+
+
+
+<ol start="2">
+<li><strong> MLOps一级</strong></li>
+</ol>
+
+
+
+<p>在级别1中，整个ML管道是自动化的。在这里，使用新数据在生产中重新训练模型的过程是自动化的。此外，为此，数据和模型验证步骤以及元数据管理需要自动化。在这一级，自动和循环运行以服务于训练模型的整个训练管道被部署为预测服务。</p>
+
+
+
+<ol start="3">
+<li><strong> MLOps二级</strong></li>
+</ol>
+
+
+
+<p>在第2级中，CI/CD管道与ML管道一起实现自动化。自动化CI/CD使您能够探索围绕功能工程或模型架构的新想法，并通过自动化管道构建、测试和部署轻松实现它们。</p>
+
+
+
+<p>现在我们知道了MLOps的重要性，让我们来详细看看您的计算机视觉项目的每个阶段和组件，以及所有相关的MLOps工具。</p>
+
+
+
+<h2 id="h-data-and-feature-management">数据和特征管理</h2>
+
+
+
+<h3>数据收集</h3>
+
+
+
+<p>以下是常见CV项目中使用的数据集列表(除了非常著名的<a href="https://web.archive.org/web/20230117104424/http://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noreferrer noopener nofollow"> CIFAR-10 </a>、<a href="https://web.archive.org/web/20230117104424/https://image-net.org/" target="_blank" rel="noreferrer noopener nofollow"> ImageNet </a>和<a href="https://web.archive.org/web/20230117104424/https://cocodataset.org/#home" target="_blank" rel="noreferrer noopener nofollow"> MS Coco </a>):</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki/" target="_blank" rel="noreferrer noopener nofollow"> IMDB-Wiki数据集</a></li>
+</ol>
+
+
+
+<p>最大的开源人脸图像数据集之一，带有性别和年龄标签。它由523051张人脸图像组成。</p>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://www.cityscapes-dataset.com/" target="_blank" rel="noreferrer noopener nofollow">城市景观数据集</a></li>
+</ol>
+
+
+
+<p>最大的数据集之一，包含在50个不同城市的街道场景中记录的一组不同的立体视频序列，除了20，000个弱注释帧之外，还有5，000个高质量注释帧。</p>
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/zalandoresearch/fashion-mnist" target="_blank" rel="noreferrer noopener nofollow">时尚MNIST </a></li>
+</ol>
+
+
+
+<p>它由60，000个训练样本和10，000个测试样本组成，每个样本都是与10个类别的标签相关联的28 X 28灰度图像。</p>
+
+
+
+<ol start="4">
+<li><a href="https://web.archive.org/web/20230117104424/https://deepmind.com/research/open-source/kinetics" target="_blank" rel="noreferrer noopener nofollow">动力学| DeepMind </a></li>
+</ol>
+
+
+
+<p>该数据集由Youtube上的6，50，000个10秒钟的视频剪辑组成，包括大约700个人类动作类，每个类中至少有600个视频剪辑。一系列以人为本的行动。</p>
+
+
+
+<ol start="5">
+<li><a href="https://web.archive.org/web/20230117104424/https://20bn.com/datasets/something-something" target="_blank" rel="noreferrer noopener nofollow">200亿左右的V2数据集| 20亿</a></li>
+</ol>
+
+
+
+<p>这个开源数据集有密集标记的视频剪辑，这些视频剪辑是人类用日常物品执行预定义的基本动作。它是为CV模型创建的，目的是为了更好地理解物理世界中发生的基本动作。包含的视频总数为220，847个，其中168，913个是训练集，24，777个是验证集，27，157个是测试集。</p>
+
+
+
+<h3><strong>数据创建</strong></h3>
+
+
+
+<p>如果您想要构建自己的数据集，以下是计算机视觉中常用的工具，它们可以帮助您创建数据集:</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/tzutalin/labelImg" target="_blank" rel="noreferrer noopener nofollow">贴标</a></li>
+</ol>
+
+
+
+<ul>
+<li>这是一个图形图像注释工具。</li>
+
+
+
+<li>用python编写，图形界面使用Qt</li>
+
+
+
+<li>注释以PASCAL VOC格式保存在XML中，<a href="https://web.archive.org/web/20230117104424/https://www.image-net.org/" target="_blank" rel="noreferrer noopener nofollow"> ImageNet </a>使用的格式。还支持YOLO和CreateML格式。</li>
+</ul>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/openvinotoolkit/cvat" target="_blank" rel="noreferrer noopener nofollow">计算机视觉标注工具</a></li>
+</ol>
+
+
+
+<ul>
+<li>这是一个免费的在线交互式视频和图像注释工具。</li>
+
+
+
+<li>具有深度学习的无服务器自动标注功能</li>
+</ul>
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/heartexlabs/label-studio" target="_blank" rel="noreferrer noopener nofollow">标签工作室</a></li>
+</ol>
+
+
+
+<ul>
+<li>这是一个开源的数据标签工具，用于图像、视频、音频等，有一个简单的用户界面。</li>
+
+
+
+<li>导出到各种模型格式</li>
+
+
+
+<li>除了创建原始数据，还可以用于改进现有数据。</li>
+</ul>
+
+
+
+<ol start="4">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/Microsoft/VoTT" target="_blank" rel="noreferrer noopener nofollow">视觉对象标记工具</a></li>
+</ol>
+
+
+
+<ul>
+<li>VoTT是一个React + Redux的Web应用，用<a href="https://web.archive.org/web/20230117104424/https://github.com/Microsoft/TypeScript" target="_blank" rel="noreferrer noopener nofollow"> TypeScript </a>编写。</li>
+
+
+
+<li>用于导入和导出数据的可扩展模型。</li>
+</ul>
+
+
+
+<h3>数据管理</h3>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://docs.neptune.ai/how-to-guides/data-versioning" target="_blank" rel="noreferrer noopener">海王星</a></li>
+</ol>
+
+
+
+<p>除了通过出色的UI很好地完成数据版本控制，Neptune还允许您<a href="https://web.archive.org/web/20230117104424/https://docs.neptune.ai/how-to-guides/data-versioning/log-image-directory-snapshots" target="_blank" rel="noreferrer noopener">记录图像目录的可视快照</a>，这对于您的计算机视觉项目非常有帮助。</p>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://dvc.org/" target="_blank" rel="noreferrer noopener nofollow">数据版本控制DVC </a></li>
+</ol>
+
+
+
+<p>旨在处理大型文件和数据集以及机器学习模型和指标。</p>
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://roboflow.com/" target="_blank" rel="noreferrer noopener nofollow"> Roboflow </a></li>
+</ol>
+
+
+
+<p>凭借无限制导出、通用主机、标签和注释工具等功能，Roboflow非常适合您的计算机视觉项目。</p>
+
+
+
+<ol start="4">
+<li><a href="https://web.archive.org/web/20230117104424/https://www.dataiku.com/" target="_blank" rel="noreferrer noopener nofollow">大台库</a></li>
+</ol>
+
+
+
+<p>Dataiku是为那些喜欢使用代码而不是可视化工具来操作、转换和建模数据的人准备的。</p>
+
+
+
+<h3>数据验证</h3>
+
+
+
+<p>要检查图像或视频数据的质量保证，以下是一些工具:</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://scale.com/" target="_blank" rel="noreferrer noopener nofollow">鳞核</a></li>
+</ol>
+
+
+
+
+
+<p>Scale通过帮助计算机视觉团队生成高质量的地面真实数据，加速了AI应用的开发。他们先进的激光雷达、视频和图像注释API允许自动驾驶、无人机和机器人团队专注于构建差异化的模型，而不是标记数据。它为所有人工智能应用程序提供高质量的培训和验证数据的付费服务，包括按需客户和企业客户。</p>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/great-expectations/great_expectations" target="_blank" rel="noreferrer noopener nofollow">远大_期望</a></li>
+</ol>
+
+
+
+
+
+<p>Great Expectations是开源的，通过数据测试、文档和概要分析，帮助数据团队消除管道债务。</p>
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://www.soda.io/" target="_blank" rel="noreferrer noopener nofollow">汽水数据可观察性</a></li>
+</ol>
+
+
+
+<p>它为您所有数据的端到端可观察性和控制提供付费服务。它的一些特性包括监控、测试和检查数据的适用性。</p>
+
+
+
+<h3>数据处理</h3>
+
+
+
+<p>数据处理和数据管道非常重要。有三个关键要素:</p>
+
+
+
+<ul>
+<li>一个来源，</li>
+
+
+
+<li>处理步骤，</li>
+
+
+
+<li>这是一个可以提供给模型使用的名称。</li>
+</ul>
+
+
+
+<p>数据管道架构需要考虑很多因素。要了解更多关于数据管道及其架构的信息，请阅读本文。</p>
+
+
+
+<p>以下是您应该考虑用于数据处理和数据管道的一些工具:</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://storm.apache.org/" target="_blank" rel="noreferrer noopener nofollow">阿帕奇风暴</a></li>
+</ol>
+
+
+
+<p>这个由Twitter构建的开源数据编排器以可靠的方式对无界数据流进行批处理。它消耗数据流，并以任意复杂的方式处理这些数据流，在每个计算阶段之间重新划分数据流。</p>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://dagster.io/" target="_blank" rel="noreferrer noopener nofollow">天星</a></li>
+</ol>
+
+
+
+<p>用于机器学习、分析和ETL(提取、转换、加载)的数据编排器。它允许您根据称为实体的逻辑组件之间的数据流来定义管道。这些管道都是在本地建设的，可以在任何地方运行。</p>
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://spark.apache.org/docs/latest/" target="_blank" rel="noreferrer noopener nofollow">阿帕奇火花</a></li>
+</ol>
+
+
+
+<p>这种开源且灵活的内存框架可作为map-reduce的替代方案，用于处理批处理、实时分析和数据处理工作负载。</p>
+
+
+
+<h3>专题报道</h3>
+
+
+
+<p>开发一个ML管道不同于开发软件，主要是从数据的角度。数据或特性的质量与代码的质量一样重要。多亏了特征库，我们可以重用特征，而不是为不同的模型重新构建它们。这种自动化是MLOps的重要组成部分。</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/quintoandar/butterfree" target="_blank" rel="noreferrer noopener nofollow">无黄油的</a></li>
+</ol>
+
+
+
+<p>该特征库构建库以下列概念为中心:</p>
+
+
+
+<ul>
+<li>ETL:创建数据管道的中心框架。基于Spark的提取、转换和加载模块随时可用。</li>
+
+
+
+<li><strong>声明式特征工程:</strong>关心你要计算什么，而不是如何编码。</li>
+
+
+
+<li><strong>特征库建模</strong>:该库轻松提供您处理和加载数据到特征库所需的一切。</li>
+</ul>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://feast.dev/" target="_blank" rel="noreferrer noopener nofollow">盛宴</a></li>
+</ol>
+
+
+
+<p>这个开源、易于使用的特征库是将分析数据用于模型训练的最快途径。主要特点是:</p>
+
+
+
+<ul>
+<li>它调用您的离线数据，以便可以进行实时预测，而无需自定义管道。</li>
+
+
+
+<li>通过保证在训练和推理过程中输入相同的数据，它消除了训练服务偏差。</li>
+
+
+
+<li>它重用现有的基础设施，并在需要时旋转新的资源，因为它运行在云管理的服务之上。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/a46d2ca6176dbb6e22d889cfe3ec7c1c.png" alt="Computer vision tools - Feast" class="wp-image-46946" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-Feast.png?resize=767%2C367&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Workflow with Feast [<a href="https://web.archive.org/web/20230117104424/https://feast.dev/" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://aws.amazon.com/sagemaker/" target="_blank" rel="noreferrer noopener nofollow"> SageMaker </a></li>
+</ol>
+
+
+
+<p>Amazon SageMaker功能商店是一个专门构建的存储库，您可以在其中存储和访问功能，因此在团队之间命名、组织和重用功能更加容易，无需编写额外的代码或创建手动流程来保持功能的一致性。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/d2d297249bf73ef039ea06a7759fed19.png" alt="Computer vision tools - SageMaker" class="wp-image-46947" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-SageMaker.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Other features of Amazon SageMaker [<a href="https://web.archive.org/web/20230117104424/https://www.domo.com/domopalooza/resources/amazon-sagemaker-adoption" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="4">
+<li><a href="https://web.archive.org/web/20230117104424/https://www.bytehub.ai/" target="_blank" rel="noreferrer noopener nofollow">字节跳动</a></li>
+</ol>
+
+
+
+<p>存储时间序列数据的另一个显著特征。这个开源、方便、基于Python的功能库提供了:</p>
+
+
+
+<ul>
+<li>类似熊猫的数据和功能界面，</li>
+
+
+
+<li>每个特征的时间序列，</li>
+
+
+
+<li>用于元数据存储的数据库，</li>
+
+
+
+<li>每个名称空间的数据存储位置，</li>
+
+
+
+<li>与Jupyter笔记本等流行工具兼容。</li>
+</ul>
+
+
+
+
+
+
+
+<h2 id="h-model-development">模型开发</h2>
+
+
+
+<h3>模型注册表</h3>
+
+
+
+<p>构建ML模型的核心思想是不断改进模型，这就是为什么MLOps增加了另一个关键的连续性支柱，称为持续培训(除了持续集成和持续发展)。模型注册中心通过维护模型血统、源代码版本和注释来帮助您完成这项任务。以下是您可以用来存储这些信息的一些工具及其主要功能，以帮助您进行选择:</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://www.mlflow.org/docs/latest/model-registry.html" target="_blank" rel="noreferrer noopener nofollow"> MLflow </a></li>
+</ol>
+
+
+
+<ul>
+<li>与团队分享ML模型。</li>
+
+
+
+<li>从实验、在线测试、生产等等一起工作。</li>
+
+
+
+<li>与批准和治理工作流集成。</li>
+
+
+
+<li>监控ML部署及其性能。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/565cf026b7c4a9d0109e7bb81bc63945.png" alt="Computer vision tools - MLflow" class="wp-image-46948" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-MLflow.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: MLflow workflow. [<a href="https://web.archive.org/web/20230117104424/https://image.slidesharecdn.com/summiteu19mateizahariacoreyzumar-191203175325/95/simplifying-model-management-with-mlflow-18-638.jpg?cb=1575396658" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="2">
+<li><a href="/web/20230117104424/https://neptune.ai/" target="_blank" rel="noreferrer noopener">海王星. ai </a></li>
+</ol>
+
+
+
+<ul>
+<li>使用软件即服务，无需在硬件上部署。</li>
+
+
+
+<li>与所有工作流程轻松集成。</li>
+
+
+
+<li>笔记本版本和差异。</li>
+</ul>
+
+
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html" target="_blank" rel="noreferrer noopener nofollow"> SageMaker模型注册表</a></li>
+</ol>
+
+
+
+<ul>
+<li>生产的目录模型。</li>
+
+
+
+<li>将元数据(如培训指标)与模型相关联。</li>
+
+
+
+<li>管理模型版本和模型的批准状态。</li>
+
+
+
+<li>使用CI/CD自动进行模型部署。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/f23f444e78c43b5ecfbed92e5e8dd6c8.png" alt="Computer vision tools - SageMaker" class="wp-image-46949" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-SageMaker-2.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: CI/CD pipeline of SageMaker showcasing the importance of model registry. [<a href="https://web.archive.org/web/20230117104424/https://twitter.com/rzembo/status/1333927711799189506" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<h3>模特培训</h3>
+
+
+
+<p>在不了解OpenCV和T2 Scikit-learn的情况下，人们不会开始一个计算机视觉项目。模型建造中的一些火炬手是<a href="https://web.archive.org/web/20230117104424/https://www.tensorflow.org/" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow </a>、<a href="https://web.archive.org/web/20230117104424/https://pytorch.org/" target="_blank" rel="noreferrer noopener nofollow"> PyTorch </a>和<a href="https://web.archive.org/web/20230117104424/https://keras.io/" target="_blank" rel="noreferrer noopener nofollow"> Keras </a>。您可以根据项目或您的兼容性选择其中的任何一个。如果你在为你的计算机视觉项目选择合适的框架方面有困难，请看看这个<a href="https://web.archive.org/web/20230117104424/https://www.simplilearn.com/keras-vs-tensorflow-vs-pytorch-article" target="_blank" rel="noreferrer noopener nofollow">博客</a>。</p>
+
+
+
+<p>如果您对构建自己的模型或微调流行模型不感兴趣，这里有一些带有预训练模型的计算机视觉平台，您可能会觉得有用:</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://cloud.google.com/vision" target="_blank" rel="noreferrer noopener nofollow">视觉人工智能</a></li>
+</ol>
+
+
+
+<ul>
+<li>Google Cloud的Vision API通过REST和RPC APIs提供了强大的预训练机器学习模型。</li>
+
+
+
+<li>为图像分配标签，并快速将它们分类到数百万个预定义的类别中。</li>
+
+
+
+<li>检测物体和人脸，阅读印刷和手写文本，并将有价值的元数据构建到您的图像目录中。</li>
+</ul>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/facebookresearch/dino" target="_blank" rel="noreferrer noopener nofollow">迪诺</a></li>
+</ol>
+
+
+
+<ul>
+<li>PyTorch实现和自我监督<a href="https://web.archive.org/web/20230117104424/https://ai.facebook.com/blog/dino-paws-computer-vision-with-self-supervised-transformers-and-10x-more-efficient-training" target="_blank" rel="noreferrer noopener nofollow">视觉变压器</a>的预训练模型。</li>
+
+
+
+<li>该模型可以发现和分割图像或视频中的对象，完全没有监督，也没有给定分割目标。</li>
+
+
+
+<li>特征很容易解释，表明这类模型能够更好地理解图像</li>
+</ul>
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://aws.amazon.com/rekognition/" target="_blank" rel="noreferrer noopener nofollow">亚马逊索赔</a></li>
+</ol>
+
+
+
+<ul>
+<li>识别图像和视频中的对象、人物、文本、场景和活动，以及检测任何不适当的内容</li>
+
+
+
+<li>提供基于亚马逊收集的数据的算法</li>
+
+
+
+<li>您可以构建可在自定义数据集上训练的算法。</li>
+</ul>
+
+
+
+<h3>元数据管理</h3>
+
+
+
+<p>当您的ML管道的每个组件做出决定时，它会传递给下一个组件。元数据存储、存储和检索这些决策、使用的超参数以及在不同步骤使用的数据。以下是一些可以用作元数据存储的库:</p>
+
+
+
+<ol>
+<li><a href="/web/20230117104424/https://neptune.ai/" target="_blank" rel="noreferrer noopener">海王星. ai </a></li>
+</ol>
+
+
+
+<p>Neptune支持许多不同类型的模型构建元数据的日志和显示，比如度量和损失、参数和模型权重等等。你可以看看他们的<a href="https://web.archive.org/web/20230117104424/https://colab.research.google.com//github/neptune-ai/neptune-colab-examples/blob/master/product-tours/how-it-works/showcase/Neptune-API-Tour.ipynb" target="_blank" rel="noreferrer noopener">现场笔记本</a>了解更多。</p>
+
+
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://www.siasearch.io/" target="_blank" rel="noreferrer noopener nofollow"> SiaSearch </a></li>
+</ol>
+
+
+
+<p>SiaSearch是一个基于元数据高效探索视觉数据的平台。它简化了数据识别和困难搜索，有助于提高效率。它的一些特点是:</p>
+
+
+
+<ul>
+<li>通过自动创建自定义间隔属性来结构化数据。</li>
+
+
+
+<li>使用自定义属性进行查询，查找罕见的边缘案例，并整理新的训练数据。</li>
+
+
+
+<li>轻松保存、编辑、版本化、注释和与同事共享帧序列。</li>
+
+
+
+<li>使用自定义属性可视化数据并分析模型性能。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/74822870d637070538814875b554c786.png" alt="Computer vision tools - SiaSearch" class="wp-image-46950" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-SiaSearch.png?resize=500%2C374&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Features of SiaSearch. [<a href="https://web.archive.org/web/20230117104424/https://www.siasearch.io/" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://www.tensorflow.org/tfx/guide/mlmd" target="_blank" rel="noreferrer noopener nofollow"> Tensorflow的ML元数据</a></li>
+</ol>
+
+
+
+<p>MLMD在其数据库中登记了以下类型的元数据:</p>
+
+
+
+<ul>
+<li>在您的ML管道的各个步骤中生成的工件。</li>
+
+
+
+<li>关于这些组件执行的元数据。</li>
+
+
+
+<li>血统信息。</li>
+</ul>
+
+
+
+<h3>超参数调谐</h3>
+
+
+
+<p>超参数调整为您提供了ML模型的最佳版本。如果你想知道关于超参数的重要性以及优化它们的不同方法，看看Tanay Agrawal 的这本书。以下是可用于超参数调整的工具的简要列表:</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/hyperopt/hyperopt/wiki/FMin" target="_blank" rel="noreferrer noopener nofollow">远视</a></li>
+</ol>
+
+
+
+<p>Hyperopt让用户描述搜索空间。通过提供更多关于你的函数在哪里定义的信息，以及你认为最好的值在哪里，你允许Hyperopt中的算法更有效地搜索。</p>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://ml.dask.org/hyper-parameter-search.html" target="_blank" rel="noreferrer noopener nofollow"> Dask </a></li>
+</ol>
+
+
+
+<p>Dask-ML类为超参数优化中最常见的两个问题提供了解决方案:</p>
+
+
+
+<ul>
+<li>当超参数搜索受到存储器限制时，</li>
+
+
+
+<li>或者当搜索受到计算限制时。</li>
+</ul>
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://optuna.org/" target="_blank" rel="noreferrer noopener nofollow"> Optuna </a></li>
+</ol>
+
+
+
+<p>这种高度模块化的超参数优化框架允许用户动态构建搜索空间。Optuna的一些主要特点是:</p>
+
+
+
+<ul>
+<li>轻量级架构，</li>
+
+
+
+<li>Pythonic搜索空间，</li>
+
+
+
+<li>易于并行化。</li>
+</ul>
+
+
+
+<h3>版本控制</h3>
+
+
+
+<p>版本控制，也称为源代码控制，跟踪和管理源代码的更改。它使团队能够工作并为相同的代码做出贡献。目前，<a href="https://web.archive.org/web/20230117104424/https://github.com/" target="_blank" rel="noreferrer noopener nofollow"> GitHub </a>和<a href="https://web.archive.org/web/20230117104424/https://about.gitlab.com/" target="_blank" rel="noreferrer noopener nofollow"> GitLab </a>是版本控制事实上的标准。在使用大量数据进行计算机视觉项目时，您可能会遇到Git的问题，因为它只是为了版本化应用程序代码而设计的，而不是为了存储大量数据，也不支持ML管道。<a href="https://web.archive.org/web/20230117104424/https://dvc.org/" target="_blank" rel="noreferrer noopener nofollow"> DVC </a>解决了这个问题，也致力于应用程序代码版本化。如果你觉得DVC在这件事上太死板，有更好的用户界面和更多的功能，比如可以随时看到团队的进展，那么使用<a href="/web/20230117104424/https://neptune.ai/" target="_blank" rel="noreferrer noopener"> Neptune </a>可以证明是一个很大的优势。</p>
+
+
+
+<p>看看<a href="/web/20230117104424/https://neptune.ai/vs/dvc" target="_blank" rel="noreferrer noopener"> Neptune与数据版本控制</a>相比如何</p>
+
+
+
+<h2 id="h-operationalization">操作化</h2>
+
+
+
+<h3>模型服务</h3>
+
+
+
+<p>模型服务通常是ML模型管道的最后一步。创建CV模型后，您必须决定在哪里部署您的模型，也就是说，您将使用哪个平台来服务您的模型？您可以选择本地服务器，但这可能会变得非常昂贵，并且难以大规模管理。以下是模型服务的一些工具:</p>
+
+
+
+<ol>
+<li>膨润土</li>
+</ol>
+
+
+
+<p>服务、管理和部署机器学习模型的框架。BentoML的一些关键特性包括:</p>
+
+
+
+<ul>
+<li>支持多种ML框架，如PyTorch、Tensorflow和<a href="https://web.archive.org/web/20230117104424/https://github.com/bentoml/BentoML#ml-frameworks" target="_blank" rel="noreferrer noopener nofollow">等等</a>。</li>
+
+
+
+<li>使用Docker、Kubernetes、OpenShift等进行生产部署的容器化模型服务器。</li>
+
+
+
+<li>最佳在线服务性能的自适应微批处理。</li>
+</ul>
+
+
+
+<p>阅读<a href="https://web.archive.org/web/20230117104424/https://docs.bentoml.org/en/latest/quickstart.html" target="_blank" rel="noreferrer noopener nofollow">快速入门指南</a>了解更多关于BentoML的基本功能。你也可以在Google Colab 上试试<a href="https://web.archive.org/web/20230117104424/https://colab.research.google.com/github/bentoml/BentoML/blob/master/guides/quick-start/bentoml-quick-start-guide.ipynb" target="_blank" rel="noreferrer noopener nofollow">。</a></p>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://www.tensorflow.org/tfx/guide/serving" target="_blank" rel="noreferrer noopener nofollow">张量流发球</a></li>
+</ol>
+
+
+
+<p>为生产环境设计的机器学习模型的灵活系统。一些关键特征是:</p>
+
+
+
+<ul>
+<li>允许在不更改代码的情况下部署新的模型版本。</li>
+
+
+
+<li>支持许多servables。</li>
+
+
+
+<li>可服务的大小和粒度是灵活的。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/6909a86b13adc556dc520060f65719e2.png" alt="Computer vision tools - TF Serving" class="wp-image-46951" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-TF-Serving.png?resize=768%2C428&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Serve models in production with TensorFlow Serving [<a href="https://web.archive.org/web/20230117104424/https://twitter.com/tensorflow/status/832008382408126464" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/SeldonIO/seldon-core" target="_blank" rel="noreferrer noopener nofollow">谢顿</a></li>
+</ol>
+
+
+
+<p>它专注于解决任何机器学习项目中的最后一步，以帮助公司将模型投入生产，解决现实世界的问题，并实现投资回报的最大化。</p>
+
+
+
+<ul>
+<li>为基于任何开源或商业模型构建格式构建的模型提供服务。</li>
+
+
+
+<li>它可以处理成千上万的生产机器学习模型。</li>
+
+
+
+<li>使用预先打包的推理服务器、定制服务器或语言包装器，提供一种简单的方法来容器化定制ML模型。</li>
+</ul>
+
+
+
+<h3>CI/CD/CT</h3>
+
+
+
+<p>与软件应用程序不同，ML中的训练数据起着至关重要的作用。没有训练就不能测试模型的有效性。这就是为什么通常的CI/CD过程在ML开发中通过增加持续培训而得到增强。这里是我能找到的在你的机器学习管道中实现CI/CD的一些最好的库:</p>
+
+
+
+
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://cml.dev/" target="_blank" rel="noreferrer noopener nofollow"> CML </a></li>
+</ol>
+
+
+
+<p>CML可用于自动化部分开发工作流程，包括模型训练和评估、跨项目历史比较ML实验，以及监控数据集。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/9bbba903e3524e32b96aa725ce81e7af.png" alt="Computer vision tools - CML" class="wp-image-46952" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-CML.png?resize=768%2C725&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Fig: on every pull request, CML helps you automatically train and evaluate models, then generates a visual report with results and metrics, like the report above [<a href="https://web.archive.org/web/20230117104424/https://github.com/iterative/cml" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="2">
+<li>循环</li>
+</ol>
+
+
+
+<p>CircleCI可以配置为使用复杂的缓存、docker层缓存、用于在更快的机器上运行的资源类以及性能定价来高效地运行复杂的管道。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/1a886409b645674f2dbbc42524c8423f.png" alt="Computer vision tools - CircleCI" class="wp-image-46953" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-CircleCI.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Overview of CircleCI [<a href="https://web.archive.org/web/20230117104424/https://circleci.com/docs/2.0/about-circleci/" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://docs.travis-ci.com/" target="_blank" rel="noreferrer noopener nofollow">特拉维斯CI </a></li>
+</ol>
+
+
+
+<p>Travis CI是一个托管的持续集成服务，用于构建和测试项目。它在您的硬件上提供专有版本的定制部署。</p>
+
+
+
+
+
+<h2 id="h-monitoring">监视</h2>
+
+
+
+<p>模型监控允许您在生产中不断调整和改进您的模型。在高度发展的MLOps工作流中，这应该是一个活动的过程。监控有三个方面:</p>
+
+
+
+<ul>
+<li><strong>技术/系统监控检查</strong>模型基础设施是否得到正确服务。</li>
+
+
+
+<li><strong>模型监控</strong>不断验证预测的准确性。</li>
+
+
+
+<li><strong>业务绩效监控</strong>归结于模型是否对业务有帮助。监控版本变化的影响是必要的。</li>
+</ul>
+
+
+
+<p>我将分享四个你可以用来监控生产的工具。如果您正在寻找更广泛的ML监控工具列表，请访问<a href="/web/20230117104424/https://neptune.ai/blog/ml-model-monitoring-best-tools" target="_blank" rel="noreferrer noopener nofollow">本文</a>。</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://neptune.ai/" target="_blank" rel="noreferrer noopener">海王星</a></li>
+</ol>
+
+
+
+<p>这是监控你的模型的最轻便的工具之一。它可以版本化、存储、组织和查询模型，以及模型开发元数据。以下是使其独一无二的一些特征:</p>
+
+
+
+<ul>
+<li>它通过在仪表板中过滤、排序和分组模型训练运行，帮助您更好地组织您的工作。</li>
+
+
+
+<li>它帮助您<strong>比较表格</strong>中的指标和参数，自动发现运行和异常之间的变化。</li>
+
+
+
+<li>整个<strong>团队可以跟踪在脚本中执行的实验</strong>，并在任何基础设施(云、笔记本电脑、集群)上执行。</li>
+</ul>
+
+
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://www.fiddler.ai/" target="_blank" rel="noreferrer noopener">提琴手</a></li>
+</ol>
+
+
+
+<p>Fiddler帮助您监控模型性能，解释和调试模型预测，分析整个数据和切片的模型行为，大规模部署机器学习模型，以及管理您的机器学习模型和数据集。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/a7834dacfd4895c134dcc97f422510e9.png" alt="Computer vision tools - Fiddler" class="wp-image-46956" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-Fiddler.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Features fiddler helps with monitoring [<a href="https://web.archive.org/web/20230117104424/https://www.fiddler.ai/ml-monitoring" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/evidentlyai/evidently" target="_blank" rel="noreferrer noopener nofollow">显然</a></li>
+</ol>
+
+
+
+<p>显然有助于在生产中分析机器学习模型或进行验证。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/e8babb7d114cf68eafb3dee16ea21e65.png" alt="Computer vision tools - Evidently" class="wp-image-46957" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-Evidently.png?resize=768%2C412&amp;ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Example of an interactive report generated by evidently to help analyze, monitor, and debug [<a href="https://web.archive.org/web/20230117104424/https://github.com/evidentlyai/evidently" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="4">
+<li><a href="https://web.archive.org/web/20230117104424/https://aws.amazon.com/sagemaker/model-monitor/" target="_blank" rel="noreferrer noopener nofollow">亚马逊SageMaker模型监视器</a></li>
+</ol>
+
+
+
+<p>SageMaker中的一个工具，通过自动检测和警告生产中部署的模型的不准确预测，帮助您维护高质量的机器学习模型。</p>
+
+
+
+
+
+<h2 id="h-automation">自动化</h2>
+
+
+
+<p>到目前为止，我已经讨论了可以用于ML管道的一个或几个组件的库和工具。但是，如果您热衷于从收集和管理数据到在生产中部署和监控数据的整个流程的自动化，也有工具可以做到这一点！</p>
+
+
+
+<p>我们将研究两种类型的自动化及其相关工具:</p>
+
+
+
+<h3>AutoML</h3>
+
+
+
+<p>各种AutoML框架自动化了机器学习生命周期的各个步骤。我管理的列表是将用户从算法选择和超参数调整中解放出来的工具，并构建一个准备部署的模型。</p>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://azure.microsoft.com/en-in/services/cognitive-services/custom-vision-service/" target="_blank" rel="noreferrer noopener nofollow">自定义视觉</a></li>
+</ol>
+
+
+
+<p>这是一个将计算机视觉应用于特定场景的端到端平台。</p>
+
+
+
+<ul>
+<li>为特定领域定制和嵌入最先进的计算机视觉图像分析。</li>
+
+
+
+<li>在云中或容器边缘运行自定义视觉。</li>
+
+
+
+<li>依靠企业级安全性和隐私保护您的数据和任何训练有素的模型。</li>
+</ul>
+
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://cloud.google.com/vision/automl/docs" target="_blank" rel="noreferrer noopener nofollow">自动视觉</a></li>
+</ol>
+
+
+
+<p><strong> AutoML Vision </strong>使您能够训练机器学习模型，根据您自己定义的标签对您的图像进行分类。</p>
+
+
+
+<ul>
+<li>从标记的图像中训练模型并评估它们的性能。</li>
+
+
+
+<li>对带有未标记图像的数据集利用人工标记服务。</li>
+
+
+
+<li>注册通过AutoML API提供服务的训练模型。</li>
+</ul>
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/http://epistasislab.github.io/tpot/" target="_blank" rel="noreferrer noopener nofollow"> TPOT </a></li>
+</ol>
+
+
+
+<p>TPOT是一个基于树的管道优化工具，它使用遗传算法来优化机器学习管道。</p>
+
+
+
+<ul>
+<li>它建立在scikit-learn之上，使用它的回归器和分类器方法。</li>
+
+
+
+<li>它需要一个干净的数据集。</li>
+
+
+
+<li>它进行特征处理、模型选择和超参数优化，以返回性能最佳的模型。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/8d07e834dfa1615cc0c846464cb21650.png" alt="Computer vision tools - TPOT" class="wp-image-46959" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-TPOT.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: an example machine learning pipeline devised by TPOT [<a href="https://web.archive.org/web/20230117104424/https://epistasislab.github.io/tpot/" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="4">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/automl/auto-sklearn" target="_blank" rel="noreferrer noopener nofollow">自动sklearn </a></li>
+</ol>
+
+
+
+<p>Auto-sklearn是一个自动化的机器学习工具包。它是scikit-learn估计器的替代产品。需要记住的一些事情是:</p>
+
+
+
+<ul>
+<li>它使用简单，代码最少。<a href="https://web.archive.org/web/20230117104424/https://automl.github.io/auto-sklearn/master/#example" target="_blank" rel="noreferrer noopener nofollow">举例</a>。</li>
+
+
+
+<li>Auto-sklearn库适用于中小型数据集，不适用于大型数据集。</li>
+
+
+
+<li>它没有训练先进的深度学习模型，这些模型可能在大型数据集上表现良好。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/aadce7ec5613e1e9800b92f2f6576351.png" alt="Computer vision tools - auto sklearn" class="wp-image-46960" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-auto-sklearn.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Auto-sklearn pipeline [<a href="https://web.archive.org/web/20230117104424/https://link.springer.com/chapter/10.1007/978-3-030-05318-5_6" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+
+
+
+
+<ol start="5">
+<li><a href="https://web.archive.org/web/20230117104424/https://mlbox.readthedocs.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow"> MLBox </a></li>
+</ol>
+
+
+
+<p>MLBox是一个强大的自动化机器学习Python库。它的一些功能包括:</p>
+
+
+
+<ul>
+<li>快速阅读和分布式数据预处理。</li>
+
+
+
+<li>稳健的特征选择和泄漏检测。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/642c6beba208e75e7c76580424a15f77.png" alt="Computer vision tools - MLbox" class="wp-image-46961" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-MLbox.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: representation of how MLBox works [<a href="https://web.archive.org/web/20230117104424/https://medium.datadriveninvestor.com/automl-in-python-an-overview-of-the-mlbox-package-208118a7fe5" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<h3>MLOps自动化</h3>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20230117104424/https://algorithmia.com/" target="_blank" rel="noreferrer noopener nofollow"> Algorithmia </a></li>
+</ol>
+
+
+
+<p>Algorithmia是一个基于企业的MLOps平台，可加速您的研究并快速、安全且经济高效地交付模型。</p>
+
+
+
+<ul>
+<li>您可以安全地部署、服务、管理和监控您的所有机器学习工作负载。</li>
+
+
+
+<li>它使用自动化机器学习管道进行版本控制、自动化、日志记录、审计和容器化。您可以轻松访问KPI、性能指标和监控数据。</li>
+
+
+
+<li>它的功能将向您清楚地展示风险、合规性、成本和性能。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/6578c53b7eeac3974a385a8992561b75.png" alt="Computer vision tools - Algorithmia" class="wp-image-46962" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-Algorithmia.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: How Algorithmia operates [<a href="https://web.archive.org/web/20230117104424/https://algorithmia.com/product" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="2">
+<li><a href="https://web.archive.org/web/20230117104424/https://github.com/kubeflow/kubeflow" target="_blank" rel="noreferrer noopener nofollow"> Kubeflow </a></li>
+</ol>
+
+
+
+<p>Kubeflow是一个开源和免费的机器学习Kubernetes-native平台，用于开发、编排、部署和运行可扩展和可移植的机器学习工作负载。</p>
+
+
+
+
+
+<ol start="3">
+<li><a href="https://web.archive.org/web/20230117104424/https://azure.microsoft.com/en-in/services/machine-learning/" target="_blank" rel="noreferrer noopener nofollow"> Azure机器学习</a></li>
+</ol>
+
+
+
+<p>Azure ML是一个基于云的平台，可以用来训练、部署、自动化、管理和监控你所有的机器学习实验。它有自己强大的开源平台<a href="https://web.archive.org/web/20230117104424/https://github.com/microsoft/MLOps" target="_blank" rel="noreferrer noopener nofollow"> MLOps平台</a>，简化了ML的创建和部署。要了解更多，请访问Azure的<a href="https://web.archive.org/web/20230117104424/https://docs.microsoft.com/en-in/azure/machine-learning/" target="_blank" rel="noreferrer noopener nofollow">文档</a>。</p>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/f697694171107fa671389442ac92c883.png" alt="Computer vision tools - Azure ML" class="wp-image-45455" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/MLOps-platforms-azure.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Features of Azure Machine Learning [<a href="https://web.archive.org/web/20230117104424/https://docs.microsoft.com/en-in/azure/machine-learning/" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<ol start="4">
+<li><a href="https://web.archive.org/web/20230117104424/https://gradient.paperspace.com/" target="_blank" rel="noreferrer noopener nofollow">坡度</a></li>
+</ol>
+
+
+
+<p>Gradient为模型开发、协作和部署提供了轻量级的软件和基础设施。gradient提供的一些服务包括:</p>
+
+
+
+<ul>
+<li>自动化版本控制、标签和生命周期管理的全面<strong>再现性</strong>。</li>
+
+
+
+<li><strong>自动化流水线</strong>:梯度作为机器学习的CI/CD。</li>
+
+
+
+<li><strong>即时可扩展性</strong>:并行训练，轻松扩展部署的模型。</li>
+</ul>
+
+
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img decoding="async" src="../Images/0d1bbb05dc879fcb71f49f00b6506765.png" alt="Computer vision tools - Gradient" class="wp-image-46964" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230117104424im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Computer-vision-tools-Gradient.png?ssl=1"/><figcaption class="wp-element-caption"><em>Fig: Workflow of Gradient [<a href="https://web.archive.org/web/20230117104424/https://blog.paperspace.com/paperspace-gradient-vs-amazon-sagemaker/" target="_blank" rel="noreferrer noopener nofollow">Source</a>]</em></figcaption></figure></div>
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>总之，在生产中实现您的计算机视觉项目并不意味着只将模型作为API部署到生产中。</p>
+
+
+
+<p>相反，它意味着部署一个ML管道，这个管道在不同的阶段是自动化的，并且有助于更快地改进您的模型。设置CI/CD系统使您能够自动测试和部署新的管道实现。</p>
+
+
+
+<p>该系统将帮助您应对数据和业务的快速变化。这并不意味着你会立即将所有的过程从一个层次转移到另一个层次。不要操之过急！您应该逐步实施这些实践来帮助提高您的ML系统开发和生产的自动化。</p>
+
+
+
+<h2 id="h-resources">资源</h2>
+
+
+
+<h3>文章</h3>
+
+
+
+
+
+
+
+<h3>书</h3>
+
+
+
+
+
+
+
+<h3>录像</h3>
+
+
+
+
+
+
+
+<h3>松弛的</h3>
+
+
+
+
+
+
+
+<h3>网站</h3>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

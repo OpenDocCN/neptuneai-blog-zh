@@ -1,0 +1,768 @@
+<html>
+<head>
+<title>Moving From TensorFlow To PyTorch </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>从TensorFlow迁移到PyTorch</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/moving-from-tensorflow-to-pytorch#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/moving-from-tensorflow-to-pytorch#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p><a href="/web/20230131065431/https://neptune.ai/blog/best-mlops-tools" target="_blank" rel="noreferrer noopener">深度学习框架、库和众多工具的概念</a>的存在是为了减少否则必须计算的大量手动计算。TensorFlow和PyTorch是目前构造神经网络架构最流行的两种框架。</p>
+
+
+
+<p>虽然TensorFlow比PyTorch早一年发布，但最近大多数开发人员都倾向于转向PyTorch。在本文中，我们将探讨如何从TensorFlow切换到PyTorch的大部分细节。我们将首先理解使用这两种深度学习框架的原因。</p>
+
+
+
+<p>然后，我们将更深入地研究这些库的安装过程以及成功过渡的实践方法。我们还将研究PyTorch库在MNIST的执行情况，并最终理解PyTorch在所有情况下是否都是最好的。</p>
+
+
+
+<h2 id="h-introduction-to-both-deep-learning-frameworks">两种深度学习框架简介</h2>
+
+
+
+<p>在文章的这一部分，我们将简要概述这两个深度学习框架，即<a href="https://web.archive.org/web/20230131065431/https://towardsdatascience.com/pytorch-vs-tensorflow-2021-d403504d7bc3" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow和PyTorch </a>。我们还将尝试理解为什么人们会从TensorFlow过渡到PyTorch，并给出一些实际的解释，然后再用更实际的方法来解决这个问题。</p>
+
+
+
+<h3>TensorFlow</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20230131065431/https://www.tensorflow.org/" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow </a>是谷歌在2015年推出的用于开发神经网络的深度学习框架的较老解释之一。谷歌大脑团队的产品总是最值得信赖的方法之一，用于开始任何类型的复杂任务。</p>
+
+
+
+<p>TensorFlow是一个开源库，使用它可以开发和构建大多数机器学习和人工智能模型。TensorFlow 2.0的更新版本也集成了Keras，是相应地培训、开发、操作和运行机器学习模型的一个很好的选择。</p>
+
+
+
+
+
+<h3>PyTorch</h3>
+
+
+
+<p>PyTorch 由脸书人工智能研究(FAIR)团队于2016年9月开发。它已经获得了很多关注，尤其是最近，大多数数据科学家和研究人员都试图从TensorFlow成功过渡到PyTorch。它与Python编程语言无缝集成，大多数开发人员发现使用它非常自然。</p>
+
+
+
+<p>PyTorch可以被认为是一个平台，在这个平台上，你可以与张量(类似于NumPy这样的库，我们使用数组)一起使用GPU加速来计算深度学习模型。在PyTorch的帮助下，您还能够获得动态图表，使用这些图表您可以动态地分析您的模型的工作方法。</p>
+
+
+
+
+
+<h2 id="h-why-are-people-moving-from-tensorflow-to-pytorch">为什么人们要从TensorFlow迁移到PyTorch？</h2>
+
+
+
+<p>虽然TensorFlow似乎是您的军火库中用于大多数深度学习任务的一个很好的工具，但大多数人现在更喜欢从TensorFlow切换到PyTorch。让我们讨论一下从一个深度学习框架过渡到另一个框架的一些主要原因。</p>
+
+
+
+<ul>
+<li>Tensorflow创建静态图，而PyTorch创建动态图。在TensorFlow中，机器学习模型的大多数计算图都应该完全从头开始定义</li>
+</ul>
+
+
+
+<ul>
+<li>在PyTorch中，您可以定义、操作和适应特定的工作图，这在像RNNs中的可变长度输入这样的场景中特别有用。</li>
+</ul>
+
+
+
+<ul>
+<li>使用PyTorch处理模型更加直观，因为它主要是用Python开发的，并且它与Python编程语言的自然工作方式无缝结合。</li>
+</ul>
+
+
+
+<ul>
+<li>另一方面，TensorFlow的学习曲线很陡，大多数用户乍一看会觉得很难掌握。即使当你学习张量流时，一些概念也需要重新审视。</li>
+</ul>
+
+
+
+<ul>
+<li>PyTorch最适合开发快速原型和研究项目，这就是为什么大多数人选择从TensorFlow过渡到PyTorch。</li>
+</ul>
+
+
+
+
+
+
+
+<h2 id="h-is-it-easy-to-switch-from-tensorflow-to-pytorch">从TensorFlow切换到PyTorch容易吗？</h2>
+
+
+
+<p>在文章的这一部分，我们将关注从TensorFlow切换到PyTorch是否容易。从任何深度学习框架转换的第一步是安装过程。该库必须易于安装，以便开发人员可以开始构建模型，而不必太担心安装过程的复杂细节。</p>
+
+
+
+<p>虽然安装TensorFlow和PyTorch库的CPU版本非常简单，但是使用CPU来训练复杂的模型是很原始的。让我们来看看他们的GPU安装程序之间的快速概述和比较。</p>
+
+
+
+<h3>探索张量流安装的复杂过程</h3>
+
+
+
+<p>如果你试图在你的Windows操作系统或任何Linux系统上安装TensorFlow的GPU版本，整个过程相当复杂。即使您正在使用Anaconda软件来开发您的深度学习项目，获得TensorFlow最新版本的过程也比您预期的要长一些。但是，如果您对使用任何版本的TensorFlow感兴趣，可以使用以下命令在您的虚拟环境中安装TensorFlow 2.0。</p>
+
+
+
+<pre class="hljs">conda install -c anaconda tensorflow-gpu</pre>
+
+
+
+<p>然而，TensorFlow的版本不断更新，上面的安装并不总是这样。因此，在共享代码或从事研究项目时，可能会引发许多问题。</p>
+
+
+
+<p>要在您的系统上安装最新版本的TensorFlow，您需要确保下载了安装过程所需的特定驱动程序。您需要查看官方的<a href="https://web.archive.org/web/20230131065431/https://www.tensorflow.org/install/source#gpu" target="_blank" rel="noreferrer noopener nofollow"> TensorFlow文档</a>,了解您需要下载并安装到系统上的CUDA文件和CuDNN版本的具体信息。</p>
+
+
+
+<p>CUDA和CuDNN版本由Nvidia不断更新，类似于它们的驱动程序。每当有TensorFlow最新版本的新发布，他们通常也会更新CUDA和CuDNN需求。</p>
+
+
+
+<p>一些功能在新版本中被贬低，因此，下载新版本以保持更新变得至关重要。但是每次我们需要安装新的TensorFlow版本时，Cuda和CuDNN更新都必须单独下载和安装。整个过程非常繁琐，每次更新都需要重复。</p>
+
+
+
+<h3>了解更简单的PyTorch安装</h3>
+
+
+
+
+
+<p>与TensorFlow安装相比，PyTorch安装要简单得多。为了成功安装PyTorch，您需要做的就是访问PyTorch官方网站获取安装指南，您可以通过此<a href="https://web.archive.org/web/20230131065431/https://pytorch.org/get-started/locally/" target="_blank" rel="noreferrer noopener nofollow">链接</a>选择您的软件需求类型、您的开发包和您的计算平台。该网站将自动为您提供准确的命令，您可以复制粘贴在您的默认或虚拟环境中开始安装。安装语句示例如下:</p>
+
+
+
+<pre class="hljs">conda install pytorch torchvision torchaudio cudatoolkit=<span class="hljs-number">10.2</span> -c pytorch</pre>
+
+
+
+<h2 id="h-how-to-make-the-switch-from-tensorflow-to-pytorch">如何从TensorFlow切换到PyTorch</h2>
+
+
+
+<p>对于TensorFlow的专家来说，可能想知道从一个库切换到另一个库的区别。从TensorFlow转换到PyTorch并不复杂，因为PyTorch提供了一种<em>python式的方法</em>来解决大多数问题。在本节中，我们将介绍从TensorFlow成功转换到PyTorch的一些主要基础知识。</p>
+
+
+
+<p>我们将了解如何在这两个深度学习框架中实现张量并与之合作。然后我们将了解他们的图形工作机制，即TensorFlow中的静态图形方法和PyTorch中的动态图形。最后，在本节中，我们还将比较TensorFlow和PyTorch的训练循环。</p>
+
+
+
+<h3>理解如何实现张量</h3>
+
+
+
+<p>张量是n维数组，通过它你可以开发和构造大部分的机器学习项目。大多数深度学习框架的核心方面是张量的概念，张量是向量和矩阵的推广。在您的系统上安装PyTorch后，您可以继续比较TensorFlow和PyTorch的编码过程之间的一些基本差异。</p>
+
+
+
+<p>让我们比较并实现一些基本实现，开始从一个库到另一个库的转换。我们将首先看看如何导入这两个库，初始化张量，并用这些张量执行一些基本操作。初始化张量的张量流代码如下:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+
+rank_2_tensor = tf.constant([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>],
+                             [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>],
+                             [<span class="hljs-number">5</span>, <span class="hljs-number">6</span>]], dtype=tf.int32)</pre>
+
+
+
+<p>在PyTorch中，同样的实现可以按如下方式完成:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+
+rank_2_tensor = torch.tensor([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>],
+                             [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>],
+                             [<span class="hljs-number">5</span>, <span class="hljs-number">6</span>]], dtype=torch.int32)</pre>
+
+
+
+<p>在这两个框架中，库的导入和张量的定义都非常简单。让我们分析一下如何在这两个库中执行一些基本的张量计算。首先，让我们看看下面的TensorFlow实现示例(注意，如果需要，您也可以将示例中显示的值直接定义为变量)。</p>
+
+
+
+<pre class="hljs">a = tf.constant([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>],
+                 [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>]])
+b = tf.constant([[<span class="hljs-number">1</span>, <span class="hljs-number">1</span>],
+                 [<span class="hljs-number">1</span>, <span class="hljs-number">1</span>]])
+
+a = tf.Variable(a)
+b = tf.Variable(b)
+
+print(tf.add(a, b), <span class="hljs-string">"n"</span>)
+print(tf.multiply(a, b), <span class="hljs-string">"n"</span>)
+print(tf.matmul(a, b), <span class="hljs-string">"n"</span>)</pre>
+
+
+
+<p>在PyTorch中，以下实现可以解释如下:</p>
+
+
+
+<pre class="hljs">a = torch.tensor([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], dtype=torch.float)
+b = torch.tensor([<span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>], dtype=torch.float)
+
+print(torch.add(a, b))
+print(torch.subtract(b, a))
+print(a.mul(b))
+
+
+print(a.dot(b))</pre>
+
+
+
+<p>现在，我们已经简要了解了如何在这两个深度学习框架中与张量合作，让我们通过实践方法来理解它们的工作机制。</p>
+
+
+
+<h3>它们的工作机制(理解各自的图表)</h3>
+
+
+
+<p>大多数深度学习框架都利用了计算图。这些计算图定义了必须执行计算的顺序，以便我们可以相应地获得最佳结果。</p>
+
+
+
+<p>通常有两个解释器用于深度学习问题的计算，其中每个解释器服务于不同的目的。其中一个解释器用于编程语言(大多数情况下是Python)，另一个解释器根据需要管理计算图形。</p>
+
+
+
+<p>因此，大多数深度学习框架利用像Python这样的编程语言来设置计算图，并且还设置了执行机制，这与宿主语言大不相同。</p>
+
+
+
+<p>这种奇怪的设置主要是出于效率和优化的原因。计算图形可以在目标GPU中优化和并行运行。因此，由于并行性和依赖性驱动调度，整个计算过程被加速并且更高效。</p>
+
+
+
+<p>在TensorFlow中，我们使用静态计算图。这些工作遵循典型的“定义并运行”惯例。？在这样的构建中，我们在开始时创建并连接所有的变量，并将它们初始化成一个静态的(不变的)会话。</p>
+
+
+
+<p>然而，有必要在静态图中定义一些可变参数，这有时被认为是不方便的，尤其是对于使用RNN型网络的任务。我建议查看下面的<a href="https://web.archive.org/web/20230131065431/https://cs230.stanford.edu/section/5/" target="_blank" rel="noreferrer noopener nofollow">网站</a>，了解更多关于这些静态图如何工作的详细信息。让我们看看静态张量流图的实现。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+
+a = tf.Variable(<span class="hljs-number">15</span>)
+b = tf.Variable(<span class="hljs-number">15</span>)
+
+prod = tf.multiply(a, b)
+sum = tf.add(a, b)
+
+result = prod/sum
+print(result)</pre>
+
+
+
+<h4>输出</h4>
+
+
+
+<pre class="hljs"> tf.Tensor(<span class="hljs-number">7.5</span>, shape=(), dtype=float64)</pre>
+
+
+
+<h4>图表</h4>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img decoding="async" src="../Images/2a85b3c9ae091335808d73d73b62fdee.png" alt="The computational graph" class="wp-image-56260" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20230131065431im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Moving-From-TensorFlow-To-PyTorch_1.png?ssl=1"/><figcaption class="wp-element-caption"><em>The computational graph | <a href="https://web.archive.org/web/20230131065431/https://builtin.com/data-science/pytorch-vs-tensorflow" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>在PyTorch中，我们利用了动态图，其中计算图是在我们键入代码时构建的。当用户最初声明变量时，直接构建计算图，并且在每次迭代训练后重新构建计算图。动态图和静态图都有其特定的用例，在特定的场景中，一个比另一个更好。</p>
+
+
+
+<p>动态图通常比静态图更好，因为我们可以相应地修改感兴趣的元素，而无需强调其他因素，从而在训练和模型构建过程中实现更高的灵活性。使用这种方法的唯一缺点是，有时需要更长的时间来重建图形。下面显示的GIF表示是PyTorch中一个项目如何工作的最好例子之一。</p>
+
+
+
+
+
+<h3>训练循环的比较</h3>
+
+
+
+<p>在TensorFlow中，创建训练循环的过程有点复杂，而且不是很直观。我们通常使用一个tf.function，它作为一个装饰器，根据静态图来编译模型。</p>
+
+
+
+<p>TensorFlow中的正常执行使用的是急切执行，这对于调试来说是好的，但是对于模型的更快的性能和实现来说是不好的。因此，我们利用tf.function使框架能够应用全局性能优化。</p>
+
+
+
+<p>然后，我们定义训练步骤，在该步骤中，我们通常使用梯度带函数，该函数执行自动微分。然后，我们可以定义培训过程将要发生的模型，并相应地计算损失。</p>
+
+
+
+<p>应用梯度值，经历反向传播过程，最后更新训练度量。在模型完成训练后，我们可以返回我们想要的指标和值。</p>
+
+
+
+<pre class="hljs"><span class="hljs-meta">@tf.function</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train_step</span><span class="hljs-params">(x, y)</span>:</span>
+    <span class="hljs-keyword">with</span> tf.GradientTape() <span class="hljs-keyword">as</span> tape:
+        logits = model(x, training=<span class="hljs-keyword">True</span>)
+        loss_value = loss_fn(y, logits)
+    grads = tape.gradient(loss_value, model.trainable_weights)
+    optimizer.apply_gradients(zip(grads, model.trainable_weights))
+    train_acc_metric.update_state(y, logits)
+    <span class="hljs-keyword">return</span> loss_value</pre>
+
+
+
+<p>这种训练循环的PyTorch实现非常简单和直观。我们可以动态地创建变量和定义动态图，然后继续训练我们的模型。我们可以将我们的数据和目标分配给设备(CPU或GPU)的状态，并继续计算前向传播，这是神经网络的前馈计算。</p>
+
+
+
+<p>一旦模型完成前馈训练过程，我们就可以在PyTorch中一些预定义实体的帮助下计算元素的反向传播。我们计算梯度，应用反向传播方法，并执行参数更新。以下计算的代码如下所示。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(epochs):
+    <span class="hljs-keyword">for</span> batch, (data, target) <span class="hljs-keyword">in</span> enumerate(train_loader):
+        
+        data = data.to(device=device)
+        target = target.to(device=device)
+        
+        score = model(data)
+        loss = criterion(score, target)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()</pre>
+
+
+
+<p>现在，我们已经理解了从TensorFlow切换到PyTorch的一些基本要求，让我们借助PyTorch深度学习框架来理解深度学习项目的代码演练。</p>
+
+
+
+<h2 id="h-code-walkthrough-of-mnist-in-pytorch">PyTorch中MNIST的代码演练</h2>
+
+
+
+<p>在本文的这一部分，我们将了解TensorFlow和PyTorch之间的一些主要差异。进一步了解他们工作程序的最好方法之一是亲自动手实施一个项目。我们将在这个代码演练比较中对MNIST数据集中的数字进行分类，我们将在PyTorch的帮助下训练一个模型，对数字从0到9进行分类。</p>
+
+
+
+<p>第一步是导入计算MNIST项目所需的所有基本库。因为我们正在从TensorFlow过渡到PyTorch，所以我们将为这个项目导入所有需要的PyTorch库。使用这个深度学习框架，我们可以在我们将要构建的神经网络架构中构建所有需要的层。PyTorch的必要导入在下面的代码块中描述如下。</p>
+
+
+
+<pre class="hljs">
+
+<span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torchvision
+<span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn
+<span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F
+<span class="hljs-keyword">from</span> torch.utils.data <span class="hljs-keyword">import</span> DataLoader
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt</pre>
+
+
+
+<p>我们的下一步是相应地设置设备参数。我们可以选择是否要将PyTorch中用于训练的默认设备设置为CPU或GPU。如果你有一个可以使用的GPU，那么使用它总是更好。然而，对于这个项目，即使一个CPU设备也能满足要求，培训不需要太长时间。在TensorFlow中，默认设备通常根据您的安装设置为GPU版本。</p>
+
+
+
+<pre class="hljs">
+
+device = torch.device(<span class="hljs-string">'cuda'</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> cpu)</pre>
+
+
+
+<p>我们的下一步是定义一些超参数，用于模型的构建和训练。定义了添加到总共10个类别中的类别数(0-9)。我们将设置默认输入大小为784 (28×28是MNIST数据的图像大小)，学习率为0.0001，批量大小为64，并且我们将在总共3个时期上训练构建的模型。</p>
+
+
+
+<pre class="hljs">
+
+num_classes = <span class="hljs-number">10</span>
+input_size = <span class="hljs-number">784</span>
+batch_size = <span class="hljs-number">64</span>
+lr = <span class="hljs-number">0.0001</span>
+epochs = <span class="hljs-number">3</span></pre>
+
+
+
+<p>下一步，我们将加载我们的数据。PyTorch框架类似于TensorFlow库，可以访问一些默认数据集，MNIST就是其中之一。我们将以训练和测试数据集的形式分离图像(大约60000个)。DataLoader函数在加载我们的数据时提供了非常好的工具。下面的代码片段展示了如何在PyTorch中加载数据。</p>
+
+
+
+<pre class="hljs">
+
+T = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
+
+X_train = torchvision.datasets.MNIST(root=<span class="hljs-string">'/datasets'</span>, train=<span class="hljs-keyword">True</span>, download=<span class="hljs-keyword">True</span>, transform=T)
+train_loader = DataLoader(dataset=X_train, batch_size=batch_size, shuffle=<span class="hljs-keyword">True</span>)
+
+X_test = torchvision.datasets.MNIST(root=<span class="hljs-string">'/datasets'</span>, train=<span class="hljs-keyword">False</span>, download=<span class="hljs-keyword">True</span>, transform=T)
+test_loader = DataLoader(dataset=X_test, batch_size=batch_size, shuffle=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<p>现在我们已经收集了所需的数据，我们终于可以使用PyTorch深度学习框架来构建神经网络架构了。我们将使用完全连接的层类型构建来解决我们的问题。</p>
+
+
+
+<p>使用PyTorch构建深度学习模型的过程非常简单，并且遵循Pythonic方法。我们将为神经网络定义一个类，并为我们的模型声明完全连接的层。功能。注意，在张量流的情况下，我们将对完全连接的层使用稠密函数。</p>
+
+
+
+<pre class="hljs">
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">neural_network</span><span class="hljs-params">(nn.Module)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, input_size, num_classes)</span>:</span>
+        super(neural_network, self).__init__()
+        self.fc1 = nn.Linear(in_features=input_size, out_features=<span class="hljs-number">50</span>)
+        self.fc2 = nn.Linear(in_features=<span class="hljs-number">50</span>, out_features=num_classes)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, x)</span>:</span>
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        <span class="hljs-keyword">return</span> x</pre>
+
+
+
+<p>既然我们已经用PyTorch完成了数据收集和深度学习模型的构建，我们可以继续定义我们将利用的损失类型和最适合该任务的优化器类型。交叉熵损失对于像MNIST项目这样的多类分类问题来说是一个非常好的选择。</p>
+
+
+
+<p>Adam是最好的默认优化器之一，几乎可以在任何场景中找到效用。我们将为指定数量的纪元训练我们的模型。对于训练过程，我们将使用前馈完全卷积网络，然后应用反向传播来学习相应的最佳权重。</p>
+
+
+
+<pre class="hljs">
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+
+
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(epochs):
+    <span class="hljs-keyword">for</span> batch, (data, target) <span class="hljs-keyword">in</span> enumerate(train_loader):
+        
+        data = data.to(device=device)
+        target = target.to(device=device)
+
+        
+        data = data.reshape(data.shape[<span class="hljs-number">0</span>], <span class="hljs-number">-1</span>)
+
+        
+        score = model(data)
+        loss = criterion(score, target)
+
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()</pre>
+
+
+
+<p>最后，现在我们的训练方法已经完成，我们可以继续训练和评估构建的模型，并相应地检查训练和测试的准确性。完成以下操作的步骤也非常简单，因为我们可以在正确分类的图像和错误分类的图像之间进行评估，并相应地计算准确度。</p>
+
+
+
+<pre class="hljs">
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">check_accuracy</span><span class="hljs-params">(loader, model)</span>:</span>
+    num_correct = <span class="hljs-number">0</span>
+    num_samples = <span class="hljs-number">0</span>
+    model.eval()
+
+    <span class="hljs-keyword">with</span> torch.no_grad():
+        <span class="hljs-keyword">for</span> x, y <span class="hljs-keyword">in</span> loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            x = x.reshape(x.shape[<span class="hljs-number">0</span>], <span class="hljs-number">-1</span>)
+
+            scores = model(x)
+            _, predictions = scores.max(<span class="hljs-number">1</span>)
+            num_correct += (predictions == y).sum()
+            num_samples += predictions.size(<span class="hljs-number">0</span>)
+
+        <span class="hljs-keyword">if</span> num_samples == <span class="hljs-number">60000</span>:
+            print(f<span class="hljs-string">"Train accuracy = "</span>
+                  f<span class="hljs-string">"{float(num_correct) / float(num_samples) * 100:.2f}"</span>)
+        <span class="hljs-keyword">else</span>:
+            print(f<span class="hljs-string">"Test accuracy = "</span>
+                  f<span class="hljs-string">"{float(num_correct) / float(num_samples) * 100:.2f}"</span>)
+
+    model.train()
+check_accuracy(train_loader, model)
+check_accuracy(test_loader, model)</pre>
+
+
+
+<p>通过这个构建模型来解决深度学习任务的简单过程，您可以在测试和训练数据上实现大约91%的准确率。即使我们只利用了一个简单的全连接神经网络结构，我们也能够获得不错的结果。更重要的是，我们明白在PyTorch的帮助下，构建几乎任何类型的研究项目都非常简单。</p>
+
+
+
+
+
+
+
+<h2 id="h-should-you-switch-from-tensorflow-to-pytorch">该不该从TensorFlow转到PyTorch？</h2>
+
+
+
+<p>在本节中，我们将权衡PyTorch的利弊，以得出最终结论，即是否值得从TensorFlow转换到PyTorch。为了深度学习神经网络的研究和开发，研究人员花费所有时间从TensorFlow过渡到PyTorch，这值得吗？让我们开始分析PyTorch的利弊。</p>
+
+
+
+<h3>PyTorch的优点</h3>
+
+
+
+<h4>1.自然界中的蟒蛇</h4>
+
+
+
+<p>PyTorch的构建方式直观易懂，易于开发机器学习项目。PyTorch中部署的大部分代码都是Python化的，这意味着过程化编码类似于Python的大部分元素。当使用TensorFlow时，代码更低级，更难理解，即使您对框架有很好的理解。</p>
+
+
+
+<p>因此，现在有一个额外的Keras高级API集成到TensorFlow 2.0中，您可以在其中更轻松地开发模型。PyTorch的功能可以很容易地用其他神奇的库实现，比如Numpy、Scipy和Cython。因为Pytorch的大部分语法和应用程序与传统的Python编程非常相似，所以学习起来也非常容易。</p>
+
+
+
+<h4>2.良好的文档和社区支持</h4>
+
+
+
+<p>PyTorch拥有最好的<a href="https://web.archive.org/web/20230131065431/https://pytorch.org/docs/stable/index.html" target="_blank" rel="noreferrer noopener nofollow">文档之一</a>,可用于掌握大多数基本概念。他们有详细的描述，在那里你可以理解大部分的核心话题:火炬。张量，张量属性，张量视图，火炬。亲笔签名，等等。你也有一些深度学习项目的博客和教程支持。除了默认文档之外，整个社区都高度支持PyTorch及其相关项目。</p>
+
+
+
+<h4>3.动态图表</h4>
+
+
+
+<p>正如在本文前面一节中详细讨论的，PyTorch支持动态图，而不是TensorFlow的静态图。这个特性对于动态创建图表特别有用。当您无法预先确定特定计算的内存分配或其他细节时，动态创建的图形最有用。它们为用户开发项目提供了更高的灵活性。</p>
+
+
+
+<h4>4.许多开发人员选择PyTorch进行项目</h4>
+
+
+
+<p>最近，开发人员和研究人员倾向于更多地转向PyTorch来构建深度学习项目。大多数研究人员更喜欢在GitHub等网站上分享他们的代码和他们的PyTorch项目实现。</p>
+
+
+
+<p>这个社区充满了奇妙的资源，当人们对某个特定的话题有任何困惑时，他们愿意伸出援助之手。在研究项目中，工作、共享和开发PyTorch项目更加容易。</p>
+
+
+
+<h3>PyTorch的缺点</h3>
+
+
+
+<h4>1.缺乏可视化技术</h4>
+
+
+
+<p>在Tensorboard的帮助下，TensorFlow为其开发的模型的工作可视化提供了最佳选择之一。Tensorboard是一个非常棒的数据可视化工具包，通过它您可以监控一些功能，如训练和验证的准确性和损失、模型图、查看构建的直方图、显示图像等等。PyTorch在可视化方面没有太大的选择，通常最好将<a href="https://web.archive.org/web/20230131065431/https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html" target="_blank" rel="noreferrer noopener nofollow"> Tensorboard </a>与PyTorch一起使用。</p>
+
+
+
+<h4>2.生产所需的API服务器</h4>
+
+
+
+<p>TensorFlow相对于PyTorch的另一个优势是，它有许多生产工具，可以随时部署已开发的模型。TensorFlow提供的可伸缩性很高，因为它是为生产准备的。</p>
+
+
+
+<p>TensorFlow服务为针对生产环境设计的机器学习模型提供了一个灵活的高性能服务系统。它处理大多数推理方面，并管理训练模型的生命周期。</p>
+
+
+
+<p>另一方面，我们有TorchServe，它灵活且易于使用，但它没有TensorFlow的紧凑性，在与高级部署工具竞争之前还有很长的路要走。</p>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>在本文中，我们已经涵盖了从TensorFlow深度学习框架成功过渡到PyTorch所需的大部分要素。PyTorch非常适合快速原型的开发。现代的开发人员在大多数研究项目中使用PyTorch来产生快速有效的结果。</p>
+
+
+
+<p id="separator-block_27ccc0ddfce9729f21a13055b85d1e04" class="block-separator block-separator--15"> </p>
+
+
+
+<div id="medium-table-block_f9f4c792e037d60ef4b39a9314d4b13a" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">TensorFlow</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">PyTorch</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>直截了当的蟒方法</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>用于高质量可视化的张量板</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>在这方面稍有欠缺</p> </div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>复低阶张量流码</p> </div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>研究型快速原型开发</p> </div></td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_43cbde259bf810e11c321796f767c8d8" class="block-separator block-separator--25"> </p>
+
+
+
+<p>深度神经网络实现的多功能性、Pythonic性质、巨大的灵活性和构造的高速度使得该框架成为研究和开发的最佳选择之一。</p>
+
+
+
+<h3>相关来源</h3>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

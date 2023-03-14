@@ -1,0 +1,607 @@
+<html>
+<head>
+<title>Geospatial Data Science: Logging Interactive Charts in Neptune with Plotly [Guide] </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>地理空间数据科学:使用Plotly在Neptune中记录交互式图表[指南]</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/geospatial-data-science-logging-interactive-charts-in-neptune-with-plotly#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/geospatial-data-science-logging-interactive-charts-in-neptune-with-plotly#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>地理空间数据科学正在成为数据科学领域的重要组成部分。几乎每个事件都可以映射到地球表面。因此，外业人员倾向于回答详细的位置问题，并了解其位置的特征和基本原理。像一般数据科学一样，地理空间提供了计算技能、统计概念以及数据争论和可视化的类似基线。本文是地理空间数据科学分析和可视化的简要指南。我们将揭开术语的神秘面纱，突出这一领域最好的部分，解释使用了什么技能和技术，并检查一个Python用例。</p>
+
+
+
+<h2 id="what">什么是地理空间数据科学？</h2>
+
+
+
+<p>数据科学中有大量的术语，过多的术语会导致误解。因此，让我们澄清一些地理空间数据科学术语:</p>
+
+
+
+<ul><li><strong>空间</strong>来源于拉丁语“spatium”，意为空间。“空间”是指空间，因为它涵盖了分布在一个空间连续体中的特征和现象。</li><li><strong>地理学</strong>是研究地球的物理特征、现象、大气以及人类活动对地球的影响。</li><li>地理空间是一个混合起源的词，希腊语“gaya”和拉丁语“Spatium”，意思是地球空间。地理空间意味着地理实体的位置是以坐标系统为参考的。</li><li><strong>地理信息系统(GIS) </strong>是用于收集、管理、操作、分析、存储和可视化地理空间数据(具有地理成分的数据)的系统。</li></ul>
+
+
+
+<p>地理空间数据科学是关于使用位置来寻找模式和解决复杂问题。范围超越了局部性，包括发现隐藏的模式、理解现象、发现复杂的关系和推动决策。该领域研究跨时间和空间的数据，以了解关于位置、距离和空间交互的地理事件。</p>
+
+
+
+<h2 id="why">为什么地理空间数据科学很重要？</h2>
+
+
+
+<p>地理空间数据科学使空间决策更容易。您可以使用一套分析方法和算法，包括机器学习和深度学习技术，从地理空间数据中提取深刻的见解。地理空间数据科学的前景包括:</p>
+
+
+
+<ul><li><strong>数据工程</strong>:帮助读取、转换、格式化、清理和丰富地理空间数据。</li><li><strong>可视化探索</strong>:用地图和动态图表直观地引导调查。</li><li><strong>地理空间分析</strong>:使用各种方法和技术帮助学习和研究地理空间实体。</li><li><strong>机器学习和深度学习</strong>:利用多种机器学习和深度学习算法建立预测模型，解决复杂的地理空间问题。</li><li><strong>大数据分析</strong>:将大量地理空间数据转换成可管理的大小，以便进行更容易访问和更好的分析。</li><li><strong>建模和脚本</strong>:地理空间系统的自动化过程和扩展功能。</li></ul>
+
+
+
+<p>在业务方面，根据“<a href="https://web.archive.org/web/20221207110054/https://go.carto.com/ebooks/state-spatial-data-science-2020" target="_blank" rel="noreferrer noopener nofollow"><strong>2020年企业地理空间数据科学状况</strong> </a> <strong>”，</strong>许多行业的地理空间分析投资增长了68%。这是一个非常有前景的领域，因为仍然很少有地理空间数据科学家— <strong>只有三分之一的数据科学家声称自己是地理空间分析专家</strong>。</p>
+
+
+
+<h2 id="where">地理空间数据科学可以用在哪里？</h2>
+
+
+
+<p>地理空间数据科学是革命性的，因为几乎所有东西都可以进行地理参考。这意味着地理空间数据科学可以用于几乎任何行业，包括:</p>
+
+
+
+<ul><li>卫生保健</li><li>电信</li><li>城市规划/发展</li><li>营销</li><li>社会服务</li><li>军队</li><li>自然资源勘探和开发</li><li>运输</li><li>教育</li><li>天气</li><li>农业</li></ul>
+
+
+
+
+
+
+
+<p>让我们讨论一下对地理空间数据科学有用的编程语言、数据库和工具。</p>
+
+
+
+<p>r和Python是流行的编程语言，因为它们为数据科学操作提供了大量的库:</p>
+
+
+
+<ul><li>Python的主要地理空间数据科学库以更好的集中和组织而闻名。这些强大的库和工具包括<a href="https://web.archive.org/web/20221207110054/https://geopandas.org/" target="_blank" rel="noreferrer noopener nofollow"> Geopandas </a>、<a href="https://web.archive.org/web/20221207110054/https://pro.arcgis.com/en/pro-app/arcpy/get-started/what-is-arcpy-.htm" target="_blank" rel="noreferrer noopener nofollow"> ArcPy </a>、<a href="https://web.archive.org/web/20221207110054/https://residentmario.github.io/geoplot/index.html" target="_blank" rel="noreferrer noopener nofollow"> Geoplot </a>、<a href="https://web.archive.org/web/20221207110054/https://python-visualization.github.io/folium/" target="_blank" rel="noreferrer noopener nofollow">leave</a>、<a href="https://web.archive.org/web/20221207110054/https://rasterio.readthedocs.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow"> Rasterio </a>、<a href="https://web.archive.org/web/20221207110054/https://pysal.org/" target="_blank" rel="noreferrer noopener nofollow"> PySAL </a>、<a href="https://web.archive.org/web/20221207110054/https://plotly.com/" target="_blank" rel="noreferrer noopener nofollow">plottly</a>、<a href="https://web.archive.org/web/20221207110054/https://carto.com/developers/cartoframes/" target="_blank" rel="noreferrer noopener nofollow"> CARTOframes </a>、<a href="https://web.archive.org/web/20221207110054/https://pypi.org/project/pandana/" target="_blank" rel="noreferrer noopener nofollow"> Pandana </a>、<a href="https://web.archive.org/web/20221207110054/https://scikit-learn.org/" target="_blank" rel="noreferrer noopener nofollow"> Scikit-Learn </a>、<a href="https://web.archive.org/web/20221207110054/https://www.tensorflow.org/" target="_blank" rel="noreferrer noopener nofollow"> Tensorflow </a></li><li>为特定的地理空间库提供了完整的产品；这些库和工具包括<a href="https://web.archive.org/web/20221207110054/https://www.rpackages.io/package/rworldmap" target="_blank" rel="noreferrer noopener nofollow"> rworldmap、</a> <a href="https://web.archive.org/web/20221207110054/https://www.rpackages.io/package/rworldxtra" target="_blank" rel="noreferrer noopener nofollow"> rworldxtra </a>、<a href="https://web.archive.org/web/20221207110054/https://ggplot2.tidyverse.org/reference/ggplot.html" target="_blank" rel="noreferrer noopener nofollow"> Ggplot、</a> <a href="https://web.archive.org/web/20221207110054/https://cran.r-project.org/web/packages/spdep/index.html" target="_blank" rel="noreferrer noopener nofollow"> Spdep、</a> <a href="https://web.archive.org/web/20221207110054/https://cran.r-project.org/web/packages/rgdal/index.html" target="_blank" rel="noreferrer noopener nofollow"> Rgdal、</a> <a href="https://web.archive.org/web/20221207110054/https://cran.r-project.org/web/packages/rgeos/index.html" target="_blank" rel="noreferrer noopener nofollow"> Rgeos、</a> <a href="https://web.archive.org/web/20221207110054/https://cran.r-project.org/web/packages/gstat/index.html" target="_blank" rel="noreferrer noopener nofollow"> Gstat、</a><a href="https://web.archive.org/web/20221207110054/https://mc-stan.org/users/interfaces/rstan" target="_blank" rel="noreferrer noopener nofollow">【RStan、</a> <a href="https://web.archive.org/web/20221207110054/https://cran.r-project.org/web/packages/mgcv/index.html" target="_blank" rel="noreferrer noopener nofollow"> Mgcv、</a> <a href="https://web.archive.org/web/20221207110054/https://shiny.rstudio.com/" target="_blank" rel="noreferrer noopener nofollow"> Shiny、</a> <a href="https://web.archive.org/web/20221207110054/http://www.r-inla.org/download" target="_blank" rel="noreferrer noopener nofollow"> INLA、</a> <a href="https://web.archive.org/web/20221207110054/https://cran.r-project.org/web/packages/sf/index.html" target="_blank" rel="noreferrer noopener nofollow"> sf、</a></li></ul>
+
+
+
+<p>地理空间数据通过数据库存储和管理；<strong> </strong>这里的一些例子有<a href="https://web.archive.org/web/20221207110054/https://postgis.net/" target="_blank" rel="noreferrer noopener nofollow"> PostGIS </a>、<a href="https://web.archive.org/web/20221207110054/https://grass.osgeo.org/" target="_blank" rel="noreferrer noopener nofollow"> GrassGIS </a>、<a href="https://web.archive.org/web/20221207110054/https://www.postgresql.org/" target="_blank" rel="noreferrer noopener nofollow"> Postgres </a>、<a href="https://web.archive.org/web/20221207110054/http://www.mysql.com/" target="_blank" rel="noreferrer noopener nofollow"> SQL </a>和<a href="https://web.archive.org/web/20221207110054/https://www.pgadmin.org/" target="_blank" rel="noreferrer noopener nofollow"> PgAdmin </a>。</p>
+
+
+
+<p>一些工具被设计用于捕获、存储、操作、分析、管理和呈现地理空间数据，例如，<a href="https://web.archive.org/web/20221207110054/https://www.esri.com/en-us/home" target="_blank" rel="noreferrer noopener nofollow"> Esri、</a><a href="https://web.archive.org/web/20221207110054/https://www.qgis.org/en/site/" target="_blank" rel="noreferrer noopener nofollow">【QGIS、</a> <a href="https://web.archive.org/web/20221207110054/https://www.mapbox.com/" target="_blank" rel="noreferrer noopener nofollow"> Mapbox </a>、<a href="https://web.archive.org/web/20221207110054/https://carto.com/" target="_blank" rel="noreferrer noopener nofollow"> CARTO、</a> <a href="https://web.archive.org/web/20221207110054/https://www.google.com/earth/" target="_blank" rel="noreferrer noopener nofollow"> Google Earth </a>、<a href="https://web.archive.org/web/20221207110054/https://www.spatialkey.com/" target="_blank" rel="noreferrer noopener nofollow"> SpatialKey、</a> <a href="https://web.archive.org/web/20221207110054/https://geospark.io/" target="_blank" rel="noreferrer noopener nofollow">、Geospark、</a> <a href="https://web.archive.org/web/20221207110054/https://www.alteryx.com/" target="_blank" rel="noreferrer noopener nofollow"> Alteryx、</a> <a href="https://web.archive.org/web/20221207110054/https://www.safe.com/" target="_blank" rel="noreferrer noopener nofollow"> FME </a>、<a href="https://web.archive.org/web/20221207110054/https://www.elastic.co/start?ultron=%5BEL%5D-%5BB%5D-%5BStack%5D-%5BTrials%5D-%5BEMEA%5D-%5BUK%5D-Exact&amp;blade=adwords-s&amp;Device=c&amp;thor=elasticsearch&amp;gclid=Cj0KCQjw0Mb3BRCaARIsAPSNGpX-pJxldC7M7NUPbGd9gTsR-pKCuJq0N5u8-ZVsO18crdZ83qzHMc8aAtPPEALw_wcB" target="_blank" rel="noreferrer noopener nofollow">弹性搜索、</a> <a href="https://web.archive.org/web/20221207110054/https://www.oracle.com/database/technologies/spatialandgraph.html" target="_blank" rel="noreferrer noopener nofollow"> Oracle </a></p>
+
+
+
+<h2 id="types">地理空间数据的类型</h2>
+
+
+
+<p>正如卡莉·弗洛里纳所说，“<em>目标是将数据转化为信息，将信息转化为见解</em>”，因此了解和理解不同的数据类型非常重要。</p>
+
+
+
+<p>地理空间数据可以分为两种类型:</p>
+
+
+
+<ol><li><strong>地理空间参考数据</strong>:用矢量和栅格格式表示。</li><li><strong>属性数据</strong>:由表格格式定义。</li></ol>
+
+
+
+<p><strong>矢量数据:</strong>在经纬度对(坐标)上成对存储的数据集。这种数据形式的基本单位是点(0维)、线(1维)和多边形(2维)。其中每一个都是一系列一个或多个坐标点-点的集合形成线单元，连接的闭合线环形成面。</p>
+
+
+
+<ul><li>点:用于描述不同的数据和不相邻的特征。0维，所以它们没有长度或面积的属性。点数据的示例有兴趣点(POI)，即学校、购物中心、火山或医院等要素。</li></ul>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/c35da69804f49497596bc2fcae0fd080.png" alt="Geospatial data - points" class="wp-image-47951" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221207110054im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Geospatial-data-points.png?ssl=1"/><figcaption><em>New York Hospital point data map <strong>made by Aboze Brain | </strong><a href="https://web.archive.org/web/20221207110054/https://kepler.gl/demo" target="_blank" rel="noreferrer noopener nofollow"><strong>Kepler.gl</strong></a></em></figcaption></figure></div>
+
+
+
+<ul><li>线/弧:用于描述一组表示线性特征的有序坐标。一维，可以测长度(有起点和终点)，但不能测面积。线数据的例子有河流、道路、等高线、边界线。</li></ul>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/ed1b736bfbfb378e9b8c23e074d12357.png" alt="Geospatial data - lines" class="wp-image-47952" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221207110054im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Geospatial-data-lines.png?ssl=1"/><figcaption><em>New York Centerline map <strong>made by Aboze Brain | </strong><a href="https://web.archive.org/web/20221207110054/https://kepler.gl/demo" target="_blank" rel="noreferrer noopener nofollow"><strong>Kepler.gl</strong></a></em></figcaption></figure></div>
+
+
+
+<ul><li>多边形:用于描述区域，本质上是二维的。多边形由构成边界的线和内部用于识别和概览的点来定义。多边形的例子有行政区、城市或森林的边界。</li></ul>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/6a8082e2ba3bae5a1ef90793bc8312dd.png" alt="Geospatial data - polygon" class="wp-image-47954" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221207110054im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Geospatial-data-polygon.png?ssl=1"/><figcaption><em>New York Airport Polygons map <strong>made by Aboze Brain | </strong><a href="https://web.archive.org/web/20221207110054/https://kepler.gl/demo" target="_blank" rel="noreferrer noopener nofollow"><strong>Kepler.gl</strong></a></em></figcaption></figure></div>
+
+
+
+<p><strong>栅格数据:</strong>该数据类型代表表面；它也被称为网格数据。“网格”由按行和列组织的代表信息的单元(像素)矩阵组成。基于数据，栅格数据以两种形式存在:离散栅格数据(如人口密度分布)和连续栅格数据(如温度或高程)。还有三种类型的栅格数据集:专题数据、光谱数据和影像。</p>
+
+
+
+<ol><li>专题地图显示了人类或自然特征的分布，主要以离散数据为主。</li><li>光谱图显示电磁波谱的特定波长，大多基于连续数据。</li><li>图像仅仅是卫星或航空照片。</li></ol>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/bc2b6153547fe68e432f82844d22e521.png" alt="Geospatial data - raster" class="wp-image-47955" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221207110054im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Geospatial-data-raster.png?resize=818%2C468&amp;ssl=1"/><figcaption><em>New York Elevation data analysis <strong>made by Aboze Brain | </strong><a href="https://web.archive.org/web/20221207110054/https://kepler.gl/demo" target="_blank" rel="noreferrer noopener nofollow"><strong>Kepler.gl</strong></a></em></figcaption></figure></div>
+
+
+
+<p><em>以上示例中使用的所有数据集均来自纽约市开放数据门户</em><a href="https://web.archive.org/web/20221207110054/https://opendata.cityofnewyork.us/" target="_blank" rel="noreferrer noopener nofollow"><em/></a>。</p>
+
+
+
+<p><strong>属性数据:</strong>这些是用于描述地理空间特征的表格数据。表字段可以包含以下字段数据类型:</p>
+
+
+
+<ul><li>整数值</li><li>浮点值(十进制数)</li><li>字符值(字符串/文本)</li><li>日期值</li><li>二进制大对象(BLOB ),用于存储图像、多媒体或代码位等信息</li></ul>
+
+
+
+<h2 id="formats">地理空间数据的格式</h2>
+
+
+
+<p>矢量数据和栅格数据都有各种文件格式，可通过文件扩展名进行区分。要跨多个平台处理地理空间分析和数据分析，您需要知道这些平台接受哪种文件格式。</p>
+
+
+
+<p>以下是矢量和栅格数据文件格式的概述:</p>
+
+
+
+<p><strong>矢量数据格式:</strong></p>
+
+
+
+
+
+
+
+<p><strong>栅格数据格式:</strong></p>
+
+
+
+
+
+
+
+<h2 id="data-sources">地理空间数据源</h2>
+
+
+
+<p>我们知道地理空间数据的类型，但是我们可以从哪里获得它呢？有很多网站，维基百科公布了获取地理空间数据的可靠来源<a href="https://web.archive.org/web/20221207110054/https://en.wikipedia.org/wiki/List_of_GIS_data_sources" target="_blank" rel="noreferrer noopener nofollow"> <em>这里</em> </a>。</p>
+
+
+
+<h2 id="use-case">用例:Python作为地理空间数据科学的工具</h2>
+
+
+
+<p>让我们使用一些Python库进行地理空间分析。我们将使用<a href="https://web.archive.org/web/20221207110054/https://geopandas.org/" target="_blank" rel="noreferrer noopener nofollow"> Geopandas </a>和<a href="https://web.archive.org/web/20221207110054/https://plotly.com/" target="_blank" rel="noreferrer noopener nofollow"> Plotly </a>进行数据争论和可视化，并使用<a href="/web/20221207110054/https://neptune.ai/" target="_blank" rel="noreferrer noopener"> Neptune AI </a>记录交互式地图，以实现以下目标:</p>
+
+
+
+<ol><li>地图上的散点图</li><li>等值区域图</li><li>密度热图</li><li>地图上的线条</li><li>地图上的研究区域</li></ol>
+
+
+
+
+
+
+
+<p>先决条件:</p>
+
+
+
+<ul><li>Python 3.7</li><li>Python库——使用<a href="https://web.archive.org/web/20221207110054/https://pypi.org/" target="_blank" rel="noreferrer noopener nofollow"> PyPI </a>包管理器:</li></ul>
+
+
+
+<p><strong>–地质公园</strong></p>
+
+
+
+<pre class="hljs">pip install geopandas</pre>
+
+
+
+<p><strong>–Plotly express</strong></p>
+
+
+
+<pre class="hljs">pip install plotly-express
+</pre>
+
+
+
+<p><strong>–海王星客户端</strong></p>
+
+
+
+<pre class="hljs">pip install --upgrade --quiet neptune-client</pre>
+
+
+
+<ul><li>此外，这些库可以安装有<a href="https://web.archive.org/web/20221207110054/https://docs.conda.io/en/latest/" target="_blank" rel="noreferrer noopener nofollow"> Conda </a>:</li></ul>
+
+
+
+<p><strong>–地质公园</strong></p>
+
+
+
+<pre class="hljs">conda install geopandas</pre>
+
+
+
+<p><strong>–Plotly express</strong></p>
+
+
+
+<pre class="hljs">conda install -c plotly plotly_express </pre>
+
+
+
+<p><strong>–海王星客户端</strong></p>
+
+
+
+<pre class="hljs"> conda install -c conda-forge neptune-client</pre>
+
+
+
+<p><strong>数据来源:</strong>我从<a href="https://web.archive.org/web/20221207110054/https://grid3.gov.ng/" target="_blank" rel="noreferrer noopener nofollow"> Grid3 </a>获取数据(地理参考基础设施和人口发展数据)。该计划提供高分辨率的人口、基础设施和其他参考数据，支持尼日利亚的国家部门发展重点、人道主义工作和联合国可持续发展目标。</p>
+
+
+
+<p>本出版物的分析范围集中在尼日利亚的拉各斯。拉各斯是全球发展最快的城市之一，也是整个非洲的主要金融中心。</p>
+
+
+
+<p><em>本文使用的代码、数据集等资源的链接可以在</em> <a href="https://web.archive.org/web/20221207110054/https://github.com/codebrain001/Getting-started-with-Spatial-Data-Science-" target="_blank" rel="noreferrer noopener nofollow"> <em>这里</em> </a>找到。</p>
+
+
+
+
+
+
+
+<p>要在Neptune AI中记录交互式情节，您需要<a href="/web/20221207110054/https://neptune.ai/register" target="_blank" rel="noreferrer noopener">注册</a>并创建一个新项目。创建一个帐户将为你提供自定义API证书，以正确集成Neptune AI的各种<a href="/web/20221207110054/https://neptune.ai/product" target="_blank" rel="noreferrer noopener">功能</a>。</p>
+
+
+
+
+
+
+
+<p>随着您的Neptune AI帐户完全设置好并访问您的自定义API，我们导入并初始化Neptune。</p>
+
+
+
+<p>在代码编辑器中，打开一个名为。env(注意前导点)并添加以下凭证:</p>
+
+
+
+<pre class="hljs">API_KEY=&lt;Your API key&gt;
+</pre>
+
+
+
+<p>出于安全目的，这一点很重要，因为你不应该将你的秘密硬编码到你的应用程序中。创建一个gitignore文件并添加一个. env文件。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> neptune.new <span class="hljs-keyword">as</span> neptune
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">from</span> dotenv <span class="hljs-keyword">import</span> load_dotenv
+load_dotenv()
+
+API_token = os.getenv(<span class="hljs-string">"API_token"</span>)
+
+run = neptune.init(project=<span class="hljs-string">'codebrain/Geospatial-article'</span>,
+                   api_token=API_token) 
+</pre>
+
+
+
+<p><strong> <em>注意:</em> </strong> <em> Dotenv是一个将环境变量从. env文件加载到进程中的模块。</em></p>
+
+
+
+<p>执行这个代码块将为您提供一个将您的项目连接到Neptune的自定义链接，如下所示:<a href="https://web.archive.org/web/20221207110054/https://app.neptune.ai/codebrain/Geospatial-article/e/GEOS-1/all">https://app . Neptune . ai/code brain/Geospatial-analysis/e/GEOS-2</a></p>
+
+
+
+<p>接下来，我们导入基本库并读取文件。要读入的文件格式都是JSON格式。数据框对应于卫生设施、行政边界和人口数据集。</p>
+
+
+
+<p>接下来，我们导入基本库并读取文件。要读入的文件格式都是JSON。读取的数据框对应于卫生设施、行政边界和人口数据集。</p>
+
+
+
+<pre class="hljs">
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+pd.set_option(<span class="hljs-string">'display.max_columns'</span>, <span class="hljs-keyword">None</span>)
+<span class="hljs-keyword">import</span> geopandas <span class="hljs-keyword">as</span> gpd
+<span class="hljs-keyword">import</span> plotly.express <span class="hljs-keyword">as</span> px
+
+
+health_df = gpd.read_file(<span class="hljs-string">'../Datasets/health-care.geojson'</span>)
+adminstrative_df = gpd.read_file(<span class="hljs-string">'../Datasets/lga.geojson'</span>)
+pop_df = gpd.read_file(<span class="hljs-string">'../Datasets/NGA_population.json'</span>)
+</pre>
+
+
+
+<p>了解每个数据集功能的概况是非常重要的。通过这种方式，您可以了解各种变量及其上下文含义和数据类型。</p>
+
+
+
+<pre class="hljs">health_df.columns</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/e650b71e69c3aeb0dc09aea9bb38bb36.png" alt="Geospatial data - dataset features " class="wp-image-47958" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221207110054im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Geospatial-data-dataset-features-1.png?ssl=1"/></figure>
+
+
+
+<pre class="hljs">Adminstrative_df.columns</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/d27b8c6ad787bc6c2263fc4878340103.png" alt="Geospatial data - dataset features " class="wp-image-47959" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221207110054im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Geospatial-data-dataset-features-2.png?ssl=1"/></figure>
+
+
+
+<pre class="hljs">pop_df.columns</pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="../Images/e43bb3f943fe290e5219ff14749b0495.png" alt="Geospatial data - dataset features " class="wp-image-47960" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221207110054im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Geospatial-data-dataset-features-3.png?ssl=1"/></figure>
+
+
+
+<p>让我们用与我们的分析相关的特征来清理各种数据框:</p>
+
+
+
+<pre class="hljs">health_df = health_df[[<span class="hljs-string">'latitude'</span>, <span class="hljs-string">'longitude'</span>,<span class="hljs-string">'functional_status'</span>,<span class="hljs-string">'type'</span>, <span class="hljs-string">'lga_name'</span>,<span class="hljs-string">'state_name'</span>, <span class="hljs-string">'geometry'</span>]]
+adminstrative_df = adminstrative_df[[<span class="hljs-string">'lga_name'</span>,<span class="hljs-string">'state_name'</span>,<span class="hljs-string">'geometry'</span>]]
+pop_df = pop_df[[<span class="hljs-string">'lganame'</span>,<span class="hljs-string">'mean'</span>, <span class="hljs-string">'statename'</span>,<span class="hljs-string">'geometry'</span>]]
+pop_df = pop_df.replace(to_replace=[<span class="hljs-string">'Ajeromi Ifelodun'</span>, <span class="hljs-string">'Ifako Ijaye'</span>,<span class="hljs-string">'Oshodi Isolo'</span> ], value=[<span class="hljs-string">'Ajeromi/Ifelodun'</span>,<span class="hljs-string">'Ifako/Ijaye'</span>, <span class="hljs-string">'Oshodi/Isolo'</span>]).reset_index()
+pop_df = pop_df.rename(columns={<span class="hljs-string">'lganame'</span>:<span class="hljs-string">'lga_name'</span>})
+pop_df.drop(<span class="hljs-string">'index'</span>, axis=<span class="hljs-number">1</span>, inplace=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<p>就本指南而言，我们希望根据功能状态、每100000人口的医疗机构数量和医疗机构类型分布(一级、二级和三级)对医疗机构分布进行分析。因此，让我们从基础数据中创建这些特征:</p>
+
+
+
+<pre class="hljs">health_pop = health_df.merge(pop_df, how=<span class="hljs-string">'left'</span>, on=<span class="hljs-string">'lga_name'</span>)
+health_pop.drop(columns=[<span class="hljs-string">'statename'</span>,<span class="hljs-string">'geometry_x'</span>],axis=<span class="hljs-number">1</span>, inplace=<span class="hljs-keyword">True</span>)
+health_pop.rename(columns={<span class="hljs-string">'geometry_y'</span>:<span class="hljs-string">'geometry'</span>}, inplace=<span class="hljs-keyword">True</span>)
+total_hospital_count=health_pop.groupby(<span class="hljs-string">'lga_name'</span>)[<span class="hljs-string">'geometry'</span>].count().reset_index()
+hosp_per_x = total_hospital_count.merge(pop_df, how=<span class="hljs-string">'left'</span>, on=<span class="hljs-string">'lga_name'</span>)
+hosp_per_x.rename(columns={<span class="hljs-string">'geometry_x'</span>:<span class="hljs-string">'count'</span>, <span class="hljs-string">'mean'</span>:<span class="hljs-string">'mean_pop'</span>, <span class="hljs-string">'geometry_y'</span>:<span class="hljs-string">'geometry'</span>}, inplace=<span class="hljs-keyword">True</span>)
+hosp_per_x[<span class="hljs-string">'Health_facilities_per_100000'</span>] = (hosp_per_x[<span class="hljs-string">'count'</span>]/hosp_per_x[<span class="hljs-string">'mean_pop'</span>])*<span class="hljs-number">100000</span>
+hosp_per_x.drop(columns=[<span class="hljs-string">'count'</span>,<span class="hljs-string">'mean_pop'</span>, <span class="hljs-string">'statename'</span>], axis=<span class="hljs-number">1</span>, inplace=<span class="hljs-keyword">True</span>)
+hosp_per_100000 = hosp_per_x[[<span class="hljs-string">'lga_name'</span>,<span class="hljs-string">'Health_facilities_per_100000'</span>]]
+
+hosp_type_df = health_df.replace(to_replace=[<span class="hljs-string">'Primary'</span>, <span class="hljs-string">'Secondary'</span>,<span class="hljs-string">'Tertiary'</span> ],
+                      value=[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]).reset_index()
+hosp_type_df.drop(<span class="hljs-string">'index'</span>, axis=<span class="hljs-number">1</span>, inplace=<span class="hljs-keyword">True</span>)</pre>
+
+
+
+<p>我们将使用Mapbox maps和Plotly进行分析。Mapbox是一个面向开发者的地图和位置云平台，它为不同的应用提供端点。地图框自定义地图基础层将被用来提高我们的地图和访问定制功能的美感。来自<a href="https://web.archive.org/web/20221207110054/https://www.mapbox.com/gallery/" target="_blank" rel="noreferrer noopener nofollow">地图框图库</a>的弗兰克风格被用于各种地图</p>
+
+
+
+<p>要连接这两个平台以获得epic结果，您需要一个Mapbox帐户和一个公共的<a href="https://web.archive.org/web/20221207110054/https://www.mapbox.com/studio" target="_blank" rel="noreferrer noopener nofollow"> Mapbox访问令牌</a>。您可以在此  <em> </em>注册<a href="https://web.archive.org/web/20221207110054/https://account.mapbox.com/auth/signup/" target="_blank" rel="noreferrer noopener nofollow"> <em>，获得您的公共访问令牌，如下所示:</em></a></p>
+
+
+
+
+
+
+
+<h2 id="h-building-interactive-maps">构建交互式地图</h2>
+
+
+
+<h3>散点图</h3>
+
+
+
+<p>该图显示了基于坐标的点数据分布。这里的主要目标是根据卫生保健设施的功能状况绘制其分布图。</p>
+
+
+
+<pre class="hljs">fig1 = px.scatter_mapbox(health_df, lat=<span class="hljs-string">"latitude"</span>, lon=<span class="hljs-string">"longitude"</span>, color=<span class="hljs-string">"functional_status"</span>, hover_data=[<span class="hljs-string">"type"</span>, <span class="hljs-string">"lga_name"</span>],
+                       zoom=<span class="hljs-number">8</span>, height=<span class="hljs-number">300</span>,
+                      labels={<span class="hljs-string">'functional_status'</span>:<span class="hljs-string">'Functional status of Health Facilities'</span>},
+                      center={<span class="hljs-string">'lat'</span>: <span class="hljs-number">6.5355</span>, <span class="hljs-string">'lon'</span>: <span class="hljs-number">3.3087</span>}
+)
+fig1.update_layout(mapbox_style=style_url, mapbox_accesstoken=access_token)
+fig1.update_layout(margin={<span class="hljs-string">"r"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"t"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"l"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"b"</span>:<span class="hljs-number">0</span>})
+run[<span class="hljs-string">'interactive__scatter_plot_img'</span>] = neptune.types.File.as_html(fig1)</pre>
+
+
+
+<p>注意:不同的运行时间和剧情将会保存在你的Neptune AI档案中。</p>
+
+
+
+
+
+
+
+<p>每个运行时跟踪结果并模拟计算资源，如CPU和内存使用。</p>
+
+
+
+
+
+
+
+<p><strong>交互式散点图:</strong></p>
+
+
+
+
+
+
+
+<h3>等值区域图</h3>
+
+
+
+<p>这是一张由彩色多边形组成的地图。它用来表示一个量的空间变化。此处，目标是显示案例研究区域(在拉各斯被称为地方政府区域(LGAs ))的各个分区中每100000人口的医疗保健机构数量的分布。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> json
+ 
+f = open(<span class="hljs-string">'/content/drive/MyDrive/Geospatial-article/Datasets/lga.geojson'</span>,)
+ 
+geo_json_file = json.load(f)
+fig2 = px.choropleth_mapbox(hosp_per_100000,
+                    geojson=geo_json_file,
+                    locations=<span class="hljs-string">'lga_name'</span>,
+                    color=<span class="hljs-string">'Health_facilities_per_100000'</span>,
+                    featureidkey=<span class="hljs-string">"properties.lga_name"</span>,
+                    range_color=(<span class="hljs-number">0</span>, <span class="hljs-number">100</span>),
+                    labels={<span class="hljs-string">'Health_facilities_per_100000'</span>:<span class="hljs-string">'Health Facilities_per_100000'</span>},
+                    zoom=<span class="hljs-number">8.5</span>,
+                    center={<span class="hljs-string">'lat'</span>: <span class="hljs-number">6.5355</span>, <span class="hljs-string">'lon'</span>: <span class="hljs-number">3.3087</span>}
+                         )
+fig2.update_layout(mapbox_style=style_url, mapbox_accesstoken=access_token)
+
+fig2.update_layout(margin={<span class="hljs-string">"r"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"t"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"l"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"b"</span>:<span class="hljs-number">0</span>})
+run[<span class="hljs-string">'interactive__chloropleth_map_img'</span>] = neptune.types.File.as_html(fig2)</pre>
+
+
+
+<p><strong>氯普图的交互图</strong>:</p>
+
+
+
+
+
+
+
+<h3>密度热图</h3>
+
+
+
+<p>这张地图用颜色显示了一种现象的数量级，并带有明显的视觉线索，说明这种现象是如何聚集或随空间变化的。在这里，我们可以尝试在案例研究中可视化医疗保健设施类型的集群。</p>
+
+
+
+<p>按键:</p>
+
+
+
+<ul><li>1:初级保健设施</li><li>2:二级保健设施</li><li>3:三级保健设施</li></ul>
+
+
+
+<pre class="hljs">fig3 = px.density_mapbox(hosp_type_df, lat=<span class="hljs-string">'latitude'</span>, lon=<span class="hljs-string">'longitude'</span>, z=<span class="hljs-string">'type'</span>, radius=<span class="hljs-number">10</span>,
+                       center={<span class="hljs-string">'lat'</span>: <span class="hljs-number">6.5355</span>, <span class="hljs-string">'lon'</span>: <span class="hljs-number">3.3087</span>}, zoom=<span class="hljs-number">8.5</span>,
+                       labels={<span class="hljs-string">'type'</span>:<span class="hljs-string">'Health Facilities type'</span>},
+                       )
+fig3.update_layout(mapbox_style=style_url, mapbox_accesstoken=access_token)
+fig3.update_layout(margin={<span class="hljs-string">"r"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"t"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"l"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"b"</span>:<span class="hljs-number">0</span>})
+run[<span class="hljs-string">'interactive__heatmap_map_img'</span>] = neptune.types.File.as_html(fig3)</pre>
+
+
+
+<p><strong>密度热图交互图:</strong></p>
+
+
+
+
+
+
+
+<h3>地图上的线</h3>
+
+
+
+<p>有时为了在地图上进行分析，你可能需要在地图上画线，例如，解释距离或路线。这很容易做到，如下所示:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> plotly.graph_objects <span class="hljs-keyword">as</span> go
+fig4 = go.Figure(go.Scattermapbox(
+   mode = <span class="hljs-string">"markers+lines"</span>,
+   lat = [<span class="hljs-number">6.5095</span>,<span class="hljs-number">6.6018</span>, <span class="hljs-number">6.4698</span>],
+   lon = [<span class="hljs-number">3.3711</span>,<span class="hljs-number">3.3515</span>, <span class="hljs-number">3.5852</span>],
+   marker = {<span class="hljs-string">'size'</span>: <span class="hljs-number">10</span>}))
+fig4.update_layout(mapbox_style=style_url, mapbox_accesstoken=access_token)
+fig4.update_layout(margin={<span class="hljs-string">"r"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"t"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"l"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"b"</span>:<span class="hljs-number">0</span>})
+fig4.update_layout(mapbox= dict(
+   center={<span class="hljs-string">'lat'</span>: <span class="hljs-number">6.5355</span>, <span class="hljs-string">'lon'</span>: <span class="hljs-number">3.3087</span>},zoom=<span class="hljs-number">8.5</span> ))
+run[<span class="hljs-string">'interactive__line_on_map_img'</span>] = neptune.types.File.as_html(fig4)
+</pre>
+
+
+
+<p><strong>地图上线的交互绘制:</strong></p>
+
+
+
+
+
+
+
+<h3>地图上的研究区域</h3>
+
+
+
+<p>就像地图上的线条一样，有时我们希望隔离某些区域来进一步研究它们。根据所需隔离区域的坐标，这些隔离在形状(多边形)上可以有所不同。这种隔离可以按如下方式进行:</p>
+
+
+
+<pre class="hljs">fig5 = go.Figure(go.Scattermapbox(
+   fill = <span class="hljs-string">"toself"</span>,
+   lon = [<span class="hljs-number">3.297806</span>, <span class="hljs-number">3.295470</span>, <span class="hljs-number">3.349685</span>, <span class="hljs-number">3.346413</span>], lat = [<span class="hljs-number">6.539536</span>,<span class="hljs-number">6.488922</span>, <span class="hljs-number">6.488922</span>, <span class="hljs-number">6.542322</span>],
+   marker = { <span class="hljs-string">'size'</span>: <span class="hljs-number">10</span>, <span class="hljs-string">'color'</span>: <span class="hljs-string">"red"</span> }))
+fig5.update_layout(mapbox_style=style_url, mapbox_accesstoken=access_token)
+fig5.update_layout(margin={<span class="hljs-string">"r"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"t"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"l"</span>:<span class="hljs-number">0</span>,<span class="hljs-string">"b"</span>:<span class="hljs-number">0</span>})
+fig5.update_layout(mapbox= dict(
+   center={<span class="hljs-string">'lat'</span>: <span class="hljs-number">6.5355</span>, <span class="hljs-string">'lon'</span>: <span class="hljs-number">3.3087</span>},zoom=<span class="hljs-number">10</span>))
+run[<span class="hljs-string">'interactive__line_on_map_img'</span>] = neptune.types.File.as_html(fig5)</pre>
+
+
+
+<p><strong>研究区域交互图:</strong></p>
+
+
+
+
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>就是这样！如果你做到了这一步，感谢你的阅读。我希望这篇文章对如何开始地理空间数据科学的新兴领域有一个全面的概述。感谢阅读！</p>
+        </div>
+        
+    </div>    
+</body>
+</html>

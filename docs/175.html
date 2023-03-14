@@ -1,0 +1,469 @@
+<html>
+<head>
+<title>A Machine Learning Approach to Log Analytics: How to Analyze Logs? </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>日志分析的机器学习方法:如何分析日志？</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/machine-learning-approach-to-log-analytics#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/machine-learning-approach-to-log-analytics#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p><a href="https://web.archive.org/web/20221206013303/https://theaisummer.com/logging-debugging/" target="_blank" rel="noreferrer noopener nofollow">日志</a>在软件系统的开发和维护中起着很大的作用。使用日志，开发人员和工程师可以分析系统的每一层发生了什么，并跟踪问题。尽管有大量的分布式日志数据，但充分分析这些数据仍然是一个巨大的挑战。</p>
+
+
+
+<p>在本文中，我们将讨论手动日志分析的主要问题，并了解为什么机器学习是这一挑战的解决方案。</p>
+
+
+
+
+
+
+
+<p>在收集和解析来自不同来源的日志后，<strong>日志分析工具</strong>分析大量数据，以找到与任何应用程序或系统错误相关的问题的主要原因。</p>
+
+
+
+<p>这些工具对于在一个集中的位置监视、收集和评估日志是必不可少的。这样，用户可以从收集的日志数据中获得系统级的洞察力。您可以快速排除故障、修复问题，并找到有意义的行为模式来指导业务决策、调查和安全。</p>
+
+
+
+<p>现代软件系统会生成大量日志，这使得基于手动查询级别匹配或基于规则的策略使用传统日志分析工具检查日志变得不切实际。</p>
+
+
+
+<h2 id="h-traditional-log-analysis-problem">传统日志分析问题</h2>
+
+
+
+<p>在进行传统日志分析之前，我们首先需要定义<strong>日志分析</strong>本身，并了解为什么它对公司至关重要。</p>
+
+
+
+<p>事实上，日志分析是审查和理解计算机生成的日志消息，如日志事件或审计跟踪记录(由计算机、网络、防火墙、应用服务器和其他it系统生成)。</p>
+
+
+
+<p>它被组织用来提高性能和解决问题。它还可以降低各种风险，响应安全策略，理解在线用户行为，并在调查期间进行取证。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/f2000fc733088421d64d79531586f9cf.png" alt="Steps of Log Analysis " class="wp-image-44313" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221206013303im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Steps-of-Log-Analysis.png?ssl=1"/><figcaption><em>Steps of log analysis (<a href="https://web.archive.org/web/20221206013303/http://arnaudpain.com/2017/12/14/xenmobile-troubleshooting-log-collection-guide/#sthash.xB4MFuuK.dpbs" target="_blank" rel="noreferrer noopener nofollow">source</a>)</em></figcaption></figure></div>
+
+
+
+<p>现代软件系统规模和复杂性的不断增加扩大了日志的数量，使得传统的手动日志检查变得不合理。事实上，现代软件系统会生成大量日志。例如，任何商业云应用程序每小时都会产生数千兆字节的数据。使用传统方法无法区分来自日常业务活动的数据和来自恶意活动的数据。</p>
+
+
+
+<p>手动日志分析取决于运行分析的人员的熟练程度。如果他们对系统有深入的了解，他们可能会获得一些手动检查日志的动力。然而，这有严重的局限性。这使得整个团队处于一个人的支配之下。只要这个人联系不上，或者无法解决问题，<strong>整个运营就处于风险之中</strong>。</p>
+
+
+
+<h2 id="h-the-answer-is-machine-learning-log-analysis">答案是机器学习日志分析</h2>
+
+
+
+<p>机器学习即使不能解决传统日志分析的挑战，也可以成为解决方案的一部分。</p>
+
+
+
+<p>计算机已经证明它们能打败人类。在有大量数据的任务中，这种能力使机器能够驾驶汽车，识别图像和检测网络威胁。</p>
+
+
+
+<p>借助机器学习驱动的日志分析，技术团队可以摆脱常规和可重复的任务，工程师可以专注于机器无法完成的其他任务。喜欢解决问题的任务，并思考创新的新产品。</p>
+
+
+
+<h2 id="h-benefits-of-machine-learning-for-log-analysis">机器学习对日志分析的好处</h2>
+
+
+
+<p>将机器学习与日志分析工具结合使用可以让我们:</p>
+
+
+
+<ul><li><strong>快速分类数据:</strong>日志可以被视为文本数据，这意味着可以应用NLP技术以有组织的方式收集相同的日志，从而可以搜索特定类型的日志。</li><li><strong>自动识别问题:</strong>ML的好处之一是它可以自动检测问题，即使有大量的日志。</li><li><strong>警报关键信息:</strong>许多日志分析工具会创建过多的警报，而在大多数情况下，这些警报并不是真正问题的原因。有了ML，就有可能在有值得关注的事情时得到提醒。这样，我们就克服了误报警报的问题。</li><li><strong>早期异常检测:</strong>在大多数灾难性事件中，总会有未被检测到的初始异常。机器学习可以在这种异常造成重大问题之前检测到它。</li></ul>
+
+
+
+
+
+
+
+<p>在本节中，我们将列出使用机器学习进行监控的最佳日志分析工具，并定义如何在它们之间进行选择。我们将通过回顾10大日志分析工具来做到这一点。</p>
+
+
+
+<h3><strong> 1。珊瑚</strong></h3>
+
+
+
+
+
+
+
+<p>Coralogix是一家希望将自动化和智能化引入日志记录的初创公司。他们正在构建一个由机器学习支持的远程监控和管理工具，该工具提供了一个分析平台来改善网络的交付和维护流程。用户有一个理想的平台来查看所有实时日志流，定义仪表板小部件以最大限度地控制数据，并将日志数据聚集回原始模式。</p>
+
+
+
+<h3><strong> 2. Datadog </strong></h3>
+
+
+
+
+
+
+
+<p>Datadog是一个日志分析工具，通过一个位于SaaS的数据分析平台提供对服务器、数据库、工具和服务的监控。Datadog的可视化以图形的形式显示日志数据，这使您可以可视化网络性能随时间的变化。Datadog使用集中式数据存储来保护日志数据不被泄露，并使用机器学习来检测异常日志模式和问题。</p>
+
+
+
+<h3><strong> 3。网络安全管理软件产品/ Loggly </strong></h3>
+
+
+
+
+
+
+
+<p>Loggly是日志数据管理的SaaS解决方案。用户可以简单地从整个基础架构中汇总日志，并将它们放在一个位置来跟踪活动和分析趋势。Loggly有多种用途，例如监控应用程序分析、排除服务器和应用程序问题、事务关联和警报。它提供了不同的高级功能，如动态字段资源管理器、自动警报、默认或自定义仪表板以及派生的日志字段。</p>
+
+
+
+<h3><strong> 4。逻辑监视器</strong></h3>
+
+
+
+
+
+
+
+<p>Logic Monitor是一个基于SaaS的性能监控平台，能够监控对业务至关重要的数据，以便您能够快速响应问题并主动提供解决方案。它在一个组合视图中提供网络、云、服务器等的全栈可见性。</p>
+
+
+
+<h3><strong> 5。</strong><a href="https://web.archive.org/web/20221206013303/http://logz.io/"><strong/></a><strong>logz . io</strong></h3>
+
+
+
+
+
+
+
+<p>Logz.io提供了一个可扩展的智能机器数据分析平台，构建于ELK和Grafana之上，用于监控现代应用。它将云原生的简单性和可扩展性与众包机器学习相结合，以在大问题发生前识别它们。用户可以使用一个统一的平台对任务关键型应用程序进行监控、故障排除和保护。</p>
+
+
+
+<h3><strong> 6。语义文本</strong></h3>
+
+
+
+
+
+
+
+<p>Sematext是一个基于云的日志管理和分析工具。这是麋鹿的在线实现。它也可通过Sematext Enterprise用于自托管解决方案。Sematext是一个统一的平台，提供一体化解决方案，用于基础设施监控、应用性能监控、日志管理、真实用户监控和综合监控，为您的整个技术体系提供统一、实时的可观察性。</p>
+
+
+
+<h3>7 .<strong>。Splunk </strong></h3>
+
+
+
+
+
+
+
+<p>Splunk是流行的商业日志集中工具之一。典型的部署是内部部署(Splunk Enterprise)，尽管它也作为服务提供(Splunk Cloud)。它有实时警报。它们可以通过电子邮件或RSS发送。警报具有可配置的阈值和触发条件，以确定哪些活动将生成通知。警报中包含的支持信息有助于缩短事件解决时间。</p>
+
+
+
+<h3><strong> 8。SumoLogic </strong></h3>
+
+
+
+
+
+
+
+<p>Sumo Logic是一个日志管理工具，用于协作、操作、开发和保护应用程序。它具有强大的搜索语法，有助于以类似于UNIX管道的方式定义操作。它还是一个基于云的机器数据分析平台，旨在主动识别性能问题，确保无缝设备可用性，并增强应用部署。此外，Sumo逻辑包括内置的模式检测、预测分析和异常检测。</p>
+
+
+
+<h3><strong> 9。x测井</strong></h3>
+
+
+
+
+
+
+
+<p>XpoLog是一个用于全自动日志管理的端到端解决方案。它旨在收集和解析来自It基础设施、云应用程序和服务器的日志数据。此外，它还提供了分析工具、报告引擎、监控引擎、关联功能、事务跟踪和日志监控搜索引擎。Xpolog支持无代理和基于代理的架构，这意味着它可以通过SSH之类的标准协议访问日志。</p>
+
+
+
+<h3>10。斑马鱼</h3>
+
+
+
+
+
+
+
+<p>Zebrium是一款用于监控日志结构的软件，使用无监督的机器学习来自动捕捉软件事件并显示其根本原因。该工具通过查找日志和指标中相关异常模式的热点来工作。该软件提供AES-256加密，并通过Slack接收警报。</p>
+
+
+
+
+
+
+
+<p>我们已经建立了一个10个日志分析工具比较表，以便于更好地审查。</p>
+
+
+
+<p id="separator-block_61af2cf8aaf9c" class="block-separator block-separator--10"> </p>
+
+
+
+<div id="medium-table-block_61af2cfeaaf9d" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">工具</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">赞成的意见</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">骗局</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">最适合</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>更快的搜索体验，强大的日志聚合和警报功能。出色的客户支持。自动数据聚类、闲置提醒和电子邮件。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>每天的日志量有限，不是每月。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>小企业和创业公司。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>强大的预警和警告配置，大幅减少误报。良好的API文档，响应迅速的客户服务。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">一些用户抱怨成本失控(由于灵活定价的可能性)。T3】</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>中小型公司。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>良好的搜索功能，可以选择在一个集中的地方收集和分析来自许多不同来源的日志。用户还可以在Slack、HipChat或吉拉等不同平台上发布警报和创建票证。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">用户界面不是很漂亮。基本功能，如API访问或多用户，仅在较高的定价计划中可用。T3】</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>部署到云环境而非本地环境的组织。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>非常详细和精确地监控各种设备和环境，包括云环境和内部环境。自定义可视化仪表板和许多预配置的丰富仪表板。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil">Web UI有时需要刷新以显示更改，这很烦人。重新考虑入门级产品的定价，以便较小的组织可以使用该工具。T3】</td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>中型和大型公司。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>良好的搜索，易于使用，包括过滤和格式化功能。出色的警报机制，尤其适用于监控应用。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>限于创建子账户，这是大公司的一大难题。数据保留不是很好。如果我们达到最大事件摄取量，有时我们可能会丢失事件。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>基于云的应用。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>导航简单，界面环境好，没有复杂杂乱。良好的文档和出色的客户支持。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>只解析服务器端的Syslog和JSON。自定义解析必须在日志传送程序中完成。不能在同一个仪表板中混合Kibana和本机UI小部件。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>面向企业和消费者的公司。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>广泛的功能列表包括机器数据索引、实时和历史搜索，以及高级报告功能。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>非常昂贵。陡峭的学习曲线，昂贵的部署和高维护。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>寻找可靠技术以及对公司和品牌的信心的组织。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>对现代应用不同方面的信息洞察，用于监控和可视化的仪表板，机器学习功能，预测分析功能。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner">T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>有几根圆木的小组织。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>非常易于维护和部署自动分析算法，包括大量日志分析和管理功能。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>比其他工具更小的社区，产品比开发者的社区更注重IT和安全。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>寻求经济实惠的快速部署解决方案的企业和中小型企业。</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>易于使用，自动检测问题和根本原因，无需手动规则。可以用作独立的日志管理工具，也可以作为现有日志管理工具(如ELK Stack)的ML附件。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>免费计划每天限量500 MB，保留3天。此外，它不像竞争对手那样知名。</p>T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>大型企业，中小型企业。</p>T3】</div></td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_61af2d02aaf9e" class="block-separator block-separator--20">结论</p>
+
+
+
+<h2 id="h-conclusion">一些日志分析平台使用机器学习来帮助自动检测根本原因和问题，而不需要太多或任何手动分析。</h2>
+
+
+
+<p>当你选择一个日志分析工具时，不要只看功能和预算，要考虑你能获得的时间。您是想花时间开发自己的日志分析工具，还是更喜欢开箱即用的解决方案，以便专注于您的业务？</p>
+
+
+
+<p>最终决定权在你。希望这篇文章能帮助你选择合适的工具！</p>
+
+
+
+<p>参考</p>
+
+
+
+<h3>References</h3>
+
+
+
+
+        </div>
+        
+    </div>    
+</body>
+</html>

@@ -1,0 +1,550 @@
+<html>
+<head>
+<title>pyLDAvis: Topic Modelling Exploration Tool That Every NLP Data Scientist Should Know </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>pyLDAvis:每个NLP数据科学家都应该知道的主题建模探索工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/pyldavis-topic-modelling-exploration-tool-that-every-nlp-data-scientist-should-know#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/pyldavis-topic-modelling-exploration-tool-that-every-nlp-data-scientist-should-know#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>你有没有想过根据新闻、论文或推文的主题对它们进行分类？知道如何做到这一点可以帮助你过滤掉不相关的文档，并且通过只阅读你感兴趣的内容来节省时间。</p>
+
+
+
+<p>这就是文本分类的目的——允许您训练您的模型识别主题。这种技术允许您使用数据标签来训练您的模型，并且它是监督学习。</p>
+
+
+
+
+
+
+
+<p>在现实生活中，您可能没有用于文本分类的数据标签。你可以检查每一个文档来标记它们，或者雇佣其他人来做这件事，但是这需要很多时间和金钱，尤其是当你有超过1000个数据点的时候。</p>
+
+
+
+<p>没有训练数据，你能找到你的文档的主题吗？可以，可以用主题建模来做。</p>
+
+
+
+
+
+<h2>什么是主题建模？</h2>
+
+
+
+<p>使用<a href="https://web.archive.org/web/20221110095745/https://towardsdatascience.com/end-to-end-topic-modeling-in-python-latent-dirichlet-allocation-lda-35ce4ed6b3e0" target="_blank" rel="noreferrer noopener nofollow">主题建模</a>，可以对一组文档进行单词聚类。这是无监督的学习，因为它自动将单词分组，而没有预定义的标签列表。</p>
+
+
+
+<p>如果你输入模型数据，它会给你不同的单词集合，每一个单词集合都描述了主题。</p>
+
+
+
+<pre class="hljs">(<span class="hljs-name">0</span>, <span class="hljs-symbol">'0.024*</span><span class="hljs-string">"ban"</span> + <span class="hljs-number">0.017</span>*<span class="hljs-string">"order"</span> + <span class="hljs-number">0.015</span>*<span class="hljs-string">"refugee"</span> + <span class="hljs-number">0.015</span>*<span class="hljs-string">"law"</span> + <span class="hljs-number">0.013</span>*<span class="hljs-string">"trump"</span> '
+ <span class="hljs-symbol">'+</span> <span class="hljs-number">0.011</span>*<span class="hljs-string">"kill"</span> + <span class="hljs-number">0.011</span>*<span class="hljs-string">"country"</span> + <span class="hljs-number">0.010</span>*<span class="hljs-string">"attack"</span> + <span class="hljs-number">0.009</span>*<span class="hljs-string">"state"</span> + '
+ <span class="hljs-symbol">'0.009*</span><span class="hljs-string">"immigration"</span>')
+(<span class="hljs-name">1</span>, <span class="hljs-symbol">'0.020*</span><span class="hljs-string">"student"</span> + <span class="hljs-number">0.020</span>*<span class="hljs-string">"work"</span> + <span class="hljs-number">0.019</span>*<span class="hljs-string">"great"</span> + <span class="hljs-number">0.017</span>*<span class="hljs-string">"learn"</span> + '
+  <span class="hljs-symbol">'0.017*</span><span class="hljs-string">"school"</span> + <span class="hljs-number">0.015</span>*<span class="hljs-string">"talk"</span> + <span class="hljs-number">0.014</span>*<span class="hljs-string">"support"</span> + <span class="hljs-number">0.012</span>*<span class="hljs-string">"community"</span> + '
+  <span class="hljs-symbol">'0.010*</span><span class="hljs-string">"share"</span> + <span class="hljs-number">0.009</span>*<span class="hljs-string">"event"</span>)</pre>
+
+
+
+<p>当你看到第一组单词的时候，你会猜测这个话题是军事和政治。看第二组单词，你可能会猜测话题是公共事件或学校。</p>
+
+
+
+<p>这个挺有用的。你的文本被自动分类，不需要给它们贴标签！</p>
+
+
+
+
+
+<h2>用pyLDAvis可视化主题建模</h2>
+
+
+
+<p>主题建模是有用的，但是仅仅看上面的单词和数字的组合是很难理解的。</p>
+
+
+
+<p>理解数据最有效的方法之一是通过可视化。有没有一种方法可以将LDA的结果可视化？是的，我们可以用<a href="https://web.archive.org/web/20221110095745/https://github.com/bmabey/pyLDAvis" target="_blank" rel="noreferrer noopener nofollow">皮戴维斯</a>。</p>
+
+
+
+<p>PyLDAvis允许我们解释如下主题模型中的主题:</p>
+
+
+
+
+
+
+
+<p>很酷，不是吗？现在我们将学习如何使用主题建模和pyLDAvis对推文进行分类并可视化结果。我们将分析包含6000条推文的真实Twitter数据集 <a href="https://web.archive.org/web/20221110095745/https://datapane.com/u/khuyentran1401/reports/tweets/" target="_blank" rel="noreferrer noopener nofollow"> <strong>。</strong> </a></p>
+
+
+
+<p>看看能找到什么话题。</p>
+
+
+
+<figure class="wp-block-embed aligncenter is-type-wp-embed is-provider-datapane wp-block-embed-datapane"/>
+
+
+
+
+
+<h2>如何开始使用pyLDAvis以及如何使用它</h2>
+
+
+
+<p>将pyLDAvis安装在:</p>
+
+
+
+<pre class="hljs">pip install pyldavis</pre>
+
+
+
+<p>处理数据的脚本可以在<a href="https://web.archive.org/web/20221110095745/https://ui.neptune.ai/khuyentran1401/sandbox/n/ac75203d-2de0-4bbf-a559-ec7763d919d8/e7960ea4-c002-4ea6-949f-8964c1e33491" target="_blank" rel="noreferrer noopener">这里</a>找到。下载处理后的<a href="https://web.archive.org/web/20221110095745/https://datapane.com/u/khuyentran1401/reports/processed_tweets/" target="_blank" rel="noreferrer noopener nofollow">数据</a>。</p>
+
+
+
+<p>接下来，让我们导入相关的库:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> gensim
+<span class="hljs-keyword">import</span> gensim.corpora <span class="hljs-keyword">as</span> corpora
+<span class="hljs-keyword">from</span> gensim.corpora <span class="hljs-keyword">import</span> Dictionary
+<span class="hljs-keyword">from</span> gensim.models.coherencemodel <span class="hljs-keyword">import</span> CoherenceModel
+<span class="hljs-keyword">from</span> gensim.models.ldamodel <span class="hljs-keyword">import</span> LdaModel
+
+<span class="hljs-keyword">from</span> pprint <span class="hljs-keyword">import</span> pprint
+
+<span class="hljs-keyword">import</span> spacy
+
+<span class="hljs-keyword">import</span> pickle
+<span class="hljs-keyword">import</span> re 
+<span class="hljs-keyword">import</span> pyLDAvis
+<span class="hljs-keyword">import</span> pyLDAvis.gensim
+
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt 
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd</pre>
+
+
+
+<p>如果您想访问上面的数据并阅读本文，请下载数据并将数据放在当前目录中，然后运行:</p>
+
+
+
+<pre class="hljs">tweets = pd.read_csv(<span class="hljs-string">'dp-export-8940.csv'</span>) 
+tweets = tweets.Tweets.values.tolist()
+
+
+tweets = [t.split(<span class="hljs-string">','</span>) <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> tweets]</pre>
+
+
+
+
+
+<h2>如何使用LDA模型</h2>
+
+
+
+<p>主题建模包括计算单词和对相似的单词模式进行分组，以描述数据中的主题。如果模型知道词频，以及哪些词经常出现在同一文档中，它将发现可以将不同的词组合在一起的模式。</p>
+
+
+
+<p>我们首先将一个单词集合转换成一个单词包，单词包是一个元组列表(word_id，word_frequency)。<strong>gensim . corpora . dictionary</strong>是一个很好的工具:</p>
+
+
+
+<pre class="hljs">id2word = Dictionary(tweets)
+
+corpus = [id2word.doc2bow(text) <span class="hljs-keyword">for</span> text <span class="hljs-keyword">in</span> tweets]
+print(corpus[:<span class="hljs-number">1</span>])
+
+[[(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">2</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">3</span>, <span class="hljs-number">3</span>), (<span class="hljs-number">4</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">5</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">6</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">7</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">8</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">9</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">10</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">11</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">12</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">13</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">14</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">15</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">16</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">17</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">18</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">19</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">20</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">21</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">22</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">23</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">24</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">25</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">26</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">27</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">28</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">29</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">30</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">31</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">32</span>, <span class="hljs-number">1</span>), ... , (<span class="hljs-number">347</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">348</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">349</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">350</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">351</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">352</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">353</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">354</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">355</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">356</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">357</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">358</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">359</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">360</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">361</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">362</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">363</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">364</span>, <span class="hljs-number">4</span>), (<span class="hljs-number">365</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">366</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">367</span>, <span class="hljs-number">3</span>), (<span class="hljs-number">368</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">369</span>, <span class="hljs-number">8</span>), (<span class="hljs-number">370</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">371</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">372</span>, <span class="hljs-number">1</span>), (<span class="hljs-number">373</span>, <span class="hljs-number">4</span>)]]</pre>
+
+
+
+<p>这些元组是什么意思？让我们将它们转换成人类可读的格式来理解:</p>
+
+
+
+<pre class="hljs">[[(id2word[i], freq) <span class="hljs-keyword">for</span> i, freq <span class="hljs-keyword">in</span> doc] <span class="hljs-keyword">for</span> doc <span class="hljs-keyword">in</span> corpus[:<span class="hljs-number">1</span>]]
+
+[[(<span class="hljs-string">"'d"</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'-'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'absolutely'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'aca'</span>, <span class="hljs-number">3</span>),
+  (<span class="hljs-string">'act'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'action'</span>, <span class="hljs-number">2</span>),
+  (<span class="hljs-string">'add'</span>, <span class="hljs-number">2</span>),
+  (<span class="hljs-string">'administrative'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'affordable'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'allow'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'amazing'</span>, <span class="hljs-number">1</span>),
+...
+  (<span class="hljs-string">'way'</span>, <span class="hljs-number">4</span>),
+  (<span class="hljs-string">'week'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'well'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'will'</span>, <span class="hljs-number">3</span>),
+  (<span class="hljs-string">'wonder'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'work'</span>, <span class="hljs-number">8</span>),
+  (<span class="hljs-string">'world'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'writing'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'wrong'</span>, <span class="hljs-number">1</span>),
+  (<span class="hljs-string">'year'</span>, <span class="hljs-number">4</span>)]]</pre>
+
+
+
+<p>现在让我们构建一个LDA主题模型。为此，我们将使用<a href="https://web.archive.org/web/20221110095745/https://radimrehurek.com/gensim/models/ldamodel.html#gensim.models.ldamodel.LdaModel" target="_blank" rel="noreferrer noopener nofollow">gensim . models . LDA model . LDA model</a>:</p>
+
+
+
+<pre class="hljs">
+lda_model = LdaModel(corpus=corpus,
+                   id2word=id2word,
+                   num_topics=<span class="hljs-number">10</span>, 
+                   random_state=<span class="hljs-number">0</span>,
+                   chunksize=<span class="hljs-number">100</span>,
+                   alpha=<span class="hljs-string">'auto'</span>,
+                   per_word_topics=<span class="hljs-keyword">True</span>)
+
+pprint(lda_model.print_topics())
+doc_lda = lda_model[corpus]
+</pre>
+
+
+
+<p>这里好像有一些<strong>模式</strong>。第一个话题可能是政治，第二个话题可能是体育，但模式不清楚。</p>
+
+
+
+<pre class="hljs">[(<span class="hljs-number">0</span>,
+ <span class="hljs-string">'0.017*"go" + 0.013*"think" + 0.013*"know" + 0.010*"time" + 0.010*"people" + '</span>
+ <span class="hljs-string">'0.008*"good" + 0.008*"thing" + 0.007*"feel" + 0.007*"need" + 0.007*"get"'</span>),
+(<span class="hljs-number">1</span>,
+ <span class="hljs-string">'0.020*"game" + 0.019*"play" + 0.019*"good" + 0.013*"win" + 0.012*"go" + '</span>
+ <span class="hljs-string">'0.010*"look" + 0.010*"great" + 0.010*"team" + 0.010*"time" + 0.009*"year"'</span>),
+(<span class="hljs-number">2</span>,
+ <span class="hljs-string">'0.029*"video" + 0.026*"new" + 0.021*"like" + 0.020*"day" + 0.019*"today" + '</span>
+ <span class="hljs-string">'0.015*"check" + 0.014*"photo" + 0.009*"post" + 0.009*"morning" + '</span>
+ <span class="hljs-string">'0.009*"year"'</span>),
+(<span class="hljs-number">3</span>,
+ <span class="hljs-string">'0.186*"more" + 0.058*"today" + 0.021*"pisce" + 0.016*"capricorn" + '</span>
+ <span class="hljs-string">'0.015*"cancer" + 0.015*"aquarius" + 0.013*"arie" + 0.008*"feel" + '</span>
+ <span class="hljs-string">'0.008*"gemini" + 0.006*"idea"'</span>),
+(<span class="hljs-number">4</span>,
+ <span class="hljs-string">'0.017*"great" + 0.011*"new" + 0.010*"thank" + 0.010*"work" + 0.008*"good" + '</span>
+ <span class="hljs-string">'0.008*"look" + 0.007*"how" + 0.006*"learn" + 0.005*"need" + 0.005*"year"'</span>),
+(<span class="hljs-number">5</span>,
+ <span class="hljs-string">'0.028*"thank" + 0.026*"love" + 0.017*"good" + 0.013*"day" + 0.010*"year" + '</span>
+ <span class="hljs-string">'0.010*"look" + 0.010*"happy" + 0.010*"great" + 0.010*"time" + 0.009*"go"'</span>)]
+</pre>
+
+
+
+<p>让我们使用pyLDAvis来可视化这些主题:</p>
+
+
+
+
+
+
+
+<p>点击<a href="https://web.archive.org/web/20221110095745/https://ui.neptune.ai/khuyentran1401/sandbox/n/Topic-modeling-b25db361-8995-42ee-bd50-6f03fa8d5847/65d94d91-43e9-4c21-bee6-8a9bf7584087#ldavis_el55571398076541038884947444595" target="_blank" rel="noreferrer noopener nofollow">此处</a>亲自与可视化互动。</p>
+
+
+<div class="custom-point-list">
+<ul><li>每个气泡代表一个主题。气泡越大，语料库中关于该主题的推文数量的百分比越高。</li><li>蓝色条代表语料库中每个单词的总频率。如果没有选择主题，将显示最常用单词的蓝色条。</li><li>红色条给出了给定主题产生给定术语的估计次数。从下面的图片中可以看到，单词“go”大约有22，000个，在主题1中使用了大约10，000次。红色条最长的单词是属于该主题的推文使用最多的单词。</li></ul>
+</div>
+
+
+
+
+
+<div class="custom-point-list">
+<ul><li>气泡之间的距离越远，它们之间的差异就越大。例如，很难区分主题1和主题2。它们看起来都是关于社会生活的，但是区分话题1和话题3要容易得多。我们可以看出话题3是关于政治的。</li></ul>
+</div>
+
+
+
+
+
+
+<p>一个好的主题模型会有分散在整个图表中的大而不重叠的气泡。从图中我们可以看到，气泡聚集在一个地方。我们能做得比这更好吗？</p>
+
+
+
+<p>是的，因为幸运的是，有一个更好的主题建模模型叫做LDA Mallet。</p>
+
+
+
+
+
+<h2>如何使用LDA Mallet模型</h2>
+
+
+
+<p>如果一个主题中的单词相似，我们的模型会更好，所以我们将使用主题连贯性来评估我们的模型。主题一致性通过测量主题中高分单词之间的语义相似度来评估单个主题。<strong>好的模型会产生话题连贯性分数高的话题。</strong></p>
+
+
+
+<pre class="hljs">
+coherence_model_lda = CoherenceModel(model=lda_model, texts=tweets, dictionary=id2word, coherence=<span class="hljs-string">'c_v'</span>)
+coherence_lda = coherence_model_lda.get_coherence()
+print(<span class="hljs-string">'\\nCoherence Score: '</span>, coherence_lda)
+
+Coherence Score:  <span class="hljs-number">0.3536443343685833</span>
+</pre>
+
+
+
+<p>这是我们的基线。我们刚刚使用了Gensim的内置版本的<a href="https://web.archive.org/web/20221110095745/https://diging.github.io/tethne/api/tutorial.mallet.html" target="_blank" rel="noreferrer noopener nofollow"> LDA算法</a>，但是有一个LDA模型提供了更好的主题质量，称为<a href="https://web.archive.org/web/20221110095745/https://medium.com/swlh/topic-modeling-lda-mallet-implementation-in-python-part-2-602ffb38d396"> <strong> LDA Mallet模型</strong> </a>。</p>
+
+
+
+<p>让我们看看是否可以用LDA Mallet做得更好。</p>
+
+
+
+<pre class="hljs">mallet_path = <span class="hljs-string">'patt/to/mallet-2.0.8/bin/mallet'</span> 
+ldamallet = gensim.models.wrappers.LdaMallet(mallet_path, corpus=corpus, num_topics=<span class="hljs-number">20</span>, id2word=id2word)
+
+
+pprint(ldamallet.show_topics(formatted=<span class="hljs-keyword">False</span>))
+
+
+coherence_model_ldamallet = CoherenceModel(model=ldamallet, texts=tweets, dictionary=id2word, coherence=<span class="hljs-string">'c_v'</span>)
+coherence_ldamallet = coherence_model_ldamallet.get_coherence()
+print(<span class="hljs-string">'\\nCoherence Score: '</span>, coherence_ldamallet)
+
+Coherence Score:  <span class="hljs-number">0.38780981858635866</span></pre>
+
+
+
+<p><strong>连贯性评分更好！</strong>如果我们增加或减少题目数量，分数会更好吗？让我们通过微调模型来找出答案。<a href="https://web.archive.org/web/20221110095745/https://www.machinelearningplus.com/nlp/topic-modeling-gensim-python/#16buildingldamalletmodel" target="_blank" rel="noreferrer noopener nofollow">本教程</a>很好地解释了如何调整LDA模型。下面是文章中的源代码:</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">compute_coherence_values</span><span class="hljs-params">(dictionary, corpus, texts, limit, start=<span class="hljs-number">2</span>, step=<span class="hljs-number">3</span>)</span>:</span>
+    <span class="hljs-string">"""
+    Compute c_v coherence for various number of topics
+
+    Parameters:
+    ----------
+    dictionary : Gensim dictionary
+    corpus : Gensim corpus
+    texts : List of input texts
+    limit : Max num of topics
+
+    Returns:
+    -------
+    model_list : List of LDA topic models
+    coherence_values : Coherence values corresponding to the LDA model with respective number of topics
+    """</span>
+    coherence_values = []
+    model_list = []
+    <span class="hljs-keyword">for</span> num_topics <span class="hljs-keyword">in</span> range(start, limit, step):
+        model = gensim.models.wrappers.LdaMallet(mallet_path, corpus=corpus, num_topics=num_topics, id2word=id2word)
+        model_list.append(model)
+        coherencemodel = CoherenceModel(model=model, texts=texts, dictionary=dictionary, coherence=<span class="hljs-string">'c_v'</span>)
+        coherence_values.append(coherencemodel.get_coherence())
+
+    <span class="hljs-keyword">return</span> model_list, coherence_values
+
+model_list, coherence_values = compute_coherence_values(dictionary=id2word, corpus=corpus, texts=tweets, start=<span class="hljs-number">2</span>, limit=<span class="hljs-number">40</span>, step=<span class="hljs-number">4</span>)
+
+
+limit=<span class="hljs-number">40</span>; start=<span class="hljs-number">2</span>; step=<span class="hljs-number">4</span>;
+x = range(start, limit, step)
+plt.plot(x, coherence_values)
+plt.xlabel(<span class="hljs-string">"Num Topics"</span>)
+plt.ylabel(<span class="hljs-string">"Coherence score"</span>)
+plt.legend((<span class="hljs-string">"coherence_values"</span>), loc=<span class="hljs-string">'best'</span>)
+plt.show()</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img data-attachment-id="30430" data-permalink="https://web.archive.org/web/20221110095745/https://neptune.ai/coherence-score" data-orig-file="https://web.archive.org/web/20221110095745/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?fit=422%2C280&amp;ssl=1" data-orig-size="422,280" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="coherence-score" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221110095745/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?fit=300%2C199&amp;ssl=1" data-large-file="https://web.archive.org/web/20221110095745/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?fit=422%2C280&amp;ssl=1" decoding="async" src="../Images/9ab10189faf582e47b37c7dbf2caac14.png" alt="coherence score" class="wp-image-30430 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221110095745/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?resize=422%2C280&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221110095745im_/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?resize=422%2C280&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="30430" data-permalink="https://web.archive.org/web/20221110095745/https://neptune.ai/coherence-score" data-orig-file="https://web.archive.org/web/20221110095745/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?fit=422%2C280&amp;ssl=1" data-orig-size="422,280" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="coherence-score" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221110095745/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?fit=300%2C199&amp;ssl=1" data-large-file="https://web.archive.org/web/20221110095745/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?fit=422%2C280&amp;ssl=1" decoding="async" src="../Images/9ab10189faf582e47b37c7dbf2caac14.png" alt="coherence score" class="wp-image-30430" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221110095745im_/https://i0.wp.com/neptune.ai/wp-content/uploads/coherence-score.png?resize=422%2C280&amp;ssl=1"/></noscript></figure></div>
+
+
+
+<p>看起来<strong>的连贯性分数随着话题</strong>数量的增加而增加。我们将使用具有最高一致性分数的模型:</p>
+
+
+
+<pre class="hljs">best_result_index = coherence_values.index(max(coherence_values))
+optimal_model = model_list[best_result_index]
+
+model_topics = optimal_model.show_topics(formatted=<span class="hljs-keyword">False</span>)
+print(f<span class="hljs-string">'''The {x[best_result_index]} topics gives the highest coherence score \\
+of {coherence_values[best_result_index]}'''</span>)</pre>
+
+
+
+<p>这34个话题的连贯得分最高，为0.3912。</p>
+
+
+
+<p>厉害！我们得到更好的连贯性分数。让我们看看如何使用pyLDAVis对单词进行聚类。</p>
+
+
+
+<p>为了使用pyLDAVis可视化我们的模型，我们需要将LDA Mallet模型转换成LDA模型。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">convertldaGenToldaMallet</span><span class="hljs-params">(mallet_model)</span>:</span>
+    model_gensim = LdaModel(
+        id2word=mallet_model.id2word, num_topics=mallet_model.num_topics,
+        alpha=mallet_model.alpha, eta=<span class="hljs-number">0</span>,
+    )
+    model_gensim.state.sstats[...] = mallet_model.wordtopics
+    model_gensim.sync_state()
+    <span class="hljs-keyword">return</span> model_gensim
+
+optimal_model = convertldaGenToldaMallet(optimal_model)</pre>
+
+
+
+<p><strong>您可以在这里</strong>  <strong>访问调好的型号</strong> <a href="https://web.archive.org/web/20221110095745/https://github.com/khuyentran1401/Data-science/blob/master/data_science_tools/pyLDAvis/pyLDAvis.ipynb" target="_blank" rel="noreferrer noopener nofollow"> <strong>。然后用pyLDAvis进行可视化:</strong></a></p>
+
+
+
+<pre class="hljs">
+pyLDAvis.enable_notebook()
+p = pyLDAvis.gensim.prepare(optimal_model, corpus, id2word)
+p</pre>
+
+
+
+
+
+
+
+<p>点击<a href="https://web.archive.org/web/20221110095745/https://ui.neptune.ai/khuyentran1401/sandbox/n/pyLDAvis-284ce842-9956-49c1-9024-4a6a0071fc0b/0ca19636-7716-4a59-887a-aa3ebc087ebc" target="_blank" rel="noreferrer noopener">这里</a>来想象你自己。现在区分不同的话题更容易了。</p>
+
+
+<div class="custom-point-list">
+<ul><li>第一个泡沫似乎是关于个人关系的</li><li>第二个泡沫似乎与政治有关</li><li>第五个泡沫似乎是关于积极的社会事件</li><li>第六个泡泡似乎是关于足球的</li><li>第七个泡沫似乎是关于家庭的</li><li>第27个泡沫似乎是关于体育的</li></ul>
+</div>
+
+
+<p>还有很多。对于这些泡沫的话题，大家有不同的猜测吗？</p>
+
+
+
+
+
+<h2>结论</h2>
+
+
+
+<p>感谢阅读。希望您已经了解了主题建模是什么，以及如何用pyLDAvis可视化您的模型的结果。</p>
+
+
+
+<p>虽然主题建模不如文本分类准确，但如果你没有足够的时间和资源给你的数据贴标签，这是值得的。为什么不先尝试一个更简单的解决方案，然后再想出更复杂、更耗时的方法呢？</p>
+
+
+
+<p>可以在这里玩转本文<a href="https://web.archive.org/web/20221110095745/https://github.com/khuyentran1401/Data-science/tree/master/data_science_tools/pyLDAvis" target="_blank" rel="noreferrer noopener nofollow">中的代码。我鼓励您将这些代码应用到您自己的数据中，看看您会得到什么。</a></p>
+
+
+
+
+<div id="author-box-new-format-block_60545a159e043" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">坤延川</h3>
+    
+          <p class="article__authorContent-text">Python评估开发人员和数据科学家，喜欢尝试新的数据科学方法并为开源做出贡献。她目前每天都在Data Science Simplified上通过文章和日常数据科学技巧分享一点点美好的事物。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="is-layout-flow wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>自然语言处理的探索性数据分析:Python工具完全指南</h2>
+
+
+
+<p class="has-small-font-size">11分钟阅读|作者Shahul ES |年7月14日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>探索性数据分析是任何机器学习工作流中最重要的部分之一，自然语言处理也不例外。但是<strong>你应该选择哪些工具</strong>来高效地探索和可视化文本数据呢？</p>
+
+
+
+<p>在这篇文章中，我们将<strong>讨论和实现几乎所有的主要技术</strong>，你可以用它们来理解你的文本数据，并给你一个完成工作的Python工具的完整之旅。</p>
+
+
+
+<h2>开始之前:数据集和依赖项</h2>
+
+
+
+<p>在本文中，我们将使用来自Kaggle的百万新闻标题数据集。如果您想一步一步地进行分析，您可能需要安装以下库:</p>
+
+
+
+<pre class="hljs">pip install \
+   pandas matplotlib numpy \
+   nltk seaborn sklearn gensim pyldavis \
+   wordcloud textblob spacy textstat</pre>
+
+
+
+<p>现在，我们可以看看数据。</p>
+
+
+
+<pre class="hljs">news= pd.read_csv(<span class="hljs-string">'data/abcnews-date-text.csv'</span>,nrows=<span class="hljs-number">10000</span>)
+news.head(<span class="hljs-number">3</span>)</pre>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="../Images/ac19fdb9de7b54f1ed6616cfce0a5fb5.png" alt="jupyter output" data-lazy-src="https://web.archive.org/web/20221110095745/https://i2.wp.com/neptune.ai/wp-content/uploads/output1.png?fit=979%2C146&amp;ssl=1&amp;is-pending-load=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class=" jetpack-lazy-image" data-original-src="https://web.archive.org/web/20221110095745im_/https://i2.wp.com/neptune.ai/wp-content/uploads/output1.png?fit=979%2C146&amp;ssl=1"/><noscript><img data-lazy-fallback="1" decoding="async" src="../Images/ac19fdb9de7b54f1ed6616cfce0a5fb5.png" alt="jupyter output" data-original-src="https://web.archive.org/web/20221110095745im_/https://i2.wp.com/neptune.ai/wp-content/uploads/output1.png?fit=979%2C146&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>数据集只包含两列，发布日期和新闻标题。</p>
+
+
+
+<p>为了简单起见，我将探索这个数据集中的前<strong> 10000行</strong>。因为标题是按<em>发布日期</em>排序的，所以实际上从2003年2月19日<em>到2003年4月7日</em>有<strong>两个月。</strong></p>
+
+
+
+<p>好了，我想我们已经准备好开始我们的数据探索了！</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20221110095745/https://neptune.ai/blog/exploratory-data-analysis-natural-language-processing-tools" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

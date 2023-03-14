@@ -1,0 +1,971 @@
+<html>
+<head>
+<title>ML Model Registry: What It Is, Why It Matters, How to Implement It </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>ML模型注册中心:它是什么，为什么重要，如何实现</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/ml-model-registry#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/ml-model-registry#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>为什么一定要多了解model registry？如果你曾经是团队中唯一的数据科学家，你可能会有这种感觉:你开始从事一个机器学习项目，并进行一系列实验，产生各种模型(和工件)，你通过非标准的命名约定“跟踪”这些模型(和工件)。由于您用于模型文件的命名约定不明确，所以您需要花费一些时间来找到您训练的最佳模型。当您最终这样做时，您决定要么将原始工件交给操作团队，要么更糟，自己部署它。</p>
+
+
+
+<p>运营团队收集了您的模型，并告诉您他们需要更多关于以下方面的信息:</p>
+
+
+<div class="case-study-numbered-list">
+    <h2><span> 1 </span>如何使用</h2>
+    <ul>
+                    <li><span> 2 </span>如果模型被测试</li>
+                    <li><span> 3 </span>模型的运行时依赖性</li>
+                    <li><span> 4 </span>和其他重要的操作信息</li>
+                    <li>因为您所做的只是构建模型并交付，所以可能很难与他们合作来成功部署。</li>
+            </ul>
+</div>
+
+
+
+<p>现在想象另一个场景。你的公司正计划推出更多基于ml的产品/特性。一名数据科学家、工程师，甚至可能还有一名产品经理加入团队。当您独自工作时，尽管您的模型部署起来很痛苦(如果部署了的话)，但是您的工作流是有效的。现在您有了新的队友，他们开始询问您的模型版本，您意识到将模型存储在文件中并不是那么容易管理的。这是您真正感受到没有有效的方法来共享您的模型版本、工件和模型元数据的痛苦的时刻。</p>
+
+
+
+<p>问题是，在这一点上，没有简单的方法回到过去，建立一些适当的东西。</p>
+
+
+
+<p>您经过改进的新跨职能团队向您询问:</p>
+
+
+
+<p>我们在哪里可以找到该模型的最佳版本，以便我们可以审计、测试、部署或重用它？</p>
+
+
+<div class="custom-point-list">
+<ul><li>这个模型是怎么训练出来的？</li><li>我们如何跟踪每个模型的文档，以确保它们是兼容的，并且人们可以知道关于它的必要细节，包括元数据？</li><li>我们如何在模型投入使用之前或者甚至在它们被部署之后对其进行评审呢？</li><li>我们如何集成工具和服务，使新项目的发布更加容易？</li><li>你能责怪他们吗？</li></ul>
+</div>
+
+
+<p>他们希望了解生产中运行的是什么，如何改进它或回滚到以前的版本。这很有道理。</p>
+
+
+
+<p>有了这些美好的经历，你开始了你的下一个项目，并寻找一个处理它的工具。你会发现这篇关于ML模型注册的文章。</p>
+
+
+
+<p>在本文中，您将了解到:</p>
+
+
+<div class="table-of-contents">
+        <h2>什么是模型注册中心？</h2>
+        
+</div>
+
+
+<h2 id="What-is-a-model-registry">模型注册中心是一个中央存储库，它允许模型开发人员发布生产就绪的模型以便于访问。有了注册中心，开发人员还可以与其他团队和利益相关者一起工作，共同管理组织中所有模型的生命周期。数据科学家可以将训练好的模型推送到模型注册中心。一旦在注册表中，您的模型就可以在类似于下面的工作流中进行测试、验证和部署到生产中了:</h2>
+
+
+
+<p>模型注册中心提供:</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img data-attachment-id="58559" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_1" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?fit=861%2C330&amp;ssl=1" data-orig-size="861,330" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?fit=300%2C115&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?fit=861%2C330&amp;ssl=1" src="../Images/07acc948c0c4a364004611f4b102acde.png" alt="What is a model registry?" class="wp-image-58559 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?resize=861%2C330&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?resize=861%2C330&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58559" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_1" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?fit=861%2C330&amp;ssl=1" data-orig-size="861,330" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?fit=300%2C115&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?fit=861%2C330&amp;ssl=1" src="../Images/07acc948c0c4a364004611f4b102acde.png" alt="What is a model registry?" class="wp-image-58559" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_1.png?resize=861%2C330&amp;ssl=1"/></noscript><figcaption><em>What is a model registry? | Source: Author</em></figcaption></figure></div>
+
+
+<p>所有型号的集中存储，</p>
+
+
+<div class="custom-point-list">
+<ul><li>和用于模型生命周期管理协作单元。</li><li>让我们仔细看看以上几点:</li></ul>
+</div>
+
+
+<p>集中存储</p>
+
+
+
+<h3 id="centralized-storage">模型注册中心提供了一个中央存储单元，用于保存模型(包括模型工件),以便应用程序(或服务)进行检索。没有模型注册中心，模型工件将被存储在难以跟踪的文件中，并被保存到任何已建立的源代码存储库中。有了模型注册中心，通过集中存储这些模型的区域，这个过程变得更加简单。</h3>
+
+
+
+<p>集中式存储还使数据团队能够拥有所有模型状态的单一视图，从而使协作更加容易。下面的例子展示了不同模型的单一视图，模型工件存储在模型注册中心:</p>
+
+
+
+<p>协作单位</p>
+
+
+<p id="block_61b1c15f707e1" class="separator separator-5">模型注册中心为ML团队提供了一个协作单元来处理和共享模型。它通过以下方式实现协作:</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?ssl=1" target="_blank" rel="noopener" data-lbwps-width="1462" data-lbwps-height="755" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Model-registry-neptune-3.png"><img data-attachment-id="70395" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/blog/ml-model-registry/attachment/model-registry-neptune-3" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?fit=1462%2C755&amp;ssl=1" data-orig-size="1462,755" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model registry neptune 3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?fit=300%2C155&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?fit=1024%2C529&amp;ssl=1" src="../Images/b79427a893f86e0e3796014418ed0545.png" alt="Model registry neptune " class="wp-image-70395 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?resize=1024%2C529&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?resize=1024%2C529&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="70395" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/blog/ml-model-registry/attachment/model-registry-neptune-3" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?fit=1462%2C755&amp;ssl=1" data-orig-size="1462,755" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model registry neptune 3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?fit=300%2C155&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?fit=1024%2C529&amp;ssl=1" src="../Images/b79427a893f86e0e3796014418ed0545.png" alt="Model registry neptune " class="wp-image-70395" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-3.png?resize=1024%2C529&amp;ssl=1"/></noscript></a><figcaption><em>A list of different models registered in the model registry | <a href="https://web.archive.org/web/20221008041956/https://app.neptune.ai/common/showcase-model-registry/models">Source</a></em></figcaption></figure></div>
+
+
+<h3 id="collaborative-unit">弥合实验和生产活动之间的差距。</h3>
+
+
+
+<p>为团队提供一个集中的UI(用户界面)来协作开发模型。</p>
+
+
+<div class="custom-point-list">
+<ul><li>为下游系统提供使用模型的接口。</li><li>弥合实验和生产活动之间的差距</li><li>模型注册中心是<a href="/web/20221008041956/https://neptune.ai/blog/mlops" target="_blank" rel="noreferrer noopener"> MLOps </a>的核心组件，它使模型开发团队、软件开发团队和操作团队能够协作。这是组织内技术和文化的重要组成部分。构建机器学习模型和操作化它们之间太熟悉的差距可以通过使用模型注册表作为MLOps堆栈的一部分来弥合。</li></ul>
+</div>
+
+
+<h4 id="bridging-the-gap-between-experiment-and-production-activities">Bridging the gap between experiment and production activities</h4>
+
+
+
+<p>该注册中心以及自动化培训管道还可以实现生产中模型服务的持续集成、交付和培训(CI/CD/CT ),因为模型可以被频繁地更新、推送到该注册中心，并且全部部署在管道中。</p>
+
+
+<p id="block_61b1c184707e2" class="separator separator-5">为团队提供一个集中的UI(用户界面)来协作开发模型</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><img data-attachment-id="58555" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_5" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?fit=1999%2C676&amp;ssl=1" data-orig-size="1999,676" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?fit=300%2C101&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?fit=1024%2C346&amp;ssl=1" src="../Images/217d6b58dcd23c58ec781d53beb3dc50.png" alt="Model registry is a central component of MLOps" class="wp-image-58555 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?resize=840%2C284&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?resize=840%2C284&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58555" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_5" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?fit=1999%2C676&amp;ssl=1" data-orig-size="1999,676" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?fit=300%2C101&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?fit=1024%2C346&amp;ssl=1" src="../Images/217d6b58dcd23c58ec781d53beb3dc50.png" alt="Model registry is a central component of MLOps" class="wp-image-58555" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_5.png?resize=840%2C284&amp;ssl=1"/></noscript><figcaption><em>Model registry is a central component of MLOps | Source: modified and adapted from <a href="https://web.archive.org/web/20221008041956/https://youtu.be/WrieKPgXZyo?t=643" target="_blank" rel="noreferrer noopener nofollow">YouTube</a></em></figcaption></figure></div>
+
+
+<p>模型注册为团队提供了对他们模型的可见性。有了中央界面，团队可以:</p>
+
+
+
+
+
+
+<h4 id="providing-a-central-ui-user-interface-for-teams-to-collaborate-on-models">搜索模型，</h4>
+
+
+
+<p>查看模型的状态(如果它们正在暂存、部署或退役)，</p>
+
+
+<div class="custom-point-list">
+<ul><li>批准或不批准不同阶段的模型，</li><li>并查看必要的文档。</li><li>这使得团队中的每个人更容易发现模型。如果需要部署模型，运营团队可以轻松地:</li><li>搜索一下，</li></ul>
+</div>
+
+
+<p>查找验证结果和其他指标，</p>
+
+
+<div class="custom-point-list">
+<ul><li>打包模型(如果需要的话)，</li><li>并将它从暂存环境移动到生产环境。</li><li>这改善了跨职能团队在ML项目上的合作方式。</li><li>And move it from the staging environment to the production environment. </li></ul>
+</div>
+
+
+<p>通过UI，模型评审者(或QA工程师)还可以在批准、发布或审核治理的生产模型之前，审核模型以确保它适合部署到生产中。</p>
+
+
+<p id="block_61b1c1a9707e3" class="separator separator-5">为下游服务提供使用模型的接口</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?ssl=1" data-lbwps-width="1208" data-lbwps-height="854" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Model-registry-neptune-1.png"><img data-attachment-id="70120" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/blog/ml-model-registry/attachment/model-registry-neptune-1" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?fit=1208%2C854&amp;ssl=1" data-orig-size="1208,854" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model registry neptune 1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?fit=300%2C212&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?fit=1024%2C724&amp;ssl=1" src="../Images/88a7b90a8fc5db09a08ea7f296b42c53.png" alt="Model registry neptune" class="wp-image-70120 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?resize=1024%2C724&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?resize=1024%2C724&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="70120" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/blog/ml-model-registry/attachment/model-registry-neptune-1" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?fit=1208%2C854&amp;ssl=1" data-orig-size="1208,854" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model registry neptune 1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?fit=300%2C212&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?fit=1024%2C724&amp;ssl=1" src="../Images/88a7b90a8fc5db09a08ea7f296b42c53.png" alt="Model registry neptune" class="wp-image-70120" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-1.png?resize=1024%2C724&amp;ssl=1"/></noscript></a><figcaption><em>Inspecting model’s versions through the dashboard in Neptune.ai | <a href="https://web.archive.org/web/20221008041956/https://app.neptune.ai/common/showcase-model-registry/m/SHOW2-MOD21/versions">Source</a></em></figcaption></figure></div>
+
+
+<p>模型注册中心提供了接口，使得下游服务能够通过API集成来使用模型。通过这种集成，下游系统可以很容易地获得模型的最新(或可接受的)版本。该集成还可以跟踪模型的离线和在线评估指标。正如我们在上一节中所讨论的，这使得使用ML管道构建CI/CD/CT的自动化设置变得容易。下游服务可以是模型用户、自动化作业或REST服务，它们可以使用最稳定的——或任何版本的模型。</p>
+
+
+
+<h4 id="providing-an-interface-for-downstream-services-to-consume-models">为什么需要模型注册中心？</h4>
+
+
+
+<p>由于在上一节中已经向您介绍了什么是模型注册中心，您的问题可能是为什么它对您有用，以及它给您的工作流带来了什么好处。模型注册表支持机器学习操作。回想一下，MLOps 的<a href="https://web.archive.org/web/20221008041956/https://www.datarobot.com/podcasts/mlops-model-deployment/" target="_blank" rel="noreferrer noopener nofollow">四大支柱包括:</a></p>
+
+
+
+
+
+
+<h2 id="Why-do-you-need-a-model-registry">Why do you need a model registry?</h2>
+
+
+
+<p><span> 1 </span>生产模式部署</p>
+
+
+<div class="case-study-numbered-list">
+    <h2><span> 2 </span>生产模式监控<br/></h2>
+    <ul>
+                    <li><span> 3 </span>车型生命周期管理<br/></li>
+                    <li><span> 4 </span>生产模式治理</li>
+                    <li>现在，让我们了解一下MLOps工作流中的模型注册组件如何支持部署、管理和治理支柱。</li>
+                    <li>Model registry支持更快地部署您的模型</li>
+            </ul>
+</div>
+
+
+
+<p>您在前面已经了解到，模型注册中心支持协作的方式之一是它在实验和生产活动之间架起了一座桥梁。这导致您的生产模型的更快推出。此外，模型注册中心存储了经过训练的模型，以便任何集成的应用程序或服务能够快速方便地检索，这最终是您在理想的自动化设置中想要的。</p>
+
+
+
+<h3 id="model-registry-enables-faster-deployment-of-your-models">有了模型注册中心，软件工程师和评审人员可以很容易地识别和选择经过训练的模型的最佳版本(基于评估度量)，因此模型可以被测试、评审和发布到产品中。这使得它成为培训和部署管道的一个很好的统一组件，因为在从实验到生产环境的生产就绪模型的移交中有更少的摩擦。</h3>
+
+
+
+<p>模型注册简化了模型生命周期管理</p>
+
+
+
+<p>当你在一个大型组织中工作，有许多实验在运行，许多模型，和跨职能团队，管理这些模型的生命周期通常是一个具有挑战性的过程。虽然管理一个或几个模型是可能的，但是在大多数情况下，您将有许多模型在生产中运行并服务于不同的用例。模型注册中心有助于应对这一挑战，并简化模型生命周期的管理。使用注册表，您可以:</p>
+
+
+
+<h3 id="model-registry-simplifies-model-lifecycle-management"><strong>在一个组织有序、可搜索的中央存储库中注册、跟踪和发布</strong>您的经过培训、部署和淘汰的模型。</h3>
+
+
+
+<p><strong>存储</strong> <strong>您训练好的模型</strong>的元数据，以及它们的运行时依赖关系，从而简化部署过程。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>建立自动化管道</strong>使生产模式的持续集成、交付和培训成为可能。</li><li><strong>将生产中运行的模型</strong>(冠军模型)与试运行环境中新训练的模型(或挑战者模型)进行比较。</li><li>以下是一个在模型注册表中注册和版本化的训练模型的示例，其中包括模型训练摘要和相关元数据:</li><li><strong>Compare models running in production</strong> (champion models) to freshly trained models (or challenger models) in the staging environment.</li></ul>
+</div>
+
+
+<p>注册中心还可以跟踪和存储模型的在线和离线评估指标。利用这一功能，您可以轻松地查找生产中的模型，以检测模型性能的下降(或<a href="https://web.archive.org/web/20221008041956/https://en.wikipedia.org/wiki/Concept_drift" target="_blank" rel="noreferrer noopener nofollow">概念漂移</a>)。您还可以比较它们的在线和离线性能，以查看哪些生产模型需要审查、维护或归档。</p>
+
+
+<p id="block_61b1c1e9707e4" class="separator separator-5">您不仅可以在生产和培训中跟踪模型的评估指标，还可以跟踪系统指标，以了解哪些模型消耗了最多的应用程序资源(CPU、内存和GPU使用)。以下是Neptune.ai模型注册中心跟踪离线系统和最佳模型评估指标的示例:</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?ssl=1" data-lbwps-width="1209" data-lbwps-height="632" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Model-registry-neptune-2.png"><img data-attachment-id="70122" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/blog/ml-model-registry/attachment/model-registry-neptune-2-2" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?fit=1209%2C632&amp;ssl=1" data-orig-size="1209,632" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model registry neptune 2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?fit=300%2C157&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?fit=1024%2C535&amp;ssl=1" src="../Images/7785430487b119fbebc2324b04c12175.png" alt="Model registry neptune 2" class="wp-image-70122 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?resize=1024%2C535&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?resize=1024%2C535&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="70122" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/blog/ml-model-registry/attachment/model-registry-neptune-2-2" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?fit=1209%2C632&amp;ssl=1" data-orig-size="1209,632" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model registry neptune 2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?fit=300%2C157&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?fit=1024%2C535&amp;ssl=1" src="../Images/7785430487b119fbebc2324b04c12175.png" alt="Model registry neptune 2" class="wp-image-70122" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-neptune-2.png?resize=1024%2C535&amp;ssl=1"/></noscript></a><figcaption><em>Example of a trained model’s version in the Neptune model registry | <a href="https://web.archive.org/web/20221008041956/https://app.neptune.ai/common/showcase-model-registry/m/SHOW2-MOD21/v/SHOW2-MOD21-12/metadata?path=model%2F&amp;attribute=data&amp;file=train_week10.csv&amp;filePath=.">Source</a></em></figcaption></figure></div>
+
+
+<p>The registry can also track and store online and offline evaluation metrics for the models. With this functionality, you can easily look up models that are in production to detect a drop in the performance of the model (or <a href="https://web.archive.org/web/20221008041956/https://en.wikipedia.org/wiki/Concept_drift" target="_blank" rel="noreferrer noopener nofollow">concept drift</a>). You can also compare their online and offline performance to see which of the production models need to be reviewed, maintained, or archived.</p>
+
+
+
+<p>模型注册支持生产模型治理</p>
+
+
+<p id="block_61b1c1fa707e5" class="separator separator-5">模型注册中心做得非常好的一件事是集中模型并组织它们的相关细节。有了注册表，您就有了模型在其生命周期的不同阶段的中心真实来源，包括:</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?ssl=1" data-lbwps-width="1600" data-lbwps-height="494" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Model-registry-monitoring.png"><img data-attachment-id="59002" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/blog/ml-model-registry/attachment/model-registry-monitoring" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?fit=1600%2C494&amp;ssl=1" data-orig-size="1600,494" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model-registry-monitoring" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?fit=300%2C93&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?fit=1024%2C316&amp;ssl=1" src="../Images/31a53dc44101a0235dfe7a096b106d23.png" alt="Model registry - monitoring" class="wp-image-59002 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?resize=1024%2C316&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?resize=1024%2C316&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="59002" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/blog/ml-model-registry/attachment/model-registry-monitoring" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?fit=1600%2C494&amp;ssl=1" data-orig-size="1600,494" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model-registry-monitoring" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?fit=300%2C93&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?fit=1024%2C316&amp;ssl=1" src="../Images/31a53dc44101a0235dfe7a096b106d23.png" alt="Model registry - monitoring" class="wp-image-59002" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-monitoring.png?resize=1024%2C316&amp;ssl=1"/></noscript></a><figcaption><em>Trained model monitoring on Neptune.ai | <a href="https://web.archive.org/web/20221008041956/https://app.neptune.ai/common/example-project-tensorflow-keras/e/TFKERAS-9/monitoring" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+<h3 id="model-registry-enables-production-model-governance">发展，</h3>
+
+
+
+<p>验证，</p>
+
+
+<div class="custom-point-list">
+<ul><li>部署，</li><li>和监控。</li><li>这有助于创建可见性和模型发现，这对于特定行业(如卫生、金融和法律)中需要全面监管投诉流程的模型非常重要。</li><li>负责确保法律合规性的用户应该能够轻松查看注册表中的模型，并理解:</li></ul>
+</div>
+
+
+<p>模型是如何被训练的，</p>
+
+
+
+<p>模型是在什么版本的数据上被训练的，</p>
+
+
+<div class="custom-point-list">
+<ul><li>在充分了解模型的能力和局限性的情况下，模型表现最佳并产生一致结果的条件。</li><li>一个标准的模型注册还将加强模型的文档和报告，确保结果是可重复的，并且可以被任何审计用户复制。评审、批准、发布和回滚都是模型启动过程中的步骤，注册中心可以提供帮助。这些选择基于多种因素，包括离线表现、偏见和公平措施以及在线实验的结果。</li><li>模型注册还可以提高模型的安全性</li></ul>
+</div>
+
+
+<p>必须对模型以及用于构建模型的底层包进行漏洞扫描，尤其是在使用大量包来开发和部署模型时。模型注册中心可以管理包的特定版本，您可以扫描并删除可能对系统造成威胁的安全漏洞。</p>
+
+
+
+<h3 id="model-registry-can-also-improve-model-security">模型同样容易受到恶意攻击，因此，必须对它们进行维护和保护。在某些情况下，必须采用<a href="https://web.archive.org/web/20221008041956/https://en.wikipedia.org/wiki/Principle_of_least_privilege" target="_blank" rel="noreferrer noopener nofollow">最低特权访问安全概念</a>，以便只有授权用户才能访问指定的模型信息、数据隐私以及保护<a href="https://web.archive.org/web/20221008041956/https://searchsecurity.techtarget.com/definition/personally-identifiable-information-PII" target="_blank" rel="noreferrer noopener nofollow">【PII】</a>和其他资源。</h3>
+
+
+
+<p>模型注册中心在MLOps堆栈中的什么位置？</p>
+
+
+
+<p>如果您想要高效且大规模地运行机器学习项目，您很可能需要将模型注册表添加到您的MLOps堆栈中。根据您在MLOps栈中的实现级别,您对模型注册中心的需求会有所不同。哪里合适？好吧，回想一下我们之前学过的，模型注册处位于机器学习开发和部署之间。</p>
+
+
+
+<h2 id="Where-does-a-model-registry-fit-in-the-MLOps-stack">MLOps级别0中的模型注册表</h2>
+
+
+
+<p>如果您处于MLOps的<a href="https://web.archive.org/web/20221008041956/https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning#mlops_level_0_manual_process" target="_blank" rel="noreferrer noopener nofollow">级别0 </a>实现，那么您的带有模型注册中心的工作流可能如下所示:</p>
+
+
+
+<h3 id="model-registry-in-mlops-level-0">实验步骤的输出被输入到模型注册中心。这涉及到一个手动过程，数据科学家准备模型工件和元数据，也可以在注册它们之前打包它们(<a href="https://web.archive.org/web/20221008041956/https://en.wikipedia.org/wiki/Serialization" target="_blank" rel="noreferrer noopener nofollow">序列化</a>，<a href="https://web.archive.org/web/20221008041956/https://www.ibm.com/cloud/learn/containerization" target="_blank" rel="noreferrer noopener nofollow">容器化</a>)。在将打包的模型部署到可以与其他应用程序集成的预测服务引擎之前，运营团队可以将打包的模型推送到临时环境进行测试。</h3>
+
+
+
+<p>MLOps级中的模型注册表</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?ssl=1" data-lbwps-width="1999" data-lbwps-height="742" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/ML-Model-Registry_11.png"><img data-attachment-id="58549" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_11" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?fit=1999%2C742&amp;ssl=1" data-orig-size="1999,742" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_11" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?fit=300%2C111&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?fit=1024%2C380&amp;ssl=1" src="../Images/c5d147405670855567214eb6bde546a7.png" alt="MLOps level 0 workflow with a model registry" class="wp-image-58549 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?resize=1024%2C380&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?resize=1024%2C380&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58549" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_11" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?fit=1999%2C742&amp;ssl=1" data-orig-size="1999,742" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_11" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?fit=300%2C111&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?fit=1024%2C380&amp;ssl=1" src="../Images/c5d147405670855567214eb6bde546a7.png" alt="MLOps level 0 workflow with a model registry" class="wp-image-58549" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_11.png?resize=1024%2C380&amp;ssl=1"/></noscript></a><figcaption><em>MLOps level 0 workflow with a model registry | <a href="https://web.archive.org/web/20221008041956/https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning#mlops_level_0_manual_process" target="_blank" rel="noreferrer noopener nofollow">Source</a> (modified)</em></figcaption></figure></div>
+
+
+<p>与0级(其中工作流是手动过程)相反，<a href="https://web.archive.org/web/20221008041956/https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning#mlops_level_1_ml_pipeline_automation" target="_blank" rel="noreferrer noopener nofollow">1级</a>中工作流的目标是通过自动化ML管道来执行模型的连续训练。这是一个模型注册中心能够很好实现的过程，因为它能够与管道集成。在这一级，整个管道被部署，并且当模型在所提供的数据集上被训练时，输出(被训练的模型和元数据)被馈送到模型注册中心，在那里它可以被登台，并且如果它通过必要的测试和检查，它可以被馈送到连续交付管道用于发布。</p>
+
+
+
+
+
+
+<h3 id="model-registry-in-mlops-level-1">MLOps级别2中的模型注册表</h3>
+
+
+
+<p>在MLOps工作流程的第1级中，模型注册中心的角色也与第2级的角色相同——自动化管道将经过训练的模型交付到模型注册中心，在那里进行准备，可能通过QA检查，然后发送到连续交付管道:</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?ssl=1" data-lbwps-width="1999" data-lbwps-height="1387" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/ML-Model-Registry_6.png"><img data-attachment-id="58554" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_6" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?fit=1999%2C1387&amp;ssl=1" data-orig-size="1999,1387" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_6" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?fit=300%2C208&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?fit=1024%2C710&amp;ssl=1" src="../Images/17eec46df691dea8be4448e76acfddf8.png" alt="MLOps level 1 workflow with a model registry" class="wp-image-58554 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?resize=1024%2C710&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?resize=1024%2C710&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58554" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_6" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?fit=1999%2C1387&amp;ssl=1" data-orig-size="1999,1387" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_6" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?fit=300%2C208&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?fit=1024%2C710&amp;ssl=1" src="../Images/17eec46df691dea8be4448e76acfddf8.png" alt="MLOps level 1 workflow with a model registry" class="wp-image-58554" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_6.png?resize=1024%2C710&amp;ssl=1"/></noscript></a><figcaption><em>MLOps level 1 workflow with a model registry | <a href="https://web.archive.org/web/20221008041956/https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning#mlops_level_1_ml_pipeline_automation" target="_blank" rel="noreferrer noopener nofollow">Source</a> (modified)</em></figcaption></figure></div>
+
+
+<h3 id="model-registry-in-mlops-level-2">模型注册中心在任何自动化管道中都是一个至关重要的组件，因为事件触发器可以与它集成，以便在对新数据或归档模型进行重新训练时提升具有良好指标的模型。</h3>
+
+
+
+<p>模型登记册的关键功能</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?ssl=1" data-lbwps-width="1999" data-lbwps-height="939" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/ML-Model-Registry_2.png"><img data-attachment-id="58558" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_2" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?fit=1999%2C939&amp;ssl=1" data-orig-size="1999,939" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?fit=300%2C141&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?fit=1024%2C481&amp;ssl=1" src="../Images/dc1cc90834d78bf11050fe3fdd11e9bf.png" alt="Stages of the CI/CD automated ML pipeline with a model registry" class="wp-image-58558 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?resize=1024%2C481&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?resize=1024%2C481&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58558" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_2" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?fit=1999%2C939&amp;ssl=1" data-orig-size="1999,939" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?fit=300%2C141&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?fit=1024%2C481&amp;ssl=1" src="../Images/dc1cc90834d78bf11050fe3fdd11e9bf.png" alt="Stages of the CI/CD automated ML pipeline with a model registry" class="wp-image-58558" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_2.png?resize=1024%2C481&amp;ssl=1"/></noscript></a><figcaption><em>Stages of the CI/CD automated ML pipeline with a model registry | <a href="https://web.archive.org/web/20221008041956/https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning#mlops_level_2_cicd_pipeline_automation" target="_blank" rel="noreferrer noopener nofollow">Source</a> (modified)</em></figcaption></figure></div>
+
+
+<p>在上一节中，我们学习了模型注册如何适应您的MLOps工作流。为了理解模型注册中心的关键功能及其必备条件，让我们看看它是如何适应开发和运营的。</p>
+
+
+
+<h2 id="Key-functionalities-of-a-model-registry">模型注册表中的<strong>关键功能包括:</strong></h2>
+
+
+
+<p>与实验管理系统或培训管道集成。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?ssl=1" data-lbwps-width="1242" data-lbwps-height="662" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/ML-Model-Registry_4.png"><img data-attachment-id="58556" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_4" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?fit=1242%2C662&amp;ssl=1" data-orig-size="1242,662" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_4" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?fit=300%2C160&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?fit=1024%2C546&amp;ssl=1" src="../Images/14f72d06a71b9a646b308acc73500f35.png" alt="Workflow components of an ideal model registry" class="wp-image-58556 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?resize=900%2C479&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?resize=900%2C479&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58556" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_4" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?fit=1242%2C662&amp;ssl=1" data-orig-size="1242,662" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_4" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?fit=300%2C160&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?fit=1024%2C546&amp;ssl=1" src="../Images/14f72d06a71b9a646b308acc73500f35.png" alt="Workflow components of an ideal model registry" class="wp-image-58556" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_4.png?resize=900%2C479&amp;ssl=1"/></noscript></a><figcaption><em>Workflow components of an ideal model registry | Source: Author</em></figcaption></figure></div>
+
+
+<p>为您的定型模型提供登台环境。</p>
+
+
+<div class="custom-point-list">
+<ul><li>与自动化的模型交付工具和服务集成。</li><li>与模型部署工具集成。</li><li>整合实验管理系统或培训管道</li><li>模型注册中心必须能够与输出经过训练的模型的系统集成。经过训练的模型可以是原始的工件(模型权重、配置和元数据)或者是为了与生产环境兼容而被序列化为文件(例如ONNX文件)或者被容器化(使用Docker)以导出到生产环境的模型。</li></ul>
+</div>
+
+
+<h3 id="integrate-with-experiment-management-systems-or-training-pipelines">模型注册中心<strong>应该能够</strong>:</h3>
+
+
+
+<p><strong>登记</strong>车型、</p>
+
+
+
+<p><strong>给</strong>分配一个版本，</p>
+
+
+<div class="custom-point-list">
+<ul><li>注意模型被训练的数据集的<strong>版本，</strong></li><li>添加<strong>注释</strong>和<strong>标签</strong>，</li><li>从实验管理系统中检索模型上的<strong>参数</strong>、<strong>验证结果</strong>(包括度量和可视化)，以及其他<strong>相关的模型元数据</strong>。</li><li><strong>为了使协作更容易</strong>，注册管理机构还应包括以下详细信息:</li><li>模型所有者或开发者，</li></ul>
+</div>
+
+
+<p>模型在实验运行id下被训练，</p>
+
+
+<div class="custom-point-list">
+<ul><li>版本化模型源代码，</li><li>用于训练模型(和版本)的环境运行时依赖性，</li><li>评论和模型改变历史，</li><li>和模型文档。</li><li>为您的训练模型集成登台环境</li><li>模型注册中心应该提供与登台环境集成的功能，以便在模型上运行所有类型的检查和平衡。这些检查可以包括在模型被提升到生产环境之前的<a href="https://web.archive.org/web/20221008041956/https://www.guru99.com/integration-testing.html" target="_blank" rel="noreferrer noopener nofollow">集成测试</a>(与其他应用程序)和其他<a href="https://web.archive.org/web/20221008041956/https://www.guru99.com/all-about-quality-assurance.html" target="_blank" rel="noreferrer noopener nofollow"> QA测试</a>。</li></ul>
+</div>
+
+
+<h3 id="integrate-with-staging-environment-for-your-trained-models">应该为该环境中的模型启用共享和协作，以便部署工程师可以与数据科学家合作来测试模型，并确保它们适合部署。</h3>
+
+
+
+<p>在阶段环境中，模型评审者还应该能够对模型执行公平性检查，以确保它:</p>
+
+
+
+<p>输出<strong>可解释的结果</strong>，</p>
+
+
+
+<p>符合<strong>法规要求</strong>，</p>
+
+
+<div class="custom-point-list">
+<ul><li>并提供<strong>有用的商业利益</strong>。</li><li>通常，治理和批准工作流应该在这种环境中配置。对于这种环境中的模型，还应该有访问级别控制和安全授权，尤其是那些使用带有敏感信息的数据进行训练的模型。</li><li>自动化是构建任何可伸缩软件的关键部分。在机器学习中，建立自动化管道将允许你花更多的时间<strong>来构建新产品，而不是维护旧模型</strong>。</li></ul>
+</div>
+
+
+<p>模型注册中心应该能够与管道自动化工具集成，并提供自定义API，允许您插入自定义工作流工具。例如，使用webhooks来触发基于注册表中预定义事件的下游操作。</p>
+
+
+
+
+
+
+
+<p>您还应该能够通过<strong>开发(培训)</strong>、<strong>登台(测试)</strong>、<strong>生产(服务)</strong>等不同环境<strong>配置模型推广方案</strong>。性能是构建自动化管道的关键要求。模型注册中心应该对基于事件或时间表的自动化作业高度可用，以支持模型的持续培训和交付。</p>
+
+
+
+<p>最终，必须部署模型，部署过程越高效越好。模型注册中心应该能够与下游服务和REST服务集成，这些服务可以消费模型，并在生产环境中为模型服务。</p>
+
+
+
+<p>注册中心还应该能够收集生产模型的实时(或聚合)指标，以记录模型的性能细节。这将有助于模型之间的比较(已部署的和已部署的)，以及审计生产模型以供审查。</p>
+
+
+
+
+
+
+
+<p>如何建立一个ML模型注册中心？</p>
+
+
+
+<p>构建与管理和购买</p>
+
+
+
+<h2 id="How-do-you-set-up-an-ML-model-registry">为您的MLOps工作流设置模型注册中心需要您决定是构建一个、维护一个还是购买一个。到目前为止，在本指南中，我们已经重点了解了什么是模型注册中心以及为什么您需要一个模型注册中心。您还了解了模型注册中心在MLOps工作流的特定实现级别中的位置。我们还发现，无论您处于什么样的MLOps实现级别，模型注册中心都是有用的。也许级别越高，您就越需要一个模型注册中心。</h2>
+
+
+
+<h3 id="build-vs-manage-vs-purchase">我想到的一个更重要的决定是，您是应该构建自己的、管理的还是自己托管的解决方案，还是购买完全托管的解决方案。让我们仔细看看这些决定中的每一个，以及在做出选择之前要考虑的因素。</h3>
+
+
+
+<p>构建模型注册中心解决方案</p>
+
+
+
+<p>像任何软件解决方案一样，如果你了解关键功能和需求，你可以<a href="https://web.archive.org/web/20221008041956/https://mlinproduction.com/model-registries-for-ml-deployment-deployment-series-06/" target="_blank" rel="noreferrer noopener nofollow">自己构建一个系统</a>。模型注册中心就是这种情况。您可能希望设置以下内容:</p>
+
+
+
+<h3 id="building-a-model-registry-solution"><a href="https://web.archive.org/web/20221008041956/https://en.wikipedia.org/wiki/Object_storage" target="_blank" rel="noreferrer noopener nofollow"> <strong>存储对象</strong> </a>为模型和构件。</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221008041956/https://en.wikipedia.org/wiki/Database" target="_blank" rel="noreferrer noopener nofollow"> <strong>数据库</strong> </a>用于记录模型详细信息。</p>
+
+
+<div class="custom-point-list">
+<ul><li><a href="https://web.archive.org/web/20221008041956/https://tray.io/blog/what-is-an-api-integration-for-non-technical-people" target="_blank" rel="noreferrer noopener nofollow"> <strong> API集成</strong> </a>用于接收模型、跨各种环境推广模型以及从不同环境收集模型信息。</li><li><a href="https://web.archive.org/web/20221008041956/https://www.indeed.com/career-advice/career-development/user-interface" target="_blank" rel="noreferrer noopener nofollow"> <strong>用户界面</strong> </a> (UI)供ML团队与可视化工作流进行交互。</li><li>虽然自己构建解决方案可能看起来很理想，但您应该考虑以下因素:</li><li><strong>激励</strong>:构建您的解决方案的激励是什么？是为了定制还是为了拥有解决方案的专有许可证？</li></ul>
+</div>
+
+
+<p><strong>人力资源</strong>:你有能力和技能来构建你的解决方案吗？</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>时间</strong>:你需要多长时间来构建一个解决方案，值得等待吗？</li><li><strong>运营</strong>:当解决方案最终建成时，谁来维护它的运营？</li><li><strong>成本</strong>:构建一个解决方案需要多少成本，包括解决方案的维护？</li><li>维护自托管的模型注册中心</li><li>如果您不想构建解决方案，另一个可以考虑的选择是自己维护现有的解决方案。在这个场景中，解决方案已经构建好了，但是您可能需要管理一些特性，比如对象存储和数据库。这些现有的解决方案大多是开源解决方案。</li></ul>
+</div>
+
+
+<h3 id="maintaining-a-self-hosted-model-registry">以下是需要考虑的因素:</h3>
+
+
+
+<p><strong>解决方案类型</strong>:您是选择没有许可成本的开源解决方案还是有许可成本的闭源解决方案？</p>
+
+
+
+<p><strong>运营</strong>:谁来管理解决方案？该解决方案是否支持一致的维护和软件更新？</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>成本</strong>:就托管解决方案的基础设施和运行成本而言，运营该解决方案的成本是多少？</li><li><strong>特性</strong>:已经实现了哪些特性，有哪些特性是你要自己构建和管理的？与构建您的解决方案相比，它是否值得采用？</li><li><strong>支持</strong>:如果在操作过程中发生故障，有什么类型的支持？有社区或专门的客户支持渠道吗？对于开源解决方案，虽然您可能有一个社区，但与闭源解决方案相比，您可能缺少解决问题所需的必要的开发人员支持。</li><li><strong>可访问性</strong>:开始使用该解决方案有多容易？文档是否足够全面？从模型评审人员到模型开发人员和软件工程师，每个人都能直观地使用该解决方案吗？</li><li>购买全面管理解决方案的许可证</li><li>要考虑的最后一个选项是订阅完全托管的解决方案，由解决方案供应商处理注册中心的运营和管理。在这种情况下，您不必担心构建或维护解决方案。您只需要确保您的系统和服务能够与注册中心集成。</li></ul>
+</div>
+
+
+<h3 id="purchase-the-license-to-a-fully-managed-solution">以下是需要考虑的因素:</h3>
+
+
+
+<p><strong>行业类型</strong>:模型是为什么类型的行业打造的？模特们学到了哪些敏感信息？是否有数据隐私合规措施？模型只允许留在内部吗？</p>
+
+
+
+<p><strong>特性</strong>:该解决方案中是否提供了任何模型注册中心的关键特性和功能？有哪些额外功能可用，它们与您的工作流程有多大关联？</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>成本:</strong>购买许可证的成本是多少，这些功能是否物有所值？</li><li><strong>安全性</strong>:托管解决方案的平台有多安全？抗第三方攻击吗？</li><li><strong>性能</strong>:注册表的性能高吗？对于模型太大的情况，注册中心能提供模型让服务以低延迟消费吗？</li><li><strong>可用性</strong>:解决方案的正常运行时间有多长，是否满足您要求的<a href="https://web.archive.org/web/20221008041956/https://en.wikipedia.org/wiki/Service-level_agreement" target="_blank" rel="noreferrer noopener nofollow">服务水平协议(SLA) </a>？</li><li><strong>支持</strong>:万一事情变糟，可以提供什么级别的支持？</li><li><strong>可访问性</strong>:开始使用该解决方案有多容易？文档和学习支持是否足够好？在使用方面有什么学习曲线？</li><li>现在，您已经了解了可供您决定是否要选择解决方案的各种选项。您还应该仔细考虑每个选项下的因素，以便做出最佳决策。让我们来看看市场上的一些模型注册中心解决方案。</li><li>有哪些ML模型注册解决方案？</li></ul>
+</div>
+
+
+<p>1.Neptune.ai模型注册表</p>
+
+
+
+<h2 id="What-ML-model-registry-solutions-are-out-there"><strong>类型</strong>:专有，提供免费和付费服务。</h2>
+
+
+
+<h3 id="2-neptune-model-registry"><strong>选项</strong>:托管(自托管)、完全托管的产品。</h3>
+
+
+
+<p>Neptune是MLOps 的元数据存储库，为运行大量实验的研究和生产团队而构建。</p>
+
+
+
+<p>它为您提供了一个中心位置来记录、存储、显示、组织、比较和查询机器学习生命周期中生成的所有元数据。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?ssl=1" data-lbwps-width="958" data-lbwps-height="664" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/Model-registry-header.png"><img data-attachment-id="68436" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/product/model-registry-2/attachment/model-registry-header" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?fit=958%2C664&amp;ssl=1" data-orig-size="958,664" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model registry header" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?fit=300%2C208&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?fit=958%2C664&amp;ssl=1" src="../Images/a3882df7ef1b67a946f0dca8a50f8961.png" alt="Model registry header" class="wp-image-68436 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?resize=958%2C664&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?resize=958%2C664&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="68436" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/product/model-registry-2/attachment/model-registry-header" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?fit=958%2C664&amp;ssl=1" data-orig-size="958,664" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Model registry header" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?fit=300%2C208&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?fit=958%2C664&amp;ssl=1" src="../Images/a3882df7ef1b67a946f0dca8a50f8961.png" alt="Model registry header" class="wp-image-68436" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Model-registry-header.png?resize=958%2C664&amp;ssl=1"/></noscript></a><figcaption><em>Neptune model registry dashboard | <a href="/web/20221008041956/https://neptune.ai/product/model-registry" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+<p>个人和组织使用Neptune进行<a href="/web/20221008041956/https://neptune.ai/product/experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>和<a href="/web/20221008041956/https://neptune.ai/product/model-registry" target="_blank" rel="noreferrer noopener">模型注册</a>来控制他们的实验和模型开发。</p>
+
+
+
+<p>特征</p>
+
+
+
+<p>海王星让你:</p>
+
+
+
+<h4 id="features"><strong>创建模型</strong>并跟踪通用模型元数据，例如模型签名和验证数据集。</h4>
+
+
+
+<p><strong>为您的模型创建版本</strong>:</p>
+
+
+<div class="custom-point-list">
+<ul><li>日志参数和其他元数据可能会从一个版本更改到另一个版本。</li><li>跟踪或存储模型二进制文件。<ul><li>跟踪特定模型版本的性能。</li><li><strong>使用四个可用阶段管理模型阶段转换</strong>。</li><li><strong>查询并下载</strong>任何存储的模型文件和元数据。</li></ul></li><li>查看<a href="https://web.archive.org/web/20221008041956/https://docs.neptune.ai/how-to-guides/model-registry" target="_blank" rel="noreferrer noopener">型号注册文档</a>了解更多详情。</li><li>海王星商店:</li></ul>
+</div>
+
+
+<p>数据集元数据，</p>
+
+
+
+<p>模型源代码版本，</p>
+
+
+<div class="custom-point-list">
+<ul><li>环境配置版本，</li><li>模型参数，</li><li>模型评估指标，</li><li>模型二进制。</li><li>它<a href="https://web.archive.org/web/20221008041956/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display" target="_blank" rel="noreferrer noopener">支持和存储许多ML模型相关的元数据</a>类型，您可以对建模过程中生成的大多数元数据进行版本化、显示和查询。</li><li>就<strong>成本</strong>而言，Neptune既有<a href="/web/20221008041956/https://neptune.ai/pricing/server" target="_blank" rel="noreferrer noopener">自托管选项</a>可用，也有<a href="/web/20221008041956/https://neptune.ai/pricing" target="_blank" rel="noreferrer noopener">各种订阅层级</a>的全托管云产品。</li></ul>
+</div>
+
+
+<p>如果您想了解更多信息:</p>
+
+
+
+<p>➡️看到了<a href="/web/20221008041956/https://neptune.ai/product/model-registry" target="_blank" rel="noreferrer noopener">产品页面</a></p>
+
+
+
+<div id="blog-cta-intext-block_61b1c42f707e6" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">➡️看到了<a href="https://web.archive.org/web/20221008041956/https://docs.neptune.ai/" target="_blank" rel="noreferrer noopener">文档</a></h3>
+  <div class="blog-cta-intext__content"><p>➡️检查出一个<a href="https://web.archive.org/web/20221008041956/https://app.neptune.ai/common/showcase-model-registry/models" target="_blank" rel="noreferrer noopener">示例项目</a>(不需要注册)</p>
+<p>2.MLflow模型注册表</p>
+<p><strong>类型</strong>:开源</p>
+</div>
+  </div>
+
+
+<h3 id="1-mlflow-model-registry"><strong>选项</strong>:托管(自托管)、完全托管的产品。</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221008041956/https://www.mlflow.org/docs/latest/model-registry.html#mlflow-model-registry" target="_blank" rel="noreferrer noopener nofollow"> MLflow Model Registry </a>组件是一个集中式模型存储、一组API和UI，用于协作管理MLflow模型的整个生命周期。它提供了模型沿袭(MLflow实验和运行产生了模型)、模型版本化、阶段转换(例如从阶段转换到生产)和注释。模型注册组件是2019年MLflow用户的迫切需求之一。</p>
+
+
+
+<p>MLflow模型注册中心是当今市场上为数不多的开源模型注册中心之一。你可以决定在你的基础设施上管理这个T1，或者在像T4数据块T5这样的平台上使用T2完全管理的实现T3。</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large is-resized"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?ssl=1" data-lbwps-width="1999" data-lbwps-height="1481" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/ML-Model-Registry_10.png"><img data-attachment-id="58550" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_10" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?fit=1999%2C1481&amp;ssl=1" data-orig-size="1999,1481" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_10" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?fit=300%2C222&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?fit=1024%2C759&amp;ssl=1" src="../Images/59df9a4f6d270cfcbd0bf0fef827afda.png" alt="MLflow model registry dashboard" class="wp-image-58550 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?resize=900%2C667&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?resize=900%2C667&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58550" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_10" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?fit=1999%2C1481&amp;ssl=1" data-orig-size="1999,1481" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_10" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?fit=300%2C222&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?fit=1024%2C759&amp;ssl=1" src="../Images/59df9a4f6d270cfcbd0bf0fef827afda.png" alt="MLflow model registry dashboard" class="wp-image-58550" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_10.png?resize=900%2C667&amp;ssl=1"/></noscript></a><figcaption><em>MLflow model registry dashboard | <a href="https://web.archive.org/web/20221008041956/https://www.mlflow.org/docs/latest/model-registry.html#ui-workflow" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>特征</p>
+
+
+
+<p>MLflow提供:</p>
+
+
+
+<h4 id="features"><strong>注释和描述工具</strong>用于标记模型，提供文档和模型信息，如模型注册日期、注册模型的修改历史、模型所有者、阶段、版本等。</h4>
+
+
+
+<p><strong>模型版本</strong>在更新时自动跟踪注册模型的版本。</p>
+
+
+<div class="custom-point-list">
+<ul><li>一个<strong> API集成</strong>，将机器学习模型作为RESTful APIs，用于在线测试、仪表板更新等。</li><li><strong> CI/CD工作流集成</strong>记录阶段转换、请求、审查和批准变更，作为CI/CD管道的一部分，以实现更好的控制和治理。</li><li>一个<strong>模型阶段特性</strong>为每个模型版本分配预设或定制的阶段，如“阶段”和“生产”来代表模型的生命周期。</li><li><strong>促销方案配置</strong>方便在不同阶段之间移动模型。</li><li>MLflow商店:</li><li>模型人工制品，</li></ul>
+</div>
+
+
+<p>元数据，</p>
+
+
+<div class="custom-point-list">
+<ul><li>参数，</li><li>度量标准。</li><li>定价将取决于您选择的选项—自主托管解决方案或完全托管的产品。</li><li>你可以在这里了解更多关于工作流程<a href="https://web.archive.org/web/20221008041956/https://www.mlflow.org/docs/latest/model-registry.html#model-registry-workflows" target="_blank" rel="noreferrer noopener nofollow">的信息，在这里</a>开始使用MLflow <a href="https://web.archive.org/web/20221008041956/https://www.mlflow.org/docs/latest/quickstart.html" target="_blank" rel="noreferrer noopener nofollow">。</a></li></ul>
+</div>
+
+
+<p>3.亚马逊Sagemaker模型注册表</p>
+
+
+
+<p><strong>类型</strong>:捆绑<a href="https://web.archive.org/web/20221008041956/https://aws.amazon.com/sagemaker/" target="_blank" rel="noreferrer noopener nofollow"> SageMaker </a>的自由层和按需<a href="https://web.archive.org/web/20221008041956/https://aws.amazon.com/sagemaker/pricing/" target="_blank" rel="noreferrer noopener nofollow">定价</a>。</p>
+
+
+
+<h3 id="3-amazon-sagemaker-model-registry"><strong>选项</strong>:完全管理的产品</h3>
+
+
+
+<p>亚马逊SageMaker是一个完全托管的服务，开发者可以在ML开发的每一步使用它，包括模型注册。<a href="https://web.archive.org/web/20221008041956/https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html%5C" target="_blank" rel="noreferrer noopener nofollow">模型注册中心</a>是SageMaker中<a href="https://web.archive.org/web/20221008041956/https://aws.amazon.com/sagemaker/mlops/" target="_blank" rel="noreferrer noopener nofollow">MLOps套件</a>的一部分，该套件通过在整个组织中<strong>自动化</strong>和<strong>标准化</strong> MLOps实践来帮助用户构建和操作机器学习解决方案。</p>
+
+
+
+<p>特征</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-full"><img data-attachment-id="58547" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_13" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?fit=444%2C402&amp;ssl=1" data-orig-size="444,402" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_13" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?fit=300%2C272&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?fit=444%2C402&amp;ssl=1" src="../Images/9545a344e3dc085c81567c4d5a62dacd.png" alt="Amazon SageMaker model registry" class="wp-image-58547 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?resize=444%2C402&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?resize=444%2C402&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58547" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_13" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?fit=444%2C402&amp;ssl=1" data-orig-size="444,402" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_13" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?fit=300%2C272&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?fit=444%2C402&amp;ssl=1" src="../Images/9545a344e3dc085c81567c4d5a62dacd.png" alt="Amazon SageMaker model registry" class="wp-image-58547" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_13.png?resize=444%2C402&amp;ssl=1"/></noscript><figcaption><em>Amazon SageMaker model registry | <a href="https://web.archive.org/web/20221008041956/https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry-details.html" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>使用SageMaker模型注册表，您可以执行以下操作:</p>
+
+
+
+<h4 id="features"><strong>生产用目录型号</strong>。</h4>
+
+
+
+<p>管理<strong>型号版本</strong>。</p>
+
+
+<div class="custom-point-list">
+<ul><li><strong>将元数据</strong>，例如训练指标，与模型相关联。</li><li>管理模型的<strong>审批状态。</strong></li><li>将模型部署到生产中。</li><li>使用CI/CD自动进行模型部署。</li><li>您可以创建一个模型组来跟踪您为解决特定问题而训练的所有模型。然后，您训练的每个模型都可以被注册，模型注册中心会将它作为一个新的模型版本添加到模型组中。典型的工作流可能如下所示:</li><li>创建模型组。</li></ul>
+</div>
+
+
+<p>使用训练模型的<a href="https://web.archive.org/web/20221008041956/https://docs.aws.amazon.com/sagemaker/latest/dg/pipelines-build.html" target="_blank" rel="noreferrer noopener nofollow"> SageMaker管道</a>创建一个ML管道。</p>
+
+
+<div class="custom-point-list">
+<ul><li>对于ML管道的每次运行，创建一个模型版本，并在第一步中创建的模型组中注册。</li><li>使用模型注册中心的成本与SageMaker <a href="https://web.archive.org/web/20221008041956/https://aws.amazon.com/sagemaker/pricing/" target="_blank" rel="noreferrer noopener nofollow">定价层</a>捆绑在一起。你可以在<a href="https://web.archive.org/web/20221008041956/https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html" target="_blank" rel="noreferrer noopener nofollow">文档</a>中了解更多关于SageMaker的模型注册组件的信息。</li><li>4.Verta.ai模型注册表</li></ul>
+</div>
+
+
+<p><strong> Type </strong>:专有，带有开源、SaaS和企业产品。</p>
+
+
+
+
+
+
+<h3 id="4-verta-ai-model-registry"><strong>选项</strong>:完全管理的产品。</h3>
+
+
+
+<p>Verta.ai模型注册表帮助您在一个位置管理您的AI-ML模型。它提供了一些特性，使您能够打包、验证和可靠地提升发布就绪模型，并应用安全的发布和治理实践。</p>
+
+
+
+<p>特征</p>
+
+
+<div class="wp-block-image is-style-default">
+<figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?ssl=1" data-lbwps-width="1572" data-lbwps-height="1634" data-lbwps-srcsmall="https://neptune.ai/wp-content/uploads/ML-Model-Registry_7.png"><img data-attachment-id="58553" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_7" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?fit=1572%2C1634&amp;ssl=1" data-orig-size="1572,1634" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_7" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?fit=289%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?fit=985%2C1024&amp;ssl=1" src="../Images/7fd139ca7f58afa2f0ac576bd9db2a2a.png" alt="Verta.ai Model Registry dashboard" class="wp-image-58553 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?resize=985%2C1024&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?resize=985%2C1024&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="58553" data-permalink="https://web.archive.org/web/20221008041956/https://neptune.ai/ml-model-registry_7" data-orig-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?fit=1572%2C1634&amp;ssl=1" data-orig-size="1572,1634" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="ML Model Registry_7" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?fit=289%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20221008041956/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?fit=985%2C1024&amp;ssl=1" src="../Images/7fd139ca7f58afa2f0ac576bd9db2a2a.png" alt="Verta.ai Model Registry dashboard" class="wp-image-58553" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221008041956im_/https://i0.wp.com/neptune.ai/wp-content/uploads/ML-Model-Registry_7.png?resize=985%2C1024&amp;ssl=1"/></noscript></a><figcaption><em>Verta.ai model registry dashboard | <a href="https://web.archive.org/web/20221008041956/https://blog.verta.ai/introducing-verta-model-registry" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+<p>它提供了一个<strong>统一中心来发布发布就绪模型</strong>,允许您:</p>
+
+
+
+<h4 id="features">连接<strong>实验管理系统</strong>进行<strong>端到端的信息跟踪</strong>。</h4>
+
+
+<div class="custom-point-list">
+<ul><li>在一个中央存储库中发布所有的<strong>模型元数据</strong>、<strong>文档</strong>和<strong>工件</strong>。<ul><li>从模型实验中选择<strong>最适合的模型</strong>和<strong>准备发布</strong>。</li><li>记录<strong>状态转换</strong>和<strong>管理从开发、试运行、生产到归档的发布生命周期</strong>。</li><li>它支持<strong>模型验证</strong>和<strong> CI/CD自动化</strong>，允许您:</li><li>与Jenkins、Chef等现有CI/CD渠道整合。</li></ul></li></ul>
+</div>
+
+<div class="custom-point-list">
+<ul><li>使用<strong> webhooks触发下游动作</strong>进行模型验证和部署。<ul><li>自动<strong>跟踪型号版本</strong>和<strong>标记的版本</strong>。</li><li>设置<strong>粒度访问控制</strong>编辑、审阅者和协作者。</li><li>访问<strong>详细的审计日志</strong>以了解合规性。</li></ul></li><li>一旦模型通过基本的<strong>安全性和公平性检查</strong>，就发布它们。</li><li>您可以在此页面上了解有关可用<a href="https://web.archive.org/web/20221008041956/https://www.verta.ai/pricing" target="_blank" rel="noreferrer noopener nofollow">定价等级的更多信息。你可以在这个</a><a href="https://web.archive.org/web/20221008041956/https://blog.verta.ai/introducing-verta-model-registry" target="_blank" rel="noreferrer noopener nofollow">页面</a>上了解更多关于Verta注册表的信息。</li><li>想了解市场上更多可用的解决方案吗？</li></ul>
+</div>
+
+
+<p>澄清一些模型注册中心的误解</p>
+
+
+
+<div id="blog-cta-intext-block_61b1b8c0707da" class="blog-cta-intext">
+  <h3 class="blog-cta-intext__title">模型注册中心与模型存储</h3>
+  
+  </div>
+
+
+<h2 id="clearing-some-model-registry-misconceptions">一个常见的误解是，模型注册中心只是一个作为营销术语的<a href="/web/20221008041956/https://neptune.ai/blog/mlops-model-stores" target="_blank" rel="noreferrer noopener">模型商店</a>。虽然这两个组件在功能上几乎没有区别，并且两者都可以被一些从业者互换使用，但是它们之间还是有一些细微的差别。</h2>
+
+
+
+<h3 id="model-registry-vs-model-store">模型存储是模型注册的超集——这意味着在模型存储中，您可以找到模型注册组件。store是一个服务，其他服务可以通过它从注册表中检索模型。在模型注册中心，您可以存储和获取模型(就像docker注册中心)，但是在模型存储中心，您可以拥有完整的日志、发现、资产、管道、元数据、所有模型信息，甚至是用于构建新模型的蓝图。典型的模型商店的例子有谷歌的人工智能中心和拥抱面孔模型库。</h3>
+
+
+
+<p>模型注册与实验跟踪</p>
+
+
+
+<p>MLOps世界中另一个常见的误解是注册表只是“<a href="/web/20221008041956/https://neptune.ai/blog/ml-experiment-tracking" target="_blank" rel="noreferrer noopener">实验跟踪</a>重命名”。你可能已经知道，这与事实相差甚远。模型注册必须与<a href="/web/20221008041956/https://neptune.ai/blog/best-ml-experiment-tracking-tools" target="_blank" rel="noreferrer noopener">实验管理系统</a>(跟踪实验)集成，以注册来自各种实验运行的模型，使它们更容易找到和使用。让我们来看看模型注册和实验管理系统之间的一些关键区别。</p>
+
+
+
+<h3 id="model-registry-vs-experiment-tracking">Model registry vs experiment tracking</h3>
+
+
+
+<p>                     </p>
+
+
+<p id="block_61b1b7cc707c4" class="separator separator-10">模型注册表</p>
+
+
+<div class="medium-table">
+        <div class="mt-row heading">
+            <p class="mt-col">实验跟踪</p>
+            <p class="mt-col">在中央存储库中存储经过培训的、生产的和退役的模型</p>
+            <p class="mt-col">为了跟踪不同参数配置和组合的实验运行</p>
+        </div>
+    
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Model registry:
+                    </span>
+                                                                <p>确保模型是可发现的，并且可以被任何用户或系统访问</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Experiment tracking:
+                    </span>
+                                                                <p>确保实验更容易管理和合作</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Model registry:
+                    </span>
+                                                                <p>与实验跟踪系统集成，以注册来自成功实验的模型，包括模型和实验元数据</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Experiment tracking:
+                    </span>
+                                                                <p>与培训管道集成，以执行实验运行并跟踪实验细节，包括数据集版本和元数据</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Model registry:
+                    </span>
+                                                                <p>MLOps和生产模型的关键部分</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Experiment tracking:
+                    </span>
+                                                                <p>在模型开发阶段最有用，但对模型的操作有间接影响。</p>
+                                    </div>
+                    </div>
+            <div class="mt-row">
+                            
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Model registry:
+                    </span>
+                                                                <p>结论</p>
+                                    </div>
+                            <div class="mt-col">
+                                        <span class="column-name">
+                        Experiment tracking:
+                    </span>
+                                                                <p>在本指南中，到目前为止，您已经了解到模型注册能够使机器学习项目成功运作。它提供了模型的可见性，并使用户能够轻松地发现和使用模型。使用模型注册表，您可以:</p>
+                                    </div>
+                    </div>
+    </div>
+
+
+<p id="block_61b1b7d4707c5" class="separator separator-15">有把握地部署模型。</p>
+
+
+
+<h2 id="conclusion">有效管理模型生命周期。</h2>
+
+
+
+<p>启用了自动化工作流。</p>
+
+
+<div class="custom-point-list">
+<ul><li>在有组织的工作流程中共享和协作模型和项目。</li><li>适当地管理机器学习模型。</li><li>下一步是你挑选一个解决方案，看看它是否能改善你的MLOps工作流程。如果您是一名个人数据科学家，Neptune是免费的，并且在5分钟内就可以轻松上手——但是当然，让这篇文章作为您的指南，根据您的MLOps实施水平和值得考虑的因素做出具体的决定。</li><li>为更多的建设和运作干杯！</li><li>参考资料和资源</li></ul>
+</div>
+
+
+<p>斯蒂芬·奥拉德勒</p>
+
+
+
+<p>开发者倡导者和MLOps技术内容创建者。</p>
+
+
+
+<h3 id="references-and-resources"><strong>阅读下一篇</strong></h3>
+
+
+
+
+
+
+<div id="author-box-new-format-block_607ece877c627" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">Continuum Industries案例研究:如何跟踪、监控和可视化CI/CD管道</h3>
+    
+          <p class="article__authorContent-text">7分钟阅读| 2021年8月9日更新</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>READ NEXT</strong></p>
+
+
+
+<h2><a href="https://web.archive.org/web/20221008041956/https://www.continuum.industries/" target="_blank" rel="noreferrer noopener nofollow"> Continuum Industries </a>是一家基础设施行业的公司，希望自动化和优化线性基础设施资产的设计，如水管、架空传输线、海底电力线或电信电缆。</h2>
+
+
+
+<p class="has-small-font-size">其核心产品Optioneer允许客户输入工程设计假设和地理空间数据，并且<strong>使用进化优化算法来寻找可能的解决方案，以在给定约束的情况下连接A点到B点。</strong></p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p><a href="https://web.archive.org/web/20221008041956/https://www.continuum.industries/" target="_blank" rel="noreferrer noopener nofollow">Continuum Industries</a> is a company in the infrastructure industry that wants to automate and optimize the design of linear infrastructure assets like water pipelines, overhead transmission lines, subsea power lines, or telecommunication cables.  </p>
+
+
+
+<p>首席科学家安德烈亚斯·马莱科斯(Andreas Malekos)致力于研究人工智能发动机，他解释道:</p>
+
+
+<p id="block_610943f455774" class="separator separator-15">“建造像电力线这样的东西是一个巨大的项目，所以你必须在开始之前获得正确的设计。你看到的设计越合理，你就能做出更好的决定。Optioneer可以在几分钟内为您提供设计资产，而成本只是传统设计方法的一小部分。”</p>
+
+
+
+<figure class="wp-block-video"><video controls="" src="https://web.archive.org/web/20221008041956im_/https://neptune.ai/wp-content/uploads/Continuum-Industries-video.mp4"/></figure>
+
+
+<p id="block_617106e0168b3" class="separator separator-15">但是，创建和操作Optioneer引擎比看起来更具挑战性:</p>
+
+
+
+<p>目标函数不代表现实</p>
+
+
+<div class="case-study-quote">
+    <p>有很多土木工程师事先不知道的假设</p>
+    
+
+</div>
+
+
+
+<p>不同的客户给它提出完全不同的问题，算法需要足够健壮来处理这些问题</p>
+
+
+<div class="custom-point-list">
+<ul><li>与其构建完美的解决方案，不如向他们展示一系列有趣的设计选项，以便他们做出明智的决策。</li><li>引擎团队利用来自机械工程、电子工程、计算物理、应用数学和软件工程的各种技能来实现这一目标。</li><li>问题</li></ul>
+</div>
+
+
+<p>无论是否使用人工智能，构建一个成功的软件产品的一个副作用是，人们依赖它工作。当人们依赖您的优化引擎做出价值百万美元的基础设施设计决策时，您需要有一个强大的质量保证(QA)。</p>
+
+
+
+<p>正如Andreas所指出的，他们必须能够说，他们返回给用户的解决方案是:</p>
+
+
+
+<h2><strong>好</strong>，意思是这是一个土木工程师可以看到并同意的结果</h2>
+
+
+
+<p><strong>更正</strong>，这意味着计算并返回给最终用户的所有不同工程数量都尽可能准确</p>
+
+
+
+<p>除此之外，该团队还在不断改进优化引擎。但要做到这一点，您必须确保这些变化:</p>
+
+
+<div class="custom-point-list">
+<ul><li>不要以这样或那样的方式破坏算法</li><li>实际上，它们不仅改善了一个基础设施问题的结果，还改善了所有问题的结果</li></ul>
+</div>
+
+
+<p>基本上，您需要<strong>建立适当的验证和测试，</strong>但是团队试图解决的问题的性质带来了额外的挑战:</p>
+
+
+<div class="custom-point-list">
+<ul><li>您无法自动判断算法输出是否正确。<strong>这不像在ML中，你已经标记了数据</strong>来计算你的评估集的准确度或召回率。</li><li>您<strong>需要一组示例问题，代表算法在生产中需要解决的那类问题的</strong>。此外，这些问题需要被版本化，以便尽可能容易地实现可重复性。</li></ul>
+</div>
+
+
+<p>Basically, you need to <strong>set up a proper validation and testing,</strong> but the nature of the problem the team is trying to solve presents additional challenges:</p>
+
+
+<div class="custom-point-list">
+<ul><li>You cannot automatically tell whether an algorithm output is correct or not. <strong>It is not like in ML where you have labeled data</strong> to compute accuracy or recall on your evaluation set. </li><li>You <strong>need a set of example problems that is representative</strong> of the kind of problem that the algorithm will be asked to solve in production. Furthermore, these problems need to be versioned so that repeatability is as easily achievable as possible.</li></ul>
+</div>
+
+<a class="button continous-post blue-filled" href="/web/20221008041956/https://neptune.ai/customers/continuum-industries" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

@@ -1,0 +1,770 @@
+<html>
+<head>
+<title>How to Deal With Imbalanced Classification and Regression Data </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>如何处理不平衡的分类和回归数据</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/how-to-deal-with-imbalanced-classification-and-regression-data#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/how-to-deal-with-imbalanced-classification-and-regression-data#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p><strong>数据不平衡</strong>是现实世界中普遍存在的固有现象。数据通常表现为带有长尾的偏态分布。然而，目前使用的大多数机器学习算法是围绕每个目标类别(分类)均匀分布的假设设计的。</p>
+
+
+
+<p>另一方面，我们不能忘记，许多任务涉及连续的目标，甚至无限的值(回归)，其中不存在类之间的硬边界(即年龄预测，深度估计，等等)。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61203" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_29" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?fit=1000%2C1265&amp;ssl=1" data-orig-size="1000,1265" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_29" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?fit=237%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?fit=809%2C1024&amp;ssl=1" src="../Images/3d25d0efdf78b6935f03a101d75a769f.png" alt="Data imbalance" class="wp-image-61203 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?resize=411%2C519&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?resize=411%2C519&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61203" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_29" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?fit=1000%2C1265&amp;ssl=1" data-orig-size="1000,1265" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_29" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?fit=237%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?fit=809%2C1024&amp;ssl=1" src="../Images/3d25d0efdf78b6935f03a101d75a769f.png" alt="Data imbalance" class="wp-image-61203" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_29-3372336075-1643136560469.jpg?resize=411%2C519&amp;ssl=1"/></noscript><figcaption><em>Data imbalance | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>在本文中，我将向您介绍如何处理分类和回归任务中的不平衡数据，并讨论在这种情况下您可以对每个任务使用的性能度量。</p>
+
+
+
+<p>从不平衡数据中学习有3种主要方法:</p>
+
+
+<div class="case-study-numbered-list">
+    <h2><span> 1 </span>数据方法</h2>
+    <ul>
+                    <li><span> 2 </span>算法方法</li>
+                    <li><span> 3 </span>混合(系综)方法</li>
+                    <li>不平衡分类数据</li>
+            </ul>
+</div>
+
+
+
+<h2 id="imbalanced-classification-data">SMOTE不平衡分类是一个被充分探索和理解的主题。</h2>
+
+
+
+
+
+
+
+<p>在实际应用中，我们面临许多挑战，我们只有不均匀的数据表示，其中<strong>少数类</strong>通常是更重要的一个，因此我们需要一些方法来提高其识别率。这个问题对预测建模提出了严峻的挑战，因为学习算法将偏向于<strong>多数阶级</strong>。</p>
+
+
+
+<p>我们生活中的重要日常任务，如防止恶意攻击、检测威胁生命的疾病或处理监控系统中的罕见情况，都面临着从1:1000到1:5000的极端类别不平衡，人们必须设计能够调整和克服这种极端偏差的智能系统。</p>
+
+
+
+<p>如何处理不平衡的数据集-数据方法</p>
+
+
+
+<h3 id="how-to-handle-an-imbalanced-dataset-data-approach">它专注于修改训练集，使其适合标准的学习算法。这可以通过平衡数据集的分布来实现，数据集可以两种方式分类:</h3>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="61206" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_26" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?fit=371%2C519&amp;ssl=1" data-orig-size="371,519" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_26" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?fit=214%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?fit=371%2C519&amp;ssl=1" src="../Images/067b15bcf3d8bb37c77d128380ddd3ec.png" alt="How would you handle an imbalanced dataset?" class="wp-image-61206 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?resize=388%2C543&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?resize=388%2C543&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61206" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_26" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?fit=371%2C519&amp;ssl=1" data-orig-size="371,519" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_26" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?fit=214%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?fit=371%2C519&amp;ssl=1" src="../Images/067b15bcf3d8bb37c77d128380ddd3ec.png" alt="How would you handle an imbalanced dataset?" class="wp-image-61206" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_26.png?resize=388%2C543&amp;ssl=1"/></noscript><figcaption><em>How would you handle an imbalanced dataset? | <a href="https://web.archive.org/web/20220926103213/https://medium.com/sfu-cspmp/winning-against-imbalanced-datasets-14809437aa62" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>过采样</p>
+
+
+<div class="custom-point-list">
+<ul><li>欠采样</li><li>1.过采样</li></ul>
+</div>
+
+
+<h4 id="1-oversampling">在这种方法中，我们综合了来自少数民族的新例子。</h4>
+
+
+
+
+
+
+
+<p>有几种方法可用于对典型分类问题中使用的数据集进行过采样。但最常见的数据扩充技术被称为<strong>合成少数过采样技术</strong>或简称为<strong> SMOTE </strong>。</p>
+
+
+
+<p>顾名思义，SMOTE创建的是“合成”的例子，而不是带有替换的过采样。具体来说，SMOTE的工作方式如下。它从随机选择一个少数类实例开始，并随机找到它的<em> k </em>个最近的少数类邻居。然后，在连接特征空间中的两个示例的线上随机选择的点处创建合成示例。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61221" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_11" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?fit=1999%2C803&amp;ssl=1" data-orig-size="1999,803" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_11" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?fit=300%2C121&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?fit=1024%2C411&amp;ssl=1" src="../Images/6ebceb746ad0ca93242995f316f2c568.png" alt="Scatter plot of the class distribution before and after SMOTE" class="wp-image-61221 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?resize=755%2C303&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?resize=755%2C303&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61221" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_11" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?fit=1999%2C803&amp;ssl=1" data-orig-size="1999,803" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_11" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?fit=300%2C121&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?fit=1024%2C411&amp;ssl=1" src="../Images/6ebceb746ad0ca93242995f316f2c568.png" alt="Scatter plot of the class distribution before and after SMOTE" class="wp-image-61221" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_11.png?resize=755%2C303&amp;ssl=1"/></noscript><figcaption><em>Scatter plot of the class distribution before and after SMOTE | <a href="https://web.archive.org/web/20220926103213/https://colab.research.google.com/drive/10gViloq5Wet40P1fod2MxYYCo8ou4Yg1#scrollTo=mp8WOh3Zj9wS" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>当被添加到训练集时，为少数类创建的来自SMOTE的合成示例平衡了类分布，并使分类器创建更大和更不具体的决策区域，帮助分类器更好地概括并减轻过拟合，而不是创建更小和更具体的区域，这将使模型过拟合多数类。</p>
+
+
+
+
+
+
+
+<p>这种方法受数据扩充技术的启发，该技术在手写字符识别中证明是成功的，其中旋转和倾斜等操作是干扰训练数据的自然方式。</p>
+
+
+
+
+
+
+
+<p>现在，我们来看看SMOTE的表现。</p>
+
+
+
+<p>从混淆矩阵中，我们可以注意到一些事情:</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61204" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_28" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?fit=1999%2C656&amp;ssl=1" data-orig-size="1999,656" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_28" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?fit=300%2C98&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?fit=1024%2C336&amp;ssl=1" src="../Images/5a792380c4cf6ef14ae2d352e15cabb1.png" alt="Confusion matrix of classifiers trained on data synthetic examples and tested on the imbalanced test set" class="wp-image-61204 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?resize=751%2C246&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?resize=751%2C246&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61204" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_28" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?fit=1999%2C656&amp;ssl=1" data-orig-size="1999,656" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_28" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?fit=300%2C98&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?fit=1024%2C336&amp;ssl=1" src="../Images/5a792380c4cf6ef14ae2d352e15cabb1.png" alt="Confusion matrix of classifiers trained on data synthetic examples and tested on the imbalanced test set" class="wp-image-61204" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_28.png?resize=751%2C246&amp;ssl=1"/></noscript><figcaption><em>Confusion matrix of classifiers trained on data synthetic examples and tested on the imbalanced test set | <a href="https://web.archive.org/web/20220926103213/https://colab.research.google.com/drive/10gViloq5Wet40P1fod2MxYYCo8ou4Yg1#scrollTo=mp8WOh3Zj9wS" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>在合成例子上训练的分类器概括得很好。</p>
+
+
+<div class="custom-point-list">
+<ul><li>分类器很好地识别少数类(真正的否定)。</li><li>与欠采样相比，它们的假阳性更少。</li><li>优势</li></ul>
+</div>
+
+
+<h5 id="advantages">它改善了由随机过采样引起的过拟合，因为生成的是合成样本，而不是现有样本的副本。</h5>
+
+
+<div class="custom-point-list">
+<ul><li>没有信息丢失。</li><li>很简单。</li><li>不足之处</li></ul>
+</div>
+
+
+<h5 id="disadvantages">在生成合成示例时，SMOTE不考虑可能来自其他类的相邻示例。这可能会增加类别的重叠，并会引入额外的噪声。</h5>
+
+
+<div class="custom-point-list">
+<ul><li>SMOTE对于高维数据不是很实用。</li><li>2.欠采样</li></ul>
+</div>
+
+
+<h4 id="2-undersampling">在这种方法中，我们减少了来自<strong>多数类</strong>的样本数量，以匹配<strong>少数类</strong>的样本数量。</h4>
+
+
+
+
+
+
+
+<p>这可以通过几种方式实现:</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61217" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_15" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?fit=1999%2C723&amp;ssl=1" data-orig-size="1999,723" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_15" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?fit=300%2C109&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?fit=1024%2C370&amp;ssl=1" src="../Images/bd4828b73b39612c096f3b09de606c5f.png" alt="Scatter plot of the class distribution before and after applying NearMiss-2" class="wp-image-61217 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?resize=770%2C278&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?resize=770%2C278&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61217" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_15" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?fit=1999%2C723&amp;ssl=1" data-orig-size="1999,723" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_15" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?fit=300%2C109&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?fit=1024%2C370&amp;ssl=1" src="../Images/bd4828b73b39612c096f3b09de606c5f.png" alt="Scatter plot of the class distribution before and after applying NearMiss-2" class="wp-image-61217" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_15.png?resize=770%2C278&amp;ssl=1"/></noscript><figcaption><em>Scatter plot of the class distribution before and after applying NearMiss-2 | <a href="https://web.archive.org/web/20220926103213/https://colab.research.google.com/drive/10gViloq5Wet40P1fod2MxYYCo8ou4Yg1#scrollTo=mp8WOh3Zj9wS" target="_blank" rel="noreferrer noopener">S</a><a href="https://web.archive.org/web/20220926103213/https://colab.research.google.com/drive/10gViloq5Wet40P1fod2MxYYCo8ou4Yg1#scrollTo=mp8WOh3Zj9wS" target="_blank" rel="noreferrer noopener nofollow">ource</a></em></figcaption></figure></div>
+
+
+
+<p><strong>随机抽样器</strong>:从多数类中随机选取几个样本，是平衡数据最简单快捷的方法。</p>
+
+
+<div class="custom-point-list">
+<ol><li><strong> NearMiss </strong>:通过实现<a href="https://web.archive.org/web/20220926103213/https://imbalanced-learn.org/stable/under_sampling.html#mathematical-formulation" target="_blank" rel="noreferrer noopener nofollow"> 3种不同的试探法</a>，给选中的样本添加一些常识性的规则，但在本文中，我们将只关注其中一种。</li><li><strong> NearMiss-2 </strong>与三个最远的少数类实例具有最小平均距离的多数类实例。<ul><li>从混淆矩阵中，我们可以注意到一些事情:</li></ul></li></ol>
+</div>
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61201" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_31" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?fit=1999%2C661&amp;ssl=1" data-orig-size="1999,661" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_31" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?fit=300%2C99&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?fit=1024%2C339&amp;ssl=1" src="../Images/de6fed2d388a58c898a969a4a02e844c.png" alt="Confusion matrix of classifiers trained on undersampled examples and tested on the imbalanced test set" class="wp-image-61201 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?resize=742%2C246&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?resize=742%2C246&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61201" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_31" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?fit=1999%2C661&amp;ssl=1" data-orig-size="1999,661" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_31" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?fit=300%2C99&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?fit=1024%2C339&amp;ssl=1" src="../Images/de6fed2d388a58c898a969a4a02e844c.png" alt="Confusion matrix of classifiers trained on undersampled examples and tested on the imbalanced test set" class="wp-image-61201" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_31.png?resize=742%2C246&amp;ssl=1"/></noscript><figcaption><em>Confusion matrix of classifiers trained on undersampled examples and tested on the imbalanced test set | <a href="https://web.archive.org/web/20220926103213/https://colab.research.google.com/drive/10gViloq5Wet40P1fod2MxYYCo8ou4Yg1#scrollTo=mp8WOh3Zj9wS" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>在识别多数类(真正值)时，欠采样与过采样相比表现不佳。但除此之外，它比过采样更好地识别少数类，并且具有更少的假阴性。</p>
+
+
+<div class="custom-point-list">
+<ul><li>优势</li></ul>
+</div>
+
+
+<h5 id="advantages">数据科学家可以平衡数据集，并降低他们的分析或机器学习算法偏向大多数的风险。因为如果不进行重采样，科学家可能会得出所谓的准确性悖论，即他们运行的分类模型具有90%的准确性。然而，仔细观察，他们会发现结果在很大程度上属于多数阶级。</h5>
+
+
+<div class="custom-point-list">
+<ul><li>更少的存储需求和更好的分析运行时间。更少的数据意味着您或您的企业需要更少的存储和时间来获得有价值的见解。</li><li>不足之处</li></ul>
+</div>
+
+
+<h5 id="disadvantages">移除足够多的多数样本以使多数类的大小与少数类的大小相同或相似会导致大量数据丢失。</h5>
+
+
+<div class="custom-point-list">
+<ul><li>所选的多数类样本可能会有偏差，这意味着它可能无法准确代表真实世界，并且分析结果可能不准确。因此，它会导致分类器在真实的看不见的数据上表现不佳。</li><li>由于这些缺点，一些科学家可能更喜欢过采样。它不会导致任何信息丢失，并且在某些情况下，可能比欠采样执行得更好。但是过采样也不是完美的。因为过采样通常涉及复制少数事件，所以会导致过拟合。</li></ul>
+</div>
+
+
+<p>“SMOTE和欠采样的组合比普通欠采样的性能更好。”</p>
+
+
+
+<blockquote class="wp-block-quote"><p><em>“The combination of SMOTE and under-sampling performs better than plain under-sampling.” </em></p><p><a href="https://web.archive.org/web/20220926103213/https://arxiv.org/abs/1106.1813" target="_blank" rel="noreferrer noopener nofollow"> SMOTE:合成少数过采样技术</a>，2011</p><cite><p>为了平衡这些问题，某些情况下可能需要将过采样和欠采样结合起来，以获得最逼真的数据集和准确的结果。</p></cite></blockquote>
+
+
+
+<p>如何处理不平衡数据——算法方法</p>
+
+
+
+<h3 id="how-to-handle-imbalanced-data-algorithm-approach">这种方法集中于修改现有的模型，以减轻它们对多数群体的偏见。这需要对修改的学习算法有很好的洞察力，并精确识别其在学习偏斜分布的表示时失败的原因。</h3>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="61207" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_25" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?fit=363%2C512&amp;ssl=1" data-orig-size="363,512" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_25" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?fit=213%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?fit=363%2C512&amp;ssl=1" src="../Images/266585408ab633ac0df87704e44e6107.png" alt="Algorithm approach – best models for imbalanced classification" class="wp-image-61207 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?resize=396%2C559&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?resize=396%2C559&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61207" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_25" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?fit=363%2C512&amp;ssl=1" data-orig-size="363,512" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_25" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?fit=213%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?fit=363%2C512&amp;ssl=1" src="../Images/266585408ab633ac0df87704e44e6107.png" alt="Algorithm approach – best models for imbalanced classification" class="wp-image-61207" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_25.png?resize=396%2C559&amp;ssl=1"/></noscript><figcaption><em>Algorithm approach – best models for imbalanced classification | <a href="https://web.archive.org/web/20220926103213/https://medium.com/analytics-vidhya/what-precision-recall-f1-score-and-accuracy-can-tell-you-fe1eab1ada5a" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>最流行的技术是成本敏感方法(<strong>加权学习者</strong>)。在这里，给定的模型被修改，以纳入不同的惩罚为每一组考虑的例子。换句话说，<strong>我们使用焦点损失，在我们的成本函数中，我们将较高的权重分配给少数类，这将惩罚模型对少数类的错误分类，同时减少多数类的权重，使模型更加关注代表性不足的类</strong>。从而提高了它在学习过程中的重要性。</p>
+
+
+
+<p>另一个有趣的算法级解决方案是应用<strong>单类学习或单类分类(简称OCC)</strong>，专注于目标群体，创建数据描述。通过这种方式，我们消除了对任何群体的偏见，因为我们只关注一组对象。</p>
+
+
+
+<p>OCC在不平衡分类问题中是有用的，因为它提供了异常值和异常检测的技术。它通过对多数类数据(也称为正例)拟合模型，并预测新数据是属于多数类还是属于少数类(也称为负例)，这意味着它是异常值/异常值。</p>
+
+
+
+<p>OCC问题通常是实际的分类任务，其中多数类数据很容易获得，但少数类数据很难、很昂贵，甚至不可能收集，即引擎工作、欺诈交易、计算机系统的入侵检测等等。</p>
+
+
+
+<p>如何处理不平衡数据——混合方法</p>
+
+
+
+<h3 id="hybrid-approach">杂交是一种利用单个组件优势的方法。在处理不平衡分类数据时，一些工作提出了混合采样和代价敏感学习。换句话说，结合<strong>数据</strong>和<strong>算法</strong>的水平接近。这种<strong>两阶段训练的想法，即</strong>将数据级解决方案与算法级解决方案(即分类器集成)合并，从而产生健壮和高效的学习器，非常受欢迎。</h3>
+
+
+
+
+
+
+
+<p>它首先通过应用数据级方法来工作。如您所知，数据级方法通过使用过采样或欠采样来修改训练集，以平衡多数类和少数类之间的类分布。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="61212" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_20" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?fit=685%2C715&amp;ssl=1" data-orig-size="685,715" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_20" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?fit=287%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?fit=685%2C715&amp;ssl=1" src="../Images/1d35478e262dca26513718aedca43c8e.png" alt="Example scheme of the hybrid approach" class="wp-image-61212 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?resize=580%2C606&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?resize=580%2C606&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61212" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_20" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?fit=685%2C715&amp;ssl=1" data-orig-size="685,715" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_20" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?fit=287%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?fit=685%2C715&amp;ssl=1" src="../Images/1d35478e262dca26513718aedca43c8e.png" alt="Example scheme of the hybrid approach" class="wp-image-61212" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_20.png?resize=580%2C606&amp;ssl=1"/></noscript><figcaption><em>Example scheme of the hybrid approach | <a href="https://web.archive.org/web/20220926103213/https://link.springer.com/article/10.1007/s42979-020-0119-4" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>然后，使用具有平衡类别分布的预处理数据来训练分类器集成，换句话说，训练多个分类器的集合，从该集合中导出新的分类器，该新的分类器比任何组成分类器执行得更好。因此，创建一个健壮而有效的学习器，它继承了数据级和算法级方法的优点，同时减少了它们的缺点。</p>
+
+
+
+<p>从混淆矩阵中，我们可以注意到一些事情:</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61222" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_10" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?fit=1999%2C767&amp;ssl=1" data-orig-size="1999,767" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_10" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?fit=300%2C115&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?fit=1024%2C393&amp;ssl=1" src="../Images/8a479d829f268a9c0baf594b0a6beece.png" alt="Confusion matrix of hybrid classifiers trained and tested on the imbalanced test set" class="wp-image-61222 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?resize=691%2C265&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?resize=691%2C265&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61222" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_10" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?fit=1999%2C767&amp;ssl=1" data-orig-size="1999,767" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_10" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?fit=300%2C115&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?fit=1024%2C393&amp;ssl=1" src="../Images/8a479d829f268a9c0baf594b0a6beece.png" alt="Confusion matrix of hybrid classifiers trained and tested on the imbalanced test set" class="wp-image-61222" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_10.png?resize=691%2C265&amp;ssl=1"/></noscript><figcaption><em>Confusion matrix of hybrid classifiers trained and tested on the imbalanced test set | <a href="https://web.archive.org/web/20220926103213/https://colab.research.google.com/drive/10gViloq5Wet40P1fod2MxYYCo8ou4Yg1#scrollTo=mp8WOh3Zj9wS" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>当涉及到识别多数类时，混合分类器比欠采样执行得更好</p>
+
+
+<div class="custom-point-list">
+<ul><li>并且，在识别少数类时，几乎与欠采样和过采样一样好。</li><li>基本上是两全其美！</li></ul>
+</div>
+
+
+<p>不平衡分类的性能度量</p>
+
+
+
+<h3 id="performance-measures-for-imbalanced-classification">在这一节中，我们回顾了在处理不平衡分类数据时常用的性能指标及其有效性。</h3>
+
+
+
+<p>混淆矩阵</p>
+
+
+<div class="custom-point-list">
+<ul><li>ROC和AUC</li><li>精确召回</li><li>f分数</li><li>1.混淆矩阵</li></ul>
+</div>
+
+
+
+
+
+<h4 id="1-confusion-matrix">对于二进制分类问题，<strong>混淆矩阵</strong>定义了性能测量的基础。大多数性能指标都来自混淆矩阵，即准确度、误分类率、精确度和召回率。</h4>
+
+
+
+<p>然而，当数据不平衡时，<strong>精度是不合适的。因为该模型可以通过准确预测多数类而对少数类表现不佳来实现更高的准确性，在大多数情况下，少数类是我们最关心的类。</strong></p>
+
+
+
+
+
+
+
+<p>2.ROC和AUC不平衡数据</p>
+
+
+
+<h4 id="2-roc-and-auc-imbalanced-data">为了适应少数类别，提出了接收机工作特性(ROC)曲线作为真阳性(TP)率和假阳性(FP)率之间权衡范围的度量。另一个重要的性能指标是曲线下面积(AUC ),这是一个常用的性能指标，用于在单个得分中总结ROC曲线。此外，AUC不偏向于模型在多数或少数类上的表现，这使得这种方法在处理不平衡数据时更合适。</h4>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61202" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_30" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?fit=1280%2C720&amp;ssl=1" data-orig-size="1280,720" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_30" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?fit=1024%2C576&amp;ssl=1" src="../Images/dd4efe53f9f2c3b24ebb3d460962b601.png" alt="ROC and AUC imbalanced data" class="wp-image-61202 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?resize=680%2C382&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?resize=680%2C382&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61202" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_30" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?fit=1280%2C720&amp;ssl=1" data-orig-size="1280,720" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_30" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?fit=300%2C169&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?fit=1024%2C576&amp;ssl=1" src="../Images/dd4efe53f9f2c3b24ebb3d460962b601.png" alt="ROC and AUC imbalanced data" class="wp-image-61202" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_30.png?resize=680%2C382&amp;ssl=1"/></noscript><figcaption><em>ROC and AUC imbalanced data | <a href="https://web.archive.org/web/20220926103213/https://i.ytimg.com/vi/afQ_DyKMxUo/maxresdefault.jpg" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="1280" data-lbwps-height="720" data-lbwps-srcsmall="https://i.ytimg.com/vi/afQ_DyKMxUo/maxresdefault.jpg">Source</a> </em></figcaption></figure></div>
+
+
+
+<p>3.精确度和召回率</p>
+
+
+
+<h4 id="3-precision-and-recall">从混淆矩阵中，我们还可以推导出<strong>精度和</strong>召回性能指标。</h4>
+
+
+
+<p>精度对于类不平衡是很重要的，它不受类不平衡的影响，因为它的计算中不包括真负数的数量。</p>
+
+
+
+
+
+
+
+<p>精度和召回率的一个缺点是，与精度一样，在这两者之间可能会有一些不平衡，我们希望提高少数类的TP，然而，FP的数量也可以增加。</p>
+
+
+
+<p>4.f分数</p>
+
+
+
+<h4 id="4-f-score">为了平衡查全率和查准率，即提高查全率，同时保持较低的查准率，建议将<strong> F值</strong>作为查准率和查全率的调和平均值。</h4>
+
+
+
+<p>由于F-score同等地加权、精确和回忆，并且平衡了这两个问题，它不太可能偏向多数或少数类。<a href="https://web.archive.org/web/20220926103213/https://docs.google.com/document/d/1jlcYg_zmBwEJJOP79bV4PfcftpclGzEEvS20TjgOcBY/edit#heading=h.ubjlh9z2r0v" target="_blank" rel="noreferrer noopener nofollow">【2】</a></p>
+
+
+
+
+
+
+
+<p>在我为您准备的Colab笔记本中，用3个不平衡分类方法代码示例检查<a href="https://web.archive.org/web/20220926103213/https://colab.research.google.com/drive/10gViloq5Wet40P1fod2MxYYCo8ou4Yg1?usp=sharing" target="_blank" rel="noreferrer noopener nofollow">这个实验。</a></p>
+
+
+
+<p>不平衡回归数据</p>
+
+
+
+<h2 id="imbalanced-regression-data"><strong>不平衡数据的回归</strong>没有得到很好的探索。此外，许多重要的现实生活应用程序，如经济、危机管理、故障诊断或气象学，要求我们对不平衡数据应用<a href="https://web.archive.org/web/20220926103213/https://towardsdatascience.com/strategies-and-tactics-for-regression-on-imbalanced-data-61eeb0921fca" target="_blank" rel="noreferrer noopener nofollow"><strong/></a>回归，这意味着从输入数据中预测罕见和极端的连续目标值。</h2>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="61219" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_13" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?fit=500%2C375&amp;ssl=1" data-orig-size="500,375" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_13" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?fit=300%2C225&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?fit=500%2C375&amp;ssl=1" src="../Images/68e13112694739d7eac8279a6ea112b9.png" alt="Imbalanced regression data" class="wp-image-61219 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?resize=479%2C359&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?resize=479%2C359&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61219" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_13" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?fit=500%2C375&amp;ssl=1" data-orig-size="500,375" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_13" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?fit=300%2C225&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?fit=500%2C375&amp;ssl=1" src="../Images/68e13112694739d7eac8279a6ea112b9.png" alt="Imbalanced regression data" class="wp-image-61219" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_13.png?resize=479%2C359&amp;ssl=1"/></noscript><figcaption><em>Imbalanced regression data | <a href="https://web.archive.org/web/20220926103213/https://i.imgflip.com/sy501.jpg" target="_blank" rel="noreferrer noopener nofollow" data-lbwps-width="500" data-lbwps-height="375" data-lbwps-srcsmall="https://i.imgflip.com/sy501.jpg">Source</a></em></figcaption></figure></div>
+
+
+
+<p>因为处理不平衡数据是主要在分类任务的上下文中研究的相关问题，所以在回归的上下文中很少有成熟或合适的策略来处理它。</p>
+
+
+
+<p>让我们先来看看不平衡分类中采用的典型方法，然后我们来看看目前使用的一些最好的不平衡回归技术。</p>
+
+
+
+<p>不平衡分类采用的方法</p>
+
+
+
+<h3 id="approachas-adopted-from-imbalanced-classification">数据方法</h3>
+
+
+
+<h4 id="data-approach">当谈到不平衡回归的数据方法时，我们有两种受不平衡分类启发很大的技术:</h4>
+
+
+
+
+
+
+
+<p>1. SMOTER</p>
+
+
+
+
+
+<h5 id="1-smoter">SMOTE是对众所周知的SMOTE算法的回归的改编。</h5>
+
+
+
+<p>它的工作原理是使用原始标签密度定义频繁(多数)和罕见(少数)区域，然后对多数区域应用随机欠采样，对少数区域应用过采样，其中用户必须预先确定SMOTER算法要执行的过采样和欠采样的百分比。</p>
+
+
+
+<p>当对少数区域进行过采样时，它不仅会生成新的合成样本，还会应用一种组合不同样本的输入和目标的<a href="https://web.archive.org/web/20220926103213/https://www.investopedia.com/terms/i/interpolation.asp#:~:text=Interpolation%20is%20achieved,haven%27t%20been%20calculated" target="_blank" rel="noreferrer noopener nofollow">插值</a>策略。准确地说，这种插值使用两种罕见的情况来执行，其中一种情况是种子情况，另一种情况是从种子的k个最近邻居中随机选择的。对两种情况的特征进行插值，并将新的目标变量确定为所使用的两种罕见情况的目标变量的加权平均值。</p>
+
+
+
+<p>你可能会问，为什么我们必须平均目标变量？请记住，在最初的SMOTE算法中，这是一个微不足道的问题，因为所有罕见的情况都具有相同的区域(目标少数区域)，但在回归的情况下，答案并不那么微不足道，因为当一对示例用于生成新的合成情况时，它们将不会具有相同的目标变量值。</p>
+
+
+
+<p>2.斯穆恩</p>
+
+
+
+<h5 id="2-smogn">SMOGN 采用SMOTER，但它会在SMOTER已有的过采样相位之外进一步增加高斯噪声。</h5>
+
+
+
+<p>SMOGN算法的关键思想是组合smote和高斯噪声策略来生成合成样本，以通过使用引入高斯噪声的更保守的策略来同时限制smote可能招致的风险，例如缺乏多样的样本，因为smote在插值过程中不会使用最远的样本。其工作方式是，仅当种子样本和所选的k-最近邻足够接近时，使用SMOTER生成新的合成样本，而当两个样本距离较远时，使用高斯噪声。</p>
+
+
+
+<p>算法方法</p>
+
+
+
+<h4 id="algorithm-approach">与不平衡分类一样，这种方法也包括调整损失函数以补偿区域不平衡(重新加权)和其他相关的学习范例，如迁移学习、度量学习、两阶段训练和元学习<a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow">【4】</a>。但我们将重点关注前两个范例:</h4>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="61227" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_5" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?fit=500%2C512&amp;ssl=1" data-orig-size="500,512" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?fit=293%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?fit=500%2C512&amp;ssl=1" src="../Images/f0d4938b22ffecf08d4b2bae4127532d.png" alt="Algorithm approach" class="wp-image-61227 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?resize=426%2C436&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?resize=426%2C436&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61227" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_5" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?fit=500%2C512&amp;ssl=1" data-orig-size="500,512" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?fit=293%2C300&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?fit=500%2C512&amp;ssl=1" src="../Images/f0d4938b22ffecf08d4b2bae4127532d.png" alt="Algorithm approach" class="wp-image-61227" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_5.png?resize=426%2C436&amp;ssl=1"/></noscript><figcaption><em>Algorithm approach | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>错误感知损失</p>
+
+
+<div class="custom-point-list">
+<ul><li>对成本敏感的重新加权</li><li>1.错误感知损失</li></ul>
+</div>
+
+
+<h5 id="1-error-aware-loss">它是用于分类的焦点损失的回归版本，称为Focal-R。焦点损失是一种动态加权的交叉熵损失，其中随着正确类别的置信度增加，加权因子(alpha)衰减到零。</h5>
+
+
+
+<p>Focal-R用一个连续函数来代替加权因子，该函数将绝对误差(L1距离)映射为0到1范围内的值。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61218" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_14" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?fit=1600%2C1024&amp;ssl=1" data-orig-size="1600,1024" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_14" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?fit=300%2C192&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?fit=1024%2C655&amp;ssl=1" src="../Images/2d64d84c7b098fbe47fef62061c52df3.png" alt="The focal loss down weights easy examples with a weighting factor of  - (1-  pt)^γ" class="wp-image-61218 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?resize=646%2C413&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?resize=646%2C413&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61218" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_14" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?fit=1600%2C1024&amp;ssl=1" data-orig-size="1600,1024" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_14" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?fit=300%2C192&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?fit=1024%2C655&amp;ssl=1" src="../Images/2d64d84c7b098fbe47fef62061c52df3.png" alt="The focal loss down weights easy examples with a weighting factor of  - (1-  pt)^γ" class="wp-image-61218" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_14.png?resize=646%2C413&amp;ssl=1"/></noscript><figcaption><em>The focal loss down weights easy examples with a weighting factor of  – (1-  pt)^γ | <a href="https://web.archive.org/web/20220926103213/https://arxiv.org/ftp/arxiv/papers/2006/2006.01413.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>准确地说，基于L1距离的焦R损失可以写成:</p>
+
+
+
+<p>其中，ei是第I个样本的L1误差，σ()是Sigmoid函数，β、γ是超参数。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="61249" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_32" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?fit=441%2C100&amp;ssl=1" data-orig-size="441,100" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_32" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?fit=300%2C68&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?fit=441%2C100&amp;ssl=1" src="../Images/84d6c3be0472949044846d3737b60b91.png" alt="Focal-R loss based on L1 distance" class="wp-image-61249 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?resize=347%2C79&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?resize=347%2C79&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61249" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_32" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?fit=441%2C100&amp;ssl=1" data-orig-size="441,100" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_32" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?fit=300%2C68&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?fit=441%2C100&amp;ssl=1" src="../Images/84d6c3be0472949044846d3737b60b91.png" alt="Focal-R loss based on L1 distance" class="wp-image-61249" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_32.png?resize=347%2C79&amp;ssl=1"/></noscript><figcaption><em>Focal-R loss based on L1 distance | <a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>2.对成本敏感的重新加权</p>
+
+
+
+<h5 id="2-cost-sensitive-re-weighting">由于可以将目标空间划分为有限的仓，所以可以直接插入经典的重新加权方案，例如逆频率加权(INV)及其平方根加权变体(SQINV ),这两种方案都是基于标签分布的。</h5>
+
+
+
+<p>混合工艺</p>
+
+
+
+<h4 id="hybrid-approach">它遵循不平衡分类的混合方法。</h4>
+
+
+
+
+
+
+
+<p>像用于不平衡分类的混合方法一样，不平衡回归混合方法也结合了数据级和算法级方法，以便产生健壮和高效的学习器。</p>
+
+
+
+<p>这种方法的一个例子是基于Bagging的集合。</p>
+
+
+
+<p>基于Bagging的集成</p>
+
+
+
+<h5 id="bagging-based-ensemble">该算法结合了数据预处理策略，以解决回归任务中的不平衡域。</h5>
+
+
+
+<p>确切地说，一篇题为“REBAGG:不平衡回归的重采样BAGGing”的论文提出了一种算法，该算法在生成的模型上获得多样性，同时使它们偏向最少表示和更重要的情况。</p>
+
+
+
+<p>它有两个主要步骤:</p>
+
+
+
+<p>使用训练集的预处理样本建立多个模型。</p>
+
+
+<div class="custom-point-list">
+<ol><li>通过应用平均策略(基本上是平均模型的预测以获得最终预测)，使用训练好的模型来获得对看不见的数据的预测。</li><li>关于第一步，作者开发了四种主要类型的重采样方法来应用于原始训练集:<strong>平衡</strong>、<strong>平衡。贴片</strong>、<strong>变异</strong>、<strong>T7、<strong>变异。SMT </strong>。这些方法的主要区别在于:</strong></li></ol>
+</div>
+
+
+<p>I)在新样本中使用的少数和多数样本之间的比率；而且，</p>
+
+
+
+<p>ii)如何获得新的少数样本。</p>
+
+
+
+<p>在标有前缀“balance”的重采样方法中，新的修改后的训练集将具有相同数量的少数和多数样本。另一方面，对于带有前缀“变化”的重采样方法，新训练集中少数样本与多数样本的比率将会变化。</p>
+
+
+
+<p>当重采样方法没有附加后缀时，则通过使用随机选择的少数样本的精确副本来获得少数区域的新合成样本。并且当添加后缀“SMT”时，使用SMOTER算法获得少数区域的新合成示例。</p>
+
+
+
+<p>深度不平衡回归</p>
+
+
+
+<h3 id="deep-imbalanced-regression-dir">不平衡分类工作采用的方法；然而，单独使用它们有几个缺点。</h3>
+
+
+
+<p>请允许我打个比方！</p>
+
+
+
+<p>上述数据集具有本质上不同的标签空间:( a) CIFAR-100展示分类标签空间，其中目标是类别索引，而(b) IMDB-WIKI展示连续标签空间，其中目标是年龄。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61216" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_16" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?fit=1872%2C1300&amp;ssl=1" data-orig-size="1872,1300" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_16" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?fit=300%2C208&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?fit=1024%2C711&amp;ssl=1" src="../Images/de85756fcf0ddec7d038f804985dc524.png" alt="Figure 1. Comparison on the test error distribution (bottom) using the same training label distribution (top) on two different datasets" class="wp-image-61216 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?resize=671%2C464&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?resize=671%2C464&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61216" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_16" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?fit=1872%2C1300&amp;ssl=1" data-orig-size="1872,1300" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_16" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?fit=300%2C208&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?fit=1024%2C711&amp;ssl=1" src="../Images/de85756fcf0ddec7d038f804985dc524.png" alt="Figure 1. Comparison on the test error distribution (bottom) using the same training label distribution (top) on two different datasets" class="wp-image-61216" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_16.jpg?resize=671%2C464&amp;ssl=1"/></noscript><figcaption><em>Figure 1. Comparison on the test error distribution (bottom) using the same training label distribution (top) on two different datasets | </em><a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow"><em>Source</em></a></figcaption></figure></div>
+
+
+
+<p>如您所见，两者的标签密度分布相同，但误差分布却大不相同。IMDB-WIKI的误差分布更加平滑，并且与标签密度分布没有很好的相关性，这影响了不平衡学习方法的工作方式，因为它们直接或间接地通过补偿<em>经验</em>标签密度分布中的不平衡来工作。这种方法适用于不平衡分类，但不适用于连续标签。相反，你必须找到一种平滑标签分布的方法。</p>
+
+
+
+<p>不平衡数据密度估计的标签分布平滑法</p>
+
+
+
+<h4 id="label-distribution-smoothing-lds-for-imbalanced-data-density-estimation">从上面的图2中我们可以看到，在连续空间中，经验标签分布与真实的标签密度分布不匹配。这是为什么呢？由于邻近标签处的数据样本之间的相关性，在这种情况下，我们讨论的是相近年龄的图像。</h4>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61220" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_12" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?fit=1771%2C904&amp;ssl=1" data-orig-size="1771,904" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_12" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?fit=300%2C153&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?fit=1024%2C523&amp;ssl=1" src="../Images/a6c9ae54b5f850159c14d24f1692e751.png" alt="Figure 2. Label distribution smoothing(LDS) convolves a symmetric kernel with the empirical label density to estimate the effective label density distribution that accounts for the continuity of labels" class="wp-image-61220 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?resize=629%2C321&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?resize=629%2C321&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61220" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_12" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?fit=1771%2C904&amp;ssl=1" data-orig-size="1771,904" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_12" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?fit=300%2C153&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?fit=1024%2C523&amp;ssl=1" src="../Images/a6c9ae54b5f850159c14d24f1692e751.png" alt="Figure 2. Label distribution smoothing(LDS) convolves a symmetric kernel with the empirical label density to estimate the effective label density distribution that accounts for the continuity of labels" class="wp-image-61220" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_12.jpg?resize=629%2C321&amp;ssl=1"/></noscript><figcaption><em>Figure 2. Label distribution smoothing (LDS) convolves a symmetric kernel with the empirical label density to estimate the effective label density distribution that accounts for the continuity of labels | </em><a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow"><em>Source</em></a></figcaption></figure></div>
+
+
+
+<p>LDS使用核密度估计来学习对应于连续目标的数据集中的有效不平衡。准确地说，LDS将对称核与经验密度分布进行卷积，以提取核平滑版本，该版本考虑了附近标签的数据样本信息中的重叠。</p>
+
+
+
+<p><em> <strong>注意</strong>:高斯或拉普拉斯核是对称核。</em></p>
+
+
+
+<p>对称核表征了目标值y’和y’之间的相似性，以及它们在目标空间中的距离。</p>
+
+
+
+<p>本节开头的图2显示了LDS捕获了影响回归的实际不平衡。通过应用LDS，我们得到了与误差分布(-0.83)很好相关的标签密度分布。</p>
+
+
+
+<p>一旦获得了有效的标签密度，就可以使用我们之前讨论过的用于解决不平衡分类的技术(即成本敏感的重新加权方法)。</p>
+
+
+
+<p>特征分布平滑(FDS)</p>
+
+
+
+<h4 id="feature-distribution-smoothing-fds">上图显示了30岁(主播)的特征统计相似度。你可以马上注意到锚周围的箱子与锚高度相似，尤其是最近的那些。但是进一步研究该图，您会注意到数据样本非常少的地区(即0-6岁)存在一个问题。由于数据不平衡，平均值和方差显示了与30岁的不合理的高度相似性。</h4>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61213" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_19" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?fit=1968%2C1302&amp;ssl=1" data-orig-size="1968,1302" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_19" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?fit=300%2C198&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?fit=1024%2C677&amp;ssl=1" src="../Images/f1023e8fd759720ca0ccc8368c2f0071.png" alt="Feature distribution smoothing (FDS)" class="wp-image-61213 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?resize=629%2C416&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?resize=629%2C416&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61213" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_19" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?fit=1968%2C1302&amp;ssl=1" data-orig-size="1968,1302" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_19" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?fit=300%2C198&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?fit=1024%2C677&amp;ssl=1" src="../Images/f1023e8fd759720ca0ccc8368c2f0071.png" alt="Feature distribution smoothing (FDS)" class="wp-image-61213" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_19.jpg?resize=629%2C416&amp;ssl=1"/></noscript><figcaption><strong><em>Top</em></strong><em>: Cosine similarity of the feature means at a particular age w.r.t its value at the anchor age. </em><strong><em>Bottom</em></strong><em>: Cosine similarity of the feature variance at a particular age w.r.t its value at the anchor age. The color of the background refers to data density in a particular target range | </em><a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow"><em>Source</em></a></figcaption></figure></div>
+
+
+
+<p>特征分布平滑(FDS)算法的<a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow">创造者</a>受到这些观察的启发，提出了这种算法，该算法在特征空间上执行分布平滑，或者换句话说，在附近的目标箱之间传输特征统计。从而校准特征分布的潜在有偏估计，特别是对于训练数据中未充分表示的目标值。</p>
+
+
+
+<p>FDS的一个伟大之处在于，您可以通过在最终特征地图后插入特征校准层，将其集成到深度神经网络中。</p>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-large is-resized"><img data-attachment-id="61231" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_1" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?fit=1197%2C643&amp;ssl=1" data-orig-size="1197,643" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?fit=300%2C161&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?fit=1024%2C550&amp;ssl=1" src="../Images/6e7341bab8bc9cb630574d60aa3d2157.png" alt="Feature distribution smoothing (FDS)" class="wp-image-61231 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?resize=651%2C350&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?resize=651%2C350&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61231" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_1" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?fit=1197%2C643&amp;ssl=1" data-orig-size="1197,643" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;1&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_1" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?fit=300%2C161&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?fit=1024%2C550&amp;ssl=1" src="../Images/6e7341bab8bc9cb630574d60aa3d2157.png" alt="Feature distribution smoothing (FDS)" class="wp-image-61231" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_1.jpg?resize=651%2C350&amp;ssl=1"/></noscript><figcaption><em>Feature distribution smoothing (FDS) | <a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>标杆管理</p>
+
+
+
+<h4 id="benchmarking">使用各种算法在语义文本相似性基准(STS-B-DIR)数据集上报告了结果。</h4>
+
+
+
+<div class="wp-block-image is-style-default"><figure class="aligncenter size-full is-resized"><img data-attachment-id="61228" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_4" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?fit=640%2C620&amp;ssl=1" data-orig-size="640,620" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_4" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?fit=300%2C291&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?fit=640%2C620&amp;ssl=1" src="../Images/44bc33d1eae319d855c2704bfe005f6b.png" alt="Benchmarking results on STS-B-DIR" class="wp-image-61228 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?resize=564%2C546&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?resize=564%2C546&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="61228" data-permalink="https://web.archive.org/web/20220926103213/https://neptune.ai/how-to-deal-with-imbalanced-classification-and-regression-data_4" data-orig-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?fit=640%2C620&amp;ssl=1" data-orig-size="640,620" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="How to Deal With Imbalanced Classification and Regression Data_4" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?fit=300%2C291&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926103213/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?fit=640%2C620&amp;ssl=1" src="../Images/44bc33d1eae319d855c2704bfe005f6b.png" alt="Benchmarking results on STS-B-DIR" class="wp-image-61228" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926103213im_/https://i0.wp.com/neptune.ai/wp-content/uploads/How-to-Deal-With-Imbalanced-Classification-and-Regression-Data_4.png?resize=564%2C546&amp;ssl=1"/></noscript><figcaption><em>Benchmarking results on STS-B-DIR | <a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow">Source</a></em></figcaption></figure></div>
+
+
+
+<p>作者表明，当LDS和FDS与其他现有方法相结合来处理不平衡数据的回归时，可以显著提高性能<a href="https://web.archive.org/web/20220926103213/https://arxiv.org/pdf/2102.09554.pdf" target="_blank" rel="noreferrer noopener nofollow">【4】</a>。</p>
+
+
+
+<p>不平衡回归的性能度量</p>
+
+
+
+<h3 id="performance-measures-for-imbalance-regression">当谈到这类问题的评估指标时，您可以使用常见的回归指标，如MAE、MSE、Pearson、几何平均(GM)以及我们在本节中探讨的技术。</h3>
+
+
+
+<p>开发不平衡回归的新方法时需要解决的关键问题</p>
+
+
+
+<h3 id="crucial-open-issues-to-address-when-developing-novel-methods-for-imbalanced-regression">开发对成本敏感的回归解决方案，使成本适应稀有观测的重要程度。为了在预测不同重要性的罕见事件时有更大的灵活性，调查使成本不仅适用于少数群体而且适用于每个个体观察的可能性将是相当有趣的。</h3>
+
+
+<div class="custom-point-list">
+<ul><li>必须提出能够区分少数样本和噪声样本的方法。</li><li>开发更好的集成学习方法，如在分类中，可以在对偏斜分布的鲁棒性和预测能力方面提供显著的改进。</li><li>结论</li></ul>
+</div>
+
+
+<h2 id="conclusion">规范的ML算法假设所考虑的类中的对象数量大致相似。然而，在我们可以应用ML的许多现实生活问题中，实例的分布是偏斜的，因为我们最关心并想要预测的事件很少发生，并且在大多数情况下，我们收集代表正常状态和多数群体的正常事件的数据点。这对学习算法造成了困难，因为它们会偏向多数群体。</h2>
+
+
+
+
+
+
+
+<p>但是在本文中，您了解了从不平衡分类和回归数据中学习的不同方法。</p>
+
+
+
+<p>感谢您的阅读！和往常一样，我有一个经过充分研究的参考部分，你可以用它来更深入地阅读下面的内容，还有一个<a href="https://web.archive.org/web/20220926103213/https://colab.research.google.com/drive/10gViloq5Wet40P1fod2MxYYCo8ou4Yg1#scrollTo=mp8WOh3Zj9wS" target="_blank" rel="noreferrer noopener nofollow"> colab笔记本</a>。</p>
+
+
+
+<p>参考</p>
+
+
+
+<h3 id="references">卡努马王子</h3>
+
+
+
+
+
+
+<div id="author-box-new-format-block_6040c34a0f888" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">Neptune . ai<br/>ML/DL开发者倡导者我想通过技术帮助人们。因为这个目的，我喜欢运用我的技术和分析能力来解决具有挑战性的问题，并与你，我的读者，分享我的一点知识和经验。</h3>
+    
+          <p class="article__authorContent-text"><strong>阅读下一篇</strong></p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">利用机器学习项目改善工作流程的最佳7种数据版本控制工具</p>
+
+
+
+<h2>5分钟阅读| Jakub Czakon |年10月20日更新</h2>
+
+
+
+<p class="has-small-font-size">5 mins read | Jakub Czakon | Updated October 20th, 2021</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10">跟踪所有用于模型和实验的数据并不容易。这需要很多时间，而且不仅仅是管理和跟踪文件。你需要确保每个人都在同一个页面上，并同时跟踪最新版本的变化。</p>
+
+
+
+<p>使用正确的软件，你可以毫不费力地做到这一点！一个好的数据版本控制工具可以让你拥有一个统一的数据集和一个强大的实验库。</p>
+
+
+
+<p>它还将实现所有团队成员之间的顺畅协作，因此每个人都可以实时跟踪变化，并始终知道发生了什么。</p>
+
+
+
+<p>这是系统化数据版本控制、改进工作流程和最小化出错风险的好方法。</p>
+
+
+
+<p>因此，请查看这些用于数据版本控制的顶级工具，它们可以帮助您实现工作自动化并优化流程。</p>
+
+
+
+<p>如果您关心可再现性、可追溯性和ML模型血统，那么数据版本化工具对您的工作流程至关重要。</p>
+
+
+
+<p>它们帮助您获得一个工件的版本，一个数据集或模型的散列，您可以在以后使用它来识别和比较。通常，您会将此数据版本记录到您的元数据管理解决方案中，以确保您的模型训练是版本化的和可重复的。</p>
+
+
+
+<p>如何选择数据版本化工具？</p>
+
+
+
+<h2>要为您的工作流选择合适的数据版本化工具，您应该检查:</h2>
+
+
+
+<p><strong>支持您的数据形态</strong>:它是如何支持视频/音频的？它是否为表格数据提供了一些预览？</p>
+
+
+<div class="custom-point-list">
+<ul><li>易用性:在你的工作流程中使用起来有多容易？它给你的执行增加了多少开销？</li><li><strong> Diff and compare </strong>:可以比较数据集吗？你能看到你的图像目录的不同吗？</li><li><strong>它与您的堆栈配合得如何</strong>:您能否轻松连接到您的基础设施、平台或模型培训工作流？</li><li><strong>你能让你的团队参与进来吗</strong>:如果你的团队不采用它，工具再好也没用。所以，记住你的队友的技能和偏好。</li><li>这里有一些值得探索的工具。</li></ul>
+</div>
+
+
+<p>Here’re are a few tools worth exploring.</p>
+
+
+<a class="button continous-post blue-filled" href="/web/20220926103213/https://neptune.ai/blog/best-data-version-control-tools" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

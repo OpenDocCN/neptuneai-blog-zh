@@ -1,0 +1,818 @@
+<html>
+<head>
+<title>Generative Adversarial Networks and Some of GAN Applications: Everything You Need to Know </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>生成对抗网络和一些GAN应用:你需要知道的一切</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/generative-adversarial-networks-gan-applications#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/generative-adversarial-networks-gan-applications#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>生成模型方法是一种无监督学习。</p>
+
+
+
+<p>在监督学习中，深度学习模型学习将输入映射到输出。在每次迭代中，都要计算损耗，并使用反向传播优化模型。</p>
+
+
+
+<p>在无监督学习中，我们不会像在监督学习中那样将目标变量输入到深度学习模型中。为什么？</p>
+
+
+
+<p>嗯，监督学习算法是为了在图像分类的情况下识别对象而构建的，或者在回归的情况下用于预测下一个值。</p>
+
+
+
+<p>无监督学习算法用于学习数据的<strong>潜在模式</strong>，或者数据的表示。</p>
+
+
+
+<p>无监督学习用于以下任务:</p>
+
+
+<div class="custom-point-list">
+<ul><li>主成分分析</li><li>使聚集</li><li>异常检测</li></ul>
+</div>
+
+
+<p>本质上，生成模型，或<strong>深度生成模型</strong>，是一类从样本中学习底层数据分布的深度学习模型。这些模型可用于将数据简化为其基本属性，或生成具有新的不同属性的新数据样本。</p>
+
+
+
+<p>生成模型有两种类型:</p>
+
+
+<div class="custom-point-list">
+<ol><li>显式似然模型</li><li>隐式似然模型</li></ol>
+</div>
+
+
+<p><strong>显式似然模型:</strong>显式模型从样本分布中学习数据分布，生成新类型的数据。这些类型的模型可以访问概率分布，并使用最大似然法对它们进行训练。在最大似然法中，假设的模型被训练以最大化该模型下数据的概率分布。</p>
+
+
+
+<p>显式似然模型:</p>
+
+
+<div class="custom-point-list">
+<ul><li>最大概似法<ul><li>PPCA，因子分析，混合模型</li><li>像素CNN/像素RNN</li><li>Wavenet</li><li>自回归语言模型</li></ul></li><li>近似最大似然<ul><li>玻尔兹曼机器</li><li>可变自动编码器</li></ul></li></ul>
+</div>
+
+
+<p><strong>隐式似然模型:</strong>隐式模型不学习数据的分布，而是学习数据的统计性质，因此它可以概括并生成新的数据样本，而不依赖于概率分布。</p>
+
+
+
+<h2>什么是生成性对抗网络？</h2>
+
+
+
+<p>生成式对抗网络是隐式似然模型，它从数据的统计分布中生成数据样本。它们用于复制数据集中的变化。他们使用两个网络的组合:生成器和鉴别器。</p>
+
+
+
+
+
+
+
+<p>发电机</p>
+
+
+
+<h3>生成器网络采用随机正态分布(z ),并输出接近原始分布的生成样本。</h3>
+
+
+
+<p>鉴别器</p>
+
+
+
+
+
+
+
+<p>鉴别器尝试用原始样本评估生成器生成的输出，并输出0到1之间的值。如果值接近0，则生成的样本是假的，如果值接近1，则生成的样本是真的。</p>
+
+
+
+<h3>Discriminator</h3>
+
+
+
+<p>简而言之，鉴别器的工作就是通过与原始样本的比较来鉴别生成的样本是真是假。生成器的工作是通过生成接近原始样本的样本来欺骗鉴别器。</p>
+
+
+
+
+
+
+
+<p>生成性对抗网络是如何工作的？</p>
+
+
+
+<p>所以，甘有两个网络。这两个网络都应该独立训练。当两个模型都是多层感知器时，GAN框架非常简单。让我们看看甘是如何工作的。</p>
+
+
+
+<h2>随机正态分布被输入到发生器中。然后，发生器输出随机分布，因为它没有参考点。</h2>
+
+
+
+<p>与此同时，一个实际的样本，或地面真相，被送入鉴别器。鉴别器学习实际样本的分布。当发生器产生的样本输入鉴别器时，它会评估分布。如果生成样本的分布接近原始样本，则鉴别器输出接近“1”=实数的值。如果两个分布不匹配，或者它们甚至彼此都不接近，那么鉴别器输出一个接近“0”的值=假。</p>
+
+
+
+<p>那么生成器如何进化以生成类似实际数据的样本呢？</p>
+
+
+
+<p>为了理解生成器的进化，我们需要了解鉴别器是如何评估生成的样本是真的还是假的。</p>
+
+
+
+<p>答案在于损失函数或者价值函数；它测量生成数据的分布和真实数据的分布之间的距离。发生器和鉴别器都有自己的损失函数。发生器试图最小化损失函数，而鉴别器试图最大化。</p>
+
+
+
+<p>发电机不直接连接到损耗，而是通过鉴别器。鉴别器产生假的或真的输出。如果输出为0 =假，那么发生器损耗惩罚发生器产生被鉴别器分类为假的样本。</p>
+
+
+
+<p>一旦计算出损耗，通过鉴别器网络到发电机的反向传播来更新发电机权重。这一点很重要，因为发生器参数的影响在很大程度上取决于鉴别器的影响，因此发生器接收反馈并使用反馈产生更“真实”的图像。</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="41600" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?fit=678%2C70&amp;ssl=1" data-orig-size="678,70" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?fit=300%2C31&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?fit=678%2C70&amp;ssl=1" src="../Images/39d234dbc1f5b226cbefa341099bfc6a.png" alt="GANs equation" class="wp-image-41600 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?resize=509%2C53&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?resize=509%2C53&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41600" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?fit=678%2C70&amp;ssl=1" data-orig-size="678,70" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?fit=300%2C31&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?fit=678%2C70&amp;ssl=1" src="../Images/39d234dbc1f5b226cbefa341099bfc6a.png" alt="GANs equation" class="wp-image-41600" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation.png?resize=509%2C53&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>培养</p>
+
+
+
+<p>对于每个训练步骤，我们从<strong>鉴别器循环</strong>开始。在进入发电机回路之前，我们要重复这一步。</p>
+
+
+
+<h3><strong>鉴别器回路</strong>:</h3>
+
+
+
+<p>设置一个循环k，其中k&gt;1。我们这样做是因为我们想确保鉴别器收敛到原始数据pd的良好估计量。</p>
+
+
+
+<p>从正态分布{z1，z2，z3，…zn}中采样m个噪声数据，并通过发生器对其进行变换。</p>
+
+
+<div class="custom-point-list">
+<ol><li>从正态分布{x1，x2，x3，…xn}中抽取m个实际数据样本。</li><li>重要的是要记住，假样本标记为0，真样本标记为1。</li><li>然后我们使用损失函数来计算使用标签的损失。</li><li>我们采用损失函数相对于鉴别器参数的梯度，并更新鉴别器中的权重。为了更新鉴别器中的梯度，我们使用梯度上升，因为我们想最大化它。</li><li>这就完成了鉴别器环路。</li><li><strong>发电机回路</strong>:</li></ol>
+</div>
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="41601" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation-2" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?fit=908%2C174&amp;ssl=1" data-orig-size="908,174" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation-2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?fit=300%2C57&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?fit=908%2C174&amp;ssl=1" src="../Images/b377de506d8e1410eecca4f93ab80198.png" alt="GANs equation" class="wp-image-41601 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?resize=454%2C87&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?resize=454%2C87&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41601" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation-2" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?fit=908%2C174&amp;ssl=1" data-orig-size="908,174" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation-2" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?fit=300%2C57&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?fit=908%2C174&amp;ssl=1" src="../Images/b377de506d8e1410eecca4f93ab80198.png" alt="GANs equation" class="wp-image-41601" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-2.png?resize=454%2C87&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>发电机回路类似。我们从以下几点开始:</p>
+
+
+
+<p>从正态分布{z1，z2，z3，…zn}中采样m个噪声数据，并通过生成器对其进行变换，以获得我们的伪样本。</p>
+
+
+
+<p>因为我们只对更新发电机的环路感兴趣，所以我们考虑损失函数相对于发电机的梯度，最终使导数为零。</p>
+
+
+<div class="custom-point-list">
+<ol><li>此外，在发生器循环中，我们不会使用真实样本，因此成本函数简化为:</li><li>使用相同的等式，我们现在可以使用梯度下降来更新生成器的权重。</li><li>非常有趣的是，生成器通过保持鉴别器为常数来进化。鉴别器作为向导，帮助生成器学习和进化！</li></ol>
+</div>
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="41602" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation-3" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?fit=626%2C164&amp;ssl=1" data-orig-size="626,164" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation-3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?fit=300%2C79&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?fit=626%2C164&amp;ssl=1" src="../Images/310c8d843fae98e97f74690f0cd58318.png" alt="GANs equation" class="wp-image-41602 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?resize=313%2C82&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?resize=313%2C82&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41602" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation-3" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?fit=626%2C164&amp;ssl=1" data-orig-size="626,164" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation-3" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?fit=300%2C79&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?fit=626%2C164&amp;ssl=1" src="../Images/310c8d843fae98e97f74690f0cd58318.png" alt="GANs equation" class="wp-image-41602" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-3.png?resize=313%2C82&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>损失函数</p>
+
+
+
+<p>gans中有两个主要损失函数:</p>
+
+
+
+<h3>最小-最大损失</h3>
+
+
+
+<p>瓦瑟斯坦损失</p>
+
+
+<div class="custom-point-list">
+<ol><li>最小最大损失</li><li>Minimax就是最大化误差和最小化误差。最小-最大损失最初是由Ian Goodfellow等人在2014年发表的一篇题为“<a href="https://web.archive.org/web/20221022004913/https://arxiv.org/abs/1406.2661" target="_blank" rel="noreferrer noopener nofollow">生成性对抗网络</a>”的论文中描述的。</li></ol>
+</div>
+
+
+<h4>极大极小损失来自博弈论。它基本上围绕着玩家之间的竞争。这个想法是，为了获胜，玩家必须最大化自己获胜的概率，并通过找到对手可以做出的最佳移动来最小化对手获胜的概率。</h4>
+
+
+
+<p>在这里，我们需要明白，鉴别者是希望通过正确分类生成器生成的假图像来最大化获胜概率的玩家。它先让自己熟悉真实图像，即<strong> D(x) = 1 </strong>，再熟悉虚假图像，即<strong> D(G(x)) = 0 </strong>。</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="41603" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation-4" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?fit=908%2C174&amp;ssl=1" data-orig-size="908,174" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation-4" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?fit=300%2C57&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?fit=908%2C174&amp;ssl=1" src="../Images/88fca600f23703dda293480d8e46e8a7.png" alt="GANs equation" class="wp-image-41603 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?resize=454%2C87&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?resize=454%2C87&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41603" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation-4" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?fit=908%2C174&amp;ssl=1" data-orig-size="908,174" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation-4" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?fit=300%2C57&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?fit=908%2C174&amp;ssl=1" src="../Images/88fca600f23703dda293480d8e46e8a7.png" alt="GANs equation" class="wp-image-41603" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-4.png?resize=454%2C87&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>(1–D(G(x)))之间的差应该增加。较大的差异表明鉴别器运行良好；它能够区分真假图像。</p>
+
+
+
+<p>另一方面，当涉及到生成器时，它会试图通过最小化(1–D(G(x))来最小化鉴别器的获胜概率。</p>
+
+
+
+<p>生成器想要做的只是产生样本，当通过鉴别器(D(G(x))时，该样本更接近于1。然后，当计算损耗(1–D(G(x)))时，输出将更接近于零。</p>
+
+
+
+<p>这个过程持续下去，直到一个玩家帮助另一个玩家进化，或者训练迭代终止。</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="41604" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation-5" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?fit=626%2C164&amp;ssl=1" data-orig-size="626,164" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation-5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?fit=300%2C79&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?fit=626%2C164&amp;ssl=1" src="../Images/3b183131fc2302c2e65bbce91a508b9f.png" alt="" class="wp-image-41604 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?resize=313%2C82&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?resize=313%2C82&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41604" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/gans-equation-5" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?fit=626%2C164&amp;ssl=1" data-orig-size="626,164" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="GANs-equation-5" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?fit=300%2C79&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?fit=626%2C164&amp;ssl=1" src="../Images/3b183131fc2302c2e65bbce91a508b9f.png" alt="" class="wp-image-41604" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/GANs-equation-5.png?resize=313%2C82&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>瓦瑟斯坦损失</p>
+
+
+
+<p>Wasserstein损失函数是为一种称为WGAN的新型GAN开发的，其中鉴别器不会将输出分类为假或真，但对于每个生成的样本，它会输出一个介于0和1之间的数字。尽管想法是相同的，其中真实样本由较大的数字表示，而假样本由较小的数字表示。</p>
+
+
+
+
+
+
+<h4>所以，它不能真正区分真假样本。WGAN鉴别器实际上被称为“批评家”。</h4>
+
+
+
+<p><strong>评论家损失</strong>:C(x)–C(G(z))</p>
+
+
+
+<p>鉴别器试图最大化这个函数，它和我们之前看到的minimax函数是一样的。它试图最大化真实实例和虚假实例之间的差异。</p>
+
+
+
+<p><strong>发电机损耗</strong> : C(G(z))</p>
+
+
+
+<p>生成器试图最大化该功能。换句话说，它试图最大化伪实例的鉴别器输出。</p>
+
+
+
+<p>甘的问题</p>
+
+
+
+<p>消失梯度下降</p>
+
+
+
+
+
+
+<h2>当在训练的每次迭代中损失函数相对于当前权重的导数非常小，以至于对原始权重的更新几乎可以忽略时，出现消失梯度下降。</h2>
+
+
+
+<h3>为了克服这个问题，建议使用WGANs。</h3>
+
+
+
+<p>模式崩溃</p>
+
+
+
+<p>当发生器能够用较少种类的数据样本欺骗鉴别器时，发生模式崩溃。</p>
+
+
+
+<h3>例如，如果输入数据有10个不同的手动数字，而发生器能够通过仅产生10个手动数字中的4个来欺骗鉴别器，则GAN遭受模式崩溃。</h3>
+
+
+
+<p>GAN变体</p>
+
+
+
+<p>深度卷积GAN</p>
+
+
+
+
+
+
+<h2>DCGANs是对使用卷积神经网络的gan的改进。CNN有利于从数据中提取重要的特征和表示，使它们更加稳定，并使它们能够生成更高质量的图像。</h2>
+
+
+
+<h3>条件gan</h3>
+
+
+
+<p>GANs可以通过添加一些额外的信息变得更好，比如标签y。</p>
+
+
+
+
+
+
+
+<h3>从上图中可以看出，生成器和鉴别器都受标签y的约束。这可能是任何类型的附加信息，比如类标签或数据。</h3>
+
+
+
+<p>在发生器中，先前的输入噪声p(z)和label (y)被合并。在鉴别器中，输入(x)和标签(y)作为鉴别函数的输入。</p>
+
+
+
+
+
+
+
+<p>cGANs通过利用输入模型的额外信息来学习生成更好的图像。</p>
+
+
+
+<p><strong>为什么是cGAN？</strong></p>
+
+
+
+<p>通过提供附加信息，GANs:</p>
+
+
+
+<p>倾向于收敛得更快；事实证明，即使是随机分布也会有一些模式。</p>
+
+
+
+<p>您可以在推断时控制生成器的输出，方法是给出您希望它生成的图像的标签。</p>
+
+
+<div class="custom-point-list">
+<ol><li><strong>应用:</strong></li><li>图像到图像的翻译</li></ol>
+</div>
+
+
+<p>文本到图像的合成</p>
+
+
+<div class="custom-point-list">
+<ol><li>视频生成</li><li>图像到图像的翻译</li><li>图像到图像的转换是一种应用，其中用a的属性来转换某个图像B。</li></ol>
+</div>
+
+
+<h3>像素2像素GAN</h3>
+
+
+
+<p>前面我们看到了正态分布中的随机样本是如何被输入到生成器中的，并且是未知的，或者是一个新的样本是如何生成的。Pix2Pix GAN使用<strong>条件GAN </strong>将一种类型的图像转换为另一种类型的图像。</p>
+
+
+
+<h4>Pix2Pix GAN使用一对图像x和y。这些图像对必须是相关的。输入x被馈送到发生器，它是一个U形网。发生器的输出然后被馈送到鉴别器，鉴别器也被馈送以标签y。直觉是一个图像可以被完全转换成另一个图像。</h4>
+
+
+
+<p>之前我们看到生成器学习将随机分布转换为图像。在pix2pix中，我们看到一个图像被转换或翻译成不同类型的图像。</p>
+
+
+
+
+
+
+
+<p>Pix2Pix可用于:</p>
+
+
+
+
+
+
+
+<p>白天到晚上或晚上到白天的翻译</p>
+
+
+
+
+
+
+
+<p>低分辨率到高分辨率</p>
+
+
+<div class="custom-point-list">
+<ol><li>草图到图纸</li><li>CycleGAN</li><li>CycleGAN是Pix2Pix GAN的更新版本。CycleGAN使用不成对的图像转换，而不是成对的图像转换。这种技术基本上给了你很多机会去拍摄任意两个图像对，然后将两个图像的属性互相传递。</li></ol>
+</div>
+
+
+<h3>从上图中可以看出，这些技术非常有用。艺术家可以用它将照片转化为绘画。</h3>
+
+
+
+<p>CycleGAN通常使用两个生成器和鉴别器。其背后的思想是，图像A被馈入生成器，它生成某个图像G(A)。相同的图像G(A)被馈送到另一个生成器中以重建原始图像F(A)。cycleGAN这个名字的灵感来源于这样一个事实，即cycleGAN不是以传统的方式计算损失，而是计算原始图像和重建图像的损失。</p>
+
+
+
+
+
+
+
+<p>文本到图像的合成</p>
+
+
+
+<p>斯塔克根</p>
+
+
+
+
+
+
+
+<h3>堆叠生成对抗网络(StackGAN)可以根据文本描述生成图像。</h3>
+
+
+
+<h4>该架构包括一系列堆叠的文本和图像GAN模型。这又是一类条件句。它有两种GAN，也称为第一阶段GAN和第二阶段GAN。StackGAN使用草图细化过程，其中第一级生成器Stage-I GAN以文本为条件，生成低分辨率图像，即描述性文本的原始形状和颜色。</h4>
+
+
+
+<p>第二级发生器，第二阶段GAN，以文本和低分辨率图像为条件，采用第一阶段的结果并添加引人注目的细节。</p>
+
+
+
+
+
+
+
+<p>低分辨率图像首先由我们的第一阶段GAN生成。在第一阶段GAN的顶部，我们堆叠了第二阶段GAN，以根据第一阶段结果和文本描述生成逼真的高分辨率(例如256×256)图像。通过再次调节第一阶段的结果和文本，第二阶段的甘学会捕捉第一阶段甘遗漏的文本信息，并为对象绘制更多细节……“摘自<a href="https://web.archive.org/web/20221022004913/https://arxiv.org/pdf/1612.03242.pdf">斯塔克甘:利用堆叠式生成对抗网络将文本转换为照片般逼真的图像合成</a>(张寒等人)</p>
+
+
+
+<p>达尔-埃</p>
+
+
+
+<p>最近<a href="https://web.archive.org/web/20221022004913/https://openai.com/"> openai </a>创建了一个名为<a href="https://web.archive.org/web/20221022004913/https://openai.com/blog/dall-e/"> DALL-E </a>的深度学习网络，它也可以进行文本到图像的合成。</p>
+
+
+
+<h4>虽然架构没有用GANs，而是GPT-3的一个版本。</h4>
+
+
+
+<p>人脸修复</p>
+
+
+
+
+
+
+
+<p>面部修复，也称为面部修复，是为面部图像中缺失的像素生成可信的面部特征的任务。</p>
+
+
+
+
+
+
+<h3>这种技术的目的是从具有遮蔽区域的图像或具有缺失内容的图像中产生更合适和更真实的人脸图像。</h3>
+
+
+
+<p>GAN的实现</p>
+
+
+
+
+
+
+
+<p>香草甘</p>
+
+
+
+<h2>出局:</h2>
+
+
+
+<h3>氮化镓的应用</h3>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Input
+<span class="hljs-keyword">from</span> tensorflow.keras.models <span class="hljs-keyword">import</span> Model, Sequential
+<span class="hljs-keyword">from</span> tensorflow.keras.layers.core <span class="hljs-keyword">import</span> Dense, Dropout
+<span class="hljs-keyword">from</span> tensorflow.keras.layers.advanced_activations <span class="hljs-keyword">import</span> LeakyReLU
+<span class="hljs-keyword">from</span> tensorflow.keras.datasets <span class="hljs-keyword">import</span> mnist
+<span class="hljs-keyword">from</span> tensorflow.keras.optimizers <span class="hljs-keyword">import</span> Adam
+<span class="hljs-keyword">from</span> tensorflow.keras <span class="hljs-keyword">import</span> initializers
+<span class="hljs-keyword">from</span> tensorflow.keras.layers <span class="hljs-keyword">import</span> Activation, Dense</pre>
+
+
+
+<pre class="hljs">
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+X_train = (X_train.astype(np.float32) - <span class="hljs-number">127.5</span>)/<span class="hljs-number">127.5</span>
+
+X_train = X_train.reshape(<span class="hljs-number">60000</span>, <span class="hljs-number">784</span>)
+
+
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">25</span>):
+    plt.subplot(<span class="hljs-number">5</span>,<span class="hljs-number">5</span>,i+<span class="hljs-number">1</span>)
+    plt.xticks([])
+    plt.yticks([])
+    plt.grid(<span class="hljs-keyword">False</span>)
+    plt.imshow(X_train.reshape(X_train.shape[<span class="hljs-number">0</span>], <span class="hljs-number">28</span>, <span class="hljs-number">28</span>)[i], interpolation=<span class="hljs-string">'nearest'</span>, cmap=<span class="hljs-string">'gray_r'</span>)</pre>
+
+
+
+<p>gan有许多实际应用，其中一些是:</p>
+
+
+
+<figure class="wp-block-image size-large is-resized"><img data-attachment-id="41593" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/vanilla-gan-output" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?fit=692%2C498&amp;ssl=1" data-orig-size="692,498" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Vanilla-GAN-output" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?fit=300%2C216&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?fit=692%2C498&amp;ssl=1" src="../Images/52957a171d09c7bb66ac57e73590d8a4.png" alt="Vanilla GAN output" class="wp-image-41593 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?resize=346%2C249&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?resize=346%2C249&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="41593" data-permalink="https://web.archive.org/web/20221022004913/https://neptune.ai/blog/generative-adversarial-networks-gan-applications/attachment/vanilla-gan-output" data-orig-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?fit=692%2C498&amp;ssl=1" data-orig-size="692,498" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="Vanilla-GAN-output" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?fit=300%2C216&amp;ssl=1" data-large-file="https://web.archive.org/web/20221022004913/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?fit=692%2C498&amp;ssl=1" src="../Images/52957a171d09c7bb66ac57e73590d8a4.png" alt="Vanilla GAN output" class="wp-image-41593" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221022004913im_/https://i0.wp.com/neptune.ai/wp-content/uploads/Vanilla-GAN-output.png?resize=346%2C249&amp;ssl=1"/></noscript></figure>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_optimizer</span><span class="hljs-params">()</span>:</span>
+    <span class="hljs-keyword">return</span> Adam(lr=<span class="hljs-number">0.0002</span>, beta_1=<span class="hljs-number">0.5</span>)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_generator</span><span class="hljs-params">(optimizer, random_dim)</span>:</span>
+    generator = Sequential()
+    generator.add(Dense(<span class="hljs-number">256</span>, input_dim=random_dim, kernel_initializer = <span class="hljs-string">'uniform'</span>, bias_initializer = <span class="hljs-string">'zeros'</span>))
+    generator.add(LeakyReLU(alpha=<span class="hljs-number">0.2</span>))
+
+    generator.add(Dense(<span class="hljs-number">512</span>))
+    generator.add(LeakyReLU(alpha=<span class="hljs-number">0.2</span>))
+
+    generator.add(Dense(<span class="hljs-number">1024</span>))
+    generator.add(LeakyReLU(alpha=<span class="hljs-number">0.2</span>))
+
+    generator.add(Dense(<span class="hljs-number">784</span>, activation=<span class="hljs-string">'tanh'</span>))
+    generator.compile(loss=<span class="hljs-string">'binary_crossentropy'</span>, optimizer=optimizer)
+    generator.summary()
+    <span class="hljs-keyword">return</span> generator
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_discriminator</span><span class="hljs-params">(optimizer)</span>:</span>
+    discriminator = Sequential()
+    discriminator.add(Dense(<span class="hljs-number">1024</span>, input_dim=<span class="hljs-number">784</span>, kernel_initializer = <span class="hljs-string">'uniform'</span>, bias_initializer = <span class="hljs-string">'zeros'</span>))
+    discriminator.add(LeakyReLU(alpha=<span class="hljs-number">0.3</span>))
+    discriminator.add(Dropout(<span class="hljs-number">0.2</span>))
+
+    discriminator.add(Dense(<span class="hljs-number">512</span>))
+    discriminator.add(LeakyReLU(alpha=<span class="hljs-number">0.3</span>))
+    discriminator.add(Dropout(<span class="hljs-number">0.2</span>))
+
+    discriminator.add(Dense(<span class="hljs-number">256</span>))
+    discriminator.add(LeakyReLU(alpha=<span class="hljs-number">0.3</span>))
+    discriminator.add(Dropout(<span class="hljs-number">0.2</span>))
+
+    discriminator.add(Dense(<span class="hljs-number">1</span>, activation=<span class="hljs-string">'sigmoid'</span>))
+    discriminator.compile(loss=<span class="hljs-string">'binary_crossentropy'</span>, optimizer=optimizer)
+    
+    discriminator.summary()
+    <span class="hljs-keyword">return</span> discriminator
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">get_gan_network</span><span class="hljs-params">(discriminator, random_dim, generator, optimizer)</span>:</span>
+    
+    
+    
+    discriminator.trainable = <span class="hljs-keyword">False</span>
+    
+    
+    gan_input = Input(shape=(random_dim,))
+    
+    
+    x = generator(gan_input)
+    
+    
+    gan_output = discriminator(x)
+    
+    gan = Model(inputs=gan_input, outputs=gan_output) 
+    gan.compile(loss=<span class="hljs-string">'binary_crossentropy'</span>, optimizer=optimizer)
+    
+    gan.summary()
+    <span class="hljs-keyword">return</span> gan
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">plot_generated_images</span><span class="hljs-params">(epoch, generator, random_dim, examples=<span class="hljs-number">100</span>, dim=<span class="hljs-params">(<span class="hljs-number">10</span>, <span class="hljs-number">10</span>)</span>, figsize=<span class="hljs-params">(<span class="hljs-number">10</span>, <span class="hljs-number">10</span>)</span>)</span>:</span>
+    noise = np.random.normal(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, size=[examples, random_dim])
+    generated_images = generator.predict(noise)
+    generated_images = generated_images.reshape(examples, <span class="hljs-number">28</span>, <span class="hljs-number">28</span>)
+
+    plt.figure(figsize=figsize)
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(generated_images.shape[<span class="hljs-number">0</span>]):
+        plt.subplot(dim[<span class="hljs-number">0</span>], dim[<span class="hljs-number">1</span>], i+<span class="hljs-number">1</span>)
+        plt.imshow(generated_images[i], interpolation=<span class="hljs-string">'nearest'</span>, cmap=<span class="hljs-string">'gray_r'</span>)
+        plt.axis(<span class="hljs-string">'off'</span>)
+    plt.tight_layout()
+    plt.savefig(<span class="hljs-string">'gan_generated_image_epoch_%d.png'</span> % epoch)
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train</span><span class="hljs-params">(X_train, y_train, x_test, y_test, epochs=<span class="hljs-number">100</span>, minibatch_size=<span class="hljs-number">128</span>, random_dim = <span class="hljs-number">100</span>)</span>:</span>
+
+
+    adam = get_optimizer()
+    G = get_generator(adam, random_dim)
+    D = get_discriminator(adam)
+    gan = get_gan_network(D, random_dim, G, adam)
+    
+    
+    D_loss = []
+    G_loss = []
+
+    <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> range(<span class="hljs-number">1</span>, epochs+<span class="hljs-number">1</span>):
+        print(<span class="hljs-string">'-'</span>*<span class="hljs-number">15</span>, <span class="hljs-string">'Epoch %d'</span> % e, <span class="hljs-string">'-'</span>*<span class="hljs-number">15</span>)
+        
+        
+        epoch_cost = <span class="hljs-number">0.</span>                       
+        
+        
+        
+        num_minibatches = int(X_train.shape[<span class="hljs-number">0</span>] / minibatch_size) 
+        
+        
+        X_train, y_train = shuffle(X_train, y_train)
+        
+        
+        
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">0</span>, X_train.shape[<span class="hljs-number">0</span>], minibatch_size):
+            
+            
+            
+            X_train_mini = X_train[i:i + minibatch_size]
+            y_train_mini = y_train[i:i + minibatch_size]
+                
+                
+            
+            
+            legit_images = X_train_mini[np.random.randint(<span class="hljs-number">0</span>, X_train_mini.shape[<span class="hljs-number">0</span>], size=int(minibatch_size/<span class="hljs-number">2</span>))]
+
+            
+            noise = np.random.normal(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, size=[int(minibatch_size/<span class="hljs-number">2</span>), random_dim]) 
+            syntetic_images = G.predict(noise)
+    
+    
+            
+            x_combined_batch = np.concatenate((legit_images, syntetic_images))
+            y_combined_batch = np.concatenate((np.ones((int(minibatch_size/<span class="hljs-number">2</span>), <span class="hljs-number">1</span>)), np.zeros((int(minibatch_size/<span class="hljs-number">2</span>), <span class="hljs-number">1</span>))))
+            y_combined_batch[:int(minibatch_size/<span class="hljs-number">2</span>)] = <span class="hljs-number">0.9</span> 
+
+            
+            D.trainable = <span class="hljs-keyword">True</span>
+            d_loss = D.train_on_batch(x_combined_batch, y_combined_batch)
+            D_loss.append(d_loss)
+            
+            
+            
+            noise = np.random.normal(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, size=[minibatch_size, random_dim])
+            y_gen = np.ones(minibatch_size)
+            D.trainable = <span class="hljs-keyword">False</span>
+            g_loss = gan.train_on_batch(noise, y_gen)
+            G_loss.append(g_loss)
+
+            
+        <span class="hljs-keyword">print</span> (<span class="hljs-string">"Cost of D after epoch %i: %f"</span> % (e, d_loss))
+        <span class="hljs-keyword">print</span> (<span class="hljs-string">"Cost of G after epoch %i: %f"</span> % (e, g_loss))
+            
+               
+            
+        <span class="hljs-keyword">if</span> e == <span class="hljs-number">1</span> <span class="hljs-keyword">or</span> e % <span class="hljs-number">20</span> == <span class="hljs-number">0</span>:
+             plot_generated_images(e, G, random_dim)
+            
+    
+    G.save_weights(<span class="hljs-string">'Generator.h5'</span>) 
+    D.save_weights(<span class="hljs-string">'Discriminator.h5'</span>)
+    
+    <span class="hljs-keyword">return</span> [D_loss, G_loss]
+
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:
+    [D_loss, G_loss] = train(X_train, y_train, X_test, y_test, epochs = <span class="hljs-number">100</span>, minibatch_size=<span class="hljs-number">128</span>, random_dim = <span class="hljs-number">100</span>)</pre>
+
+
+
+<h2>生成图像数据集的示例</h2>
+
+
+
+<p>在医学或材料科学中，生成示例非常方便，因为这些领域中很少有数据可处理。</p>
+
+
+<div class="custom-point-list">
+<ul><li>生成人脸照片<ul><li>视频游戏设计者可以用它来生成逼真的人脸。</li></ul></li><li>生成逼真的照片<ul><li>对摄影师和摄像师非常有用。</li></ul></li><li>生成卡通人物<ul><li>艺术家可以用它来创造一个新的角色设计，或者卡通中的场景，甚至是视频游戏。</li></ul></li><li>图像到图像的翻译<ul><li>摄影师可以使用这些算法将白天转换成夜晚，将夏天转换成冬天，等等。</li></ul></li><li>GANs可用于模拟最坏的情况，以优化企业的风险管理。<ul><li>GAN的其他使用案例包括:</li></ul></li><li>文本到图像的翻译</li></ul>
+</div>
+
+
+<p>人脸正面视图生成</p>
+
+
+<div class="custom-point-list">
+<ul><li>生成新的人体姿态</li><li>照片到表情符号</li><li>面部老化</li><li>超分辨率</li><li>照片修复</li><li>服装翻译</li><li>视频预测</li><li>3D对象生成</li><li>结论</li><li>在本文中，我们了解了:</li></ul>
+</div>
+
+
+<h2>生成建模和生成模型</h2>
+
+
+
+<p>显式似然模型</p>
+
+
+<div class="custom-point-list">
+<ol><li>隐式似然模型<ol><li>生成对抗网络</li><li>它属于隐含似然模型。</li></ol></li><li>当我们设计GANs时，我们不关心真实数据的概率分布，而是试图模拟或生成具有相同分布和变化特征的真实数据。<ol><li>它有两个网络:生成器和鉴别器，它们试图相互竞争，同时帮助彼此学习更好的表示和分布。</li><li>损失函数及其工作原理。</li><li>甘斯的问题。</li></ol></li><li>GANs的不同变体</li><li>最后，我们使用keras实现了vanilla GANs。</li><li>这是一个迷人的话题，如果你坚持到了最后——感谢你的阅读！</li><li>尼尔什·巴拉</li></ol>
+</div>
+
+
+<p>我是最近一家初创公司perceptronai.net的创始人，该公司旨在通过我们的深度学习算法提供医疗和材料科学方面的解决方案。我也阅读和思考了很多。有时我把它们以绘画或音乐的形式表现出来。当我需要喘口气时，我会去跑步。</p>
+
+
+
+
+<div id="author-box-new-format-block_604218f9077b8" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name"><strong>阅读下一篇</strong></h3>
+    
+          <p class="article__authorContent-text">如何组织深度学习项目——最佳实践范例</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color">13分钟阅读|作者Nilesh Barla |年5月31日更新</p>
+
+
+
+<h2>How to Organize Deep Learning Projects – Examples of Best Practices</h2>
+
+
+
+<p class="has-small-font-size">一个成功的深度学习项目，你需要很多迭代，很多时间，很多努力。为了让这个过程不那么痛苦，你应该尽量利用你的资源。</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10">一个好的循序渐进的工作流程将帮助你做到这一点。有了它，你的项目变得<strong>高效、可复制、</strong>和<strong>可理解</strong>。</p>
+
+
+
+<p>在本文中，您将看到如何构建深度学习项目的工作——从开始到部署，监控部署的模型，以及中间的一切。</p>
+
+
+
+<p>在这个过程中，我们将使用Neptune来运行、监控和分析您的实验。Neptune是提高ML项目生产率的一个很酷的工具。</p>
+
+
+
+<p>在本文中，您将了解到:</p>
+
+
+
+<p>关于项目的生命周期。</p>
+
+
+
+<p>定义项目目标的重要性。</p>
+
+
+<div class="custom-point-list">
+<ol><li>根据项目需求收集数据。</li><li>模型训练和结果探索，包括:</li><li>为更好的结果建立基线。</li><li>采用现有的开源最新模型研究论文和代码库中的技术和方法。<ol><li>实验跟踪和管理</li><li>避免欠拟合和过拟合的模型优化技术，例如:</li><li>控制超参数</li></ol></li><li>规范化<ol><li>修剪</li><li>在部署之前测试和评估您的项目。</li><li>模型部署</li></ol></li><li>项目维护</li><li>Model deployment</li><li>Project maintenance</li></ol>
+</div>
+
+<a class="button continous-post blue-filled" href="/web/20221022004913/https://neptune.ai/blog/how-to-organize-deep-learning-projects-best-practices" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

@@ -1,0 +1,1189 @@
+<html>
+<head>
+<title>PyTorch Lightning vs Ignite: What Are the Differences? </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>PyTorch闪电vs点燃:有什么区别？</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/pytorch-lightning-vs-ignite-differences#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/pytorch-lightning-vs-ignite-differences#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>Pytorch是使用最广泛的深度学习库之一，仅次于Keras。它为任何在开发和研究中使用深度学习方法的人提供了敏捷性、速度和良好的社区支持。</p>
+
+
+
+<p>Pytorch比Tensorflow有一定优势。作为一名人工智能工程师，我非常喜欢的两个关键特性是:</p>
+
+
+
+<ol>
+<li>Pytorch有动态图(Tensorflow有静态图)，这使得Pytorch实现更快，并增加了pythonic的感觉。</li>
+
+
+
+<li>Pytorch很容易学，而Tensorflow有点难，主要是因为它的图形结构。</li>
+</ol>
+
+
+
+<p>我在Pytorch上遇到的唯一问题是，当模型按比例放大时，它缺少结构。随着算法中引入越来越多的函数，模型变得复杂，很难跟踪细节。类似Keras的东西将有利于提供一个具有简单调用功能的高级接口。</p>
+
+
+
+<p>今天，Pytorch社区已经相当大了，不同的群体已经创建了解决相同问题的高级库。在本文中，我们将探索两个库:<a href="https://web.archive.org/web/20221206042755/https://www.pytorchlightning.ai/" target="_blank" rel="noreferrer noopener nofollow"> Pytorch Lighting </a>和<a href="https://web.archive.org/web/20221206042755/https://pytorch.org/ignite/" target="_blank" rel="noreferrer noopener nofollow"> Pytorch Ignite </a>，它们为您的深度学习代码提供了灵活性和结构。</p>
+
+
+
+<h2 id="h-comparison-pytorch-lighting-vs-pytorch-ignite">对比:Pytorch照明与Pytorch点火</h2>
+
+
+
+<div id="medium-table-block_6b3c48c57818ada7bb6ebf68be30542f" class="block-medium-table c-table__outer-wrapper ">
+
+    <table class="c-table">
+                    <thead class="c-table__head">
+            <tr>
+                                    <td class="c-item">
+                        <p class="c-item__inner">                                                      </p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">闪电</p>
+                    </td>
+                                    <td class="c-item">
+                        <p class="c-item__inner">燃烧</p>
+                    </td>
+                            </tr>
+            </thead>
+        
+        <tbody class="c-table__body">
+
+                    
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> TensorBoard，海王星，MLflow，Wandb，</p>彗星，T3】</div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p> TensorBoard，Neptune，MLflow，Wandb，Polyaxon</p>T3】</div></td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>制作<br/>样书</p> </div></td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                </tr>
+
+            
+                <tr class="c-row">
+
+                    
+                        <td class="c-ceil">                                                      </td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>功能指标和模块指标界面</p> </div></td>
+
+                    
+                        <td class="c-ceil"><div class="c-ceil__inner"> <p>如果不定义指标，则根据任务选择。在本文中，我们将其定义为(autosklearn . metrics . roc _ AUC)</p></div></td>
+
+                    
+                </tr>
+
+                    
+        </tbody>
+    </table>
+
+</div>
+
+
+
+<p id="separator-block_81ff10d7b48c7025720699bba30874bf" class="block-separator block-separator--10">Pytorch闪电是什么？</p>
+
+
+
+<h2 id="h-what-is-pytorch-lightning">Lightning是构建在Pytorch之上的高级python框架。它是威廉·法尔孔在攻读博士学位时发明的。它是为研究人员创建的，专门用于尝试新的深度学习模型，其中涉及研究规模、多GPU训练、16位精度和TPU。</h2>
+
+
+
+<p>为什么是闪电？</p>
+
+
+
+<h3>创建Lightning的目的是通过消除低级代码，同时保持代码的可读性、逻辑性和易于执行，来扩展和加速研究过程。</h3>
+
+
+
+<p>Lightning为pytorch函数提供了一种结构，在这种结构中，函数的排列方式可以防止模型训练过程中的错误，这种错误通常发生在模型放大时。</p>
+
+
+
+<p>关键特征</p>
+
+
+
+<h3>Pytorch Lightning附带了许多功能，可以为专业人员以及研究领域的新手提供价值。</h3>
+
+
+
+<p><strong>在任何硬件</strong>上训练模型:CPU、GPU或TPU，无需更改源代码</p>
+
+
+
+<ul>
+<li><strong> 16位精度支持</strong>:通过将内存使用减半来加快训练模型的速度</li>
+
+
+
+<li><strong>可读性</strong>:减少不想要的或样板代码，把重点放在代码的研究方面</li>
+
+
+
+<li><strong>删除不需要的或样板代码</strong></li>
+
+
+
+<li><strong>界面</strong>:简洁、整洁、易于导航</li>
+
+
+
+<li><strong>更容易复制</strong></li>
+
+
+
+<li><strong>可扩展</strong>:你可以使用多个数学函数(优化器、激活函数、损失函数等等)</li>
+
+
+
+<li><strong>可重用性</strong></li>
+
+
+
+<li><strong>与可视化框架</strong>集成，如Neptune.ai、Tensorboard、MLFlow、Comet.ml、Wandb</li>
+
+
+
+<li>使用PyTorch Lightning的好处</li>
+</ul>
+
+
+
+<h2 id="h-benefits-of-using-pytorch-lightning">闪电API</h2>
+
+
+
+<h3>Lightning API提供了与原始Pytorch相同的功能，只是更加结构化。在定义模型的时候，你不用修改任何代码，完全一样，你需要做的就是继承<strong> LightningModule </strong>而不是<strong> nn.module </strong>。LightningModule负责建模深度学习网络的所有重要方面，例如:</h3>
+
+
+
+<p>定义模型的架构(<em> init </em></p>
+
+
+
+<ul>
+<li>定义训练、验证和测试循环(分别为训练_步骤、验证_步骤和测试_步骤)</li>
+
+
+
+<li>定义优化器(<em>configure _ optimizer</em></li>
+
+
+
+<li>Lightning自带<strong>lightning data module</strong>；您可以创建自己的培训、验证和测试数据集，然后将其传递给培训师模块。</li>
+
+
+
+<li>让我们看看在Lightning中定义模型是什么样子的。</li>
+</ul>
+
+
+
+<p>如您所见，LightningModule很简单，类似于Pytorch。它负责所有需要定义的重要方法，比如:</p>
+
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MNISTModel</span><span class="hljs-params">(pl.LightningModule)</span>:</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+        super(MNISTModel, self).__init__()
+        self.l1 = torch.nn.Linear(<span class="hljs-number">28</span> * <span class="hljs-number">28</span>, <span class="hljs-number">10</span>)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, x)</span>:</span>
+        <span class="hljs-keyword">return</span> torch.relu(self.l1(x.view(x.size(<span class="hljs-number">0</span>), <span class="hljs-number">-1</span>)))
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">training_step</span><span class="hljs-params">(self, batch, batch_nb)</span>:</span>
+        x, y = batch
+        loss = F.cross_entropy(self(x), y)
+        <span class="hljs-keyword">return</span> loss
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">configure_optimizers</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-keyword">return</span> torch.optim.Adam(self.parameters(), lr=<span class="hljs-number">0.02</span>)</pre>
+
+
+
+<p><strong> __init__ </strong>负责模型和相关权重</p>
+
+
+
+<ul>
+<li><strong> forward </strong>:与Pytorch Forward相同，连接架构的所有不同组件，并向前传递</li>
+
+
+
+<li><strong>训练_步骤</strong>:定义训练循环及其功能</li>
+
+
+
+<li><strong>配置优化器</strong>:定义优化器</li>
+
+
+
+<li>还有其他功能:</li>
+</ul>
+
+
+
+<p><strong>测试_步骤</strong></p>
+
+
+
+<ul>
+<li><strong>测试_结束</strong></li>
+
+
+
+<li><strong>配置优化器</strong></li>
+
+
+
+<li><strong>验证_步骤</strong></li>
+
+
+
+<li><strong>验证_结束</strong></li>
+
+
+
+<li><strong>训练器</strong>方法负责配置训练标准(时期数、训练硬件:CPU、GPU和TPU、GPU数量等)。培训师的主要工作是将<strong>工程代码</strong>从研究代码中分离出来。<br/>最后，你需要做的就是调用<strong>。从训练器实例中拟合</strong>方法，传递定义好的模型和数据加载器，并执行。</li>
+</ul>
+
+
+
+<p>韵律学</p>
+
+
+
+<pre class="hljs">
+mnist_model = MNISTModel()
+
+
+train_ds = MNIST(os.getcwd(), train=<span class="hljs-keyword">True</span>, download=<span class="hljs-keyword">True</span>, transform=transforms.ToTensor())
+train_loader = DataLoader(train_ds, batch_size=<span class="hljs-number">32</span>)
+
+
+trainer = pl.Trainer(gpus=<span class="hljs-number">1</span>, max_epochs=<span class="hljs-number">3</span>, progress_bar_refresh_rate=<span class="hljs-number">20</span>)
+
+
+trainer.fit(mnist_model, train_loader)</pre>
+
+
+
+<h4>指标的目的是允许用户使用某种数学标准来监控和测量训练过程，如:准确性、AUC、RMSE等。它不同于损失函数；损失函数测量预测值和实际值之间的差异，并同时使用参数更新权重，而指标则用于监控模型在训练集和验证测试中的表现。这为模型的性能提供了有洞察力的行为。</h4>
+
+
+
+<p>Lightning有两种指标:</p>
+
+
+
+<p>功能度量</p>
+
+
+
+<ol>
+<li>模块度量接口</li>
+
+
+
+<li><strong>功能指标</strong></li>
+</ol>
+
+
+
+<p>功能性指标允许您根据自己的需求创建自己的指标作为功能。Pytorch为您提供了一个tensor_metric decorator，它主要负责将所有输入和输出转换为张量，以便在所有DDP节点上同步度量的输出(如果DDP已初始化)。</p>
+
+
+
+<p>Pytorch还提供:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+
+<span class="hljs-keyword">from</span> pytorch_lightning.metrics <span class="hljs-keyword">import</span> tensor_metric
+
+<span class="hljs-meta">@tensor_metric()</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">rmse</span><span class="hljs-params">(pred: torch.Tensor, target: torch.Tensor)</span> -&gt; torch.Tensor:</span>
+  <span class="hljs-keyword">return</span> torch.sqrt(torch.mean(torch.pow(pred-target, <span class="hljs-number">2.0</span>)))
+</pre>
+
+
+
+<p>numpy_metric:用numpy实现的度量函数的包装器</p>
+
+
+
+<ul>
+<li>tensor_collection_metric:其输出不能转换为torch的度量的包装器。张量完全</li>
+
+
+
+<li><strong>模块指标接口</strong></li>
+</ul>
+
+
+
+<p>模块指标接口允许您为指标提供模块化接口。它负责张量转换，并处理DDP同步和i/o转换。</p>
+
+
+
+<p>使用模块度量接口的另一种方法是使用普通pytorch创建一个度量函数，并从lightning基类派生一个类，然后在forward中调用您的度量:</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+
+<span class="hljs-keyword">from</span> pytorch_lightning.metrics <span class="hljs-keyword">import</span> TensorMetric
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RMSE</span><span class="hljs-params">(TensorMetric)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, x, y)</span>:</span>
+        <span class="hljs-keyword">return</span> torch.sqrt(torch.mean(torch.pow(x-y, <span class="hljs-number">2.0</span>)))</pre>
+
+
+
+<p>钩住</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> torch
+
+<span class="hljs-keyword">from</span> pytorch_lightning.metrics <span class="hljs-keyword">import</span> TensorMetric
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">rmse</span><span class="hljs-params">(pred: torch.Tensor, target: torch.Tensor)</span> -&gt; torch.Tensor:</span>
+  <span class="hljs-keyword">return</span> torch.sqrt(torch.mean(torch.pow(pred-target, <span class="hljs-number">2.0</span>)))
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RMSE</span><span class="hljs-params">(TensorMetric)</span>:</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(pred: torch.Tensor, target: torch.Tensor)</span> -&gt; torch.Tensor:</span>
+    <span class="hljs-keyword">return</span> rmse(pred, target)</pre>
+
+
+
+<h4>Lightning也有被称为<strong>钩子</strong>的处理程序。挂钩帮助用户在训练期间与教练互动。基本上，它让用户在训练中采取某种行动。</h4>
+
+
+
+<p>例如:</p>
+
+
+
+<p><strong> on_epoch_start </strong>:这是在epoch最开始的训练循环中调用的:</p>
+
+
+
+<p>为了启用挂钩，请确保您覆盖了您的<strong> LightningModule </strong>中的方法，并定义了需要在期间完成的操作或任务，培训师将在正确的时间调用它。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_epoch_start</span><span class="hljs-params">(self)</span>:</span>
+    </pre>
+
+
+
+<p><strong> on_epoch_end </strong>:这是在epoch结束时的训练循环中调用的:</p>
+
+
+
+<p>要了解更多关于钩子的信息，请点击<a href="https://web.archive.org/web/20221206042755/https://pytorch-lightning.readthedocs.io/en/0.4.9/Trainer/hooks" target="_blank" rel="noreferrer noopener nofollow">链接</a>。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_epoch_end</span><span class="hljs-params">(self)</span>:</span>
+    </pre>
+
+
+
+<p>分布式培训</p>
+
+
+
+<h3>Lightning提供多GPU培训和5种分布式后端培训:</h3>
+
+
+
+<p>数据并行' dp '</p>
+
+
+
+<ul>
+<li>分布式数据并行' ddp '</li>
+
+
+
+<li>分布式数据并行-2 'ddp2 '</li>
+
+
+
+<li>分布式数据并行分片' dpp_sharded '</li>
+
+
+
+<li>极速'极速'</li>
+
+
+
+<li>这些设置可以在调用。拟合方法。</li>
+</ul>
+
+
+
+<p>注意，为了使用分片发行版，您需要从plugins参数中调用它。</p>
+
+
+
+<pre class="hljs">
+Trainer = Trainer(distributed_backend = <span class="hljs-keyword">None</span>)
+
+
+Trainer = Trainer(distributed_backend =<span class="hljs-string">'dp'</span>)
+
+
+Trainer = Trainer(distributed_backend =<span class="hljs-string">'ddp'</span>)</pre>
+
+
+
+<pre class="hljs">trainer = Trainer(gpus=<span class="hljs-number">4</span>, plugins=<span class="hljs-string">'ddp_sharded'</span>)</pre>
+
+
+
+<p>查看这篇<a href="https://web.archive.org/web/20221206042755/https://towardsdatascience.com/sharded-a-new-technique-to-double-the-size-of-pytorch-models-3af057466dba" target="_blank" rel="noreferrer noopener nofollow">文章</a>以更深入地了解<strong>分片发行版</strong>。</p>
+
+
+
+<p>deepspeed也是如此:</p>
+
+
+
+<p>要了解更多关于<strong> deepspeed </strong>的信息，请查看这篇<a href="https://web.archive.org/web/20221206042755/https://pytorch-lightning.medium.com/pytorch-lightning-v1-2-0-43a032ade82bhttps://pytorch-lightning.medium.com/pytorch-lightning-v1-2-0-43a032ade82b" target="_blank" rel="noreferrer noopener nofollow">文章</a>。</p>
+
+
+
+<pre class="hljs">trainer = Trainer(gpus=<span class="hljs-number">4</span>, plugins=<span class="hljs-string">'deepspeed'</span>, precision=<span class="hljs-number">16</span>)</pre>
+
+
+
+<p>再现性</p>
+
+
+
+<h3>这样，<strong>再现性变得非常容易</strong>。为了一次又一次地重现相同的结果，你需要做的就是设置伪随机发生器的种子值，并确保训练器中的确定性参数为真<strong>。</strong></h3>
+
+
+
+<p>有了上面的配置，您现在可以放大模型，甚至不用担心模型的工程方面。请放心，一切都由闪电模块负责。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pytorch_lightning <span class="hljs-keyword">import</span> Trainer, seed_everything
+
+seed_everything(<span class="hljs-number">23</span>)
+
+model=Model()
+Trainer = Trainer(deterministic = <span class="hljs-keyword">True</span>)</pre>
+
+
+
+<p>它规范了代码。</p>
+
+
+
+<p>你所需要做的就是关注研究方面，包括操纵数学函数，增加一层神经元，甚至改变训练硬件。</p>
+
+
+
+<p>它将工程与研究分离开来。</p>
+
+
+
+<p>与海王星整合</p>
+
+
+
+<h3>Lightning提供了与Neptune的无缝集成。你需要做的就是调用<strong> NeptuneLogger </strong>模块:</h3>
+
+
+
+<p>如上所示设置所有需要的参数，然后将其作为一个参数传递给trainer函数，您就可以通过Neptune仪表盘监视您的模型了。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> pytorch_lightning.loggers.neptune <span class="hljs-keyword">import</span> NeptuneLogger
+
+neptune_logger = NeptuneLogger(
+   api_key=<span class="hljs-string">"ANONYMOUS"</span>,
+   project_name=<span class="hljs-string">"shared/pytorch-lightning-integration"</span>,
+   close_after_fit=<span class="hljs-keyword">False</span>,
+   experiment_name=<span class="hljs-string">"train-on-MNIST"</span>,
+   params=ALL_PARAMS,
+   tags=[<span class="hljs-string">'1.x'</span>, <span class="hljs-string">'advanced'</span>],
+)</pre>
+
+
+
+<p>生产</p>
+
+
+
+<pre class="hljs">trainer = pl.Trainer(logger=neptune_logger,
+                    checkpoint_callback=model_checkpoint,
+                    callbacks=[lr_logger],
+                    **Trainer_Params)</pre>
+
+
+
+<h3>将lightning模型部署到生产环境中也非常简单，就像使用。to_torchscript，。to_onnx并且有三种方法可以保存用于生产的模型:</h3>
+
+
+
+<p>将模型保存为PyTorch检查点</p>
+
+
+
+<ol>
+<li>将模型转换为ONNX</li>
+
+
+
+<li>将模型导出到Torchscript</li>
+
+
+
+<li>要获得关于模型部署和生产的更深入的知识，请查看这篇<a href="https://web.archive.org/web/20221206042755/https://towardsdatascience.com/how-to-deploy-pytorch-lightning-models-to-production-7e887d69109f" target="_blank" rel="noreferrer noopener nofollow">文章</a>。</li>
+</ol>
+
+
+
+<p>社区</p>
+
+
+
+<h3>闪电社区正在成长。几乎有<strong> 390名贡献者</strong>、<strong>11名研究科学家</strong>组成的核心团队、博士生，以及超过<strong> 17k的活跃用户</strong>。因为社区正在快速发展，文档非常重要。</h3>
+
+
+
+<p>如果你发现自己有什么问题，可以在Lightning的Slack或者Github上寻求帮助。</p>
+
+
+
+<p>Lightning的<a href="https://web.archive.org/web/20221206042755/https://pytorch-lightning.readthedocs.io/" target="_blank" rel="noreferrer noopener nofollow">文档</a>非常简洁、易读、易懂。还包括视频解释。</p>
+
+
+
+<p>何时使用PyTorch闪电</p>
+
+
+
+<h2 id="h-when-to-use-pytorch-lightning">研究和创造新的建筑。</h2>
+
+
+
+<ul>
+<li>寻找分布式并行培训。</li>
+
+
+
+<li>寻找CPU，GPU和TPU培训。在PyTorch中，您可以轻松地从训练器本身更改硬件。</li>
+
+
+
+<li>它提供了SOTA架构，因此您可以根据自己的需要调整它的设置。</li>
+
+
+
+<li>何时不使用PyTorch闪电</li>
+</ul>
+
+
+
+<h2 id="h-when-not-to-use-pytorch-lightning">如果你不知道PyTorch，那就先学PyTorch再用闪电。可以去看看<a href="https://web.archive.org/web/20221206042755/https://github.com/PyTorchLightning/lightning-flash" target="_blank" rel="noreferrer noopener nofollow">闪电</a>。</h2>
+
+
+
+<ul>
+<li>代码对比:Pytorch vs闪电</li>
+</ul>
+
+
+
+<h2 id="h-code-comparison-pytorch-vs-lightning">从上面的例子中，您可以看到，Lightning为每个操作提供了更专用的功能:构建模型、加载数据、配置优化器等等，此外，它还负责样板代码，如配置训练循环。它更侧重于研究方面，而不是工程方面。</h2>
+
+
+
+
+
+<p>什么是Ignite？</p>
+
+
+
+<h2 id="h-what-is-ignite">Ignite是在PyTorch基础上开发的另一个高级库。它有助于神经网络训练。和闪电一样，它也是为研究人员创造的。它需要更少的纯PyTorch代码，这增加了界面的灵活性和简单性。</h2>
+
+
+
+<p>为什么点燃？</p>
+
+
+
+<h3>Ignite为用户提供了一个界面，将架构、标准和损耗整合到一个函数中，用于培训和评估(可选)。这个特性使Ignite基于Pytorch的基础，<strong>，同时也使用户意识到从工程术语中分离出来的高级抽象</strong>(可以稍后在培训之前配置)。这给了用户很大的灵活性。</h3>
+
+
+
+<p>关键特征</p>
+
+
+
+<h3>Ignite提供了三个高级功能:</h3>
+
+
+
+<p><strong>引擎</strong>:这允许用户构造不同的配置用于训练和评估；</p>
+
+
+
+<ul>
+<li><strong>现成的</strong>指标:允许用户轻松评估模型；</li>
+
+
+
+<li><strong>内置处理程序:</strong>这允许用户创建<em>训练管道，记录</em>，或者简单地说——<em/>与引擎交互<em>。</em></li>
+
+
+
+<li>使用PyTorch Ignite的好处</li>
+</ul>
+
+
+
+<h2 id="h-benefits-of-using-pytorch-ignite">点燃API</h2>
+
+
+
+<h3><strong>引擎:</strong>引擎让用户在每一批数据集上运行给定的<strong>抽象</strong>，在它经历时期、日志记录等时发出事件。</h3>
+
+
+
+<p>让我们看看发动机是如何工作的:</p>
+
+
+
+<p>正如你所看到的，用于训练深度学习模型的抽象或基础被包含在函数<em> update_model </em>中，然后被传递到引擎中。这只是包含反向传播的训练函数。没有定义额外的参数或事件。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">update_model</span><span class="hljs-params">(engine, batch)</span>:</span>
+    inputs, targets = batch
+    optimizer.zero_grad()
+    outputs = model(inputs)
+    loss = criterion(outputs, targets)
+    loss.backward()
+    optimizer.step()
+    <span class="hljs-keyword">return</span> loss.item()
+
+trainer = Engine(update_model)</pre>
+
+
+
+<p>要开始训练，您只需调用<strong>。从训练器运行</strong>方法，根据要求定义<em> max_epochs </em>。</p>
+
+
+
+<pre class="hljs">trainer.run(data_loader, max_epochs=<span class="hljs-number">5</span>)</pre>
+
+
+
+<p>事件和处理程序</p>
+
+
+
+<h4>事件和处理程序帮助用户在训练期间与引擎进行交互。基本上，它让用户监控模型。我们将看到两种与模型互动的方式:借助<strong>装饰者、</strong>和<em>的帮助。添加事件处理程序。</em></h4>
+
+
+
+<p>下面的函数使用@trainer.on decorator打印评估器在训练数据集上运行的结果。</p>
+
+
+
+<p>如您所见，函数中的主要元素是train_evaluator，它主要对训练数据执行评估并返回指标。可以使用相同的度量来发现准确性、损失等。您所要做的就是给出一个打印件或一个return语句，以便获得值。</p>
+
+
+
+<pre class="hljs"><span class="hljs-meta">@trainer.on(Events.EPOCH_COMPLETED)</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">log_training_results</span><span class="hljs-params">(trainer)</span>:</span>
+    train_evaluator.run(train_loader)
+    metrics = train_evaluator.state.metrics
+    accuracy = metrics[<span class="hljs-string">'accuracy'</span>]*<span class="hljs-number">100</span>
+    loss = metrics[<span class="hljs-string">'nll'</span>]
+    last_epoch.append(<span class="hljs-number">0</span>)
+    training_history[<span class="hljs-string">'accuracy'</span>].append(accuracy)
+    training_history[<span class="hljs-string">'loss'</span>].append(loss)
+    print(<span class="hljs-string">"Training Results - Epoch: {}  Avg accuracy: {:.2f} Avg loss: {:.2f}"</span>
+          .format(trainer.state.epoch, accuracy, loss))</pre>
+
+
+
+<p>另一种方法是使用<strong>。训练器的add_event_handler </strong>。<strong>T3】</strong></p>
+
+
+
+<p>上面的代码使用验证数据集来操作指标。这个和上一个一模一样。唯一的区别是我们在<strong>中传递这个函数。训练器<strong>、</strong>的add_event_handler </strong>方法，它将像前面的函数一样工作。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">log_validation_results</span><span class="hljs-params">(trainer)</span>:</span>
+    val_evaluator.run(val_loader)
+    metrics = val_evaluator.state.metrics
+    accuracy = metrics[<span class="hljs-string">'accuracy'</span>]*<span class="hljs-number">100</span>
+    loss = metrics[<span class="hljs-string">'nll'</span>]
+    validation_history[<span class="hljs-string">'accuracy'</span>].append(accuracy)
+    validation_history[<span class="hljs-string">'loss'</span>].append(loss)
+    print(<span class="hljs-string">"Validation Results - Epoch: {}  Avg accuracy: {:.2f} Avg loss: {:.2f}"</span>
+          .format(trainer.state.epoch, accuracy, loss))
+
+trainer.add_event_handler(Events.EPOCH_COMPLETED, log_validation_results)</pre>
+
+
+
+<p>有相当多的<strong>内置</strong>事件可以让你在训练期间或训练结束后与教练互动。</p>
+
+
+
+<p>例如，<strong>事件。EPOCH_COMPLETED </strong>会在EPOCH完成后执行某个功能。<strong>事件。另一方面，完成的</strong>将在训练完成后执行。</p>
+
+
+
+<p>韵律学</p>
+
+
+
+<h4>Ignite提供准确度、精确度、召回率或混淆矩阵等指标，以计算各种质量。</h4>
+
+
+
+<p>例如，下面我们计算训练数据集的准确度。</p>
+
+
+
+<p>从上面的代码中，您可以看到用户必须<strong>将度量实例</strong>连接到引擎。然后使用引擎的<strong> process_function </strong>的输出来计算度量值。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> ignite.metrics <span class="hljs-keyword">import</span> Accuracy
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict_on_batch</span><span class="hljs-params">(engine, batch)</span>
+    <span class="hljs-title">model</span>.<span class="hljs-title">eval</span><span class="hljs-params">()</span>
+    <span class="hljs-title">with</span> <span class="hljs-title">torch</span>.<span class="hljs-title">no_grad</span><span class="hljs-params">()</span>:</span>
+        x, y = prepare_batch(batch, device=device, non_blocking=non_blocking)
+        y_pred = model(x)
+
+    <span class="hljs-keyword">return</span> y_pred, y
+
+evaluator = Engine(predict_on_batch)
+Accuracy().attach(evaluator, <span class="hljs-string">"val_acc"</span>)
+evaluator.run(val_dataloader)</pre>
+
+
+
+<p>Ignite还允许用户通过算术运算创建自己的指标。</p>
+
+
+
+<p>分布式培训</p>
+
+
+
+<h3>Ignite支持分布式培训，但用户必须对其进行相应的配置，这可能需要很大的努力。用户需要正确设置分布式过程组、分布式采样器等。如果你不熟悉如何设置它，它会非常乏味。</h3>
+
+
+
+<p>再现性</p>
+
+
+
+<h3>Ignite的可再现性在于:</h3>
+
+
+
+<p>Ignite自动处理随机状态的能力，这可以确保批处理在不同的运行时间具有相同的数据分布。</p>
+
+
+
+<ul>
+<li>Ignite不仅允许集成Neptune，还允许集成MLflow、Polyaxon、TensorBoard等等。</li>
+
+
+
+<li>与海王星整合</li>
+</ul>
+
+
+
+<h3>这个<a href="https://web.archive.org/web/20221206042755/https://docs.neptune.ai/integrations/ignite/" target="_blank" rel="noreferrer noopener">海王星整合</a>非常容易。你所需要做的就是<a href="https://web.archive.org/web/20221206042755/https://docs.neptune.ai/setup/installation/" target="_blank" rel="noreferrer noopener"> pip安装neptune-client库</a>，然后你只需从<strong>ignite . contrib . handlers . Neptune _ logger</strong>中调用<strong> NeptuneLogger </strong>。</h3>
+
+
+
+<p>有趣的是，您可以附加许多事件处理程序，这样所有数据都将显示在Neptune仪表盘中，这将有助于您监控训练。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">from</span> ignite.contrib.handlers.neptune_logger <span class="hljs-keyword">import</span> *
+
+npt_logger = NeptuneLogger(api_token=<span class="hljs-string">"ANONYMOUS"</span>,
+                           project_name=<span class="hljs-string">'shared/pytorch-ignite-integration'</span>,
+                           name=<span class="hljs-string">'ignite-mnist-example'</span>,
+                           params={<span class="hljs-string">'train_batch_size'</span>: train_batch_size,
+                                   <span class="hljs-string">'val_batch_size'</span>: val_batch_size,
+                                   <span class="hljs-string">'epochs'</span>: epochs,
+                                   <span class="hljs-string">'lr'</span>: lr,
+                                   <span class="hljs-string">'momentum'</span>: momentum})
+</pre>
+
+
+
+<p>下面你会发现一些例子，说明如何用Neptune附加事件处理程序。</p>
+
+
+
+<p>社区</p>
+
+
+
+<pre class="hljs">npt_logger.attach(trainer,
+                  log_handler=OutputHandler(tag=<span class="hljs-string">"training"</span>,
+                                            output_transform=<span class="hljs-keyword">lambda</span> loss: {<span class="hljs-string">'batchloss'</span>: loss},
+                                            metric_names=<span class="hljs-string">'all'</span>),
+                  event_name=Events.ITERATION_COMPLETED(every=<span class="hljs-number">100</span>))
+
+npt_logger.attach(train_evaluator,
+                  log_handler=OutputHandler(tag=<span class="hljs-string">"training"</span>,
+                                            metric_names=[<span class="hljs-string">"loss"</span>, <span class="hljs-string">"accuracy"</span>],
+                                            another_engine=trainer),
+                  event_name=Events.EPOCH_COMPLETED)
+
+npt_logger.attach(validation_evaluator,
+                  log_handler=OutputHandler(tag=<span class="hljs-string">"validation"</span>,
+                                            metric_names=[<span class="hljs-string">"loss"</span>, <span class="hljs-string">"accuracy"</span>],
+                                            another_engine=trainer),
+                  event_name=Events.EPOCH_COMPLETED)
+</pre>
+
+
+
+<h3>Ignite社区正在成长；在撰写本文时，几乎有<strong> 124个贡献者</strong>和超过<strong> 391个活跃用户</strong>。</h3>
+
+
+
+<p>何时使用PyTorch Ignite</p>
+
+
+
+<h2 id="h-when-to-use-pytorch-ignite">具有优秀界面的高级库，具有根据需求定制Ignite API的附加属性。</h2>
+
+
+
+<ul>
+<li>当您想分解代码，但不想牺牲灵活性来支持复杂的训练策略时</li>
+</ul>
+
+
+
+<ul>
+<li>提供了一个丰富的实用工具支持环境，如指标、处理程序和记录器，可用于轻松地评估/调试您的模型，它们可以单独配置。</li>
+</ul>
+
+
+
+<ul>
+<li>何时不使用PyTorch点火</li>
+</ul>
+
+
+
+<h2 id="h-when-not-to-use-pytorch-ignite">如果你不熟悉Pytorch。</h2>
+
+
+
+<ul>
+<li>如果你不精通分布式培训，只是想轻松使用它。</li>
+</ul>
+
+
+
+<ul>
+<li>如果你不想花很多时间去学习一个新的库。</li>
+</ul>
+
+
+
+<ul>
+<li>代码比较:Pytorch与Ignite</li>
+</ul>
+
+
+
+<h2 id="h-code-comparison-pytorch-vs-ignite"><strong>纯PyTorch </strong></h2>
+
+
+
+<div class="is-layout-flex wp-container-3 wp-block-columns">
+<div class="is-layout-flow wp-block-column">
+<p class="has-text-align-center"><strong> PyTorch-Ignite </strong></p>
+
+
+
+<pre class="hljs">model = Net()
+train_loader, val_loader = get_data_loaders(train_batch_size, val_batch_size)
+optimizer = torch.optim.SGD(model.parameters(), lr=<span class="hljs-number">0.01</span>, momentum=<span class="hljs-number">0.8</span>)
+criterion = torch.nn.NLLLoss()
+
+max_epochs = <span class="hljs-number">10</span>
+validate_every = <span class="hljs-number">100</span>
+checkpoint_every = <span class="hljs-number">100</span>
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">validate</span><span class="hljs-params">(model, val_loader)</span>:</span>
+    model = model.eval()
+    num_correct = <span class="hljs-number">0</span>
+    num_examples = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> val_loader:
+        input, target = batch
+        output = model(input)
+        correct = torch.eq(torch.round(output).type(target.type()), target).view(<span class="hljs-number">-1</span>)
+        num_correct += torch.sum(correct).item()
+        num_examples += correct.shape[<span class="hljs-number">0</span>]
+    <span class="hljs-keyword">return</span> num_correct / num_examples
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">checkpoint</span><span class="hljs-params">(model, optimizer, checkpoint_dir)</span>:</span>
+    filepath = <span class="hljs-string">"{}/{}"</span>.format(checkpoint_dir, <span class="hljs-string">"checkpoint.pt"</span>)
+    obj = {<span class="hljs-string">"model"</span>: model.state_dict(), <span class="hljs-string">"optimizer"</span>:optimizer.state_dict()}
+    torch.save(obj, filepath)
+
+
+iteration = <span class="hljs-number">0</span>
+
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(max_epochs):
+    <span class="hljs-keyword">for</span> batch <span class="hljs-keyword">in</span> train_loader:
+        model = model.train()
+        optimizer.zero_grad()
+        input, target = batch
+        output = model(input)
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()
+
+        <span class="hljs-keyword">if</span> iteration % validate_every == <span class="hljs-number">0</span>:
+            binary_accuracy = validate(model, val_loader)
+            print(<span class="hljs-string">"After {} iterations, binary accuracy = {:.2f}"</span>
+                  .format(iteration, binary_accuracy))
+
+        <span class="hljs-keyword">if</span> iteration % checkpoint_every == <span class="hljs-number">0</span>:
+            checkpoint(model, optimizer, checkpoint_dir)
+        iteration += <span class="hljs-number">1</span></pre>
+</div>
+
+
+
+<div class="is-layout-flow wp-block-column">
+<p class="has-text-align-center"><a href="https://web.archive.org/web/20221206042755/https://colab.research.google.com/drive/1gFIPXmUX73HWlLSxFvvYEweQBD_OPx1t#scrollTo=FnUEHqN9lPcb" target="_blank" rel="noreferrer noopener nofollow"> <em>来源</em> </a></p>
+
+
+
+<pre class="hljs">model = Net()
+train_loader, val_loader = get_data_loaders(train_batch_size, val_batch_size)
+optimizer = torch.optim.SGD(model.parameters(), lr=<span class="hljs-number">0.01</span>, momentum=<span class="hljs-number">0.8</span>)
+criterion = torch.nn.NLLLoss()
+
+max_epochs = <span class="hljs-number">10</span>
+validate_every = <span class="hljs-number">100</span>
+checkpoint_every = <span class="hljs-number">100</span>
+
+trainer = create_supervised_trainer(model, optimizer, criterion)
+evaluator = create_supervised_evaluator(model, metrics={<span class="hljs-string">'accuracy'</span>: Accuracy()})
+
+<span class="hljs-meta">@trainer.on(Events.ITERATION_COMPLETED(every=validate_every))</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">validate</span><span class="hljs-params">(trainer)</span>:</span>
+    evaluator.run(val_loader)
+    metrics = evaluator.state.metrics
+    print(<span class="hljs-string">"After {} iterations, binary accuracy = {:.2f}"</span>
+          .format(trainer.state.iteration, metrics[<span class="hljs-string">'accuracy'</span>]))
+
+
+checkpointer = ModelCheckpoint(checkpoint_dir, n_saved=<span class="hljs-number">3</span>, create_dir=<span class="hljs-keyword">True</span>)
+trainer.add_event_handler(Events.ITERATION_COMPLETED(every=checkpoint_every),
+                          checkpointer, {<span class="hljs-string">'mymodel'</span>: model})
+
+trainer.run(train_loader, max_epochs=max_epochs)</pre>
+</div>
+</div>
+
+
+
+<p class="has-text-align-center">如您所见，Ignite压缩了pytorch代码，使您在研究领域更加高效，您可以在跟踪和操作工程方面(即模型训练)的同时练习不同的技术。</p>
+
+
+
+<p>结论</p>
+
+
+
+<h2 id="h-conclusion">Lightning和Ignite各有各的好处。如果您正在寻找灵活性，那么Ignite是不错的选择，因为您可以使用传统的Pytorch来设计您的架构、优化器和整体实验。Ignite将帮助您组装特定功能的不同组件。</h2>
+
+
+
+<p>如果你正在为一个新的<strong>设计</strong>寻找<strong>快速</strong>原型，或者研究最先进的ML方法，那么就用闪电吧。这将有助于你专注于研究方面，并有助于你更快地扩大模型，从而减少误差。此外，它还提供TPU和并行分布。</p>
+
+
+
+<p>我希望你喜欢这篇文章。如果您想尝试一些实际的例子，请访问Lightning和Ignite的笔记本链接(在本文开头的比较表中)。</p>
+
+
+
+<p>感谢阅读！</p>
+
+
+
+<p>资源</p>
+
+
+
+<h3><a href="https://web.archive.org/web/20221206042755/https://pytorch-lightning.readthedocs.io/en/latest/index.html" target="_blank" rel="noreferrer noopener nofollow">闪电文件</a></h3>
+
+
+
+<ol>
+<li><a href="https://web.archive.org/web/20221206042755/https://pytorch.org/ignite/" target="_blank" rel="noreferrer noopener nofollow">点燃文档</a></li>
+
+
+
+<li><a href="https://web.archive.org/web/20221206042755/https://docs.neptune.ai/integrations/" target="_blank" rel="noreferrer noopener"> Neptune记录器文档</a></li>
+
+
+
+<li><a href="/web/20221206042755/https://neptune.ai/blog/model-training-libraries-pytorch-ecosystem" target="_blank" rel="noreferrer noopener"> 8位创作者和核心贡献者谈论他们来自PyTorch生态系统的模型训练库</a></li>
+
+
+
+<li><a href="/web/20221206042755/https://neptune.ai/blog/model-training-libraries-pytorch-ecosystem" target="_blank" rel="noreferrer noopener">8 Creators and Core Contributors Talk About Their Model Training Libraries From PyTorch Ecosystem</a></li>
+</ol>
+        </div>
+        
+    </div>    
+</body>
+</html>

@@ -1,0 +1,327 @@
+<html>
+<head>
+<title>Best Tools to Do ML Model Serving </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>做ML模型服务的最佳工具</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/ml-model-serving-best-tools#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/ml-model-serving-best-tools#0001-01-01</a></blockquote><div><div class="article__content col-lg-10">
+<p>机器学习中的模型服务工具可以为您提供数据工程师和DevOp关注的许多问题的解决方案。它们有许多功能，使管理您的模型变得更加容易。</p>
+
+
+
+<p>您可以在ML项目的整个生命周期中使用它们，从构建一个训练有素的模型开始，到部署、监控、提供易访问性和生产。他们将自动化和优化你的工作，但也确保没有错误，使其易于<a href="/web/20220926093801/https://neptune.ai/blog/roles-in-ml-team-and-how-they-collaborate" target="_blank" rel="noreferrer noopener">与其他人</a>协作，并实时跟踪变化。</p>
+
+
+
+<p>让我们来看看能在模型服务中帮助你的最好的工具！</p>
+
+
+
+
+
+
+
+
+
+<p>BentoML标准化了模型打包，并为用户在广泛的部署环境中部署预测服务提供了一种简单的方法。该公司的开源框架旨在弥合数据科学和DevOps之间的差距，使团队能够以快速、可重复和可扩展的方式提供预测服务。</p>
+
+
+
+<p><strong>下面是BentoML的总结:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>标准化的“便当”格式打包了模型、依赖项和代码</li><li>管理所有主要ML框架的依赖项和包</li><li>使用<a href="https://web.archive.org/web/20220926093801/https://github.com/bentoml/bentoctl" target="_blank" rel="noreferrer noopener nofollow"> BentoCtl </a>可在任何云环境中部署</li><li>通过REST/GRPC的在线API服务或离线批处理服务</li><li>自动生成和配置docker映像以进行部署</li><li>具有自适应微批处理支持的高性能API模型服务器</li><li>本机Python支持将推理工人与业务逻辑分开扩展</li><li>通过Web UI和API作为管理模型和部署流程的中心</li></ul>
+</div>
+
+
+
+
+
+
+<figure class="wp-block-image size-large"><img data-attachment-id="20004" data-permalink="https://web.archive.org/web/20220926093801/https://neptune.ai/cortex" data-orig-file="https://web.archive.org/web/20220926093801/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?fit=1075%2C783&amp;ssl=1" data-orig-size="1075,783" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="cortex" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093801/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?fit=300%2C219&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093801/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?fit=1024%2C746&amp;ssl=1" src="../Images/a588fd5153b7400235c69e970f8f2e20.png" alt="" class="wp-image-20004 jetpack-lazy-image" data-recalc-dims="1" data-lazy-src="https://web.archive.org/web/20220926093801/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?resize=1024%2C746&amp;is-pending-load=1#038;ssl=1" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-original-src="https://web.archive.org/web/20220926093801im_/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?resize=1024%2C746&amp;ssl=1"/><noscript><img data-lazy-fallback="1" data-attachment-id="20004" data-permalink="https://web.archive.org/web/20220926093801/https://neptune.ai/cortex" data-orig-file="https://web.archive.org/web/20220926093801/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?fit=1075%2C783&amp;ssl=1" data-orig-size="1075,783" data-comments-opened="0" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="cortex" data-image-description="" data-image-caption="" data-medium-file="https://web.archive.org/web/20220926093801/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?fit=300%2C219&amp;ssl=1" data-large-file="https://web.archive.org/web/20220926093801/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?fit=1024%2C746&amp;ssl=1" src="../Images/a588fd5153b7400235c69e970f8f2e20.png" alt="" class="wp-image-20004" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20220926093801im_/https://i0.wp.com/neptune.ai/wp-content/uploads/cortex.png?resize=1024%2C746&amp;ssl=1"/></noscript></figure>
+
+
+
+<p>Cortex是一个用于部署、管理和扩展机器学习模型的开源平台。这是一个多框架工具，允许您部署所有类型的模型。</p>
+
+
+
+<p>Cortex基于Kubernetes构建，支持大规模机器学习工作负载。</p>
+
+
+
+<p><strong>皮层–总结:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>自动扩展API以处理生产工作负载</li><li>对任何AWS实例类型运行推理</li><li>在单个API中部署多个模型，并在不停机的情况下更新已部署的API</li><li>监控API性能和预测结果</li></ul>
+</div>
+
+
+
+
+
+
+
+
+<p>TensorFlow Serving是一个灵活的机器学习模型系统，专为生产环境而设计。它<strong>处理机器学习</strong>的推理方面。</p>
+
+
+
+<p>它接受训练后的模型并管理它们的生命周期，通过高性能的引用计数查找表为您提供版本化访问。</p>
+
+
+
+<p>以下是一些最重要的特性:</p>
+
+
+<div class="custom-point-list">
+<ul><li>可以同时服务于多个模型或同一模型的多个版本</li><li>公开gRPC和HTTP推理端点</li><li>允许在不更改代码的情况下部署新的模型版本</li><li>让您灵活地测试实验模型</li><li>其高效、低开销的实现给推理时间增加了最小的延迟</li><li>支持许多服务:张量流模型、嵌入、词汇表、特征转换和非基于张量流的机器学习模型</li></ul>
+</div>
+
+
+
+
+
+
+<p>TorchServe是一款<strong>灵活易用的工具，用于服务PyTorch模型</strong>。这是一个开源框架，可以轻松地大规模部署训练有素的PyTorch模型，而无需编写定制代码。TorchServe提供低延迟的轻量级服务，因此您可以部署您的模型进行高性能推理。</p>
+
+
+
+<p>TorchServe是实验性的，可能还会经历一些变化，但无论如何，它提供了一些有趣的功能。</p>
+
+
+
+<p><strong>火炬服务-主要特点:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>多模式服务</li><li>A/B测试的模型版本控制</li><li>监控指标</li><li>用于应用集成的RESTful端点</li><li>支持任何机器学习环境，包括亚马逊SageMaker、Kubernetes、亚马逊EKS和亚马逊EC2</li><li>TorchServe可以在生产环境中用于许多类型的推理</li><li>提供易于使用的命令行界面</li></ul>
+</div>
+
+
+
+
+
+
+
+
+<p>KFServing提供了一个Kubernetes自定义资源定义(CRD ),用于在任意框架上服务机器学习模型。它<strong>旨在通过为通用ML框架</strong>如Tensorflow、XGBoost、ScikitLearn、PyTorch和ONNX提供高性能、高抽象的接口来解决生产模型服务用例。</p>
+
+
+
+<p>该工具提供了一种无服务器的机器学习推理解决方案</p>
+
+
+
+<p>部署模型的简单界面。</p>
+
+
+
+<p><strong>KFServing的主要特点:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>通过提供预测、预处理、后处理和可解释性，为您的生产ML推理服务器提供一个简单、可插入和完整的故事</li><li>可定制的推理服务，为CPU、GPU、TPU和内存请求和限制添加您的资源请求</li><li>批量处理单个模型推理请求</li><li>交通管理</li><li>从零开始缩放</li><li>修订管理</li><li>请求/响应日志记录</li><li>可扩展的多模型服务</li></ul>
+</div>
+
+
+
+
+
+
+<p>多模型服务器(MMS)是一个灵活且易于使用的<strong>工具，用于服务使用任何ML/DL框架训练的深度学习模型</strong>。该工具可用于生产环境中的多种推理。它提供了一个易于使用的命令行界面，并利用基于REST的API来处理状态预测请求。</p>
+
+
+
+<p>您可以使用MMS服务器CLI或预先配置的Docker图像来启动一个服务，该服务设置HTTP端点来处理模型推断请求。</p>
+
+
+
+<p><strong>主要特性:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>高级配置允许深度定制彩信的行为</li><li>开发定制推理服务的能力</li><li>MMS的内务处理单元测试</li><li>JMeter通过paces运行MMS并收集基准数据</li><li>多型号服务器基准测试</li><li>亚马逊弹性推理服务模型</li><li>ONNX模型导出功能支持深度学习框架的不同模型</li></ul>
+</div>
+
+
+
+
+
+
+
+
+<p>Triton推理服务器提供了<strong>优化的云和边缘推理解决方案</strong>。它针对CPU和GPU进行了优化。Triton支持HTTP/REST和GRPC协议，允许远程客户端请求对服务器管理的任何模型进行推理。</p>
+
+
+
+<p>对于edge部署，Triton是一个带有C API的共享库，允许将Triton的全部功能直接包含在应用程序中。</p>
+
+
+
+<p><strong>Triton的主要特性:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>支持多种深度学习框架(TensorRT、TensorFlow GraphDef、TensorFlow SavedModel、ONNX和PyTorch TorchScript)</li><li>在同一个GPU或多个GPU上同时执行模型</li><li>动态配料</li><li>可扩展后端</li><li>支持模型集成</li><li>普罗米修斯数据格式的指标，指示GPU利用率、服务器吞吐量和服务器延迟</li></ul>
+</div>
+
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20220926093801/https://forestflow.ai/"> ForestFlow </a>是在Apache 2.0许可下授权的LF AI基金会孵化项目。</p>
+
+
+
+<p>它是一个可扩展的基于策略的云原生<strong>机器学习模型服务器，用于轻松部署和管理ML模型</strong>。</p>
+
+
+
+<p>它为数据科学家提供了一种简单的方法，以最小的摩擦将模型部署到生产系统，从而加速生产价值主张的开发。</p>
+
+
+
+<p><strong>以下是ForestFlow的主要特性:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>可以作为单个实例(笔记本电脑或服务器)运行，也可以部署为协同工作并自动管理和分配工作的节点群集。</li><li>提供原生Kubernetes集成，只需少量配置即可轻松部署在Kubernetes集群上</li><li>允许在影子模式下部署模型</li><li>不使用时自动缩小(合并)模型和资源，并自动将模型重新合并到内存中以保持高效</li><li>多租户</li><li>允许为多个用例部署模型，并在不同的路由策略之间进行选择，以在服务于每个用例的模型变量之间引导推理流量</li></ul>
+</div>
+
+
+
+
+
+
+
+
+<p>DeepDetect是一个用C++11编写的深度学习API和服务器，以及一个用于<strong>培训和管理模型</strong>的纯Web平台。</p>
+
+
+
+<p>DeepDetect旨在使先进的深度学习易于使用并集成到现有的应用程序中。它支持后端机器学习库Caffe、Caffe2、Tensorflow、XGBoost、Dlib和NCNN。</p>
+
+
+
+<p><strong> DeepDetect的主要特性:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>为图像标记、对象检测、分割、OCR、音频、视频、文本分类、表格数据和时间序列的CSV应用做好准备</li><li>用于培训和管理模型的Web用户界面</li><li>由于有超过25种预先训练的模型，训练速度很快</li><li>用纯C++编写的快速服务器，适用于云、桌面和嵌入式的单一代码库</li><li>用于GPU、CPU和嵌入式设备的最有效架构的神经网络模板</li><li>从对象检测到OCR和情感分析，为一系列任务提供了现成的模型</li></ul>
+</div>
+
+
+
+
+
+
+
+
+<p><a href="https://web.archive.org/web/20220926093801/https://www.seldon.io/tech/products/core/"> Seldon Core </a>是一个开源平台，它有一个框架，可以更容易、更快地在Kubernetes上大规模部署你的机器学习模型和实验。</p>
+
+
+
+<p>这是一个独立于云的、安全、可靠且强大的系统，通过一致的安全和更新策略进行维护。</p>
+
+
+
+<p><strong>谢顿核心——摘要:</strong></p>
+
+
+<div class="custom-point-list">
+<ul><li>使用我们预先打包的推理服务器、定制服务器或语言包装器来容器化ML模型的简单方法</li><li>由预测器、转换器、路由器、组合器等组成的强大而丰富的推理图</li><li>元数据来源，以确保每个模型可以追溯到其各自的培训系统、数据和指标</li><li>集成到Prometheus和Grafana的高级和可定制指标。</li><li>通过模型输入输出请求的完全可审计性(与Elasticsearch的日志集成)</li></ul>
+</div>
+
+
+<h2>把它包起来</h2>
+
+
+
+<p>有大量的机器学习模型工具可供选择。在你选择你最喜欢的之前，确保它满足你的所有需求。虽然相似，但每个工具提供的不同功能可能不适合每个ML从业者。</p>
+
+
+
+
+<div id="author-box-new-format-block_6177d1f197d17" class="article__footer article__author">
+  
+
+  <div class="article__authorContent">
+          <h3 class="article__authorContent-name">保罗·查科夫</h3>
+    
+          <p class="article__authorContent-text">将市场营销引入机器学习世界。</p>
+    
+          
+    
+  </div>
+</div>
+
+
+<div class="wp-container-1 wp-block-group"><div class="wp-block-group__inner-container">
+<hr class="wp-block-separator"/>
+
+
+
+<p class="has-text-color"><strong>阅读下一篇</strong></p>
+
+
+
+<h2>你需要知道的最好的机器学习模型管理工具</h2>
+
+
+
+<p class="has-small-font-size">9分钟阅读|作者弗拉基米尔·利亚申科| 2021年7月14日更新</p>
+
+
+<p id="block_5ffc75def9f8e" class="separator separator-10"/>
+
+
+
+<p>开发您的模型是ML项目工作的重要部分。这通常是一个艰难的挑战。</p>
+
+
+
+<p>每个数据科学家都必须面对它，还有困难，比如失去实验的线索。这些困难很可能既烦人又不明显，会让你时不时感到困惑。</p>
+
+
+
+<p>这就是为什么简化管理ML模型的过程是有好处的，幸运的是有几个工具可以做到这一点。这些工具有助于:</p>
+
+
+<div class="custom-point-list">
+<ul><li>实验跟踪</li><li>模型版本控制</li><li>测量推理时间</li><li>团队协作</li><li>资源监控</li></ul>
+</div>
+
+
+<p>因此，寻找和使用适合您的项目的工具是常识和良好的实践。</p>
+
+
+
+<p>在本文中，我们将探索模型管理工具的<strong>前景。我将尝试向您展示各种工具，并强调它们的优点。</strong></p>
+
+
+
+<p>我们将涵盖:</p>
+
+
+<div class="custom-point-list">
+<ul><li>选择<strong>模型管理工具</strong>的标准</li><li><strong>模型管理工具</strong> : <strong> Neptune、亚马逊SageMaker、Azure机器学习、Domino数据科学平台、Google Cloud AI平台、Metaflow、MLflow </strong></li></ul>
+</div>
+
+<a class="button continous-post blue-filled" href="/web/20220926093801/https://neptune.ai/blog/best-machine-learning-model-management-tools" target="_blank">
+    Continue reading -&gt;</a>
+
+
+
+<hr class="wp-block-separator"/>
+</div></div>
+</div>
+      </div>    
+</body>
+</html>

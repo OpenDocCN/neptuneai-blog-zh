@@ -1,0 +1,1204 @@
+<html>
+<head>
+<title>Building MLOps Pipeline for NLP: Machine Translation Task [Tutorial] </title>
+<link href="../Styles/Style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1>为NLP构建MLOps管道:机器翻译任务[教程]</h1>
+<blockquote>原文：<a href="https://web.archive.org/web/https://neptune.ai/blog/mlops-pipeline-for-nlp-machine-translation#0001-01-01">https://web.archive.org/web/https://neptune.ai/blog/mlops-pipeline-for-nlp-machine-translation#0001-01-01</a></blockquote><div><div class="l-content content-wrapper js-content">
+            
+<p>机器学习操作通常被称为<strong> <a href="https://web.archive.org/web/20221203090558/https://ml-ops.org/" target="_blank" rel="noreferrer noopener nofollow"> MLOps </a> </strong>使我们能够创建一个端到端的机器学习管道，从设计实验、构建ML模型、训练和测试，到部署和监控，换句话说就是<strong> <a href="/web/20221203090558/https://neptune.ai/blog/life-cycle-of-a-machine-learning-project" target="_blank" rel="noreferrer noopener">机器学习生命周期</a> </strong>。MLOps的这个领域类似于DevOps，但专门为机器学习项目量身定制。</p>
+
+
+
+<p>作为一个相对较新的领域，像机器学习这样的MLOps已经获得了很大的吸引力，正因为如此，人工智能驱动的软件正在所有行业中流行。我们必须有专门的操作人员来完成这一过程。MLOps使我们能够利用其两个主要组件来构建人工智能驱动的软件:持续集成和持续部署。我们可以创建从开始到部署的无缝管道，并随时修改构建。</p>
+
+
+
+<p>在本文中，我们将详细讨论如何使用各种技术为机器翻译构建MLOps管道。我们将使用的一些关键技术是:</p>
+
+
+
+<ul><li>唐斯多夫，</li><li>海王星啊！</li><li>GitHub股份公司，</li><li>码头工，</li><li>Kubernetes，</li><li>和谷歌云构建。</li></ul>
+
+
+
+<p>本教程旨在为您提供如何为您自己的机器学习或数据科学项目逻辑地实现MLOps的完整理解。</p>
+
+
+
+<h2 id="h-what-is-an-mlops-pipeline">什么是MLOps管道？</h2>
+
+
+
+<p>MLOps可以被描述为机器学习或数据科学项目的生命周期。生命周期本身由三个主要部分组成:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284cd562fc7a" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item"><span class="c-list__counter"> 1 </span>设计</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 2 </span>模型开发</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>操作</li>
+            </ul>
+</div>
+
+
+
+<p>通过结合这三个部分，我们可以建立一个集成的系统，可以利用机器学习和软件应用程序的力量。这个管道自动化了数据收集、数据预处理、培训和测试、部署和监控的过程。除此之外，它还能够检测构建中的任何新变化，并同时更新全局的新变化。</p>
+
+
+
+
+
+
+
+<h2 id="h-building-mlops-pipeline-for-machine-translation-where-to-start">为机器翻译构建MLOps管道:从哪里开始？</h2>
+
+
+
+<p>为了打造流畅的MLOps生命周期管道，必须考虑以下步骤。</p>
+
+
+
+<h3>设计</h3>
+
+
+
+<p>设计基本上是理解通常与目标受众打交道的<strong>业务问题</strong>的过程。</p>
+
+
+
+<p>设计实验还包括研究可用的资源，如知识收集、可以使用的数据类型、合适的体系结构、财务资源、计算资源等等。</p>
+
+
+
+<p>通常，在这个过程中，数据科学家和机器学习工程师为了节省时间，会尝试寻找可用的解决方案，并根据要求进行修改。</p>
+
+
+
+<p>本质上，设计通过预测的解决方案设定目标。</p>
+
+
+
+<h4>问题陈述</h4>
+
+
+
+<p>作为本文的一部分，让我们考虑我们需要构建一个应用程序，将葡萄牙语翻译成英语。这个问题属于自然语言处理的范畴，更具体地说是机器翻译。现在，作为一名数据科学家或ML工程师，您需要考虑以下几点:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284ce462fc80" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item"><span class="c-list__counter"> 1 </span>应该使用什么计算语言和相关库？</li>
+                    <li class="c-list__item">我们可以从哪里获得数据？</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>模型的核心架构必须是什么？</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 4 </span>培训目标和输出应该是什么，以及准确性和损失指标、优化技术等等。</li>
+                    <li class="c-list__item">截止日期和预算是什么？</li>
+            </ul>
+</div>
+
+
+
+
+
+
+
+<h4>研究</h4>
+
+
+
+<p>研究是我们探索每一个可能的解决方案来制造产品的一部分。例如，在选择构建深度学习模型的语言时，python是最佳选择。但如果你是一名iOS开发者，那么Swift是首选语言，一些公司如Tesla确实考虑C和C++以及Python。对于本文，让我们坚持使用python，因为它是构建深度学习和机器学习模型最广泛使用的语言。</p>
+
+
+
+<p>现在，为了构建深度学习模型，可以使用两个python库中的一个:Tensorflow和Pytorch。两者都非常受欢迎，多才多艺，并拥有大量的社区支持。在这个阶段，这一切都归结为偏好和一方相对于另一方的优势。在我们的例子中，我们将使用Tensorflow，因为它有一个非常结构化的API，即Keras，并且与Pytorch相比，实现它需要更少的代码行。</p>
+
+
+
+<p>当语言和核心库设置好后，我们就可以研究可以用来实现机器翻译的架构了。目前我们知道大多数SOTA语言模型大量使用<strong>变形金刚</strong>，因为它的<strong>自我关注机制</strong>。所以我们也会这样做。</p>
+
+
+
+<p>说到数据，我们可以很容易地从几乎任何地方下载语言翻译数据，但最佳实践是从合法资源下载精选数据，如Kaggle。在我们的例子中，我们将使用<strong> TensorFlow-dataset </strong> API来下载数据。</p>
+
+
+
+<p>现在让我们了解一下目录结构。</p>
+
+
+
+<h4>目录结构</h4>
+
+
+
+<p>在所有项目中，最关键的是<strong>目录结构</strong>。一个结构良好的项目有利于读者高效地跟踪和协作。就MLOps而言，它扮演着重要的角色，因为从构建到部署，我们将使用不同的技术来访问端点。</p>
+
+
+
+<p>MLOps项目的一般结构如下所示:</p>
+
+
+
+<pre class="hljs">Machine-translation
+├── kube
+├── metadata
+├── notebook
+├── requirements.txt
+├── README.md
+└── source</pre>
+
+
+
+<p>这是主目录结构及其子目录requirements.txt和README.md文件。随着我们继续前进，我们将不断向目录中添加更多的文件。</p>
+
+
+
+<h2 id="h-mlops-pipeline-for-machine-translation-model-development">机器翻译的MLOps流水线:模型开发</h2>
+
+
+
+<p>为了这篇文章，我们将使用Tensorflow网站上提供的笔记本。该笔记本信息量很大，并给出了如何编写和训练机器翻译模型的透彻想法。</p>
+
+
+
+<p>我们将对笔记本进行一些修改，并在培训期间集成Neptune客户端来监控模型。现在我们来简单的探讨一下，修改一下笔记本。</p>
+
+
+
+<h3>设置</h3>
+
+
+
+<p>首先，我们必须安装三个库:<strong> Tensorflow-datasets </strong>用于下载数据，<strong> Tensorflow </strong>用于深度学习，以及<strong> Neptune-client </strong>用于监控和保存元数据。</p>
+
+
+
+<pre class="hljs">!pip install tensorflow_datasets
+!pip install -U <span class="hljs-string">'tensorflow-text==2.8.*'</span>
+
+!pip install neptune-client</pre>
+
+
+
+<p>一旦安装了库，我们就可以将它们全部导入到笔记本中。</p>
+
+
+
+<h3>下载数据集</h3>
+
+
+
+<p>我们将使用的数据集，即将葡萄牙语翻译成英语，可以直接从TensorFlow-datasets库中下载。一旦数据集被下载，我们就可以把它分成训练数据集和验证数据集。</p>
+
+
+
+<pre class="hljs">examples, metadata = tfds.load(<span class="hljs-string">'ted_hrlr_translate/pt_to_en'</span>, with_info=<span class="hljs-keyword">True</span>,
+                               as_supervised=<span class="hljs-keyword">True</span>)
+train_examples, val_examples = examples[<span class="hljs-string">'train'</span>], examples[<span class="hljs-string">'validation'</span>]</pre>
+
+
+
+<h3>创建requirements.txt</h3>
+
+
+
+<p>Requirements.txt是一个重要的文件，因为它包含了所有的库。这允许新的贡献者在他们的工作环境中快速安装所有的库或依赖项。</p>
+
+
+
+<p>要创建一个<strong> requirement.txt </strong>文件，我们需要做的就是运行:</p>
+
+
+
+<pre class="hljs">!pip freeze &gt; requirements.txt </pre>
+
+
+
+<p>这可以在我们安装并导入所有文件之后，或者在您完成了对模型的训练和执行推断之后完成。优选地，实践后者。</p>
+
+
+
+<p>requirements.txt文件应该是这样的:</p>
+
+
+
+<pre class="hljs">matplotlib==<span class="hljs-number">3.2</span><span class="hljs-number">.2</span>
+neptune-client==<span class="hljs-number">0.16</span><span class="hljs-number">.1</span>
+numpy==<span class="hljs-number">1.21</span><span class="hljs-number">.6</span>
+tensorflow-datasets==<span class="hljs-number">4.0</span><span class="hljs-number">.1</span>
+tensorflow==<span class="hljs-number">2.8</span><span class="hljs-number">.0</span></pre>
+
+
+
+<h3>跟踪模型元数据</h3>
+
+
+
+<p><a href="https://web.archive.org/web/20221203090558/https://docs.neptune.ai/you-should-know/logging-metadata" target="_blank" rel="noreferrer noopener">登录neptune.ai </a>仪表盘相当简单。首先，我们创建一个类，<a href="https://web.archive.org/web/20221203090558/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display#parameters-and-model-configuration" target="_blank" rel="noreferrer noopener">存储所有的超参数</a>。这种方法在创建单独的python模块时非常方便(我们将在后面看到)。</p>
+
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">config</span><span class="hljs-params">()</span>:</span>
+ BUFFER_SIZE = <span class="hljs-number">20000</span>
+ BATCH_SIZE = <span class="hljs-number">64</span>
+ MAX_TOKENS = <span class="hljs-number">128</span>
+ MAX_EPOCHS = <span class="hljs-number">5</span>
+ TRAIN_LOSS = <span class="hljs-string">'train_loss'</span>
+ TRAIN_ACCURACY = <span class="hljs-string">'train_accuracy'</span>
+ OPTIMIZER = <span class="hljs-string">'Adam'</span>
+ BETA_1 = <span class="hljs-number">0.9</span>
+ BETA_2 = <span class="hljs-number">0.98</span>
+ EPSILON = <span class="hljs-number">1e-9</span>
+ NUM_LAYER = <span class="hljs-number">4</span>
+ D_MODEL = <span class="hljs-number">128</span>
+ DFF = <span class="hljs-number">512</span>
+ NUM_HEAD = <span class="hljs-number">8</span>
+ DROP_OUT = <span class="hljs-number">0.1</span></pre>
+
+
+
+<p>然后我们可以创建一个存储所有超参数的字典。</p>
+
+
+
+<pre class="hljs">params = {
+   <span class="hljs-string">'BUFFER_SIZE'</span>: config.BUFFER_SIZE,
+   <span class="hljs-string">'BATCH_SIZE'</span> : config.BATCH_SIZE,
+   <span class="hljs-string">"MAX_TOKENS"</span> : config.MAX_TOKENS,
+   <span class="hljs-string">"MAX_EPOCHS"</span> : config.MAX_EPOCHS,
+   <span class="hljs-string">"TRAIN_LOSS"</span> : config.TRAIN_LOSS,
+   <span class="hljs-string">"TRAIN_ACCURACY"</span> : config.TRAIN_ACCURACY,
+   <span class="hljs-string">"OPTIMIZER"</span> : config.OPTIMIZER,
+   <span class="hljs-string">"BETA_1"</span> : config.BETA_1,
+   <span class="hljs-string">"BETA_2"</span> : config.BETA_2,
+   <span class="hljs-string">"EPSILON"</span> : config.EPSILON,
+   <span class="hljs-string">"NUM_LAYER"</span> : config.NUM_LAYER,
+   <span class="hljs-string">"D_MODEL"</span> : config.D_MODEL,
+   <span class="hljs-string">"DFF"</span> : config.DFF,
+   <span class="hljs-string">"NUM_HEAD"</span> : config.NUM_HEAD,
+   <span class="hljs-string">"DROP_OUT"</span> : config.DROP_OUT,
+}</pre>
+
+
+
+<p>一旦创建了字典，我们就可以使用<a href="https://web.archive.org/web/20221203090558/https://docs.neptune.ai/getting-started/installation#authentication-neptune-api-token" target="_blank" rel="noreferrer noopener"> API令牌</a>初始化Neptune客户端，并将参数作为字典传递。</p>
+
+
+
+<pre class="hljs">run = neptune.init(
+   project=<span class="hljs-string">"nielspace/machine-translation"</span>,
+   api_token=<span class="hljs-string">"eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiJkYjRhYzI0Ny0zZjBmLTQ3YjYtOTY0Yi05ZTQ4ODM3YzE0YWEifQ=="</span>,
+)
+
+run[<span class="hljs-string">"parameters"</span>] = params</pre>
+
+
+
+<p>一旦执行，这将是它在neptune.ai仪表板中的外观。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221203090558/https://neptune.ai/building-mlops-pipeline-for-machine-translation-task-step-by-step-tutorial6"><img decoding="async" src="../Images/96d3a6073cc3d6f86288697c84e8056e.png" alt="Loging into Neptune" class="wp-image-66142" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial6-542547298-1652873225231.png?ssl=1"/></a><figcaption><em>Parameters logged in Neptune.ai | <a href="https://web.archive.org/web/20221203090558/https://app.neptune.ai/nielspace/machine-translation/e/MAC-25/all?path=parameters%2F">Source</a></em></figcaption></figure></div>
+
+
+
+<p>如您所见，所有的超参数都被记录下来。</p>
+
+
+
+<h3>模特培训</h3>
+
+
+
+<p>一旦模型的所有组件如编码器、解码器、自我关注机制等都准备好了，就可以训练模型了。但是，我们必须再次确保在训练期间集成Neptune-client来监控模型，以查看它的表现如何。</p>
+
+
+
+<p>要做到这一点，我们只需要定义精度和损失函数，并将它们传递到训练循环中。</p>
+
+
+
+<pre class="hljs">train_loss = tf.keras.metrics.Mean(name=config.TRAIN_LOSS)
+train_accuracy = tf.keras.metrics.Mean(name=config.TRAIN_ACCURACY)</pre>
+
+
+
+<p>在训练循环中，我们将使用与之前相同的方法来记录准确性和损失。</p>
+
+
+
+<pre class="hljs">run[<span class="hljs-string">'Training Accuracy'</span>].log(train_accuracy.result())
+run[<span class="hljs-string">'Training Loss'</span>].log(train_loss.result())</pre>
+
+
+
+<p>让我们将它们整合到培训循环中。</p>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> range(config.MAX_EPOCHS):
+ start = time.time()
+
+ train_loss.reset_states()
+ train_accuracy.reset_states()
+
+ 
+ <span class="hljs-keyword">for</span> (batch, (inp, tar)) <span class="hljs-keyword">in</span> enumerate(train_batches):
+   train_step(inp, tar)
+   run[<span class="hljs-string">'Training Accuracy'</span>].log(train_accuracy.result())
+   run[<span class="hljs-string">'Training Loss'</span>].log(train_loss.result())
+
+   <span class="hljs-keyword">if</span> batch % <span class="hljs-number">50</span> == <span class="hljs-number">0</span>:
+     print(f<span class="hljs-string">'Epoch {epoch + 1} Batch {batch} Loss {train_loss.result():.4f} Accuracy {train_accuracy.result():.4f}'</span>)
+
+ <span class="hljs-keyword">if</span> (epoch + <span class="hljs-number">1</span>) % <span class="hljs-number">5</span> == <span class="hljs-number">0</span>:
+   ckpt_save_path = ckpt_manager.save()
+   print(f<span class="hljs-string">'Saving checkpoint for epoch {epoch+1} at {ckpt_save_path}'</span>)
+
+ print(f<span class="hljs-string">'Epoch {epoch + 1} Loss {train_loss.result():.4f} Accuracy {train_accuracy.result():.4f}'</span>)
+
+ print(f<span class="hljs-string">'Time taken for 1 epoch: {time.time() - start:.2f} secsn'</span>)
+
+run.stop()</pre>
+
+
+
+<p>这是培训期间仪表板的外观。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><a href="https://web.archive.org/web/20221203090558/https://neptune.ai/building-mlops-pipeline-for-machine-translation-task-step-by-step-tutorial21"><img decoding="async" src="../Images/088b6bea32c7b516f8ad5afb5379f46e.png" alt="Training in Neptune" class="wp-image-66157" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial21-1143766106-1652873409252.png?ssl=1"/></a><figcaption><em>Training accuracy and loss logged in Neptune.ai | <a href="https://web.archive.org/web/20221203090558/https://app.neptune.ai/nielspace/machine-translation/e/MAC-25/charts" target="_blank" rel="noreferrer noopener">Source</a></em></figcaption></figure></div>
+
+
+
+<p>要记住的一个关键点是，在实验完成或训练循环完全执行后停止运行。</p>
+
+
+
+<p>Neptune-client API的一个好处是，您可以记录几乎任何事情。</p>
+
+
+
+<h3>验证和测试模型</h3>
+
+
+
+<p>一旦训练完成，我们就可以在创建应用程序之前对模型进行推理测试。当创建一个用于推理的类对象时，你必须记住，所有的预处理步骤都必须包含在内，因为这个相同的类将在app.py中用来创建端点。</p>
+
+
+
+<p>这里有一个例子:</p>
+
+
+
+<pre class="hljs"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Translator</span><span class="hljs-params">(tf.Module)</span>:</span>
+ <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, tokenizers, transformer)</span>:</span>
+   self.tokenizers = tokenizers
+   self.transformer = transformer
+
+ <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__call__</span><span class="hljs-params">(self, sentence, max_length=config.MAX_TOKENS)</span>:</span>
+   
+   <span class="hljs-keyword">assert</span> isinstance(sentence, tf.Tensor)
+   <span class="hljs-keyword">if</span> len(sentence.shape) == <span class="hljs-number">0</span>:
+     sentence = sentence[tf.newaxis]
+
+   sentence = self.tokenizers.pt.tokenize(sentence).to_tensor()
+
+   encoder_input = sentence
+
+   
+   
+   start_end = self.tokenizers.en.tokenize([<span class="hljs-string">''</span>])[<span class="hljs-number">0</span>]
+   start = start_end[<span class="hljs-number">0</span>][tf.newaxis]
+   end = start_end[<span class="hljs-number">1</span>][tf.newaxis]
+
+   
+   
+   output_array = tf.TensorArray(dtype=tf.int64, size=<span class="hljs-number">0</span>, dynamic_size=<span class="hljs-keyword">True</span>)
+   output_array = output_array.write(<span class="hljs-number">0</span>, start)
+
+   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> tf.range(max_length):
+     output = tf.transpose(output_array.stack())
+     predictions, _ = self.transformer([encoder_input, output], training=<span class="hljs-keyword">False</span>)
+
+     
+     predictions = predictions[:, <span class="hljs-number">-1</span>:, :]  
+
+     predicted_id = tf.argmax(predictions, axis=<span class="hljs-number">-1</span>)
+
+     
+     
+     output_array = output_array.write(i+<span class="hljs-number">1</span>, predicted_id[<span class="hljs-number">0</span>])
+
+     <span class="hljs-keyword">if</span> predicted_id == end:
+       <span class="hljs-keyword">break</span>
+
+   output = tf.transpose(output_array.stack())
+   
+   text = tokenizers.en.detokenize(output)[<span class="hljs-number">0</span>]  
+
+   tokens = tokenizers.en.lookup(output)[<span class="hljs-number">0</span>]
+
+   
+   
+   
+   _, attention_weights = self.transformer([encoder_input, output[:,:<span class="hljs-number">-1</span>]], training=<span class="hljs-keyword">False</span>)
+
+   <span class="hljs-keyword">return</span> text, tokens, attention_weights</pre>
+
+
+
+<p>如您所见，预处理和预测所需的步骤包含在同一个类对象中。现在我们测试我们的模型在看不见的数据上的表现。</p>
+
+
+
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">print_translation</span><span class="hljs-params">(sentence, tokens, ground_truth)</span>:</span>
+ print(f<span class="hljs-string">'{"Input:":15s}: {sentence}'</span>)
+ print(f<span class="hljs-string">'{"Prediction":15s}: {tokens.numpy().decode("utf-8")}'</span>)
+ print(f<span class="hljs-string">'{"Ground truth":15s}: {ground_truth}'</span>)
+
+sentence = <span class="hljs-string">'este é um problema que temos que resolver.'</span>
+ground_truth = <span class="hljs-string">'this is a problem we have to solve .'</span>
+
+translator = Translator(tokenizers, transformer)
+translated_text, translated_tokens, attention_weights = translator(
+   tf.constant(sentence))
+print_translation(sentence, translated_text, ground_truth)</pre>
+
+
+
+<p>输出:</p>
+
+
+
+<pre class="hljs">Input:         : este é um problema que temos que resolver.
+Prediction     : this <span class="hljs-keyword">is</span> a problem that we have to solve .
+Ground truth   : this <span class="hljs-keyword">is</span> a problem we have to solve .</pre>
+
+
+
+<h3>下载元数据和笔记本</h3>
+
+
+
+<p>一旦训练和推理完成，我们就可以从Google Colab下载元数据和笔记本到我们的本地目录，然后为每个类对象创建单独的python模块。</p>
+
+
+
+<p>例如，你可以看到所有的目录已经完全被它们各自的文件和元数据填满了。</p>
+
+
+
+<pre class="hljs">machine-translation
+├── metadata
+│   ├── checkpoints
+│   │   └── train
+│   │       ├── checkpoint
+│   │       ├── ckpt<span class="hljs-number">-1.</span>data<span class="hljs-number">-00000</span>-of<span class="hljs-number">-00001</span>
+│   │       └── ckpt<span class="hljs-number">-1.</span>index
+│   ├── ted_hrlr_translate_pt_en_converter
+│   │   ├── assets
+│   │   │   ├── en_vocab.txt
+│   │   │   └── pt_vocab.txt
+│   │   ├── saved_model.pb
+│   │   └── variables
+│   │       ├── variables.data<span class="hljs-number">-00000</span>-of<span class="hljs-number">-00001</span>
+│   │       └── variables.index
+│   ├── ted_hrlr_translate_pt_en_converter.zip
+│   └── translator
+│       ├── assets
+│       │   ├── en_vocab.txt
+│       │   └── pt_vocab.txt
+│       ├── saved_model.pb
+│       └── variables
+│           ├── variables.data<span class="hljs-number">-00000</span>-of<span class="hljs-number">-00001</span>
+│           └── variables.index
+├── notebook
+├── requirements.txt
+└── source
+    ├── attention.py
+    ├── config.py
+    ├── decoder.py
+    ├── encoder.py
+    ├── inference.py
+    ├── preprocessing.py
+    ├── train.py
+    └── transformer.py
+</pre>
+
+
+
+<p>在上面的例子中，源目录由python模块组成，这些模块包含直接取自笔记本的函数和类对象。</p>
+
+
+
+<h3>app.py</h3>
+
+
+
+<p>下一步是创建一个app.py，它将利用flask API为模型服务。为了服务于该模型，我们需要:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284dcf52fc87" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item"><span class="c-list__counter"> 1 </span>从预处理和转换模块导入所有函数。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 2 </span>加载保存在翻译目录中的重量。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>定义获得预测的端点。</li>
+            </ul>
+</div>
+
+
+
+<pre class="hljs"><span class="hljs-keyword">import</span> flask
+<span class="hljs-keyword">from</span> flask <span class="hljs-keyword">import</span> Flask
+<span class="hljs-keyword">import</span> logging
+<span class="hljs-keyword">import</span> time
+
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+
+<span class="hljs-keyword">import</span> tensorflow_datasets <span class="hljs-keyword">as</span> tfds
+<span class="hljs-keyword">import</span> tensorflow <span class="hljs-keyword">as</span> tf
+<span class="hljs-keyword">import</span> tensorflow_text
+
+<span class="hljs-keyword">import</span> source.config <span class="hljs-keyword">as</span> config
+<span class="hljs-keyword">from</span> source.preprocessing <span class="hljs-keyword">import</span> *
+<span class="hljs-keyword">from</span> source.transformer <span class="hljs-keyword">import</span> *
+
+app = Flask(__name__)
+
+<span class="hljs-meta">@app.route("/predict")</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict</span><span class="hljs-params">()</span>:</span>
+   sentence = request.args.get(<span class="hljs-string">"sentence"</span>)
+   response = translator(sentence).numpy()
+   <span class="hljs-keyword">return</span> flask.jsonify(response)
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>:
+   translator = tf.saved_model.load(<span class="hljs-string">'../translator'</span>)
+   app.run(host=<span class="hljs-string">"0.0.0.0"</span>, port=<span class="hljs-string">"9999"</span>)</pre>
+
+
+
+<h2 id="h-mlops-pipeline-for-machine-translation-operations-ci-cd">机器翻译的MLOps管道:操作(CI/CD)</h2>
+
+
+
+<p>一旦代码库准备就绪，我们就可以继续我们的第三个也是最后一个阶段，即运营，这是我们将实施持续部署和持续集成的地方。这就是事情变得有点棘手的地方。但是不要担心，我已经把整个操作分成了不同的部分，这样每个模块都清晰易懂。这些是我们将遵循的步骤:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284dd3d2fc8b" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item"><span class="c-list__counter"> 1 </span>创建Github repo。</li>
+                    <li class="c-list__item">使用Docker文件创建图像。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>将图像推送到Google Cloud Build。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 4 </span>展开。</li>
+            </ul>
+</div>
+
+
+
+
+
+
+
+<h3>创建GitHub repo</h3>
+
+
+
+<p>第一步是将您的所有代码从本地目录推到您的GitHub帐户。这将有助于我们将回购目录连接到谷歌云开发。在那里，我们可以创建Kubernetes pods并在其中部署应用程序。</p>
+
+
+
+<h3>Dockerfile</h3>
+
+
+
+<p>dockerfile使我们能够创建一个容器<em>，这是一种包装应用程序的软件，包括它的库和依赖关系</em>。它还创建了一个静态环境，使应用程序能够在任何环境中运行。</p>
+
+
+
+<p>另一方面，Docker是构建和管理容器的软件。我们可以创建任意多的容器。</p>
+
+
+
+<p>为了给我们的app.py创建一个容器，我们需要创建一个<strong> Dockerfile </strong>。该文件即<em>映像</em>必须存储构建<strong>容器</strong>所需遵循的所有指令。一些一般说明如下:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284ddcf2fc91" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item">安装编程语言，在我们的例子中是python。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 2 </span>创造环境。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>安装库和依赖项。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 4 </span>复制模型、API和其他实用程序文件，以便正确执行。</li>
+            </ul>
+</div>
+
+
+
+<p>在下面的例子中，你会看到我是如何构建Docker配置的。相当简约极简。</p>
+
+
+
+<pre class="hljs">FROM python:<span class="hljs-number">3.7</span>-slim
+RUN apt-get update
+
+ENV APP_HOME /app
+WORKDIR $APP_HOME
+COPY . ./
+
+RUN ls -la $APP_HOME/
+
+RUN pip install -r requirements.txt
+
+CMD [<span class="hljs-string">"python3"</span>,<span class="hljs-string">"app.py"</span> ]</pre>
+
+
+
+<h3>谷歌云开发</h3>
+
+
+
+<p>配置Dockerfile后，我们将使用Google Cloud Development或GCD来自动化CI/CD管道。当然，你可以使用任何其他服务，比如Azure、AWS等等，但是我发现GCD简单易用。我将详细解释这一部分，以便您可以轻松掌握完整的概念并理解该过程。</p>
+
+
+
+<p>第一步是登录你的GCD账户，如果你是新用户，你将获得300美元的免费积分，可以在90天内使用。</p>
+
+
+
+<h4>谷歌云开发:云壳</h4>
+
+
+
+<p>一旦你登录到你的GCD，创建一个<strong>新项目。</strong>之后点击屏幕右上角的云壳图标激活云壳。</p>
+
+
+
+<p>需要注意的一点是，在大多数情况下，我们将使用内置的<strong>云外壳</strong>来执行流程。第一步是从Github克隆存储库。您可以在给定的<a href="https://web.archive.org/web/20221203090558/https://github.com/Nielspace/tensorflow-machine-translation" target="_blank" rel="noreferrer noopener nofollow">链接</a>中使用相同的代码。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/c44491ed768f67e65d30822bcdfd3657.png" alt="Google Cloud development: Cloud Shell " class="wp-image-66148" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial12-4127751715-1652876278257.png?ssl=1"/><figcaption><em>Google Cloud development: Cloud Shell | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>一旦回购被克隆到cd中。</p>
+
+
+
+<h4>谷歌云开发:Kubernetes</h4>
+
+
+
+<p>现在我们将<strong>启用</strong>，<strong>设置，</strong>和<strong>启动</strong>Kubernetes引擎。Kubernetes引擎将允许我们管理我们的dockerized应用程序。要配置Kubernetes，我们需要遵循4个步骤:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284de802fc96" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item"><span class="c-list__counter"> 1 </span>创建deployment.yaml文件。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 2 </span>创建一个service.yaml文件。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>在GCD中启用Kubernetes引擎。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 4 </span>通过云壳启动Kubernetes引擎。</li>
+            </ul>
+</div>
+
+
+
+<p><strong>创建一个deployment.yaml </strong></p>
+
+
+
+<p>deployment.yaml的目的是配置部署设置。它由两部分组成:</p>
+
+
+
+<ul><li>API版本和操作种类</li></ul>
+
+
+
+<pre class="hljs">apiVersion: apps/v1
+kind: Deployment</pre>
+
+
+
+
+
+
+
+<pre class="hljs">metadata:
+ name: translation
+
+spec:
+ replicas: <span class="hljs-number">2</span> 
+ selector:
+   matchLabels:
+     app: translation-app 
+ template:
+   metadata:
+     labels:
+       app: translation-app 
+   spec:
+     containers:
+     - name: translation-app
+       image: gcr.io/tensor-machine-translation/translation:v1
+       ports:
+       - containerPort: <span class="hljs-number">9999</span></pre>
+
+
+
+<p>下面是我在元数据中指定的配置内容:</p>
+
+
+
+<ul><li>在本例中，我将使用的复制副本或pod的数量是2。</li><li>集装箱位置。该位置也可以分为四个步骤:<ul><li>URL: " <strong> gcr.io </strong>"。这是常见的容器地址。</li><li>项目ID: " <strong>张量机器翻译</strong>"</li><li>App名称:<strong>翻译</strong>。您可以给出任何名称，但它必须在所有配置文件中相同。</li><li>版本:<strong> v1 </strong>。这是一个标签。</li></ul></li></ul>
+
+
+
+<p><strong>创建一个service.yaml </strong></p>
+
+
+
+<p>service.yaml将整个应用程序暴露给网络。它类似于deployment.yaml，但主要区别在于我们想要实现的操作类型，它也由两部分组成:</p>
+
+
+
+<ul><li>API版本和操作种类</li></ul>
+
+
+
+<pre class="hljs">apiVersion: v1
+kind: Service</pre>
+
+
+
+
+
+
+
+<pre class="hljs">metadata:
+ name: machinetranslation
+spec:
+ type: LoadBalancer
+ selector:
+   app: machinetranslation
+ ports:
+ - port: <span class="hljs-number">80</span>
+   targetPort: <span class="hljs-number">9999</span></pre>
+
+
+
+<p>配置完部署和服务文件后，让我们转到Kubernetes。</p>
+
+
+
+<p><strong>在GCD中启用Kubernetes引擎</strong></p>
+
+
+
+<p>一旦我们的配置文件准备好了，我们就可以开始启用Kubernetes API了。这是一个用于管理Dockerized应用程序的开源系统。要启用Kubernetes，只需在GCD搜索栏中输入<em>‘GKE’</em>。只要点击<strong>‘启用</strong>，你就会被导航到Kubernetes引擎API页面。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/e534dc2d5d85ea658cc968ea48f1e85a.png" alt="Building MLOPS pipeline with Kubernets" class="wp-image-66151" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial15-1751968640-1652875209841.png?ssl=1"/><figcaption><em>Building MLOPS pipeline with Kubernets | Source: Author<br/></em></figcaption></figure></div>
+
+
+
+<p>启用API后，您需要创建Kubernetes集群。有两种方法可以创建集群:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284e6b32fcab" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item"><span class="c-list__counter"> 1 </span>只需点击屏幕上的“创建”按钮。</li>
+                    <li class="c-list__item">使用Google-Cloud shell。</li>
+            </ul>
+</div>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/2f3027acaeae4e84c724a741e5f3ab8f.png" alt="Kubernets clusters" class="wp-image-66139" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial3-1346136557-1652875681451.png?resize=900%2C288&amp;ssl=1"/><figcaption><em>Kubernets clusters | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>在我们的例子中，我们将使用Google-Cloud shell，因为您可以更具体地了解您想要什么类型的集群。</p>
+
+
+
+<p><strong>启动Kubernetes引擎</strong></p>
+
+
+
+<p>要启动Kubernetes引擎，请在您的云shell中编写以下代码。</p>
+
+
+
+<pre class="hljs">!gcloud config set project tensor-machine-translation
+!gcloud config set compute/zone us-central1
+!gcloud container clusters create tensorflow-machine-translation --num-nodes=<span class="hljs-number">2</span></pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/1a8e204884931f7220b25a7da2ccde5e.png" alt="Launching the Kubernetes engine" class="wp-image-66141" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial5-3110063320-1652874829443.png?ssl=1"/><figcaption><em>Launching the Kubernetes engine | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>完成后，您可以在仪表板上查看K8集群。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/c156438e95e1b9426ad2cf35157f6a46.png" alt="Launching the Kubernetes engine" class="wp-image-66153" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial17-2254604972-1652876399971.png?ssl=1"/><figcaption><em>Launching the Kubernetes engine | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>现在，我们的Kubernetes配置文件和引擎已经准备好了，我们可以开始配置我们的<em> clouldbuild.yaml </em>文件，然后启动整个应用程序。</p>
+
+
+
+<h4>谷歌云开发:云构建</h4>
+
+
+
+<p>cloudbuild.yaml文件将所有进程同步在一起。这很容易理解。配置文件通常包含以下步骤:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284e4c62fc9b" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"/>
+
+    <ul class="c-list">
+                    <li class="c-list__item"><span class="c-list__counter"> 1 </span>从Dockerfile文件构建容器映像。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 2 </span>将容器映像推送到Google Cloud Registry (GCR)。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>配置入口点。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 4 </span>在Kubernetes引擎中部署整个应用程序。</li>
+            </ul>
+</div>
+
+
+
+<pre class="hljs">steps:
+- name: <span class="hljs-string">'gcr.io/cloud-builders/docker'</span>
+ args: [<span class="hljs-string">'build'</span>, <span class="hljs-string">'-t'</span>, <span class="hljs-string">'gcr.io/tensor-machine-translation/translation'</span>, <span class="hljs-string">'.'</span>]
+ timeout: <span class="hljs-number">180</span>s
+- name: <span class="hljs-string">'gcr.io/cloud-builders/docker'</span>
+ args: [<span class="hljs-string">'push'</span>, <span class="hljs-string">'gcr.io/tensor-machine-translation/translation'</span>]
+- name: <span class="hljs-string">'gcr.io/cloud-builders/gcloud'</span>
+ entrypoint: <span class="hljs-string">"bash"</span>
+ args:
+ - <span class="hljs-string">"-c"</span>
+ - |
+   echo <span class="hljs-string">"Docker Container Built"</span>
+   ls -la
+   ls -al metadata/
+- name: <span class="hljs-string">"gcr.io/cloud-builders/gke-deploy"</span>
+ args:
+ - run
+ - --filename=kube/
+ - --location=us-west1-b
+ - --cluster=tensor-machine-translation</pre>
+
+
+
+<p>配置完cloudbuild.yaml文件后，您可以返回到Google-Cloud Shell并运行以下命令:</p>
+
+
+
+<pre class="hljs">!gcloud builds submit --config cloudbuild.yaml
+</pre>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/019f70cb8e2d9e2db6f6dd3f7a81d440.png" alt="Google Cloud development: Cloudbuild" class="wp-image-66155" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial19-1641719723-1652876619720.png?ssl=1"/><figcaption><em>Google Cloud development: Cloud Build | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>部署完成后，您将获得应用程序的链接。</p>
+
+
+
+<h3 class="has-big-font-size">GitHub操作</h3>
+
+
+
+<p>现在，我们已经完成了所有重要的过程，我们的应用程序已经启动并运行了。但现在我们将看到如何使用Github动作创建触发器，这将使我们能够在修改和推送Github repo中的代码时自动更新构建。让我们看看我们能做些什么。</p>
+
+
+
+<p>去Github市场搜索Google Cloud Build。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/b8933b9d31dd58bed4f7e7fb0ffc692c.png" alt="Github marketplace" class="wp-image-66154" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial18-383620925-1652877113378.png?ssl=1"/><figcaption><em>Github marketplace | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>点击谷歌云构建。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/0627340a2f3589f4eca309b6c6bb5f03.png" alt="Selecting Google Cloud build" class="wp-image-66150" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial14-527162134-1652877265159.png?ssl=1"/><figcaption><em>Selecting Google Cloud Build | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>点击建立一个计划。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/6fb3256b5e1a5559ac7f059bfb54fd2a.png" alt="Setting up a plan with Google Cloud build" class="wp-image-66158" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial22-3710201312-1652877247701.png?ssl=1"/><figcaption><em>Setting up a plan with Google Cloud Build | Source: Author</em></figcaption></figure></div>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/ae06843680899547a961a82a05b05c6a.png" alt="Setting up a plan with Google Cloud build" class="wp-image-66149" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial13-2165264053-1652877385126.png?ssl=1"/><figcaption><em>Setting up a plan with Google Cloud Build | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>点击配置。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/ff49615c26d916e3940cc2bafd13641d.png" alt="Google Cloud Build configuration" class="wp-image-66147" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial11-1862348697-1652877530394.png?ssl=1"/><figcaption><em>Google Cloud Build configuration | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>选择存储库。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/e1cb418e496d860ad9482fe4f8335281.png" alt="Selecting Google Cloud Build repository" class="wp-image-66146" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial10-403054351-1652877545759.png?ssl=1"/><figcaption><em>Selecting Google Cloud Build repository | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>选择项目在我们的情况下，它是张量机器翻译。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/bacb86a818fd0b1975f4bbae97c7c322.png" alt="Selecting &quot;Tensor-machine-translation&quot;" class="wp-image-66144" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial8-3354308709-1652877757461.png?ssl=1"/><figcaption><em>Selecting “Tensor-machine-translation” | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>点击创建触发器。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/e23cacc23b03bbd94bc5cd02a7da69e1.png" alt="Creating a trigger" class="wp-image-66145" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial9-2968092915-1652877830841.png?resize=900%2C333&amp;ssl=1"/><figcaption><em>Creating a trigger | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>为触发器提供一个“名称”,并保留所有设置。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/82d0bb8d27d2e4ae6863aa41447c14e2.png" alt="Naming the trigger" class="wp-image-66140" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial4-3461938254-1652877974313.png?resize=829%2C371&amp;ssl=1"/><figcaption><em>Naming the trigger | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>点击<strong>创建</strong>。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-full is-resized"><img decoding="async" loading="lazy" src="../Images/302211dc7bfdecd39c26d8b93c5e4e52.png" alt="Creating a trigger" class="wp-image-66137" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial1-3190950081-1652949068573.png?resize=578%2C629&amp;ssl=1"/><figcaption><em>Creating a trigger | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>创建后，您将被引导至以下页面。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/6bd87c0768731e8a8b0d1eb3f3c37670.png" alt="Trigger's view in Google Cloud Build" class="wp-image-66156" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial20-858475724-1652949214213.png?ssl=1"/><figcaption><em>Trigger’s view in Google Cloud Build | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>现在，有趣的部分是，每当您对Github repo进行任何更改时，云构建都会自动检测到它，并在部署的构建中进行更改。</p>
+
+
+
+<h3 class="has-big-font-size">生产中的监控模型</h3>
+
+
+
+<p>到目前为止，我们已经了解了如何构建自动MLOps管道，现在我们将探讨最后一步，即如何监控部署在云上的应用。这个过程称为云部署。GCD为我们提供了一个仪表板，使我们能够从任何设备监控应用程序:手机、平板电脑或电脑。</p>
+
+
+
+<p>下面是iOS中给出的谷歌云控制台的图像。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img decoding="async" loading="lazy" src="../Images/6290b9f2839a220cbcce68312e65da8c.png" alt="Google cloud console" class="wp-image-66152" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial16-4049975866-1652949377497.jpg?resize=447%2C819&amp;ssl=1"/><figcaption><em>Google Cloud console | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>为了监控该应用程序，您只需在GCD搜索栏中键入monitor，它就会将您导航到相应的页面。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/d6e0d3b2688096e0d1bf672ad187c079.png" alt="Monitoring in Google Cloud" class="wp-image-66143" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial7-1464970740-1652949507724.png?ssl=1"/><figcaption><em>Monitoring in Google Cloud | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>你会看到一堆选项可供选择。我建议您首先选择一个概述，然后探索所有可能的选项。例如，如果您选择GKE，那么您将看到关于Kubernetes的所有信息:各个项目的pod、节点、集群等等。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/1cbe6051f49af08322cff38abfd996f7.png" alt="Monitoring in Google Cloud" class="wp-image-66159" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial23-2854362486-1652949579984.png?ssl=1"/><figcaption><em>Monitoring in Google Cloud | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>同样，您也可以创建警报策略。和许多其他事情。</p>
+
+
+
+<div class="wp-block-image"><figure class="aligncenter size-large"><img decoding="async" src="../Images/4a534b680cc0847a70c9d10aecfbd4ba.png" alt="Monitoring in Google Cloud" class="wp-image-66138" data-recalc-dims="1" data-original-src="https://web.archive.org/web/20221203090558im_/https://i0.wp.com/neptune.ai/wp-content/uploads/2022/10/Building-MLOps-Pipeline-for-Machine-Translation-Task-Step-by-Step-Tutorial2-658200955-1652949645340.png?ssl=1"/><figcaption><em>Monitoring in Google Cloud | Source: Author</em></figcaption></figure></div>
+
+
+
+<p>在监控阶段，您必须熟悉的一个重要概念是<strong>模型漂移</strong>。当模型的预测能力随着时间的推移而下降时，就会发生这种情况。</p>
+
+
+
+<p>模型漂移可分为两种类型:</p>
+
+
+
+<h4>数据漂移</h4>
+
+
+
+<p>数据漂移通常是生产数据与训练/测试数据之间的差异。它通常发生在训练和部署之间有时间间隔的时候。一个这样的例子是任何时间序列数据，如新冠肺炎数据或股票市场数据。在这种情况下，像可变性这样的因素每小时都会被引入，换句话说，数据会随着时间的推移而不断发展。数据的这种演变会在生产阶段产生预测误差。</p>
+
+
+
+<p>在我们的例子中，我们不必担心，因为语言数据在大多数情况下保持稳定，因此我们可以在更长的时间内使用相同的模型。</p>
+
+
+
+<p>您可以在下面的博客中找到更多关于数据漂移检测的信息:<a href="https://web.archive.org/web/20221203090558/https://towardsdatascience.com/why-data-drift-detection-is-important-and-how-do-you-automate-it-in-5-simple-steps-96d611095d93" target="_blank" rel="noreferrer noopener nofollow">为什么数据漂移检测如此重要，以及如何通过5个简单的步骤实现自动化</a>。</p>
+
+
+
+<h4>概念漂移</h4>
+
+
+
+<p>当预测变量随时间变化时，或者换句话说，当输出的统计属性随时间变化时，就会发生概念漂移。在概念漂移中，模型无法利用它在训练期间提取的模式。例如，让我们说垃圾邮件自从被定义以来已经随着时间的推移而发展。现在，该模型将发现很难使用3周前在训练中提取的模式来检测垃圾邮件。为了解决这些问题，必须调整模型参数。</p>
+
+
+
+<p>如果公司的商业模式正在发生变化，或者所使用的数据集不能代表整个人口，那么概念漂移就可能发生。</p>
+
+
+
+<h4>如何监控一个模型？</h4>
+
+
+
+<ul><li>像顺序分析和时间分布方法这样的方法有助于识别数据漂移。</li><li>另一方面，持续监控输入数据并观察其统计特性有助于克服概念漂移。</li><li>除了像ADWIN、卡方检验、直方图交叉、kolmogorov smirnov统计之类技术之外，这些技术也是有用的。</li></ul>
+
+
+
+<h4>如何克服模型漂移？</h4>
+
+
+
+<p>模型再训练是解决模型漂移(包括数据漂移、概念漂移和模型退化问题)的最好方法。再培训可以参考这些策略:</p>
+
+
+
+<ul><li><strong>定期再培训</strong>–定期:每周、每月等等。</li><li><strong>数据/事件驱动</strong>–每当新数据可用时。</li><li><strong>模型/度量驱动</strong>–当精度低于阈值时。</li></ul>
+
+
+
+<h2 id="h-conclusion">结论</h2>
+
+
+
+<p>在本教程中，我们探讨了如何使用各种技术来无缝部署机器翻译应用程序。这就是MLOps的力量。当然，你可以像UI/UX一样在app.py文件中添加很多东西，创建一个全新的网页。</p>
+
+
+
+<p>总而言之，我们看到:</p>
+
+
+
+<div id="case-study-numbered-list-block_6284e5d32fca0" class="block-case-study-numbered-list ">
+
+    
+    <h2 id="h-"><span class="c-list__counter"> 1 </span>如何设计一个实验？</h2>
+
+    <ul class="c-list">
+                    <li class="c-list__item"><span class="c-list__counter"> 2 </span>训练和测试模型。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 3 </span>保存模型的权重和元数据。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 4 </span>构建目录。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 5 </span>分离功能，创建python模块。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 6 </span>创建Flask app。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 7 </span>将应用程序归档。</li>
+                    <li class="c-list__item">创建和配置Google Kubernetes引擎。</li>
+                    <li class="c-list__item"><span class="c-list__counter"> 9 </span>在Google Kubernetes引擎中部署应用程序。</li>
+                    <li class="c-list__item">最后，使用Github Actions自动化整个过程。</li>
+                    <li class="c-list__item">如果你正在创建任何利用机器学习或深度学习算法的项目，那么你应该超越并创建一个MLOps管道，而不是停留在模型训练上。我希望本教程能够帮助您理解如何在自己的项目中实现MLOps。</li>
+            </ul>
+</div>
+
+
+
+<p>请务必尝试一下，因为这是部署您的ML和DL应用程序的最佳方式。</p>
+
+
+
+<p>密码</p>
+
+
+
+<h3>你可以在这里找到完整的库。另外，值得一提的是，机器翻译的笔记本取自<a href="https://web.archive.org/web/20221203090558/https://www.tensorflow.org/text/tutorials/nmt_with_attention" target="_blank" rel="noreferrer noopener nofollow">官网</a>。</h3>
+
+
+
+<p>参考</p>
+
+
+
+<h3><a href="https://web.archive.org/web/20221203090558/https://www.tensorflow.org/text/tutorials/nmt_with_attention" target="_blank" rel="noreferrer noopener nofollow">注意力神经机器翻译</a></h3>
+
+
+
+<ol><li><a href="https://web.archive.org/web/20221203090558/https://ml-ops.org/" target="_blank" rel="noreferrer noopener nofollow">机器学习操作</a></li><li><a href="/web/20221203090558/https://neptune.ai/blog/build-mlops-pipelines-with-github-actions-guide" target="_blank" rel="noreferrer noopener">如何使用GitHub操作构建MLOps管道【分步指南】</a></li><li><a href="https://web.archive.org/web/20221203090558/https://github.blog/2020-06-17-using-github-actions-for-mlops-data-science/" target="_blank" rel="noreferrer noopener nofollow">为MLOps使用GitHub动作</a></li><li><a href="https://web.archive.org/web/20221203090558/https://towardsdatascience.com/deploy-machine-learning-model-on-google-kubernetes-engine-94daac85108b" target="_blank" rel="noreferrer noopener nofollow">在Google Kubernetes引擎上部署机器学习管道</a></li><li><a href="https://web.archive.org/web/20221203090558/https://towardsdatascience.com/why-data-drift-detection-is-important-and-how-do-you-automate-it-in-5-simple-steps-96d611095d93" target="_blank" rel="noreferrer noopener nofollow">为什么数据漂移检测如此重要，您如何通过5个简单的步骤实现自动化</a></li><li><a href="https://web.archive.org/web/20221203090558/https://towardsdatascience.com/why-data-drift-detection-is-important-and-how-do-you-automate-it-in-5-simple-steps-96d611095d93" target="_blank" rel="noreferrer noopener nofollow">Why data drift detection is important and how do you automate it in 5 simple steps</a></li></ol>
+        </div>
+        
+    </div>    
+</body>
+</html>
