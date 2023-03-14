@@ -42,21 +42,21 @@ Python 生态系统中的两个主要后端解决方案是 [Django](https://web.
 
 你可以访问这个 [Kaggle 页面](https://web.archive.org/web/20221203090307/https://www.kaggle.com/datasets/team-ai/spam-text-message-classification?resource=download)并下载数据集。然后，运行下面的命令创建一个 conda 环境来托管本教程的 Python 和库安装。
 
-```
+```py
 conda create -n model-deploy python=3.9.7
 
 ```
 
 安装完成后，通过运行以下命令激活环境:
 
-```
+```py
 conda activate model-deploy
 
 ```
 
 然后，通过运行以下命令安装我们需要的库:
 
-```
+```py
 pip install Flask scikit-learn
 
 ```
@@ -67,7 +67,7 @@ pip install Flask scikit-learn
 
 进行所需的进口。
 
-```
+```py
 import csv
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -76,7 +76,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 创建所需的功能。
 
-```
+```py
 def load_data(fpath):
 
 	cat_map = {
@@ -117,7 +117,7 @@ train(X, y, clf)
 
 现在，让我们设置 Flask，并为服务微服务的模型创建端点。我们首先要导入 Flask 并创建一个简单的应用程序。
 
-```
+```py
 import model
 import json
 
@@ -148,14 +148,14 @@ app.run()
 
 现在让我们测试一下这个应用程序，以确保它能正常工作！为此，请在命令行中运行以下命令:
 
-```
+```py
 python deploy.py
 
 ```
 
 这将启动位于 [http://localhost:5000](https://web.archive.org/web/20221203090307/http://localhost:5000/) 上的 Flask 服务器。现在，打开一个单独的 Python 提示符并运行以下代码。
 
-```
+```py
 res = requests.post('http://127.0.0.1:5000/predict', json={"text": "You are a winner U have been specially selected 2 receive ¬£1000 or a 4* holiday (flights inc) speak to a live operator 2 claim 0871277810910p/min (18+)"})
 ```
 
@@ -185,7 +185,7 @@ res = requests.post('http://127.0.0.1:5000/predict', json={"text": "You are a wi
 
 您可以在终端的该目录下运行该命令来创建它。
 
-```
+```py
 pip freeze > requirements.txt
 
 ```
@@ -194,7 +194,7 @@ pip freeze > requirements.txt
 
 现在来看文档。
 
-```
+```py
 FROM python:3.9.7-slim
 
 COPY requirements.txt /app/requirements.txt
@@ -228,7 +228,7 @@ ENTRYPOINT [“python”, “deploy.py”]
 
 接下来，要运行包含 Flask 部署脚本的 Docker 容器，请键入:
 
-```
+```py
 docker run -p 5000:5000 -t spam-or-ham-deploy
 ```
 
@@ -254,13 +254,13 @@ Kubernetes 是一个跨大型部署编排容器的工具。使用 Kubernetes，�
 
 接下来，我们希望通过运行以下命令来创建部署:
 
-```
+```py
 kubectl create deployment hello-minikube --image=spam-or-ham-deploy
 ```
 
 然后，我们希望使用以下方式公开我们的部署:
 
-```
+```py
 kubectl expose deployment hello-minikube --type=NodePort --port=8080
 ```
 

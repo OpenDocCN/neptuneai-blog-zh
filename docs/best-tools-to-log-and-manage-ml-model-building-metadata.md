@@ -28,14 +28,14 @@ Neptune 的一个[新版本刚刚发布。新版本支持更多的工作流，�
 
 有了这两件事，您现在可以初始化项目了。
 
-```
+```py
 import neptune
 neptune.init(project_qualified_name='mwitiderrick/LIGHTSAT', api_token='YOUR_TOKEN')
 ```
 
 下一步是创建一个实验并命名它。这个实验的参数也在这个阶段传入。
 
-```
+```py
 params = {'boosting_type': 'gbdt',
               'objective': 'regression',
               'num_leaves': 40,
@@ -50,7 +50,7 @@ exp = neptune.create_experiment(name='LightGBM-training',params=param)
 
 接下来，您将导入“neptune_monitor”回调并将其传递给 LightGBM 的“train”方法。
 
-```
+```py
 from neptunecontrib.monitoring.lightgbm import neptune_monitor
 import lightgbm as lgb
 lgb_train = lgb.Dataset(X_train, y_train)
@@ -69,7 +69,7 @@ gbm = lgb.train(params,
 
 Neptune 也记录模型度量。例如，让我们看看如何记录平均绝对误差、均方误差和均方根误差。您可以使用“log_metric”功能记录各种指标。
 
-```
+```py
 predictions = gbm.predict(X_test)
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error
@@ -82,14 +82,14 @@ Neptune 还自动记录训练和验证学习曲线。您可以在 web 用户界�
 
 记录你训练好的模型是非常重要的。通过这种方式，您可以快速将其投入生产。您可以使用“log_artifact”功能记录所有模型。
 
-```
+```py
 gbm.save_model('model.pkl')
 neptune.log_artifact('model.pkl')
 ```
 
 Neptune 允许您访问这个实验并下载模型。使用“get_experiments”方法访问实验，并使用“download_artifact”功能下载模型。这个模型需要工件的名称以及您想要存储它的路径。
 
-```
+```py
 project = neptune.init('mwitiderrick/LIGHTSAT',api_token='YOUR_TOKEN')
 experiment = project.get_experiments(id='LIGHTSAT-5')[0]
 experiment.download_artifact("model.pkl","model")
@@ -103,14 +103,14 @@ experiment.download_artifact("model.pkl","model")
 
 使用 MLflow 运行实验时，我们要做的第一件事是启用参数和指标的自动记录。
 
-```
+```py
 import mlflow
 mlflow.lightgbm.autolog()
 ```
 
 您也可以使用“log_param”功能手动记录参数。该方法记录当前运行下的参数。如果没有处于活动状态的管路，它将创建一个新管路。
 
-```
+```py
 params = {'boosting_type': 'gbdt',
               'objective': regression,
               'num_leaves': 67,
@@ -127,14 +127,14 @@ mlflow.log_param("feature_fraction", params["feature_fraction"])
 
 也可以使用“log_model”功能手动记录经过训练的 LightGBM 模型。启用自动记录时，MFlow 会自动记录此情况。
 
-```
+```py
 from mlflow.lightgbm import log_model
 log_model(artifact_path='lightgbm-model',lgb_model=gbm)
 ```
 
 然后，您可以使用该模型对新数据进行预测。加载模型，并使用“预测”功能进行预测。
 
-```
+```py
 import mlflow
 logged_model = 'file:///Users/derrickmwiti/Downloads/mlruns/0/56cb6b76c6824ec0bc58d4426eb92b91/artifacts/lightgbm-model'
 
@@ -146,7 +146,7 @@ loaded_model.predict(pd.DataFrame(data))
 
 如果你将模型作为[火花 UDF](https://web.archive.org/web/20221206203026/https://spark.apache.org/docs/latest/sql-ref-functions-udf-scalar.html) 加载，你也可以在[火花数据帧](https://web.archive.org/web/20221206203026/https://neptune.ai/blog/apache-spark-tutorial)上进行预测。
 
-```
+```py
 import mlflow
 logged_model = 'file:///Users/derrickmwiti/Downloads/mlruns/0/56cb6b76c6824ec0bc58d4426eb92b91/artifacts/lightgbm-model'
 
@@ -173,7 +173,7 @@ Weights and Biases 是一个平台，用于[实验跟踪](/web/20221206203026/ht
 
 现在让我们导入‘wandb’并初始化一个项目。此时，您可以传递将用于 LightGBM 算法的参数。这些将被记录下来，您将在 web 用户界面上看到它们。
 
-```
+```py
 import wandb
 params = {'boosting_type': 'gbdt',
           'objective': 'regression',
@@ -186,7 +186,7 @@ run = wandb.init(config=params,project='light', entity='mwitiderrick', name='lig
 
 下一步是使用来自“wandb”的 LightGBM 回调来可视化和记录模型的训练过程。将“wandb_callback”传递给 LightGBM 的“train”函数。
 
-```
+```py
 from wandb.lightgbm import wandb_callback
 
 gbm = lgb.train(params,
@@ -200,7 +200,7 @@ gbm = lgb.train(params,
 
 权重和偏差日志标量，如准确性和回归度量。让我们看看如何记录每次 LightGBM 运行的回归指标。使用“wandb.log”功能。
 
-```
+```py
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 predictions = gbm.predict(X_test)
@@ -215,7 +215,7 @@ wandb.log({'Mean Absolute Error': mean_absolute_error(y_test, predictions)})
 
 您可以保存训练好的 LightGBM 模型，并在每次运行时将其记录到权重和偏差中。实例化一个空的“工件”实例，然后用它来记录模型。数据集可以类似地被记录。
 
-```
+```py
 gbm.save_model('model.pkl')
 artifact = wandb.Artifact('model.pkl', type='model')
 artifact.add_file('model.pkl')
@@ -232,14 +232,14 @@ run.log_artifact(artifact)
 
 [神圣](https://web.archive.org/web/20221206203026/https://github.com/IDSIA/sacred)是一个开源的机器学习实验工具。该工具还可以用于记录和管理 ML 模型构建元数据。使用神圣时，首先需要创建一个实验。如果你在 Jupyter 笔记本上运行实验，你需要通过“interactive=True”。
 
-```
+```py
 from sacred import Experiment
 ex = Experiment('lightgbm',interactive=True)
 ```
 
 接下来，使用` @ex.config `装饰器定义实验配置。该配置用于定义和记录算法的参数。
 
-```
+```py
 @ex.config
 def cfg():
     params = {'boosting_type': 'gbdt',
@@ -260,7 +260,7 @@ def cfg():
 
 您还可以使用“添加资源”功能记录资源，如 Python 文件。
 
-```
+```py
 import lightgbm as lgb
 
 @ex.main
@@ -286,7 +286,7 @@ def run(params):
 
 下一步是进行实验。
 
-```
+```py
 r = ex.run()
 ```
 
@@ -296,14 +296,14 @@ r = ex.run()
 
 Omniboard 是一个基于网络的神圣用户界面。该工具连接到神圣使用的 MongoDB 数据库。然后，它将为每个实验收集的指标和日志可视化。要查看神圣收集的所有信息，您必须创建一个观察者。“MongoObserver”是默认的观察者。它连接 MongoDB 数据库并创建一个包含所有这些信息的集合。
 
-```
+```py
 from sacred.observers import MongoObserver
 ex.observers.append(MongoObserver())
 ```
 
 准备就绪后，您可以从终端运行 [Omniboard](https://web.archive.org/web/20221206203026/https://vivekratnavel.github.io/omniboard/#/quick-start) 。
 
-```
+```py
 $ omniboard -m localhost:27017:sacred
 ```
 

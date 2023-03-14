@@ -112,7 +112,7 @@ ETL 子流程，涉及一堆*提取、转换和数据加载*层，将数据路�
 
 我们希望从 *csv* 文件中提取数据，并将其用于我们的实验目的。为此，首先我们创建一个小的 *Python 数据管理器*类，它将负责解析 csv、提取和格式化任何相关数据以供我们分析。
 
-```
+```py
 class DataETLManager:
     def __init__(self, root_dir: str, csv_file: str):
         if os.path.exists(root_dir):
@@ -154,7 +154,7 @@ class DataETLManager:
 
 我们将把列名改得更短:
 
-```
+```py
 credit_df=credit_df.drop('Unnamed: 0', axis=1)
 credit_df.columns = ['Target', 'Revolving', 'Age', '30-59PastDue', 'DbtRatio', 'Income', 'NumOpenLines', 'Num90DayLate', 'NumRealEstLines', '60-89PastDueNoW', 'FamMemb']
 ```
@@ -180,7 +180,7 @@ credit_df.columns = ['Target', 'Revolving', 'Age', '30-59PastDue', 'DbtRatio', '
 
 **删除重复值和缺失值:**
 
-```
+```py
 def transform_data(self):
 
         self.credit_scoring_df.drop_duplicates(keep='last', inplace=True)
@@ -194,7 +194,7 @@ def transform_data(self):
 *   检查值大于 1 的债务和周转比率的上限和顶部编码方法，这意味着所有高于上限的值都将被删除。
 *   从模型中排除具有显著(超过 50%)缺失值的特征或记录，尤其是当缺失的程度对于数据不平衡率(相当高)来说足够重要时。
 
-```
+```py
 clean_credit = self.credit_scoring_df.loc[self.credit_scoring_df['Revolving'] <= 1]
 clean_credit = clean_credit.loc[clean_credit['DbtRatio'] <= 1]
 clean_credit = clean_credit.loc[clean_credit['Age'] <= 100]
@@ -207,7 +207,7 @@ clean_credit = clean_credit.loc[clean_credit['FamMemb'] < 20]
 
 清理完数据后，我们将用**均值=0** 和**标准差=1** 对数据进行标准化，除了作为目标的二元因变量。
 
-```
+```py
 def normalize(dataset):
     dataNorm=((dataset-dataset.min())/(dataset.max()-dataset.min()))
     dataNorm["Target"]=dataset["Target"]
@@ -230,7 +230,7 @@ clean_scaled_df = normalize(clean_credit)
 
 首先，让我们运行一个充分性测试来检查数据集是否适合于因子分析。我们将进行[巴莱特球形度测试](https://web.archive.org/web/20221117203556/https://www.statology.org/bartletts-test-of-sphericity/#:~:text=Bartlett's%20Test%20of%20Sphericity%20compares,are%20orthogonal%2C%20i.e.%20not%20correlated.)。
 
-```
+```py
 from scipy.stats import chi2, pearsonr
 import numpy as np
 
@@ -248,7 +248,7 @@ def barlett_test(frame: pd.DataFrame):
     return chi_measure, p_value
 ```
 
-```
+```py
 chi_square, p_value = barlett_test(clean_scaled_df)
 (1003666.113272278, 0.0)
 ```
@@ -257,13 +257,13 @@ chi_square, p_value = barlett_test(clean_scaled_df)
 
 我们将使用 factor_analyzer python 包，通过以下命令安装它:
 
-```
+```py
 pip install factor_analyzer
 ```
 
 将数据拟合到 FactorAnalyzer 类，我们将运行 Kaiser criterion 内部统计以得出数据中的特征值。
 
-```
+```py
 from factor_analyzer import FactorAnalyzer
 
 fa = FactorAnalyzer()
@@ -284,7 +284,7 @@ eigen_values
 
 绘制碎石图我们可以很容易地想象出我们需要的四个相关因素:
 
-```
+```py
 import matplotlib.pyplot as plt
 
 plt.scatter(range(1,clean_scaled_df.shape[1]+1),ev)
@@ -304,7 +304,7 @@ plt.show()
 
 让我们对这 4 个因素进行因素分析轮换，以获得更好的解释。旋转可以是正交的或倾斜的。它有助于在观察到的变量之间重新分配[公度](https://web.archive.org/web/20221117203556/https://www.datacamp.com/community/tutorials/introduction-factor-analysis)，具有清晰的载荷模式。
 
-```
+```py
 fac_rotation = FactorAnalyzer(n_factors=4, rotation='varimax')
 fac_rotation.fit(clean_scaled_df)
 
@@ -354,11 +354,11 @@ fac_rotation.get_factor_variance()
 
 为了简化和便于说明，我们将使用 Sql_Alchemy python 包将之前转换的数据框加载到本地 MySQL 数据库中。
 
-```
+```py
 pip install SQLAlchemy
 ```
 
-```
+```py
 from sqlalchemy.engine import create_engine
 
 def load_data(self):
@@ -395,14 +395,14 @@ Airflow 计划自动化的数据工作流，包括共享特定依赖关系的多
 
 在我们的例子中，我们将编写一个小的 DAG 文件来模拟 ETL 的自动化。我们将安排 DAG 从 2021 年 3 月 25 日开始每天运行。DAG 将有三个 python 运算符，分别代表提取、转换和加载功能。
 
-```
+```py
 from datetime import timedelta, datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 ```
 
-```
+```py
 from etl_process import DataETLManager, DATA_PATH
 
 default_dag_args = {
@@ -427,7 +427,7 @@ etl_dag = DAG(
 
 负责运行每个 ETL 过程的 PyhtonOperators:
 
-```
+```py
 etl_manager = DataETLManager(DATA_PATH, 'OnlineRetail.csv')
 
 extract = PythonOperator(
@@ -451,7 +451,7 @@ load = PythonOperator(
 
 最后，我们定义任务相关性:提取，然后转换，然后加载到数据库中。
 
-```
+```py
 extract >> transform >gt; load
 ```
 
@@ -479,19 +479,19 @@ extract >> transform >gt; load
 
 安装 neptune 库:
 
-```
+```py
 pip  install neptune-client
 ```
 
 安装 Neptune 笔记本，这样可以将我们所有的工作保存到 Neptune 网站
 
-```
+```py
 pip install -U neptune-notebooks
 ```
 
 通过安装以下扩展来启用 jupiter 集成
 
-```
+```py
 jupyter nbextension enable --py neptune-notebooks
 ```
 
@@ -503,7 +503,7 @@ jupyter nbextension enable --py neptune-notebooks
 
 要完成设置，请在笔记本中导入 neptune 客户端库，并调用 neptune.init()方法初始化连接:
 
-```
+```py
 import neptune
 neptune.init(project_qualified_name='aymane.hachcham/CreditScoring')
 ```
@@ -522,21 +522,21 @@ neptune.init(project_qualified_name='aymane.hachcham/CreditScoring')
 
 *Table that aggregates the values for the 4 factors*
 
-```
+```py
 credit_scoring_final = pd.DataFrame(new_data_frame, columns=['Financial_Struggle', 'Finance_Requirements', 'Expendable_Income', 'Behavioral_LifeStyle'])
 credit_scoring_final
 ```
 
 **分离训练集和测试集中的数据:**
 
-```
+```py
 X = credit_scoring_final
 x_train, x_test, y_train, y_test = train_test_split(X, target, test_size=0.25, random_state=56)
 ```
 
 **用逻辑回归训练:**
 
-```
+```py
 from sklearn.linear_model import LogisticRegression
 
 model = LogisticRegression(C=0.00026366508987303583, class_weight=None, dual=False, max_iter=100, multi_class='auto', n_jobs=None, penalty='l1',
@@ -546,7 +546,7 @@ model.fit(x_train, y_train)
 
 **测试结果:**
 
-```
+```py
 from sklearn.metrics import accuracy_score, classification_report
 
 predictions = model.predict(x_test)
@@ -573,7 +573,7 @@ XGBoost 使用决策树(像 random forest)来解决分类(二进制和多类)、
 
 从初始化海王星实验开始:
 
-```
+```py
 import neptune
 from neptunecontrib.monitoring.xgboost import neptune_callback
 
@@ -598,7 +598,7 @@ neptune.create_experiment(
 
 拆分数据并实例化 DMatrix 数据加载器:
 
-```
+```py
 x_train, x_test, y_train, y_test = train_test_split(X, target, test_size=0.25, random_state=56)
 
 dtrain = xgb.DMatrix(x_train, label=y_train)
@@ -607,7 +607,7 @@ dtest = xgb.DMatrix(x_test, label=y_test)
 
 让我们开始训练模型，并使用[Neptune XGBoost integration](https://web.archive.org/web/20221117203556/https://docs.neptune.ai/essentials/integrations/machine-learning-frameworks/xgboost)跟踪每个指标。
 
-```
+```py
 import xgboost as xgb
 import neptune
 from neptunecontrib.monitoring.xgboost import neptune_callback
@@ -662,7 +662,7 @@ XGBoost 结果:
 
 ### 回忆
 
-```
+```py
 from sklearn.tree import DecisionTreeClassifier
 
 classifier = DecisionTreeClassifier()
@@ -671,7 +671,7 @@ classifier.fit(x_train, y_train)
 
 精确
 
-```
+```py
 preds = classifier.predict(x_test)
 print('Accuracy Score: ', metrics.accuracy_score(y_test, preds))
 ```

@@ -70,7 +70,7 @@
 
 您可以按如下方式导入数据:
 
-```
+```py
 import statsmodels.datasets.co2 as co2
 co2_data = co2.load(as_pandas=True).data
 print(co2_data)
@@ -80,13 +80,13 @@ print(co2_data)
 
 有几个 NA 值可以使用插值法移除，如下所示:
 
-```
+```py
 co2_data = co2_data.fillna(co2_data.interpolate())
 ```
 
 您可以使用以下代码查看 CO2 值的时间演变:
 
-```
+```py
 co2_data.plot()
 ```
 
@@ -98,7 +98,7 @@ co2_data.plot()
 
 您可以使用 statsmodels 的季节性分解函数进行现成的分解。以下代码将生成一个图，将时间序列分为趋势、季节性和噪声(此处称为残差):
 
-```
+```py
 from statsmodels.tsa.seasonal import seasonal_decompose
 result = seasonal_decompose(co2_data)
 result.plot()
@@ -129,7 +129,7 @@ result.plot()
 
 您可以使用 Python 计算 ACF 图，如下所示:
 
-```
+```py
 from statsmodels.graphics.tsaplots import plot_acf
 plot_acf(co2_data)
 ```
@@ -148,7 +148,7 @@ PACF 是 ACF 的替代品。它给出的不是自相关，而是偏相关。这�
 
 您可以使用 Python 计算 PACF 图，如下所示:
 
-```
+```py
 from statsmodels.graphics.tsaplots import plot_pacf
 plot_pacf(co2_data)
 ```
@@ -167,7 +167,7 @@ plot_pacf(co2_data)
 
 Dickey-Fuller 检验是一种统计假设检验，允许您检测非平稳性。您可以使用以下 Python 代码对 CO2 数据进行 Dickey-Fuller 测试:
 
-```
+```py
 from statsmodels.tsa.stattools import adfuller
 adf, pval, usedlag, nobs, crit_vals, icbest =  adfuller(co2_data.co2.values)
 print('ADF test statistic:', adf)
@@ -189,7 +189,7 @@ ADF 检验的零假设是时间序列中存在单位根。另一个假设是数�
 
 您可以从时间序列中移除趋势。目标是只有季节性变化:这可以是使用某些模型的一种方式，这些模型只适用于季节性，而不适用于趋势。
 
-```
+```py
 prev_co2_value = co2_data.co2.shift()
 differenced_co2 = co2_data.co2 - prev_co2_value
 differenced_co2.plot()
@@ -203,7 +203,7 @@ differenced_co2.plot()
 
 如果对差异数据重新进行 ADF 测试，您将确认该数据现在确实是稳定的:
 
-```
+```py
 adf, pval, usedlag, nobs, crit_vals, icbest =  adfuller(differenced_co2.dropna())
 print('ADF test statistic:', adf)
 print('ADF p-values:', pval)
@@ -333,7 +333,7 @@ ARIMA 或萨里马克斯模型的困难之处在于，你有许多参数(pp，D�
 
 安装后，有必要进行训练/测试分割。您将在后面看到更多关于这方面的内容，但现在我们先继续。
 
-```
+```py
 import pmdarima as pm
 from pmdarima.model_selection import train_test_split
 import numpy as np
@@ -342,20 +342,20 @@ import matplotlib.pyplot as plt
 
 然后，根据 CO2 训练数据拟合模型，并使用最佳选择的模型进行预测。
 
-```
+```py
 train, test = train_test_split(co2_data.co2.values, train_size=2200)
 ```
 
 您可以用这里创建的图向他们展示:
 
-```
+```py
 model = pm.auto_arima(train, seasonal=True, m=52)
 preds = model.predict(test.shape[0])
 ```
 
 在该图中，蓝线是实际值(训练数据)，橙线是预测值。
 
-```
+```py
 x = np.arange(y.shape[0])
 plt.plot(co2_data.co2.values[:2200], train)
 plt.plot(co2_data.co2.values[2200:], preds)
@@ -412,7 +412,7 @@ Python 中指数平滑的一个例子
 
 蓝线代表原始数据，橙线代表平滑曲线。由于这是一个简单的指数平滑法，它只能捕捉一个信号:趋势。
 
-```
+```py
 from statsmodels.tsa.api import SimpleExpSmoothing
 es = SimpleExpSmoothing(co2_data.co2.values)
 es.fit(smoothing_level=0.01)
@@ -454,7 +454,7 @@ plt.show()
 
 这样你就有了三个独立变量:日、月和周。你也可以考虑其他季节性变量，比如星期几、星期几等等。，但是现在，我们先这样吧。
 
-```
+```py
 import numpy as np
 
 months = [x.month for x in co2_data.index]
@@ -469,7 +469,7 @@ X = np.array([day, months, years]).T
 
 使用此代码时，您将获得下面的图，该图显示了与数据相对较好的拟合:
 
-```
+```py
 from sklearn.linear_model import LinearRegression
 
 my_lr = LinearRegression()
@@ -493,7 +493,7 @@ scikit-learn 库有 RandomForestRegressor，您可以简单地使用它来替换
 
 现在对训练数据的拟合甚至比以前更好:
 
-```
+```py
 from sklearn.ensemble import RandomForestRegressor
 
 my_rf = RandomForestRegressor()
@@ -521,7 +521,7 @@ XGBoost 是一个基于梯度推进框架的机器学习模型。这个模型是
 
 如你所见，这个模型也非常符合数据。在本文的后面部分，您将学习如何进行模型评估。
 
-```
+```py
 import xgboost as xgb
 
 my_xgb = xgb.XGBRegressor()
@@ -663,7 +663,7 @@ DeepAR 的一个伟大且易于使用的实现可以在 [Gluon](https://web.arch
 
 你可以在图中看到自 1980 年以来 S&P500 收盘价的演变:
 
-```
+```py
 !pip install yfinance
 
 import yfinance as yf
@@ -681,7 +681,7 @@ sp500_data.plot(figsize=(12, 12))
 
 定义实验方法
 
-```
+```py
 difs = (sp500_data.shift() - sp500_data) / sp500_data
 difs = difs.dropna()
 difs.plot(figsize=(12, 12))
@@ -705,7 +705,7 @@ difs.plot(figsize=(12, 12))
 
 您可以以表格形式查看结果:
 
-```
+```py
 import numpy as np
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import TimeSeriesSplit
@@ -775,7 +775,7 @@ for order in param_list:
 
 既然有了训练数据库，就可以使用常规的交叉验证:毕竟，数据集的行可以独立使用。它们都是 30 个训练日和 1 个“未来”测试日的集合。由于有了这些数据准备，您可以使用常规的 KFold 交叉验证。
 
-```
+```py
 import yfinance as yf
 
 sp500_data = yf.download('^GSPC', start="1980-01-01", end="2021-11-21")
@@ -798,7 +798,7 @@ X_windows = np.vstack(X_data)
 
 下表显示了使用此循环获得的一些分数:
 
-```
+```py
 import numpy as np
 import xgboost as xgb
 from sklearn.model_selection import KFold
@@ -884,7 +884,7 @@ for params in param_list:
 
 您将看到 10 个时期的以下输出:
 
-```
+```py
 import yfinance as yf
 sp500_data = yf.download('^GSPC', start="1980-01-01", end="2021-11-21")
 sp500_data = sp500_data[['Close']]

@@ -46,7 +46,7 @@ Google Colab 支持 GPU 和 TPU 实例，这使得它成为深度学习和数据
 
 ### **设置:**
 
-```
+```py
 import tensorflow as tf
 
 mnist = tf.keras.datasets.mnist
@@ -58,7 +58,7 @@ x_train, x_test = x_train / 255.0, x_test / 255.0
 
 该代码片段的输出如下所示:
 
-```
+```py
 Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz
 11493376/11490434 [==============================] - 0s 0us/step
 
@@ -66,7 +66,7 @@ Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-dataset
 
 **接下来，我们使用 Python 定义 Google Colab 模型:**
 
-```
+```py
 model = tf.keras.models.Sequential([
                                tf.keras.layers.Flatten(input_shape=(28,28)),
                                    tf.keras.layers.Dense(128,activation='relu'),
@@ -86,7 +86,7 @@ model.fit(x_train,y_train,epochs=5)
 
 执行上述代码片段的预期输出是:
 
-```
+```py
 Epoch 1/5
 1875/1875 [==============================] - 3s 2ms/step - loss: 0.3006 - accuracy: 0.9125
 Epoch 2/5
@@ -101,20 +101,20 @@ Epoch 5/5
 
 ```
 
-```
+```py
 model.evaluate(x_test,y_test,verbose=2)
 
 ```
 
 预期产出:
 
-```
+```py
 313/313 - 0s - loss: 0.0786 - accuracy: 0.9761
 [0.07860152423381805, 0.9761000275611877]
 
 ```
 
-```
+```py
 probability_model = tf.keras.Sequential([
                                         model,
                                         tf.keras.layers.Softmax()])
@@ -133,7 +133,7 @@ probability_model = tf.keras.Sequential([
 
 要安装 TensorFlow 的特定版本，请使用以下命令:
 
-```
+```py
 !pip3 install tensorflow==1.5.0
 
 ```
@@ -172,7 +172,7 @@ probability_model = tf.keras.Sequential([
 
 1.  转到您的 Google Colab 项目文件，并运行以下命令:
 
-```
+```py
 ! pip install -q kaggle
 from google.colab import files
 
@@ -204,7 +204,7 @@ cp kaggle.json ~/.kaggle/
 
 ***注****:curl 命令会在 Colab 工作区下载数据集，每次运行时断开连接都会丢失。因此，一个安全的做法是，一旦数据集下载完成，就将数据集移动到您的云驱动器中。*
 
-```
+```py
 !curl http://some.url --output some.file
 
 ```
@@ -217,7 +217,7 @@ cp kaggle.json ~/.kaggle/
 
 它会要求你使用你的谷歌账户访问一个链接，并给你一个认证密钥。将密钥粘贴到提供的空白处，以验证您的帐户。
 
-```
+```py
 from google.colab import auth
 auth.authenticate_user()
 
@@ -229,7 +229,7 @@ auth.authenticate_user()
 
 这样做将要求您从基本设置的某些选项中进行选择:
 
-```
+```py
 !curl https://sdk.cloud.google.com | bash
 !gcloud init
 
@@ -243,14 +243,14 @@ auth.authenticate_user()
 
 要将文件从 Google Colab 上传到云，请使用:
 
-```
+```py
 !gsutil cp gs://maskaravivek-data/data_file.csv
 
 ```
 
 在启用 GPU/TPU 的情况下启动运行时
 
-```
+```py
 gsutil cp test.csv gs://maskaravivek-data/
 
 ```
@@ -298,7 +298,7 @@ TPU 运行时针对大批量和 CNN 进行了高度优化，具有最高的训�
 
 单击链接，复制代码，并将其粘贴到提供的框中。按 enter 键安装驱动器。
 
-```
+```py
 from google.colab import drive
 drive.mount('/content/drive')
 
@@ -316,7 +316,7 @@ drive.mount('/content/drive')
 
 一旦这个单元被执行，您将会看到类似如下的输出:
 
-```
+```py
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
@@ -373,7 +373,7 @@ model.fit(train_X,train_Y,epochs=10,validation_data=(val_X, val_Y))
 
 预期产出:
 
-```
+```py
 Epoch 1/10
 1250/1250 [==============================] - 37s 30ms/step - loss: 0.1817 - accuracy: 0.9433 - val_loss: 0.0627 - val_accuracy: 0.9770
 Epoch 2/10
@@ -387,7 +387,7 @@ Epoch 10/10
 
 ```
 
-```
+```py
 test_loss, test_acc = model.evaluate(val_X,val_Y,verbose=2)
 Expected output:
 63/63 - 1s - loss: 0.0982 - accuracy: 0.9735
@@ -425,7 +425,7 @@ Google Colab 中的 TensorBoard
 
 在我们开始可视化数据之前，我们需要在 model.fit()中做一些更改:
 
-```
+```py
 %load_ext tensorboard
 import datetime, os
 
@@ -433,7 +433,7 @@ import datetime, os
 
 训练结束后，您可以启动 TensorBoard 工具包来查看模型的表现:
 
-```
+```py
 logdir = os.path.join("logs", datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 tensorboard_callback = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
 
@@ -443,7 +443,7 @@ model.fit(x=x_train,y=y_train,epochs=5,validation_data=(x_test, y_test),callback
 
 它给出了精度和损失如何随运行的时期数而变化的信息。
 
-```
+```py
 %tensorboard --logdir logs
 ```
 
@@ -459,14 +459,14 @@ model.fit(x=x_train,y=y_train,epochs=5,validation_data=(x_test, y_test),callback
 
 要在模型中加载权重，请使用:
 
-```
+```py
  model.save_weights('./checkpoints/my_checkpoint')
 
 ```
 
 **保存并加载整个模型**
 
-```
+```py
 model.load_weights('./checkpoints/my_checkpoint'
 ```
 
@@ -476,13 +476,13 @@ model.load_weights('./checkpoints/my_checkpoint'
 
 要加载已保存的模型，请使用:
 
-```
+```py
 model.save('saved_model/my_model'
 ```
 
 结论
 
-```
+```py
 new_model = tf.keras.models.load_model('saved_model/my_model')
 
 ```

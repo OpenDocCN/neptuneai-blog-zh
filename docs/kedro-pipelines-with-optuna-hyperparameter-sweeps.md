@@ -42,7 +42,7 @@ Kedro 和 Optuna 在自动化 ML 工作流方面互为补充。Kedro 处理高�
 
 建议为该项目使用 conda 环境，并在安装任何依赖项之前激活它:
 
-```
+```py
 conda create --name kedro-environment python=3.7 -y
 conda activate kedro-environment
 ```
@@ -63,7 +63,7 @@ conda activate kedro-environment
 
 接下来，我们安装所有的需求。Kedro 的模板已经生成了一个 requirements.txt 文件。我们在文件中添加了一些特定于我们项目的需求。requirements.txt 文件应该如下所示:
 
-```
+```py
 black==21.5b1
 flake8>=3.7.9, <4.0
 ipython~=7.10
@@ -89,14 +89,14 @@ optuna
 
 要安装需求，请遵循以下代码:
 
-```
+```py
 (kedro-environment) dhruvilkarani@Dhruvils-MacBook-Air kedro-blog % cd tutorial/src
 (kedro-environment) dhruvilkarani@Dhruvils-MacBook-Air src % pip install -r requirements.txt
 ```
 
 在此下载酒质数据[并保存在**教程/data/01_raw** 目录下；](https://web.archive.org/web/20220926093908/https://www.kaggle.com/yasserh/wine-quality-dataset)
 
-```
+```py
 (kedro-environment) dhruvilkarani@Dhruvils-MacBook-Air kedro-blog % cd tutorial
 ```
 
@@ -104,7 +104,7 @@ optuna
 
 Kedro 有两条主要管道——数据处理和数据科学。数据处理管道处理数据操作、清理、连接多个数据集、特征创建，以及模型训练和评估之前的几乎所有事情。要创建数据处理模板，请遵循以下命令:
 
-```
+```py
 (kedro-environment) dhruvilkarani@Dhruvils-MacBook-Air tutorial % kedro pipeline create data_processing
 ```
 
@@ -116,7 +116,7 @@ Kedro 有两条主要管道——数据处理和数据科学。数据处理管�
 
 它获取原始数据并进行训练测试分割。这里唯一的节点是**列车试裂**:
 
-```
+```py
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -136,7 +136,7 @@ def create_train_test_data(df, frac, random_seed):
 
 在**src/tutorial/pipelines/data _ processing/nodes . py**中添加上面的 train-test 分割代码。您应该在这个文件中编写一个节点必须执行的函数。现在，打开 **tutorial/conf/base** 下的文件 **catalog.yml** 。在文件中添加以下内容:
 
-```
+```py
 raw:
  type: pandas.CSVDataSet
  filepath: data/01_raw/WineQT.csv
@@ -154,7 +154,7 @@ test:
 
 接下来，在**src/tutorial/pipelines/data _ processing/pipeline . py**下添加以下代码:
 
-```
+```py
 """
 This is a boilerplate pipeline 'data_processing'
 generated using Kedro 0.17.7
@@ -176,7 +176,7 @@ def create_pipeline(**kwargs) -> Pipeline:
 
 这创建了一个数据处理管道，其中有一个名为 **train_test_split** 的节点。它将执行函数 **create_train_test_data** ，输入为 **raw** (在 conf.yml 中定义)，附加参数为 **frac** 和 **random_seed** 。输出将是 train 和 test(其中 kedro 通过 conf.yml 保持跟踪)。注意 **params:frac** 中的参数来自**conf/base/parameters . yml**中的配置文件。在其中添加以下几行:
 
-```
+```py
 frac: 0.15
 random_seed: 42
 features: ['fixed acidity', 'volatile acidity', 'citric acid', 'residual sugar',
@@ -189,7 +189,7 @@ y_label: 'quality'
 
 在最后一步中，通过在**src/tutorial/pipeline _ registry . py**中添加以下内容来注册新的数据处理管道:
 
-```
+```py
 from typing import Dict
 
 from kedro.pipeline import Pipeline, pipeline
@@ -212,7 +212,7 @@ def register_pipelines() -> Dict[str, Pipeline]:
 
 只需从 CLI 运行 **kedro run** 并观察日志。它应该是这样的:
 
-```
+```py
 kedro run
 2022-03-05 12:29:15,993 - kedro.framework.cli.hooks.manager - INFO - Registered CLI hooks from 1 installed plugin(s): kedro-telemetry-0.1.3
 Kedro-Telemetry is installed, but you have opted out of sharing usage analytics so none will be collected.
@@ -238,13 +238,13 @@ fatal: not a git repository (or any of the parent directories): .git
 
 现在数据准备好了，我们准备训练一个模型。我们将创建一个数据科学管道，就像我们创建一个数据处理管道一样。教程的其余部分与我们到目前为止所做的非常相似。在本节中，我们选择一个 **RandomForestClassifier** 并调整它的两个重要的超参数—**n _ estimators**和 **max_depth** 。您可以选择任何具有各自超参数的 sklearn 模型:
 
-```
+```py
 (kedro-environment) dhruvilkarani@Dhruvils-MacBook-Air tutorial % kedro pipeline create data_science
 ```
 
 接下来，我们将在**src/tutorial/pipelines/data _ science/nodes . py**中添加以下代码:
 
-```
+```py
 """
 This is a boilerplate pipeline 'data_science'
 generated using Kedro 0.17.7
@@ -290,7 +290,7 @@ def evaluate_model(model, df_test, y_label, features):
 
 返回模型、指标字典和元数据字典。在 **evaluate_model** 函数中，我们使用训练好的模型并返回度量字典。为了在管道中获得所有这些，将以下代码添加到**src/tutorial/pipelines/data _ science/pipeline . py**:
 
-```
+```py
 """
 This is a boilerplate pipeline 'data_science'
 generated using Kedro 0.17.7
@@ -318,7 +318,7 @@ def create_pipeline(**kwargs) -> Pipeline:
 
 并通过将**src/tutorial/pipeline _ registry . py**修改为以下内容来注册管道:
 
-```
+```py
 """Project pipelines."""
 from typing import Dict
 
@@ -352,7 +352,7 @@ def register_pipelines() -> Dict[str, Pipeline]:
 
 在运行管道之前，我们将把它添加到 **conf/base/catalog.yml** :
 
-```
+```py
 train_metrics:
  type: tracking.MetricsDataSet
  filepath: data/09_tracking/train_metrics.json
@@ -375,7 +375,7 @@ model:
 
 您可以在 CLI 中看到类似的内容:
 
-```
+```py
 2022-03-06 15:23:47,713 - kedro.io.data_catalog - INFO - Loading data from `params:y_label` (MemoryDataSet)...
 2022-03-06 15:23:47,714 - kedro.io.data_catalog - INFO - Loading data from `params:features` (MemoryDataSet)...
 2022-03-06 15:23:47,714 - kedro.pipeline.node - INFO - Running node: train_model: train_model([train,params:y_label,params:features]) -> [model,train_metrics,features]
@@ -422,7 +422,7 @@ Neptune 及其与多个开源框架的集成使得通过最小的代码更改来
 
 #### 装置
 
-```
+```py
 pip install neptune-client
 pip install kedro-neptune
 conda install -c conda-forge neptune-optuna 
@@ -432,7 +432,7 @@ conda install -c conda-forge neptune-optuna
 
 对于数据科学管道中的 nodes.py，我们将添加< 10 行，让 Neptune 进行跟踪。更新后的文件如下所示:
 
-```
+```py
 """
 This is a boilerplate pipeline 'data_science'
 generated using Kedro 0.17.7
@@ -501,7 +501,7 @@ def evaluate_model(model, df_test, y_label, features, neptune_run):
 
 确保添加了 API 令牌和项目名称。最后，将 **train_model** 和 **evaluate_model** 函数中额外的 **neptune_run** 参数添加到我们的流水线中:
 
-```
+```py
 def create_pipeline(**kwargs) -> Pipeline:
    return pipeline([
        node(

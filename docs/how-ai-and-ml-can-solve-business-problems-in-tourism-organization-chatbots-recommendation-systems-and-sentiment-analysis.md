@@ -147,7 +147,7 @@ Foursquare 是一个定位技术平台，致力于改善人们在世界各地的
 
 接下来，我们将使用 Foursquare API 来提取地点，并以一种准备建模的形式预处理这些数据。
 
-```
+```py
 import numpy as np 
 import pandas as pd 
 Import requests
@@ -185,7 +185,7 @@ manhattan = neighborhoods[neighborhoods['Borough'] == 'Manhattan'].reset_index(d
 
 **上面的代码块产生下面的输出:**
 
-```
+```py
 CLIENT_ID = '*****************'
 CLIENT_SECRET = '************************'
 VERSION = '20200202'
@@ -224,7 +224,7 @@ manhattan_venues = getNearbyVenues(names=manhattan['Neighbourhood'],
 
 **上面的代码块产生下面的结果:**
 
-```
+```py
 manhattan_seg_onehot = pd.get_dummies(manhattan_venues[['Venue Category']], prefix="", prefix_sep="")
 
 manhattan_seg_onehot['Neighbourhood'] = manhattan_venues['Neighbourhood']
@@ -263,7 +263,7 @@ for ind in np.arange(manhattan_seg_group.shape[0]):
 
 **模型构建完成，现在让我们看看来自集群 0、1 和 2 的一些结果:**
 
-```
+```py
 From sklearn.cluster import KMeans
 man_cluster = manhattan_seg_group.drop('Neighbourhood', 1)
 km = KMeans(n_clusters=5, random_state=0).fit(man_cluster)
@@ -287,7 +287,7 @@ Foursquare 每天只允许 50 个高级 API 调用，用于场地评级等类别
 
 **下面的结果显示了每个社区整体评分的平均值:**
 
-```
+```py
 
 manhattan_rec_data = pd.concat([manhattan_venues[0:298],manhattan_venues[2579:2679]],  axis=0).reset_index(drop=True)
 manhattan_rec_data['ratings'] = rating['rating']
@@ -322,7 +322,7 @@ rec_rating_grouped
 
 现在推荐表做好了。让我们来看看最受推荐的 4 个街区:
 
-```
+```py
 final_rating=pd.DataFrame(rec_rating_grouped)
 final_rating=final_rating.reset_index()
 
@@ -334,7 +334,7 @@ user_rate.sort_values(ascending=False)
 
 ![tourism_results ](img/4078dabfb8eaf53b710048203fe471f7.png)
 
-```
+```py
 rec_df= ((recommender_onehot*user_rate).sum(axis=1))/(user_rate.sum())
 rec_df = rec_df.sort_values(ascending=False)
 

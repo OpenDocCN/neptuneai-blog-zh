@@ -49,7 +49,7 @@
 
 对于模型训练，我们将使用最老的 80%的数据，并将最近的 20%保存为保留测试集。
 
-```
+```py
 test_ratio = 0.2
 training_ratio = 1 - test_ratio
 
@@ -80,7 +80,7 @@ RMSE 给出了预测值和真实值之间的差异，而 MAPE (%)测量了相对
 
 *   将股票价格数据分成训练序列 X 和下一个输出值 Y，
 
-```
+```py
 def extract_seqX_outcomeY(data, N, offset):
     """
     Split time-series into training sequence X and outcome value Y
@@ -100,7 +100,7 @@ def extract_seqX_outcomeY(data, N, offset):
 
 *   计算 RMSE 和 MAPE (%)，
 
-```
+```py
 def calculate_rmse(y_true, y_pred):
     """
     Calculate the Root Mean Squared Error (RMSE)
@@ -119,7 +119,7 @@ def calculate_mape(y_true, y_pred):
 
 *   计算技术分析的评估指标并登录到 Neptune(带 arg。logNeptune = True)，
 
-```
+```py
 def calculate_perf_metrics(var, logNeptune=True, logmodelName='Simple MA'):
 
     rmse = calculate_rmse(np.array(stockprices[train_size:]['Close']), np.array(stockprices[train_size:][var]))
@@ -135,7 +135,7 @@ def calculate_perf_metrics(var, logNeptune=True, logmodelName='Simple MA'):
 
 *   绘制股票价格的趋势，并将该图记录到 Neptune(带参数。带参数。logNeptune = True)，
 
-```
+```py
 def plot_stock_trend(var, cur_title, stockprices=stockprices, logNeptune=True, logmodelName='Simple MA'):
     ax = stockprices[['Close', var,'200day']].plot(figsize=(20, 10))
     plt.grid(False)
@@ -163,7 +163,7 @@ SMA 是简单移动平均线的缩写，它计算一系列股票(收盘)价格�
 
 在这个构建 SMA 模型的练习中，我们将使用下面的 Python 代码来计算 50 天的 SMA。为了更好的衡量，我们还会添加一个 200 天的均线。
 
-```
+```py
 window_size = 50
 
 npt_exp = neptune.init(
@@ -208,7 +208,7 @@ npt_exp.stop()
 
 均线优于均线的一个优点是，均线对价格变化更敏感，这使得它对短线交易很有用。下面是 EMA 的 Python 实现:
 
-```
+```py
 npt_exp = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project=myProject,
@@ -258,7 +258,7 @@ npt_exp.stop()
 
 首先，我们需要创建一个专用于 LSTM 的海王星实验，其中包括指定的超参数。
 
-```
+```py
 layer_units, optimizer = 50, 'adam'
     cur_epochs = 15
     cur_batch_size = 20
@@ -281,7 +281,7 @@ npt_exp['LSTMPars'] = cur_LSTM_pars
 
 接下来，我们缩放 LSTM 模型规则的输入数据，并将其分成训练集和测试集。
 
-```
+```py
 scaler = StandardScaler()
 scaled_data = scaler.fit_transform(stockprices[['Close']])
     scaled_data_train = scaled_data[:train.shape[0]]
@@ -296,7 +296,7 @@ X_train, y_train = extract_seqX_outcomeY(scaled_data_train, window_size, window_
 
 继续，让我们开始 LSTM 建模过程。具体来说，我们正在构建一个具有两个隐藏层的 LSTM，以及一个基于输出的“线性”激活函数。还有，这个模型登录的是海王星。
 
-```
+```py
 def Run_LSTM(X_train, layer_units=50, logNeptune=True, NeptuneProject=None):
     inp = Input(shape=(X_train.shape[1], 1))
 
@@ -322,7 +322,7 @@ history = model.fit(X_train, y_train, epochs=cur_epochs, batch_size=cur_batch_si
 
 一旦培训完成，我们将根据我们的坚持集测试模型。
 
-```
+```py
 def preprocess_testdat(data=stockprices, scaler=scaler, window_size=window_size, test=test):
     raw = data['Close'][len(data) - len(test) - window_size:].values
     raw = raw.reshape(-1,1)
@@ -347,7 +347,7 @@ test['Predictions_lstm'] = predicted_price
 
 是时候计算性能指标并将其记录到 Neptune 了。
 
-```
+```py
 rmse_lstm = calculate_rmse(np.array(test['Close']), np.array(test['Predictions_lstm']))
 mape_lstm = calculate_mape(np.array(test['Close']), np.array(test['Predictions_lstm']))
 

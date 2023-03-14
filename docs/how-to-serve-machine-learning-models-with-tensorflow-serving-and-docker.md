@@ -82,14 +82,14 @@ Docker 类似于[虚拟机](https://web.archive.org/web/20221206051444/https://e
 
 通过各自的安装程序下载并安装 Docker 后，在终端/命令提示符下运行以下命令，以确认 Docker 已成功安装:
 
-```
+```py
  docker run hello-world
 
 ```
 
 它应该输出:
 
-```
+```py
 Unable to find image ‘hello-world:latest’ locally
 latest: Pulling from library/hello-world
 0e03bdcc26d7: Pull complete
@@ -116,7 +116,7 @@ To generate this message, Docker took the following steps:
 
 在您的终端中运行以下命令:
 
-```
+```py
 docker pull tensorflow/serving
 
 ```
@@ -125,7 +125,7 @@ docker pull tensorflow/serving
 
 如果您在具有 GPU 的实例上运行 Docker，您也可以安装 GPU 版本:
 
-```
+```py
 docker pull tensorflow/serving:latest-gpu
 ```
 
@@ -151,7 +151,7 @@ docker pull tensorflow/serving:latest-gpu
 
 **第二步:**在项目文件夹中，创建一个名为 **model.py，**的新脚本，并粘贴下面的代码:
 
-```
+```py
 import matplotlib.pyplot as plt
 import time
 from numpy import asarray
@@ -212,7 +212,7 @@ model.save(filepath=file_path, save_format='tf')
 
 您可以检查文件夹中保存的模型。它应该类似于下图所示:
 
-```
+```py
 ├── img_classifier
 │ ├── 1600788643
 │ │ ├── assets
@@ -236,7 +236,7 @@ model.save(filepath=file_path, save_format='tf')
 
 首先在你的项目文件夹中**、**，打开一个终端，并在下面添加 Docker 命令:
 
-```
+```py
 docker run -p 8501:8501 --name tfserving_classifier
 --mount type=bind,source=/Users/tf-server/img_classifier/,target=/models/img_classifier
 -e MODEL_NAME=img_classifier -t tensorflow/serving
@@ -270,7 +270,7 @@ docker run -p 8501:8501 --name tfserving_classifier
 
 在您的项目文件夹中创建一个名为 **predict.py，**的新脚本，并添加以下代码行来导入一些包:
 
-```
+```py
 import matplotlib.pyplot as plt
 import requests
 import json
@@ -283,7 +283,7 @@ from tensorflow.keras.datasets.mnist import load_data
 
 接下来，您将加载数据并对其进行预处理:
 
-```
+```py
 (_, _), (x_test, y_test) = load_data()
 
 x_test = x_test.reshape((x_test.shape[0], x_test.shape[1], x_test.shape[2], 1))
@@ -296,7 +296,7 @@ x_test = x_test.astype('float32') / 255.0
 
 接下来，定义 REST 端点 URL:
 
-```
+```py
 url = 'http://localhost:8501/v1/models/img_classifier:predict'
 
 ```
@@ -312,7 +312,7 @@ url = 'http://localhost:8501/v1/models/img_classifier:predict'
 
 接下来，添加一个向端点发出请求的函数:
 
-```
+```py
 def make_prediction(instances):
    data = json.dumps({"signature_name": "serving_default", "instances": instances.tolist()})
    headers = {"content-type": "application/json"}
@@ -337,12 +337,12 @@ def make_prediction(instances):
 
 要运行 **predict.py** 文件，在新的终端窗口中运行`python predict.py`之前，确保 TF 服务容器仍然是活动的。
 
-```
+```py
 predictions = make_prediction(x_test[0:4])
 
 ```
 
-```
+```py
 //output
 [[1.55789715e-12, 1.01289466e-08, 1.07480628e-06, 1.951177e-08, 1.01430878e-10,
 5.59054842e-12, 1.90570039e-17, 0.999998927, 4.16908175e-10, 5.94038907e-09],
@@ -358,13 +358,13 @@ predictions = make_prediction(x_test[0:4])
 
 要获得实际的预测类，可以使用如下所示的“np.argmax”函数:
 
-```
+```py
 for pred in predictions:
     print(np.argmax(pred))
 
 ```
 
-```
+```py
  7
 2
 1
@@ -373,13 +373,13 @@ for pred in predictions:
 
 您还可以通过与真实值进行比较来检查预测的正确程度，如下所示:
 
-```
+```py
 for i, pred in enumerate(predictions):
     print(f"True Value: {y_test[i]}, Predicted Value: {np.argmax(pred)}")
 
 ```
 
-```
+```py
 //output
 True Value: 7, Predicted Value: 7
 True Value: 2, Predicted Value: 2
@@ -389,7 +389,7 @@ True Value: 0, Predicted Value: 0
 
 **predict.py** 的完整代码如下所示:
 
-```
+```py
 import matplotlib.pyplot as plt
 import requests
 import base64

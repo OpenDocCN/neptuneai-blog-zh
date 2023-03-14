@@ -16,7 +16,7 @@
 
 我想你的`main.py`脚本应该是这样的:
 
-```
+```py
 import pandas as pd
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
@@ -52,7 +52,7 @@ print('validation AUC:', score)
 
 获取您想要调整的参数，并将它们放在脚本顶部的字典中。这样做可以有效地将搜索参数从代码的其余部分中分离出来。
 
-```
+```py
 import pandas as pd
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
@@ -89,7 +89,7 @@ print('validation AUC:', score)
 
 现在，您可以将整个训练和评估逻辑放在一个`train_evaluate`函数中。该函数将参数作为输入，并输出验证分数。
 
-```
+```py
 import pandas as pd
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
 在这个例子中，我将从 **10** 随机选择的参数集开始，尝试 **100** 种不同的配置。
 
-```
+```py
 import skopt
 
 from script_step2 import train_evaluate
@@ -185,7 +185,7 @@ print('best parameters: ', best_params)
 
 如果您想**可视化您的训练并在训练结束后保存诊断图表**，您可以添加一个回调和一个函数调用来**将每个超参数搜索**记录到 Neptune。只需使用 neptune-contrib 库中的这个[助手函数。](https://web.archive.org/web/20221007001227/https://neptune-contrib.readthedocs.io/_modules/neptunecontrib/monitoring/skopt.html#NeptuneMonitor)
 
-```
+```py
 import neptune
 import neptunecontrib.monitoring.skopt as sk_utils
 import skopt

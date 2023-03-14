@@ -163,14 +163,14 @@ T3 不提供 | 您可以从搜索空间中排除一些评估者。不适用于 V
 
 让我们解决一些分类和回归问题。
 
-```
+```py
 pip3 install auto-sklearn
 
 ```
 
 用于分类的 Auto-sklearn
 
-```
+```py
 import autosklearn
 print(autosklearn.__version__)
 
@@ -180,7 +180,7 @@ print(autosklearn.__version__)
 
 ### 我们还需要定义一些配置，以便更深入地了解 auto-sklearn:
 
-```
+```py
 import autosklearn
 X_train=None
 X_val=None
@@ -236,7 +236,7 @@ sprint_statistics_str = automl.sprint_statistics()
 
 当您安装 auto-sklearn 模型时，您可以使用 [PipelineProfiler](https://web.archive.org/web/20221207184547/https://pypi.org/project/pipelineprofiler/) (pip 安装 PipelineProfiler)检查所有表现最佳的管道。为此，您需要运行以下代码:
 
-```
+```py
 TIME_BUDGET=60
 automl = autosklearn.classification.AutoSklearnClassifier(
 time_left_for_this_task=TIME_BUDGET,
@@ -254,7 +254,7 @@ automl.fit(X_train, y_train )
 
 另一方面，我也运行了一些基于 auto-sklearn V2 的实验。结果令人着迷。您可以看到下面的结果:
 
-```
+```py
 import PipelineProfiler
 
 profiler_data= PipelineProfiler.import_autosklearn(automl)
@@ -267,7 +267,7 @@ PipelineProfiler.plot_pipeline_matrix(profiler_data)
 
 auto-sklearn 可以解决的第二类问题是回归。我基于 auto-sklearn [文档](https://web.archive.org/web/20221207184547/https://automl.github.io/auto-sklearn/master/examples/index.html)中的官方示例运行了一些实验。
 
-```
+```py
 TIME_BUDGET=60
 automl = autosklearn.experimental.askl2.AutoSklearn2Classifier(
 time_left_for_this_task=TIME_BUDGET,
@@ -281,7 +281,7 @@ metric=autosklearn.metrics.roc_auc,
 
 最终想法
 
-```
+```py
 TIME_BUDGET=60
 automl = autosklearn.regression.AutoSklearnRegressor(
 time_left_for_this_task=TIME_BUDGET,

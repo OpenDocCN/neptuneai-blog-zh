@@ -46,7 +46,7 @@ Keras metrics
 
 用海王星跟踪神经网络模型实验
 
-```
+```py
 from keras import metrics
 model.compile(loss='binary_crossentropy', optimizer='adam',
 metrics=[metrics.categorical_accuracy])
@@ -71,7 +71,7 @@ metrics=[metrics.categorical_accuracy])
 
 接下来，我们将创建一个连接到我们的 **KerasMetricNeptune** 项目的 Neptune 实验，以便我们可以在 Neptune 上记录和监控模型训练信息:
 
-```
+```py
 import neptune as neptune.new
 
 import os
@@ -104,7 +104,7 @@ os.chdir('PATH_TO_YOUR_WORK_DIRECTORY')
 
 **neptune.init()** 中的 *api_token* arg 取您在配置步骤中生成的 Neptune API
 
-```
+```py
 myProject = "YourUserName/YourProjectName"
 project = neptune.init(api_token=os.getenv('NEPTUNE_API_TOKEN'),
                        project=myProject)
@@ -129,7 +129,7 @@ npt_exp = neptune.init(
 
 为了展示这个自定义指标函数是如何工作的，我将使用信用卡欺诈检测数据集作为例子。这是最受欢迎的不平衡数据集之一(更多细节[在这里](https://web.archive.org/web/20230224202511/https://www.kaggle.com/mlg-ulb/creditcardfraud))。
 
-```
+```py
 
 def custom_f1(y_true, y_pred):
     def recall_m(y_true, y_pred):
@@ -158,7 +158,7 @@ def custom_f1(y_true, y_pred):
 
 使用神经网络的模型结构
 
-```
+```py
 credit_dat = pd.read_csv('creditcard.csv')
 
 counts = credit_dat.Class.value_counts()
@@ -180,7 +180,7 @@ dat = credit_dat
 
 在对数据进行预处理之后，我们现在可以进入建模部分。在这篇文章中，我将构建一个具有两个隐藏层的神经网络用于二进制分类(使用 sigmoid 作为输出层的激活函数):
 
-```
+```py
 def myformat(value, decimal=4):
     return str(round(value, decimal))
 
@@ -203,7 +203,7 @@ x_train, x_test, y_train, y_test = Pre_proc(dat)
 
 接下来，我们使用交叉验证(CV)来训练模型。由于构建准确的模型超出了本文的范围，我设置了一个 5 重 CV，每个 CV 只有 20 个时期，以展示 F1 度量函数是如何工作的:
 
-```
+```py
 def runModel(x_tr, y_tr, x_val, y_val, epos=20, my_batch_size=112):
 
     inp = Input(shape = (x_tr.shape[1],))
@@ -226,7 +226,7 @@ def runModel(x_tr, y_tr, x_val, y_val, epos=20, my_batch_size=112):
 
 预定义函数 *custom_f1* 在 model.compile 步骤中指定；
 
-```
+```py
 f1_cv, precision_cv, recall_cv = [], [], []
 
 current_folds = 5
@@ -292,7 +292,7 @@ npt_exp[metric_text_final] = myformat(np.mean(f1_cv))
 
 然后我们这样编译和拟合我们的模型:
 
-```
+```py
 class NeptuneMetrics(Callback):
     def __init__(self, neptune_experiment, validation, current_fold):
         super(NeptuneMetrics, self).__init__()
@@ -336,7 +336,7 @@ class NeptuneMetrics(Callback):
 
 与之前一样，在训练发生时检查由新回调方法生成的详细日志记录，我们观察到我们的 NeptuneMetrics 对象为训练过程和验证生成一致的 F1 分数(大约 0.7-0.9)，如 Neptune 视频剪辑所示:
 
-```
+```py
 model.compile(loss='binary_crossentropy', optimizer= "adam", metrics=[])
 model.fit(x_tr,
           y_tr,
@@ -361,7 +361,7 @@ model.fit(x_tr,
 
 你有它！在您的神经网络模型中计算和监控 F1 分数的正确和不正确方法。如果你感兴趣的话，相似的过程可以应用于召回和精确。我希望这篇博客对你有所帮助。完整的代码可以在[这个 Github repo](https://web.archive.org/web/20230224202511/https://github.com/YiLi225/NeptuneBlogs/blob/main/Implement_F1score_neptune_git_NewVersion.py) 中找到，整个 Neptune 模型可以在[这里](https://web.archive.org/web/20230224202511/https://app.neptune.ai/katyl/KerasMetricNeptuneNewVersion/experiments?split=bth&dash=charts&viewId=standard-view)找到。
 
-```
+```py
 def predict(x_test):
     model_num = len(models)
     for k, m in enumerate(models):

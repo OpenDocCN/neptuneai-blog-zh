@@ -51,7 +51,7 @@ Neptune 是一个轻量级的 ML 实验管理工具。它灵活且易于与所�
 
 Neptune 和 MLflow 可以通过一个简单的命令进行集成:
 
-```
+```py
 neptune mlflow
 ```
 
@@ -76,7 +76,7 @@ neptune mlflow
 
 3.  创建一个 NEPTUNE_API_TOKEN 环境变量，并在控制台中运行它。
 
-```
+```py
 export NEPTUNE_API_TOKEN=’your_api_token’
 ```
 
@@ -86,19 +86,19 @@ export NEPTUNE_API_TOKEN=’your_api_token’
 
 首先安装 Neptune-MLflow:
 
-```
+```py
 pip install neptune-mlflow
 ```
 
 接下来，将 NEPTUNE_PROJECT 变量设置为用户名/项目名:
 
-```
+```py
 export NEPTUNE_PROJECT=USER_NAME/PROJECT_NAME
 ```
 
 最后，将您的 mlruns 目录与 Neptune 同步:
 
-```
+```py
 neptune mlflow
 ```
 

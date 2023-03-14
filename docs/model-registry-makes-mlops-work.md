@@ -55,7 +55,7 @@ Neptune 是 MLOps 的一个元数据存储库，为运行大量实验的研究�
 
 1.  **安装**
 
-```
+```py
 pip install neptune-client
 ```
 
@@ -63,7 +63,7 @@ pip install neptune-client
 
 创建一个文件(main.py)并粘贴下面提到的代码
 
-```
+```py
 import neptune.new as neptune
 run = neptune.init(project="your_workspace/your_project")
 
@@ -82,7 +82,7 @@ run["f1_score"] = 0.66
 
 转到终端并运行:
 
-```
+```py
 python main.py
 ```
 
@@ -96,7 +96,7 @@ python main.py
 
 1.  **连接海王星**
 
-```
+```py
 import neptune.new as neptune
 run = neptune.init(project='common/quickstarts',
 api_token='ANONYMOUS')
@@ -104,7 +104,7 @@ api_token='ANONYMOUS')
 
 2.  **测井参数**
 
-```
+```py
 PARAMS = {'lr': 0.1, 'epoch_nr': 10, 'batch_size': 32}
 run['parameters'] = PARAMS
 
@@ -112,7 +112,7 @@ run['parameters'] = PARAMS
 
 3.  **添加指标和损失**
 
-```
+```py
 loss = ...
 run["train/loss"].log(loss)
 
@@ -120,7 +120,7 @@ run["train/loss"].log(loss)
 
 下面是创建回调的示例，该回调使用 Keras 在每个时期后记录指标和损失:
 
-```
+```py
 run = neptune.init(project='common/myproject',
                    api_token=”YOUR_API_TOKEN”)
 class NeptuneLogger(keras.callbacks.Callback):
@@ -138,7 +138,7 @@ class NeptuneLogger(keras.callbacks.Callback):
 
  *将其传递给回调参数:
 
-```
+```py
 model.fit(x_train, y_train,
           epochs=PARAMS['epoch_nr'],
           batch_size=PARAMS['batch_size'],
@@ -148,13 +148,13 @@ model.fit(x_train, y_train,
 
 4.  **测试分数记录**
 
-```
+```py
 run['test/acc'] = 0.76
 ```
 
 5.  **添加模型文件的日志**
 
-```
+```py
 run["model"].upload('my_model.pkl')
 ```
 
@@ -181,7 +181,7 @@ Azure ML 是一个基于云的平台，用于训练、部署、自动化、管�
 
 **从本地机器注册模型**
 
-```
+```py
 wget https://aka.ms/bidaf-9-model -o model.onnx
 az ml model register -n bidaf_onnx -p ./model.onnx
 ```
@@ -190,7 +190,7 @@ az ml model register -n bidaf_onnx -p ./model.onnx
 
 **从 Azure 机器学习的训练运行中注册模型**
 
-```
+```py
 az ml model register -bidaf_onnx --asset-path outputs/model.onnx --experiment-name myexperiment --run-id myrunid --tag area=qna
 ```
 
@@ -198,7 +198,7 @@ az ml model register -bidaf_onnx --asset-path outputs/model.onnx --experiment-na
 
 有三种方法可以向 Azure 注册模型。
 
-```
+```py
 with mlflow.start_run(run_name=<run-name>) as run:
   ...
   mlflow.<model-flavor>.log_model(<model-flavor>=<model>,
@@ -210,13 +210,13 @@ with mlflow.start_run(run_name=<run-name>) as run:
 
 要用某个特定的名称注册一个模型，在运行完所有实验之后，使用 mlflow.register_model()方法。
 
-```
+```py
 result=mlflow.register_model("runs:<model-path>", "<model-name>")
 ```
 
 要创建一个具有惟一名称的新注册模型，您可以使用客户机 api 方法 create_registered_model()
 
-```
+```py
 client = MlflowClient()
 result = client.create_registered_model("<model-name>")
 ```
@@ -250,7 +250,7 @@ MLFlow 是一个开源平台，用于管理您的机器学习模型生命周期�
 
 API 工作流是使用模型注册表的另一种方法。您可以在 MLflow 实验运行期间或所有实验运行之后注册模型。
 
-```
+```py
 with mlflow.start_run(run_name="YOUR_RUN_NAME") as run:
     params = {"n_estimators": 5, "random_state": 42}
     sk_learn_rfr = RandomForestRegressor(**params)
@@ -269,7 +269,7 @@ with mlflow.start_run(run_name="YOUR_RUN_NAME") as run:
 
 *   从注册表获取 MLFlow 模型
 
-```
+```py
 model_name = "sk-learn-random-forest-reg-model"
 model_version = 1
 
@@ -282,7 +282,7 @@ model.predict(data)
 
 *   从注册表提供 MLflow 模型
 
-```
+```py
 export MLFLOW_TRACKING_URI=http://localhost:5000
 
 mlflow models serve -m "models:/sk-learn-random-forest-reg-model/Production"
@@ -290,7 +290,7 @@ mlflow models serve -m "models:/sk-learn-random-forest-reg-model/Production"
 
 *   更新您的模型信息/描述
 
-```
+```py
 client = MlflowClient()
 client.update_model_version(
     name="sk-learn-random-forest-reg-model",

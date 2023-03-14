@@ -87,7 +87,7 @@ KNN 依靠可观测数据的相似性和复杂的距离度量来生成准确的�
 
 下载数据集并安装所有必需的软件包:
 
-```
+```py
 pip install scikit-learn
 pip install matplotlib
 pip install pandas
@@ -96,7 +96,7 @@ pip install pandas
 
 导入数据集并以 csv 格式读取:
 
-```
+```py
 import pandas as pd
 
 data = pd.read_csv('breast-cancer-wisconsin.data')
@@ -109,7 +109,7 @@ data.info()
 
 添加数据集列名:
 
-```
+```py
 data.columns = ['Id', 'Clump Thickness', 'Unifomrmity of Cell size', 'Unifomrmity of Cell shape', 'Marginal Adhesion',
                 'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin', 'Normal Nucleoli', 'Mitoses', 'Class']
 ```
@@ -120,7 +120,7 @@ data.columns = ['Id', 'Clump Thickness', 'Unifomrmity of Cell size', 'Unifomrmit
 
 这是一个比较良性和恶性记录之间平衡的图:
 
-```
+```py
 import matplotlib.pyplot as plt
 import chart_studio.plotly as py
 import plotly.graph_objects as go
@@ -145,7 +145,7 @@ pyoff.iplot(fig)
 
 另一个有见地的统计数据是两组临床患者的有丝分裂水平。1 级最低，9 级最高。有丝分裂水平是导致肿瘤生长和进化的重要因素。自然地，恶性组将登记更多患有晚期有丝分裂阶段的患者。
 
-```
+```py
 beg_class_pat = data.loc[data['Class'] == 2]
 mal_class_pat = data.loc[data['Class'] == 4]
 
@@ -153,7 +153,7 @@ Mith_10_beg = beg_class_pat['Mitoses'].value_counts().reset_index()
 Mith_10_mal = mal_class_pat['Mitoses'].value_counts().reset_index()
 ```
 
-```
+```py
 fig = go.Figure(data=[
     go.Bar(name='Levels of Mitoses in Begnin Group', x=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
            y=Mith_10_beg['Mitoses']),
@@ -172,7 +172,7 @@ fig.show()
 
 我通常喜欢从创建一个虚拟环境开始，在那里我将安装项目所需的包。
 
-```
+```py
 conda create --name neptune python=3.6
 ```
 
@@ -184,7 +184,7 @@ conda create --name neptune python=3.6
 
 *   安装 Neptune 及其依赖项，并启用 jupyter 集成:
 
-```
+```py
 pip  install neptune-client
 pip install -U neptune-notebooks
 jupyter nbextension enable --py neptune-notebooks
@@ -196,7 +196,7 @@ jupyter nbextension enable --py neptune-notebooks
 *   获取您的 API 令牌，将您的笔记本与您的 Neptune 会话[连接起来。](https://web.archive.org/web/20221206001844/https://docs.neptune.ai/getting-started/hello-world)
 *   启用与 Neptune 的连接:
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init(
@@ -207,7 +207,7 @@ project='aymane.hachcham/KNN-Thorough-Tour',
 
 *   从你的实验开始。设置我们将使用的所需参数:
 
-```
+```py
 run["Algorithm"] = "KNN"
 
 params = {
@@ -225,7 +225,7 @@ run["parameters"] = params
 
 *   在开始使用 KNN 模型之前，考虑对数据进行预处理。所有属性都是 int64 类型，没有空值。我们还需要将数据分成训练和测试两部分。
 
-```
+```py
 data = data.loc[data['Bare Nuclei'] != '?']
 data['Bare Nuclei'] = data['Bare Nuclei'].astype('int64')
 
@@ -244,7 +244,7 @@ x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=
 
 我们将使用 neptune.log_metric()记录 Neptune 中的每一次 K 迭代。
 
-```
+```py
 accuracy_K = []
 for k in range(1, 10):
     knn = KNeighborsClassifier(n_neighbors=k)
@@ -265,13 +265,13 @@ for k in range(1, 10):
 
 KNN 分类器如下所示:
 
-```
+```py
 KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski', metric_params=None, n_jobs=None, n_neighbors=5, p=2, weights='uniform')
 ```
 
 一旦我们确定最佳值 K 为 5，我们将继续使用数据训练模型，并检查其总体准确性得分。
 
-```
+```py
 knn = KNeighborsClassifier(n_neighbors=5)
 knn.fit(x_train, y_train)
 predictions = knn.predict(x_test)

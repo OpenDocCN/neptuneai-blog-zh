@@ -207,7 +207,7 @@ VAE 让我们能够控制我们希望如何对潜在变量的分布进行建模�
 
 对于一个普通的自动编码器，下面的库就足够了。我们还将为设备定义一个变量。它会自动检测 colab 笔记本是有 cpu 还是有 gpu。
 
-```
+```py
 import numpy as np
 import torch
 import torch.nn as nn
@@ -221,7 +221,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 从 Pytorch 库下载的图像是 PIL 格式的，应该转换成张量格式。转变。ToTensor()将 PIL 转换为 Pytorch 要求的张量格式。
 
-```
+```py
 transform = transforms.Compose([transforms.ToTensor(),
                                transforms.Normalize((0.5, ), (0.5, ))
                               ])
@@ -229,7 +229,7 @@ transform = transforms.Compose([transforms.ToTensor(),
 
 下载并加载培训数据。
 
-```
+```py
 trainset = datasets.MNIST('MNIST_data/', download = True, train = True, transform = transform)
 testset = datasets.MNIST('MNIST_data/', download = True, train = False, transform = transform)
 
@@ -240,7 +240,7 @@ testloader  = torch.utils.data.DataLoader(testset,  batch_size = batch_size, shu
 
 让我们检查一个样本。
 
-```
+```py
 dataiter = iter(trainloader)
 images, labels = dataiter.next()
 plt.figure()
@@ -257,7 +257,7 @@ plt.colorbar(fraction=0.046, pad=0.04)
 
 还有，注意损失函数。我们将定义均方误差损失来计算损失，并在优化过程中使用 adam optimizer。亚当是最受欢迎的优化器之一，用于大多数深度学习任务。
 
-```
+```py
 class Learner():
  def __init__(self, train_dl, valid_dl, model, loss_func = nn.MSELoss()):
    self.train_dl, self.valid_dl = train_dl, valid_dl
@@ -325,7 +325,7 @@ image_idxs = [list(label.numpy()).index(x) for x in range(10)]
 
 我们定义了一个非常简约的模型，其中潜在的大小可以改变。这将有助于我们看到和理解模型如何执行变化的潜在大小。
 
-```
+```py
 class AutoEncoder(nn.Module):
 
  def __init__(self, latent_size = 3):
@@ -354,7 +354,7 @@ class AutoEncoder(nn.Module):
 
 开始训练。
 
-```
+```py
 model = AutoEncoder().to(device)
 learn = Learner(trainloader, testloader, model)
 learn.fit(epochs = 10, lr = 1e-4, flatten = True)
@@ -379,7 +379,7 @@ plt.plot(learn.valid_losses)
 
 我们将再次使用 MNIST，这次使用 Keras 来下载数据集，因为 Pytorch MNIST 数据是 PIL 格式的。虽然为了本文的简单起见，您可以使用它，但是我们将从 Keras 下载数据，因为它将确保我们以 NumPy 格式下载数据，以便我们可以添加噪声。
 
-```
+```py
 import numpy as np
 import torch
 import torch.nn as nn
@@ -397,7 +397,7 @@ from torch.utils.data import DataLoader,Dataset
 1.  高斯的
 2.  点缀
 
-```
+```py
 def add_noise(img,noise_type="gaussian"):
   row,col=28,28
  img=img.astype(np.float32)
@@ -452,7 +452,7 @@ print("n{} noise addition completed to images".format(noises[noise_id]))
 
 可视化数据。
 
-```
+```py
 f, axes=plt.subplots(2,2)
 
 axes[0,0].imshow(xtrain[0])
@@ -473,7 +473,7 @@ axes[1,1].set_title("Noised Image")
 
 使用 Pytorch 的 DataLoader 函数创建可用于训练和建模的生成器变量。
 
-```
+```py
 class noisedDataset(Dataset):
   def __init__(self,datasetnoised,datasetclean,labels,transform):
    self.noise=datasetnoised
@@ -509,7 +509,7 @@ testloader=DataLoader(testset,batch_size=1,shuffle=True)
 
 sigmoid 函数将确保最终输出在 0 到 1 的范围内，因为干净数据在 0 到 1 的范围内。我们将最终信号转换到相同的范围是有意义的。
 
-```
+```py
 class denoising_model(nn.Module):
  def __init__(self):
    super(denoising_model,self).__init__()
@@ -541,7 +541,7 @@ class denoising_model(nn.Module):
 
 我们也将为此任务初始化相同的损失和优化器函数。
 
-```
+```py
 model=denoising_model().to(device)
 criterion=nn.MSELoss()
 optimizer=torch.optim.Adam(model.parameters(),lr=0.01)
@@ -549,7 +549,7 @@ optimizer=torch.optim.Adam(model.parameters(),lr=0.01)
 
 初始化 120 个时期的训练。
 
-```
+```py
 epochs=120
 l=len(trainloader)
 losslist=list()
@@ -582,7 +582,7 @@ for epoch in range(epochs):
 
 可视化结果。
 
-```
+```py
 f,axes= plt.subplots(6,3,figsize=(20,20))
 axes[0,0].set_title("Original Image")
 axes[0,1].set_title("Dirty Image")
@@ -623,14 +623,14 @@ ECG 信号可以告诉我们很多关于一个人的健康和幸福的信息。�
 
 要在 colab 笔记本中安装这些包，我们使用以下命令:
 
-```
+```py
 !pip install -qq arff2pandas
 !pip install -U pandas-profiling
 ```
 
 一旦安装了所需的包，我们就可以开始导入它们以及本案例研究所需的其他包。
 
-```
+```py
 import torch
 
 import copy
@@ -650,7 +650,7 @@ from arff2pandas import a2p
 
 为了视觉上吸引人的情节，我们设置以下变量:
 
-```
+```py
 %matplotlib inline
 %config InlineBackend.figure_format='retina'
 
@@ -669,32 +669,32 @@ torch.manual_seed(RANDOM_SEED)
 
 以下命令可用于将数据直接下载到您的 colab 笔记本:
 
-```
+```py
 !gdown --id 16MIleqoIr1vYxlGk4GKnGmrsCPuWkkpT
 Once the data is downloaded we unzip it in the desired folder. 
 ```
 
 mkdir -p 命令创建一个子目录和父目录。在我们的例子中，“data”是父目录，“timeseries”是子目录。
 
-```
+```py
 !mkdir -p data/timeseries
 ```
 
 同样，我们可以使用！unzip ECG 5000 . zip-d data/time series 用于解压缩文件。参数-d 允许文件在期望的路径中解压缩。在我们的例子中，我们创建的目录。
 
-```
+```py
 !unzip ECG5000.zip -d data/timeseries
 ```
 
 我们将定义 CPU 或 GPU 使用的设备。
 
-```
+```py
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ```
 
 一旦文件被解压缩，我们就可以使用 a2p 函数打开它，该函数使用 pandas 数据帧打开 arff 文件。
 
-```
+```py
 with open('data/timeseries/ECG5000_TRAIN.arff') as f:
  train = a2p.load(f)
 
@@ -704,7 +704,7 @@ with open('data/timeseries/ECG5000_TEST.arff') as f:
 
 可视化数据。
 
-```
+```py
 df = train.append(test)
 df = df.sample(frac=1.0)
 df.shape
@@ -720,7 +720,7 @@ ax.set_xticklabels(class_names);
 
 *As you can see from the bar chart above, the normal class has by far the most examples. Now let’s plot a time series graph to see how these features look like against the target feature.*
 
-```
+```py
 def plot_time_series_class(data, class_name, ax, n_steps=10):
  time_series_df = pd.DataFrame(data)
 
@@ -766,7 +766,7 @@ fig.tight_layout()
 
 使用条件语句创建带有两个变量(正常和异常)的数据集的时间。一旦创建了这两个变量，我们就可以使用 sklearn 中的 train_test_split 来分离训练、测试和验证数据。
 
-```
+```py
 normal_df = df[df.target == str(CLASS_NORMAL)].drop(labels='target', axis=1)
 
 anomaly_df = df[df.target != str(CLASS_NORMAL)].drop(labels='target', axis=1)
@@ -785,7 +785,7 @@ val_df, test_df = train_test_split(
 
 一旦数据被分离，我们就将 NumPy 转换成二维张量，autoencoder 可以用它来训练和模拟数据。
 
-```
+```py
 def create_dataset(df):
 
  sequences = df.astype(np.float32).to_numpy().tolist()
@@ -806,7 +806,7 @@ test_anomaly_dataset, _, _ = create_dataset(anomaly_df)
 
 LSTMs 擅长对顺序数据建模。他们可以记住长期序列，这使得根据序列长度预测变量变得更加容易。
 
-```
+```py
 class Encoder(nn.Module):
 
  def __init__(self, seq_len, n_features, embedding_dim=64):
@@ -840,7 +840,7 @@ class Encoder(nn.Module):
 
 一旦编码器准备好了，我们还要定义一个解码器。解码器也将具有相同的 LSTM 架构。
 
-```
+```py
 class Decoder(nn.Module):
 
  def __init__(self, seq_len, input_dim=64, n_features=1):
@@ -878,7 +878,7 @@ class Decoder(nn.Module):
 
 让我们将编码器和解码器封装在一个模块中。
 
-```
+```py
 class RecurrentAutoencoder(nn.Module):
 
  def __init__(self, seq_len, n_features, embedding_dim=64):
@@ -895,14 +895,14 @@ class RecurrentAutoencoder(nn.Module):
 
 现在我们定义模型。
 
-```
+```py
 model = RecurrentAutoencoder(seq_len, n_features, 128)
 model = model.to(device)
 ```
 
 让我们写一个我们将要训练的函数。
 
-```
+```py
 def train_model(model, train_dataset, val_dataset, n_epochs):
  optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
  criterion = nn.L1Loss(reduction='sum').to(device)
@@ -958,7 +958,7 @@ def train_model(model, train_dataset, val_dataset, n_epochs):
 
 让我们开始训练吧。
 
-```
+```py
 model, history = train_model(
  model,
  train_dataset,
@@ -969,7 +969,7 @@ model, history = train_model(
 
 一旦模型经过训练，我们就可以开始预测值，并将它们与原始数据进行比较，以了解我们的模型的表现如何。
 
-```
+```py
 def predict(model, dataset):
  predictions, losses = [], []
  criterion = nn.L1Loss(reduction='sum').to(device)
@@ -993,7 +993,7 @@ sns.distplot(losses, bins=50, kde=True)
 
 *As you can see from the graph, the model managed to minimize loss on the training data set. Now let’s do the same with the test dataset and see how our model performs.*
 
-```
+```py
 predictions, pred_losses = predict(model, test_normal_dataset)
 sns.distplot(pred_losses, bins=50, kde=True)
 ```
@@ -1004,7 +1004,7 @@ sns.distplot(pred_losses, bins=50, kde=True)
 
 最后，让我们在时序图中看看模型性能。
 
-```
+```py
 def plot_prediction(data, model, title, ax):
  predictions, pred_losses = predict(model, [data])
 

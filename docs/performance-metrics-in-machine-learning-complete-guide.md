@@ -48,7 +48,7 @@
 
 这可以简单地用 Python 中的 NumPy 数组来实现。
 
-```
+```py
 mse = (y-y_hat)**2
 print(f"MSE: {mse.mean():0.2f} (+/- {mse.std():0.2f})")
 ```
@@ -72,7 +72,7 @@ MAE 的几个关键点
 
 与 MSE 类似，这个指标也很容易实现。
 
-```
+```py
 mae = np.abs(y-y_hat)
 print(f"MAE: {mae.mean():0.2f} (+/- {mae.std():0.2f})")
 ```
@@ -92,7 +92,7 @@ print(f"MAE: {mae.mean():0.2f} (+/- {mae.std():0.2f})")
 
 实现类似于 MSE:
 
-```
+```py
 mse = (y-y_hat)**2
 rmse = np.sqrt(mse.mean())
 print(f"RMSE: {rmse:0.2f}")
@@ -116,7 +116,7 @@ Y 的总变化(Y 的方差):
 
 这个系数可以简单地用 Python 中的 NumPy 数组实现。
 
-```
+```py
 SE_line = sum((y-y_hat)**2)
 SE_mean = sum((y-y.mean())**2)
 r2 = 1-(SE_line/SE_mean)
@@ -165,13 +165,13 @@ print(f"R^2 coefficient of determination: {r2*100:0.2f}%")
 
 从从*度量*类导入 *accuracy_score* 函数开始。
 
-```
+```py
 from sklearn.metrics import accuracy_score
 ```
 
 然后，只需传递基本事实和预测值，就可以确定模型的准确性:
 
-```
+```py
 print(f'Accuracy Score is {accuracy_score(y_test,y_hat)}')
 ```
 
@@ -194,7 +194,7 @@ print(f'Accuracy Score is {accuracy_score(y_test,y_hat)}')
 
 我们可以使用下面的代码计算单元格的值:
 
-```
+```py
 def find_TP(y, y_hat):
 
    return sum((y == 1) & (y_hat == 1))
@@ -211,7 +211,7 @@ def find_TN(y, y_hat):
 
 我们将使用逻辑回归分类器中的两组超参数来查看两种不同状态下的混淆矩阵。
 
-```
+```py
 from sklearn.linear_model import LogisticRegression
 clf_1 = LogisticRegression(C=1.0, class_weight={0:100,1:0.2}, dual=False, fit_intercept=True,
                   intercept_scaling=1, l1_ratio=None, max_iter=100,
@@ -239,7 +239,7 @@ clf_2 = LogisticRegression(C=1.0, class_weight={0:0.001,1:900}, dual=False, fit_
 
 对于第一组超参数:
 
-```
+```py
 TP = find_TP(y, y_hat)
 FN = find_FN(y, y_hat)
 FP = find_FP(y, y_hat)
@@ -260,7 +260,7 @@ print('Precision:',precision)
 
 对于第二组超参数:
 
-```
+```py
 TP = find_TP(y, y_hat)
 FN = find_FN(y, y_hat)
 FP = find_FP(y, y_hat)
@@ -297,7 +297,7 @@ print('Precision:',precision)
 
 对于第一组超参数:
 
-```
+```py
 TP = find_TP(y, y_hat)
 FN = find_FN(y, y_hat)
 FP = find_FP(y, y_hat)
@@ -318,7 +318,7 @@ print('Recall: %f' % recall)
 
 对于第二组超参数:
 
-```
+```py
 TP = find_TP(y, y_hat)
 FN = find_FN(y, y_hat)
 FP = find_FP(y, y_hat)
@@ -345,7 +345,7 @@ print('Recall: %f' % recall)
 
 这里有一个描绘同样权衡的图:
 
-```
+```py
 from sklearn.metrics import plot_precision_recall_curve
 disp = plot_precision_recall_curve(clf, X, y)
 disp.ax_.set_title('2-class Precision-Recall curve: '
@@ -368,7 +368,7 @@ F1 分数低(几乎)说明不了什么——它只能告诉你在某个阈值时
 
 对于第一组超参数:
 
-```
+```py
 f1_score = 2*((precision*recall)/(precision+recall))
 print('F1 score: %f' % f1_score)
 ```
@@ -379,7 +379,7 @@ print('F1 score: %f' % f1_score)
 
 对于第二组超参数:
 
-```
+```py
 f1_score = 2*((precision*recall)/(precision+recall))
 print('F1 score: %f' % f1_score)
 ```
@@ -401,7 +401,7 @@ F1 无疑是判断模型性能最流行的指标之一。它实际上是被称�
 
 为了将 **FPR** 和 **TPR** 组合成一个单一指标，我们首先使用许多不同的逻辑回归阈值来计算前两个指标，然后将它们绘制在一个图表上。得到的曲线称为 ROC 曲线，我们考虑的度量是这条曲线下的面积，我们称之为 AUROC。
 
-```
+```py
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from matplotlib import pyplot

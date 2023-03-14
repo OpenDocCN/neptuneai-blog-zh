@@ -47,7 +47,7 @@
 
 如果您想要 PyTorch 中 Keras 的 Tensorflow 之类的模型摘要，只需使用:
 
-```
+```py
 !pip install torchsummary
 ```
 
@@ -206,7 +206,7 @@ Neptune 是为研究和生产团队开发的 MLOps 的元数据存储。它为�
 
 让我们从初始化 Neptune 开始:
 
-```
+```py
 import neptune.new as neptune
 run = neptune.init(api_token='<API_KEY>',
 project='<PROJECT_NAME>')
@@ -216,13 +216,13 @@ project='<PROJECT_NAME>')
 
 首先通过安装 vega_datasets 创建一个样例图形:
 
-```
+```py
 pip install --upgrade --quiet vega_datasets==0.9.0
 ```
 
 使用数据创建样图:
 
-```
+```py
 import altair as alt
 from vega_datasets import data
 
@@ -253,7 +253,7 @@ chart
 
 记录数字:
 
-```
+```py
 run['interactive_img'] = neptune.types.File.as_html(chart)
 ```
 
@@ -265,7 +265,7 @@ run['interactive_img'] = neptune.types.File.as_html(chart)
 
 按照上面第一步所示初始化 Neptune，从在环境中创建一个样例图形开始。确保安装了正确的版本。
 
-```
+```py
 import matplotlib.pyplot as plt
 import numpy as np
 np.random.seed(42)
@@ -274,13 +274,13 @@ data = np.random.randn(2, 100)
 
 记录为静态图像:
 
-```
+```py
 run['static-img'] = neptune.types.File.as_image(figure)
 ```
 
 将日志记录为交互式图表:
 
-```
+```py
 run['interactive-img'] = neptune.types.File.as_html(figure)
 ```
 

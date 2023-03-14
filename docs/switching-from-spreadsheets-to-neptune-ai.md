@@ -101,7 +101,7 @@
 
 与电子表格相比，Neptune 的一个关键优势是**它为您节省了大量手工工作**。使用 Neptune，您可以使用管道中的 API 在代码运行时自动上传和存储元数据。
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init(project='#', api_token='#') 
@@ -164,7 +164,7 @@ run["f1_score"] = 0.66
 
 将您的实验的排行榜分数添加到 Neptune 跟踪表的最便捷方式是使用[“恢复跑步”功能](https://web.archive.org/web/20221117203610/https://docs.neptune.ai/you-should-know/logging-and-managing-runs-results/resume-run#how-to-resume-run)。**它允许你用几行代码用一个新的指标更新任何完成的实验。**这个特性也有助于恢复跟踪崩溃的会话，我们在上一段中已经讨论过了。
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init(project=’Your-Kaggle-Project’, run="SUN-123")
@@ -181,7 +181,7 @@ model = run["train/model_weights"].download()
 
 虽然在网站上做这些事情还不可行，但是 Neptune 允许你使用一个简单的 API 调用将所有实验的元数据直接下载到你的笔记本 [中。这使得更深入地研究结果或导出元数据表并在外部与使用不同跟踪工具或不依赖任何实验跟踪的人共享变得容易。](https://web.archive.org/web/20221117203610/https://docs.neptune.ai/you-should-know/logging-and-managing-runs-results/downloading-runs-data)
 
-```
+```py
 import neptune.new as neptune
 
 my_project = neptune.get_project('Your-Workspace/Your-Kaggle-Project')

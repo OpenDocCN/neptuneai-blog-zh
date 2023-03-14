@@ -54,7 +54,7 @@ To use mean average precision and recall, you should configure your pipeline.con
 
 需要使用`test.record`来检查已经训练过的最终模型的性能。
 
-```
+```py
 Tensorflow/
 └─ cocoapi/
 └─ ...
@@ -85,7 +85,7 @@ Tensorflow/
 
 **<模型目录路径>** 是评估作业写入日志(评估结果)的目录路径。我的建议是使用以下路径:。/models/ <文件夹中放着您选择的型号> /v1/。鉴于此，您的评估结果将放在培训日志旁边，
 
-```
+```py
 python model_main_tf2.py
   --pipeline_config_path=<path to your config file>
   --model_dir=<path to a directory with your model>
@@ -104,14 +104,14 @@ python model_main_tf2.py
 
 模型性能跟踪简介
 
-```
+```py
 export CUDA_VISIBLE_DEVICES= <GPU number>
 
 ```
 
 在机器学习中，对于给定的任务，很难事先告诉你哪个模型会给你最好的结果。开发人员通常使用试错法来测试多个假设。
 
-```
+```py
 export CUDA_VISIBLE_DEVICES=-1
 
 ```
@@ -152,7 +152,7 @@ Tensorboard 比较好用。为了启动您的 TensorBoard，请打开一个*终�
 
 Neptune 完全兼容 tfevent (TensorBoard)格式。你所需要做的就是在你的*终端*窗口中启动一个[单命令行](https://web.archive.org/web/20221203101213/https://github.com/neptune-ai/neptune-tensorboard#overview)，
 
-```
+```py
 tensorboard --logdir=<path to a directory with your experiment / experiments>
 ```
 
@@ -183,7 +183,7 @@ tensorboard --logdir=<path to a directory with your experiment / experiments>
 
 2.第二步——在推理模式下运行您的模型。
 
-```
+```py
 python exporter_main_v2.py
   --pipeline_config_path=<path to a config file>
   --trained_checkpoint_dir=<path to a directory with your trained model>

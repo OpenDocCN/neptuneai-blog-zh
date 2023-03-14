@@ -26,7 +26,7 @@
 
 在这个例子中，我们通过创建 loss 类的一个实例来定义 loss 函数。使用类是有利的，因为您可以传递一些附加参数。
 
-```
+```py
 from tensorflow import keras
 from tensorflow.keras import layers
 
@@ -41,7 +41,7 @@ model.compile(loss=loss_function, optimizer='adam')
 
 如果您想使用 Keras 内置的损失函数而不指定任何参数，您可以只使用字符串别名，如下所示:
 
-```
+```py
 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam')
 
 ```
@@ -62,7 +62,7 @@ Keras 中有各种损失函数。其他时候，您可能需要实现自己的�
 
 二元交叉熵将计算预测类和真实类之间的交叉熵损失。默认情况下，使用 *sum_over_batch_size* 缩减。这意味着损失将返回批次中每个样本损失的平均值。
 
-```
+```py
 y_true = [[0., 1.], [0.2, 0.8],[0.3, 0.7],[0.4, 0.6]]
 y_pred = [[0.6, 0.4], [0.4, 0.6],[0.6, 0.4],[0.8, 0.2]]
 bce = tf.keras.losses.BinaryCrossentropy(reduction='sum_over_batch_size')
@@ -72,7 +72,7 @@ bce(y_true, y_pred).numpy()
 
 总和减少意味着损失函数将返回批次中每个样本损失的总和。
 
-```
+```py
 bce = tf.keras.losses.BinaryCrossentropy(reduction='sum')
 bce(y_true, y_pred).numpy()
 
@@ -80,7 +80,7 @@ bce(y_true, y_pred).numpy()
 
 将减少值设为 none 将返回每样本损失的完整数组。
 
-```
+```py
 bce = tf.keras.losses.BinaryCrossentropy(reduction='none')
 bce(y_true, y_pred).numpy()
 array([0.9162905 , 0.5919184 , 0.79465103, 1.0549198 ], dtype=float32)
@@ -96,7 +96,7 @@ array([0.9162905 , 0.5919184 , 0.79465103, 1.0549198 ], dtype=float32)
 
 CategoricalCrossentropy 还计算真实类和预测类之间的交叉熵损失。标签以 *one_hot* 格式给出。
 
-```
+```py
 cce = tf.keras.losses.CategoricalCrossentropy()
 cce(y_true, y_pred).numpy()
 ```
@@ -105,7 +105,7 @@ cce(y_true, y_pred).numpy()
 
 如果有两个或更多的类，并且标签是整数，那么应该使用 SparseCategoricalCrossentropy。
 
-```
+```py
 y_true = [0, 1,2]
 y_pred = [[0.05, 0.95, 0], [0.1, 0.8, 0.1],[0.1, 0.8, 0.1]]
 scce = tf.keras.losses.SparseCategoricalCrossentropy()
@@ -117,7 +117,7 @@ scce(y_true, y_pred).numpy()
 
 您还可以使用泊松类来计算中毒损失。如果数据集来自泊松分布，例如呼叫中心每小时接到的电话数量，这是一个很好的选择。
 
-```
+```py
 y_true = [[0.1, 1.,0.8], [0.1, 0.9,0.1],[0.2, 0.7,0.1],[0.3, 0.1,0.6]]
 y_pred = [[0.6, 0.2,0.2], [0.2, 0.6,0.2],[0.7, 0.1,0.2],[0.8, 0.1,0.1]]
 p = tf.keras.losses.Poisson()
@@ -131,7 +131,7 @@ p(y_true, y_pred).numpy()
 
 ***KL 散度*** *对于连续分布来说是一种有用的距离度量，在对(离散采样的)连续输出分布空间执行直接回归时通常很有用。*
 
-```
+```py
 y_true = [[0.1, 1.,0.8], [0.1, 0.9,0.1],[0.2, 0.7,0.1],[0.3, 0.1,0.6]]
 y_pred = [[0.6, 0.2,0.2], [0.2, 0.6,0.2],[0.7, 0.1,0.2],[0.8, 0.1,0.1]]
 kl = tf.keras.losses.KLDivergence()
@@ -153,7 +153,7 @@ kl(y_true, y_pred).numpy()
 
 随着正确类别的置信度增加，通过缩放在零处衰减的因子来缩放交叉熵损失。缩小因子在训练时对无挑战样本的贡献进行加权，并关注有挑战的样本。
 
-```
+```py
 import tensorflow_addons as tfa
 
 y_true = [[0.97], [0.91], [0.03]]
@@ -169,7 +169,7 @@ array([0.00010971, 0.00329749, 0.00030611], dtype=float32)
 
 引入了 Union 上的广义交集来解决 IoU 面临的这一挑战。它确保通过保持 IoU 的比例不变属性、将比较对象的形状属性编码到区域属性中、以及确保在对象重叠的情况下与 IoU 有很强的相关性来实现概括。
 
-```
+```py
 gl = tfa.losses.GIoULoss()
 boxes1 = tf.constant([[4.0, 3.0, 7.0, 5.0], [5.0, 6.0, 10.0, 7.0]])
 boxes2 = tf.constant([[3.0, 4.0, 6.0, 8.0], [14.0, 14.0, 15.0, 15.0]])
@@ -185,7 +185,7 @@ loss = gl(boxes1, boxes2)
 
 MeanSquaredError 类可用于计算预测值和真实值之间的均方误差。
 
-```
+```py
 y_true = [12, 20, 29., 60.]
 y_pred = [14., 18., 27., 55.]
 mse = tf.keras.losses.MeanSquaredError()
@@ -203,7 +203,7 @@ mse(y_true, y_pred).numpy()
 
 它的计算如下所示。
 
-```
+```py
 y_true = [12, 20, 29., 60.]
 y_pred = [14., 18., 27., 55.]
 mape = tf.keras.losses.MeanAbsolutePercentageError()
@@ -221,7 +221,7 @@ mape(y_true, y_pred).numpy()
 
 下面是同样的一个实现:
 
-```
+```py
 y_true = [12, 20, 29., 60.]
 y_pred = [14., 18., 27., 55.]
 msle = tf.keras.losses.MeanSquaredLogarithmicError()
@@ -239,7 +239,7 @@ msle(y_true, y_pred).numpy()
 
 **结果是一个介于-1 和 1** 之间的数字。0 表示正交性，而接近-1 的值表示有很大的相似性。
 
-```
+```py
 y_true = [[12, 20], [29., 60.]]
 y_pred = [[14., 18.], [27., 55.]]
 cosine_loss = tf.keras.losses.CosineSimilarity(axis=1)
@@ -255,7 +255,7 @@ LogCosh 类计算预测误差的双曲余弦的对数。
 
 下面是它作为独立函数的实现。
 
-```
+```py
 y_true = [[12, 20], [29., 60.]]
 y_pred = [[14., 18.], [27., 55.]]
 l = tf.keras.losses.LogCosh()
@@ -269,7 +269,7 @@ l(y_true, y_pred).numpy()
 
 对于对异常值不太敏感的回归问题，使用 [Huber 损失](https://web.archive.org/web/20221027132202/https://www.tensorflow.org/api_docs/python/tf/keras/losses/Huber)。
 
-```
+```py
 y_true = [12, 20, 29., 60.]
 y_pred = [14., 18., 27., 55.]
 h = tf.keras.losses.Huber()
@@ -283,7 +283,7 @@ h(y_true, y_pred).numpy()
 
 你也可以通过 TensorFlow 插件用半硬负挖掘计算[三重态损失](https://web.archive.org/web/20221027132202/https://arxiv.org/abs/1503.03832)。该损失促使具有相同标签的嵌入对之间的正距离小于最小负距离。
 
-```
+```py
 import tensorflow_addons as tfa
 
 model.compile(optimizer='adam',
@@ -298,7 +298,7 @@ model.compile(optimizer='adam',
 
 可通过定义一个将真实值和预测值作为必需参数的函数来创建自定义损失函数。该函数应该返回一个损失数组。然后可以在编译阶段传递该函数。
 
-```
+```py
 def custom_loss_function(y_true, y_pred):
    squared_difference = tf.square(y_true - y_pred)
    return tf.reduce_mean(squared_difference, axis=-1)
@@ -309,7 +309,7 @@ model.compile(optimizer='adam', loss=custom_loss_function)
 
 让我们看看如何将这个自定义损失函数应用于一组预测值和真实值。
 
-```
+```py
 import numpy as np
 
 y_true = [12, 20, 29., 60.]
@@ -327,7 +327,7 @@ cl.numpy()
 
 使用包含每个类的权重的字典来传递权重。您可以使用 [Scikit-learn](https://web.archive.org/web/20221027132202/https://scikit-learn.org/stable/modules/generated/sklearn.utils.class_weight.compute_sample_weight.html) 计算重量，或者根据您自己的标准计算重量。
 
-```
+```py
 weights = { 0:1.01300017,1:0.88994364,2:1.00704935, 3:0.97863318,      4:1.02704553, 5:1.10680686,6:1.01385603,7:0.95770152, 8:1.02546573,
                9:1.00857287}
 model.fit(x_train, y_train,verbose=1, epochs=10,class_weight=weights)
@@ -336,7 +336,7 @@ model.fit(x_train, y_train,verbose=1, epochs=10,class_weight=weights)
 
 第二种方法是在编译阶段传递这些权重。
 
-```
+```py
 weights = [1.013, 0.889, 1.007, 0.978, 1.027,1.106,1.013,0.957,1.025, 1.008]
 
 model.compile(optimizer=tf.keras.optimizers.SGD(),
@@ -355,7 +355,7 @@ model.compile(optimizer=tf.keras.optimizers.SGD(),
 
 记录和查看损失的最快和最简单的方法是简单地将它们打印到控制台上。
 
-```
+```py
 import tensorflow as tf
 
 mnist = tf.keras.datasets.mnist
@@ -386,7 +386,7 @@ model.fit(x_train, y_train,verbose=1, epochs=10)
 
 例如，记录 keras 对 Neptune 的损失可能如下所示:
 
-```
+```py
 from keras.callbacks import Callback 
 
 class NeptuneCallback(Callback):
@@ -403,11 +403,11 @@ class NeptuneCallback(Callback):
 
 一旦您准备好回调，您只需将它传递给`model.fit(...)`:
 
-```
+```py
 pip install neptune-client neptune-tensorboard
 ```
 
-```
+```py
 import neptune.new as neptune
 from neptunecontrib.monitoring.keras import NeptuneMonitor
 

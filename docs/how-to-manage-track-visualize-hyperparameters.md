@@ -22,7 +22,7 @@
 
 很基础，很有用。只需在 Python 字典中收集超参数，如下例所示:
 
-```
+```py
 PARAMS = {'epoch_nr': 5,
           'batch_size': 64,
           'dense': 256,
@@ -60,7 +60,7 @@ PARAMS = {'epoch_nr': 5,
 
 ![](img/9ca543bfe77006930be78dbdfc769078.png)
 
-```
+```py
 config = {'neptune': {'project': 'kamil/analysis',
                       'tags': ['xgb-tune']},
           'booster': {'max_depth': 10,
@@ -89,7 +89,7 @@ config = {'neptune': {'project': 'kamil/analysis',
 
 ![](img/9ca543bfe77006930be78dbdfc769078.png)
 
-```
+```py
 cfg = AttrDict(config)rncfg.booster.eta
 
 ```
@@ -102,7 +102,7 @@ cfg = AttrDict(config)rncfg.booster.eta
 
 与基于字典的风格类似，您只需要对这个文件进行版本控制，以跟踪超参数。
 
-```
+```py
 project: ORGANIZATION/home-credit
 name: home-credit-default-risk
 
@@ -130,7 +130,7 @@ parameters:
 
 由于刚刚介绍了**attr direct**，我们修改一下这个代码片段，用更优雅的方式**访问** `n_cv_splits` **值**:
 
-```
+```py
 import yaml
 
 with open(config_path) as f:
@@ -142,7 +142,7 @@ print(config['parameters']['n_cv_splits'])
 
 这里是一个用于存储特征选择、模型参数等的大型 yaml 文件的[示例](https://web.archive.org/web/20221206041922/https://ui.neptune.ai/o/neptune-ai/org/Home-Credit-Default-Risk/e/HC-11735/source-code?path=configs%2F&file=neptune.yaml)。
 
-```
+```py
 import yaml
 from attrdict import AttrDict
 
@@ -179,7 +179,7 @@ print(cfg.parameters.n_cv_splits)
 
 如果你**运行**这个程序，**没有任何参数，那么将使用默认值**:
 
-```
+```py
 import argparse
 
 parser = argparse.ArgumentParser(description='Process hyper-parameters')
@@ -198,14 +198,14 @@ print(args.data_dir)
 
 输出是:
 
-```
+```py
 python main.py
 
 ```
 
 如果您**指定参数**，那么它们将被解析，以便您**可以在您的训练脚本**中使用它们:
 
-```
+```py
 0.001
 0.0
 /neptune/is/the/best/data/
@@ -214,14 +214,14 @@ python main.py
 
 输出是:
 
-```
+```py
 python main.py --lr 0.005 --dropout 0.5
 
 ```
 
 关于跟踪的一个重要注意事项:注意 **argparse 不保存或记录在命令行**中传递的参数。用户必须**自己保存参数值**。
 
-```
+```py
 0.005
 0.5
 /neptune/is/the/best/data/
@@ -260,7 +260,7 @@ python main.py --lr 0.005 --dropout 0.5
 
 当您运行它时，您应该会看到:
 
-```
+```py
 project: ORGANIZATION/home-credit
 name: home-credit-default-risk
 
@@ -280,7 +280,7 @@ parameters:
 
 在 hydra 中**方便的是，您可以从 CLI** 覆盖配置中的任何值，如下所示:
 
-```
+```py
 import hydra
 from omegaconf import DictConfig
 
@@ -295,7 +295,7 @@ if __name__ == "__main__":
 
 因此，在配置中有了新的值:
 
-```
+```py
 name: home-credit-default-risk
 parameters:
   n_cv_splits: 5
@@ -314,14 +314,14 @@ project: ORGANIZATION/home-credit
 
 另一个提供良好灵活性的**特性是一个选项，可以直接从命令行**传递新的、以前看不到的参数。
 
-```
+```py
 python hydra-main.py parameters.n_cv_splits=12   parameters.stratified_cv=False name=entirely-new-name
 
 ```
 
 要启用此功能，只需关闭 hydra 中的严格模式。
 
-```
+```py
 name: entirely-new-name
 parameters:
   n_cv_splits: 12
@@ -342,21 +342,21 @@ project: ORGANIZATION/home-credit
 
 输出相应改变:
 
-```
+```py
 @hydra.main(config_path='config.yaml', strict=False)
 
 ```
 
 hydra 项目正在积极开发中，所以请确保不时查看他们的[教程](https://web.archive.org/web/20221206041922/https://hydra.cc/docs/tutorials/intro)以了解新特性。
 
-```
+```py
 python hydra-main.py parameters.rf__n_estimators=1500   parameters.rf__max_features=0.2
 
 ```
 
 **优点**
 
-```
+```py
 name: home-credit-default-risk
 parameters:
   n_cv_splits: 5
@@ -396,7 +396,7 @@ save_hyperparameters()方法将对象中存在的所有超参数保存到 YAML �
 
 **优点:**
 
-```
+```py
 class LitMNIST(LightningModule):
     def __init__(self, layer_1_dim=128, learning_rate=1e-2):
         super().__init__()
@@ -432,7 +432,7 @@ class LitMNIST(LightningModule):
 
 您可以在模型中直接使用上面在 HParams 中声明的超参数。前往[文档](https://web.archive.org/web/20221206041922/https://www.tensorflow.org/tensorboard/hyperparameter_tuning_with_hparams)了解更多信息。
 
-```
+```py
 import tensorflow as tf
 from tensorboard.plugins.hparams import api as hp
 
@@ -451,7 +451,7 @@ with tf.summary.create_file_writer('logs/hparam_tuning').as_default():
 
 **优点:**
 
-```
+```py
 def train_test_model(hparams):
   model = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
@@ -488,7 +488,7 @@ def train_test_model(hparams):
 
 前往文档了解如何无缝集成 Neptune，而无需对代码做太多修改。
 
-```
+```py
 PARAMS = {'batch_size': 64,
           'n_epochs': 100,
           'shuffle': True,

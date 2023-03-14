@@ -69,7 +69,7 @@
 
 让我们先来看一下这两种方法的一些例子，看看它们在实际中是怎样的。我们将从我们的测试集中抽取 20 个句子的样本，查看两个模型，看看他们认为什么是拼写错误。
 
-```
+```py
 for q in original_queries:
     doc = nlp(q)
     spacy_misspell = doc._.performed_spellCheck
@@ -96,7 +96,7 @@ for q in original_queries:
 
 例如，查询“*do you need a proceser*”似乎有一个明显的拼写错误。然而，spaCy 模型似乎认为这更像是一个上下文任务，而不是拼写错误:
 
-```
+```py
 do you need a procceser
 =======================
 spaCy: spelling error detected
@@ -118,7 +118,7 @@ procceser
 
 而 NeuSpell 模型确实识别了正确的拼写错误:
 
-```
+```py
 -----------------------
 NeuSpell:
 -----------------------
@@ -128,7 +128,7 @@ do you need a processor
 
 spaCy 模型还显示了更多与上下文相关的修正，例如:
 
-```
+```py
 Does this work well for canada?
 ===============================
 spaCy: spelling error detected
@@ -185,7 +185,7 @@ T5 执行这些类型的任务，基于 T5 任务的一个很好的“抽象”�
 
 要设置任务，您需要首先确定要使用的模型。约翰斯诺实验室提供其他模型，但现在我们将使用 T5。
 
-```
+```py
 documentAssembler = DocumentAssembler()
     .setInputCol("text")
     .setOutputCol("document")
@@ -198,7 +198,7 @@ t5 = T5Transformer.pretrained(name='t5_base',lang='en')
 
 然后你需要告诉它你要执行的任务。
 
-```
+```py
 t5.setTask('cola sentence:')
 
 pipe_components = [documentAssembler,t5]
@@ -208,7 +208,7 @@ pipeline = Pipeline().setStages( pipe_components)
 
 现在我们只需要测试数据中的一些例句。
 
-```
+```py
 sentences = test_dataset_df['question'].sample(n=20).tolist()
 
 sentences = [[x] for x in sentences if len(x) < 90]
@@ -259,20 +259,20 @@ annotated_df.select(['text','t5.result']).show(truncate=False)
 
 我们首先需要下载模型，这很容易，因为它是 HuggingFace 的一部分:
 
-```
+```py
 from sentence_transformers import SentenceTransformer
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 ```
 
 然后，我们需要从数据集中获取一个句子样本进行测试:
 
-```
+```py
 sentences = test_dataset_df['question'].sample(n=10).tolist()
 for i, s in enumerate(sentences, 1):
     print(f'{i}: {s}')
 ```
 
-```
+```py
 1: Will this work on a 64bit system?
 2: If I buy print shop 23 can I access my old files from print shop 22?
 3: does this work on a macbook mid 2010 laptop??? (Macintosh HD OS X version 10.9.4)
@@ -287,7 +287,7 @@ for i, s in enumerate(sentences, 1):
 
 这里看起来类似的句子不多，我们来看看模型是怎么想的。
 
-```
+```py
 paraphrases = util.paraphrase_mining(model, sentences, top_k=1)
 for paraphrase in paraphrases[0:100]:
     score, i, j = paraphrase
@@ -306,12 +306,12 @@ para_df
 
 这一点的美妙之处在于，我们可以很容易地将它应用到大量的例子中。在我们的亚马逊数据集中，我们有超过 7500 个例子。让我们看看我们可以预测哪些可能的释义。处理所有 7，588 个示例需要 14 秒多一点。这个时间可能会有所不同，取决于你在哪里运行你的笔记本电脑，但一般来说，这是很快考虑到它在引擎盖下做什么。
 
-```
+```py
 %%time
 paraphrases = util.paraphrase_mining(model, all_sentences, top_k=1)
 ```
 
-```
+```py
 CPU times: user 5min 34s, sys: 27.4 s, total: 6min 2s
 Wall time: 13.6 s
 ```
@@ -324,7 +324,7 @@ Wall time: 13.6 s
 
 但是，如果我们看看一些较低的分数，我们可以看到它确实捕捉到了一些有趣的语言细微差别。
 
-```
+```py
 para_df.query('0.75 <= `Paraphrase Likelihood` <= 0.85')
 ```
 
@@ -334,7 +334,7 @@ para_df.query('0.75 <= `Paraphrase Likelihood` <= 0.85')
 
 为了更好地观察，让我们看一下随机抽样的结果。
 
-```
+```py
 for row in sample_prar_df.sample(n=20).itertuples():
     print(row[2])
     print(f'------------------ {row[1]}------------------')
@@ -342,7 +342,7 @@ for row in sample_prar_df.sample(n=20).itertuples():
     print('='*50)
 ```
 
-```
+```py
 Is this version a subscription product that has to be renewed every year?
 ------------------ 0.82------------------
 Is this a subscription for one year?
@@ -440,7 +440,7 @@ Can I install it on my desktop and laptop?
 
 在上面的例子中，我们预测了数据集中转述句子的最佳例子。换句话说，对于每一句话，该模型将在数据集中找到最佳的释义替代示例。我们可能希望找到不止一个例子，因为在这样的数据集中，很可能有多个潜在的释义例子。我们可以通过改变 top_k 参数来做到这一点。
 
-```
+```py
 paraphrases = util.paraphrase_mining(model, all_sentences, top_k=5)
 para_list = []
 

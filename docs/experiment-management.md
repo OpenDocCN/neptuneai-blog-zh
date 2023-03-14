@@ -54,7 +54,7 @@
 
 一旦你有了你的笔记本版本，我会建议你再多做一点，确保它从上到下运行。为此，您可以使用 jupytext 或 nbconvert:
 
-```
+```py
 jupyter nbconvert --to script train_model.ipynb;
 python train_model.py
 
@@ -82,7 +82,7 @@ Neptune [记录你的 git 信息](https://web.archive.org/web/20220928194919/htt
 
 通常是一个*。yaml* 文件，包含脚本运行所需的所有信息。例如:
 
-```
+```py
 data:
     train_path: '/path/to/my/train.csv'
     valid_path: '/path/to/my/valid.csv'
@@ -100,7 +100,7 @@ model:
 
 您只需将参数作为参数传递给脚本:
 
-```
+```py
 python train_evaluate.py \
     --train_path '/path/to/my/train.csv' \
     --valid_path '/path/to/my/valid.csv' \
@@ -116,7 +116,7 @@ python train_evaluate.py \
 
 您将所有参数放在脚本中的字典中:
 
-```
+```py
 TRAIN_PATH = '/path/to/my/train.csv' 
 VALID_PATH = '/path/to/my/valid.csv'
 
@@ -142,7 +142,7 @@ Hydra 使您能够准备和覆盖复杂的配置设置(包括配置组和层次�
 
 为了理解它是如何工作的，让我们举一个 config.yaml 文件的简单例子:
 
-```
+```py
 project: ORGANIZATION/home-credit
 name: home-credit-default-risk
 parameters:
@@ -160,7 +160,7 @@ parameters:
 
 只需调用 hydra decorator，就可以在应用程序中使用这种配置:
 
-```
+```py
 import hydra
 from omegaconf import DictConfig
 @hydra.main(config_path='config.yaml')
@@ -173,7 +173,7 @@ if __name__ == "__main__":
 
 运行上述脚本将产生以下输出:
 
-```
+```py
 name: home-credit-default-risk
 parameters:
 	n_cv_splits: 5
@@ -191,14 +191,14 @@ project: ORGANIZATION/home-credit
 
 要覆盖现有参数或添加新参数，只需将它们作为 CLI 参数传递即可:
 
-```
+```py
 python hydra-main.py parameters.rf__n_estimators=1500 parameters.rf__max_features=0.2
 
 ```
 
 ***注意:**添加新参数必须关闭严格模式:*
 
-```
+```py
 @hydra.main(config_path='config.yaml', strict=False)
 
 ```
@@ -211,7 +211,7 @@ Hydra 正在积极开发中，请务必查看他们的最新文档。
 
 每当你需要传递一个参数时，你只需传递该参数的一个值。
 
-```
+```py
 ...
 train = pd.read_csv('/path/to/my/train.csv')
 
@@ -233,7 +233,7 @@ model.evaluate(valid)
 
 如果您决定将所有参数作为脚本参数**传递，请确保将它们记录在某个地方**。这很容易忘记，所以使用一个实验管理工具可以自动做到这一点，可以节省你的时间。
 
-```
+```py
 parser = argparse.ArgumentParser()
 parser.add_argument('--number_trees')
 parser.add_argument('--learning_rate')
@@ -253,7 +253,7 @@ Neptune 通过提供各种选项，使得在运行中跟踪超参数变得非常
 
 *   单独记录超参数:
 
-```
+```py
 run["parameters/epoch_nr"] = 5
 run["parameters/batch_size"] = 32
 run["parameters/dense"] = 512
@@ -264,7 +264,7 @@ run["parameters/activation"] = "relu"
 
 *   将它们作为字典记录在一起:
 
-```
+```py
 params = {
 	"epoch_nr": 5,
 	"batch_size": 32,
@@ -280,7 +280,7 @@ run["parameters"] = params
 
 在上述两种情况下，参数都记录在*运行* UI 的*所有元数据*部分下:
 
-```
+```py
 run["config_file"].upload("config.yaml")
 
 ```
@@ -310,7 +310,7 @@ run["config_file"].upload("config.yaml")
 
 如果你仔细想想，记录这些信息并不一定是火箭科学。
 
-```
+```py
 exp.set_property('data_path', 'DATASET_PATH')
 exp.set_property('data_version', md5_hash('DATASET_PATH'))
 ```
@@ -333,14 +333,14 @@ exp.set_property('data_version', md5_hash('DATASET_PATH'))
 
 通常，指标就像一个简单的数字
 
-```
+```py
 exp.send_metric('train_auc', train_auc)
 exp.send_metric('valid_auc', valid_auc)
 ```
 
 但我喜欢把它想得更宽泛一些。为了了解你的模型是否有所改进，你可能想看看图表、混淆矩阵或预测分布。在我看来，这些仍然是度量标准，因为它们帮助你衡量实验的表现。
 
-```
+```py
 exp.send_image('diagnostics', 'confusion_matrix.png')
 exp.send_image('diagnostics', 'roc_auc.png')
 exp.send_image('diagnostics', 'prediction_dist.png')
@@ -370,7 +370,7 @@ exp.send_image('diagnostics', 'prediction_dist.png')
 
 这是首选方案，关于这个主题有很多资源。我特别喜欢的一个是杰夫·黑尔的“学足够多的 Docker 有用”系列。简而言之，您用一些指令定义 docker 文件。
 
-```
+```py
 FROM continuumio/miniconda3
 
 RUN pip install jupyterlab==0.35.6 && \
@@ -390,14 +390,14 @@ WORKDIR /mnt/workdir
 
 您可以根据这些说明构建您的环境:
 
-```
+```py
 docker build -t jupyterlab \
     --build-arg NEPTUNE_API_TOKEN=$NEPTUNE_API_TOKEN .
 ```
 
 您可以通过以下方式在环境中运行脚本:
 
-```
+```py
 docker run \
     -p 8888:8888 \
     jupyterlab:latest \
@@ -411,7 +411,7 @@ docker run \
 
 这是一个更简单的选择，在许多情况下，它足以管理您的环境，不会出现任何问题。它不像 docker 那样给你很多选择或保证，但对你的用例来说已经足够了。环境可以定义为一个*。yaml* 配置文件如下:
 
-```
+```py
 name: salt
 
 dependencies:
@@ -437,14 +437,14 @@ dependencies:
 
 您可以通过运行以下命令来创建 conda 环境:
 
-```
+```py
 conda env create -f environment.yaml
 
 ```
 
 非常酷的是，您总是可以通过运行以下命令将环境状态转储到这样的配置中:
 
-```
+```py
 conda env export > environment.yaml
 
 ```
@@ -455,7 +455,7 @@ conda env export > environment.yaml
 
 您总是可以在 Makefile 中显式定义所有 bash 指令。例如:
 
-```
+```py
 git clone git@github.com:neptune-ml/open-solution-mapping-challenge.git
 cd open-solution-mapping-challenge
 
@@ -468,7 +468,7 @@ curl -0 https://www.kaggle.com/c/imagenet-object-localization-challenge/data/LOC
 
 并通过运行以下命令进行设置:
 
-```
+```py
 source Makefile
 
 ```
@@ -479,7 +479,7 @@ source Makefile
 
 同样，如果您使用的是实验管理器，您可以在创建新实验时对代码进行快照，即使您忘记了 git commit:
 
-```
+```py
 experiment_manager.create_experiment(upload_source_files=['environment.yml')
 ...
 
@@ -500,7 +500,7 @@ experiment_manager.create_experiment(upload_source_files=['environment.yml')
 
 有多种方法可以做到这一点——像 [PyTorch](https://web.archive.org/web/20220928194919/https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-model-for-inference) 和 [Keras](https://web.archive.org/web/20220928194919/https://www.tensorflow.org/guide/keras/save_and_serialize) 这样的库有自己的保存和加载方法，而深度学习之外的 [Pickle](https://web.archive.org/web/20220928194919/https://docs.python.org/3/library/pickle.html) 仍然是从文件中保存和加载模型的最流行的方法:
 
-```
+```py
 import pickle
 
 with open(“saved_model.pkl”, “wb”) as f:
@@ -513,7 +513,7 @@ with open(“saved_model.pkl”, “rb”) as f:
 
 由于模型被保存为文件，您可以使用文件版本控制工具，如 git，或者将文件上传到实验跟踪器，如 Neptune:
 
-```
+```py
 run[“trained_model”].upload(“saved_model.pkl”)
 
 ```
@@ -584,7 +584,7 @@ MLflow 提供:
 
 我想从一些伪代码开始，稍后再解释:
 
-```
+```py
 time, budget, business_goal = business_specification()
 
 creative_idea = initial_research(business_goal)

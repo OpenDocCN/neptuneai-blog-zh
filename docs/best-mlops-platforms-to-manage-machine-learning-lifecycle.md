@@ -141,7 +141,7 @@ MLflow 是用 REST APIs 构建的，这使得它的工作空间看起来很简�
 
 下面是一个 MLFlow 项目示例，它可以由一个名为 MLproject 的简单 YAML 文件定义:
 
-```
+```py
 name: My Project
 conda_env: conda.yaml
 entry_points:

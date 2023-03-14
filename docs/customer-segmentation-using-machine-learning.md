@@ -148,7 +148,7 @@ K-Means 聚类是解决数据聚类问题的一种有效的机器学习算法。
 
 首先，我们需要实现所需的 Python 库，如下表所示。
 
-```
+```py
 
 import pandas as pd
 import numpy as np
@@ -163,7 +163,7 @@ import matplotlib.pyplot as plt
 
 导入库之后，我们的下一步是加载 pandas 数据框中的数据。为此，我们将使用熊猫的 read_csv 方法。
 
-```
+```py
 customersdata = pd.read_csv("customers-data.csv")
 
 ```
@@ -172,14 +172,14 @@ customersdata = pd.read_csv("customers-data.csv")
 
 加载数据后，我们需要定义 K 均值模型。这是在我们从 sklearn 导入的 KMeans 类的帮助下完成的，如下面的代码所示。
 
-```
+```py
 kmeans_model = KMeans(init='k-means++',  max_iter=400, random_state=42)
 
 ```
 
 定义模型后，我们要使用训练数据集进行训练。这是通过使用 fit 方法实现的，如下面的代码所示。
 
-```
+```py
 kmeans_model.fit(customersdata[['products_purchased','complains',
 'money_spent']])
 
@@ -212,7 +212,7 @@ kmeans_model.fit(customersdata[['products_purchased','complains',
 *   k(簇的数量)，
 *   数据(输入数据)。
 
-```
+```py
 def try_different_clusters(K, data):
 
     cluster_values = list(range(1, K+1))
@@ -229,7 +229,7 @@ def try_different_clusters(K, data):
 
 下面的代码调用了 try_different_clusters 方法，其中我们将 K 的值从 1 传递到 12，并计算 K 的每个值的惯性。
 
-```
+```py
 outputs = try_different_clusters(12, customersdata[['products_purchased','complains','money_spent']])
 distances = pd.DataFrame({"clusters": list(range(1, 13)),"sum of squared distances": outputs})
 
@@ -237,7 +237,7 @@ distances = pd.DataFrame({"clusters": list(range(1, 13)),"sum of squared distanc
 
 使用下面的代码，我们绘制了 K 值(在 x 轴上)相对于 Y 轴上相应的惯性值。
 
-```
+```py
 figure = go.Figure()
 figure.add_trace(go.Scatter(x=distances["clusters"], y=distances["sum of squared distances"]))
 
@@ -257,7 +257,7 @@ figure.show()
 
 如前所述，我们需要使用找到的最佳聚类数再次训练 k-means 聚类模型。
 
-```
+```py
 kmeans_model_new = KMeans(n_clusters = 5,init='k-means++',max_iter=400,random_state=42)
 
 kmeans_model_new.fit_predict(customersdata[['products_purchased','complains','money_spent']])
@@ -274,7 +274,7 @@ kmeans_model_new.fit_predict(customersdata[['products_purchased','complains','mo
 
 首先，让我们向现有的客户数据集中添加一个名为“clusters”的新列。该列将能够表明哪个客户属于哪个集群。
 
-```
+```py
 cluster_centers = kmeans_model_new.cluster_centers_
 data = np.expm1(cluster_centers)
 points = np.append(data, cluster_centers, axis=1)
@@ -284,7 +284,7 @@ points
 
 注意，我们在这里使用 NumPy expm1 方法。NumPy expm1 函数为 NumPy 数组中的每个元素返回负一的指数值作为输出。因此，np.expm1 方法接受 arr_name 和 out 参数，然后将数组作为输出返回。
 
-```
+```py
 points = np.append(points, [[0], [1], [2], [3], [4]], axis=1)
 customersdata["clusters"] = kmeans_model_new.labels_
 
@@ -308,7 +308,7 @@ plotly.express 类具有可以一次性生成完整数字的函数。一般来�
 
 与 [2D 散点图](https://web.archive.org/web/20221206005800/https://plotly.com/python/line-and-scatter/)一样，px.scatter 在二维空间中绘制单个数据，而 3D 方法 px.scatter_3d 在三维空间中绘制单个数据。
 
-```
+```py
 figure = px.scatter_3d(customersdata,
                     color='clusters',
                     x="products_purchased",

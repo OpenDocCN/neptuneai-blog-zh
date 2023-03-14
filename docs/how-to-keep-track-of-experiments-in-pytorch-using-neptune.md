@@ -36,14 +36,14 @@
 
 为了在 python 的培训过程中使用这个仪表板，Neptune 开发人员开发了一个易于使用的包，您可以通过 pip 安装它:
 
-```
+```py
 pip install neptune-client
 
 ```
 
 完成安装后，您需要像这样初始化 Neptune:
 
-```
+```py
 import neptune.new as neptune
 from neptune.new.types import File
 
@@ -59,7 +59,7 @@ run = neptune.init(project='<username>/Experiment-Tracking-PyTorch',
 
 让我们从跟踪通常的度量开始，比如训练/测试损失、时期损失和梯度。为此，您只需将 run['metrics/train_loss']。log(loss ),其中“metrics”是可以存储所需参数的目录,“loss”是被跟踪的度量。在你的 PyTorch 训练循环中会是这样的:
 
-```
+```py
 def train(model, device, train_loader, optimizer, epoch):
    model.train()
    for batch_idx, (data, target) in enumerate(train_loader):
@@ -86,7 +86,7 @@ def train(model, device, train_loader, optimizer, epoch):
 
 为了跟踪超参数(你应该，总是这样做！)你需要做的就是简单的给海王星的 run 对象添加这样的参数。
 
-```
+```py
 PARAMS = {'batch_size_train': 64,
          'batch_size_test': 1000,
          'momentum': 0.5,
@@ -118,7 +118,7 @@ Neptune 为您提供了许多定制选项，您可以简单地记录更多特定
 
 只需将这些作为参数传递给 init()函数，这很简单:
 
-```
+```py
 NEPTUNE_API_TOKEN = "<api-token-here>"
 run = neptune.init(project='<username>/Experiment-Tracking-PyTorch',
                    api_token=NEPTUNE_API_TOKEN,
@@ -132,7 +132,7 @@ run = neptune.init(project='<username>/Experiment-Tracking-PyTorch',
 
 #### 记录图像
 
-```
+```py
 def train(model, device, train_loader, optimizer, epoch):
    model.train()
    for batch_idx, (data, target) in enumerate(train_loader):
@@ -178,7 +178,7 @@ def train(model, device, train_loader, optimizer, epoch):
 
 例如，我们可以使用 torch.save()方法将模型权重和配置保存到本地磁盘以及 Neptune 的仪表板中:
 
-```
+```py
 torch.save(model.state_dict(), 'model_dict.ckpt')
 
 run["model_checkpoints"].upload("model_dict.ckpt")
@@ -186,7 +186,7 @@ run["model_checkpoints"].upload("model_dict.ckpt")
 
 至于像 ROC 曲线和混淆矩阵这样的训练后分析，您可以使用您最喜欢的绘图库绘制它，并用 neptune.log_image()记录它
 
-```
+```py
 from scikitplot.metrics import plot_confusion_matrix
 import matplotlib.pyplot as plt
 ...

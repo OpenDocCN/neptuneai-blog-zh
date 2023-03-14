@@ -49,7 +49,7 @@
 
 在本练习中，我们将创建一个 Neptune 项目，并将其标记为"*learningrateschedule*？。在[获得您的 Neptune](https://web.archive.org/web/20230228190120/https://docs.neptune.ai/getting-started/installation#authentication-neptune-api-token) API 令牌后，您可以使用下面的代码将 Python 连接到我们的项目:
 
-```
+```py
 project = neptune.init(api_token=os.getenv('NEPTUNE_API_TOKEN'),
                        project='YourUserName/YourProjectName')
 project.stop()
@@ -61,7 +61,7 @@ project.stop()
 
 除此之外，我们还将定义几个辅助函数来保存和绘制训练过程中的学习率:
 
-```
+```py
 def reset_random_seeds(CUR_SEED=9125):
    os.environ['PYTHONHASHSEED']=str(CUR_SEED)
    tf.random.set_seed(CUR_SEED)
@@ -125,7 +125,7 @@ def plotPerformance(history, CURRENT_LR_SCHEDULER=CURRENT_LR_SCHEDULER):
 
 此外，让我们还创建一个帮助器函数，在整个实验过程中，将学习率和模型性能图表记录到 Neptune:
 
-```
+```py
 def plot_Neptune(history, decayTitle, npt_exp):
 
         npt_exp[f'Learning Rate Change ({decayTitle})'].upload(neptune.types.File.as_image(plotLR(history)))
@@ -137,7 +137,7 @@ def plot_Neptune(history, decayTitle, npt_exp):
 
 有了数据集和辅助函数，我们现在可以构建一个神经网络模型作为图像分类器。为简单起见，我们当前的模型包含两个隐藏层和一个输出层，输出层具有用于多类分类的*‘soft max’*激活功能:
 
-```
+```py
 def runModel():
     model = Sequential()
     model.add(Flatten(input_shape=[28, 28]))
@@ -156,7 +156,7 @@ model.summary()
 
 如上所述，恒定调度是所有学习率调度器中最简单的方案。为了设置性能基线，我们将在所有时期使用一致的学习率 0.01 来训练模型:
 
-```
+```py
 npt_exp = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project='YourUserName/YourProjectName',
@@ -209,7 +209,7 @@ npt_exp.stop()
 
 Keras 提供了一个内置的标准衰减策略，它可以在优化器的“*衰减*”参数中指定，如下所示:
 
-```
+```py
 initial_learning_rate = 0.1
 epochs = 100
 
@@ -263,7 +263,7 @@ trainHistory_constantLR = model.fit(
 
 利用这种方案，学习率将在训练时期结束时衰减到零。要实现线性衰减:
 
-```
+```py
 initial_learning_rate = 0.5
 epochs = 100
 decay = initial_learning_rate/epochs
@@ -293,7 +293,7 @@ class lr_polynomial_decay:
 
 为了用这个定制的线性衰减来训练我们的模型，我们所需要的就是在[leargatescheduler](https://web.archive.org/web/20230228190120/https://keras.io/api/callbacks/learning_rate_scheduler/)函数中指定它:
 
-```
+```py
 npt_exp_4 = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project='YourUserName/YourProjectName',
@@ -349,20 +349,20 @@ npt_exp_4.stop()
 
 基于时间的衰减公式定义为:
 
-```
+```py
 def lr_time_based_decay(epoch, lr):
         return lr * 1 / (1 + decay * epoch)
 ```
 
 其中“衰变”是一个参数，通常计算如下:
 
-```
+```py
 decay = initial_learning_rate/epochs
 ```
 
 让我们指定以下参数:
 
-```
+```py
 initial_learning_rate = 0.5
 epochs = 100
 decay = initial_learning_rate/epochs
@@ -376,7 +376,7 @@ decay = initial_learning_rate/epochs
 
 与线性函数相比，基于时间的衰减导致学习率在训练开始时下降得更快，而在之后下降得更慢。和以前一样，让我们将这个调度器传递给 **LearningRateScheduler** 回调，并将性能图表记录到 Neptune:
 
-```
+```py
 npt_exp_1 = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project='YourUserName/YourProjectName',
@@ -404,7 +404,7 @@ npt_exp_1.stop()
 
 现在，有办法消除这些波动吗？让我们转向指数衰减，它被定义为历元数的指数函数:
 
-```
+```py
 def lr_exp_decay(epoch):
     k = 0.1
     return initial_learning_rate * math.exp(-k*epoch)
@@ -418,7 +418,7 @@ def lr_exp_decay(epoch):
 
 指数方案在开始时提供了更平滑的衰减路径，这将导致更平滑的训练曲线。让我们运行这个模型，看看是否是这样:
 
-```
+```py
 npt_exp_3 = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project='YourUserName/YourProjectName',
@@ -447,7 +447,7 @@ npt_exp_3.stop()
 
 在该策略下，我们的学习率被安排为每 N 个时期减少一定量:
 
-```
+```py
 def lr_step_based_decay(epoch):
     drop_rate = 0.8
     epochs_drop = 10.0
@@ -464,7 +464,7 @@ def lr_step_based_decay(epoch):
 
 将它传递给我们的模型:
 
-```
+```py
 npt_exp_2 = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project='YourUserName/YourProjectName',
@@ -503,7 +503,7 @@ npt_exp_2.stop()
 
 基于我们的实验，总体来看，学习在大约 60 个时期停止；因此，为了便于可视化，我们将放大以关注前 60 个时期。和以前一样，我们将在 Neptune 中记录跟踪图:
 
-```
+```py
 npt_exp_master = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project='YourUserName/YourProjectName',
@@ -539,7 +539,7 @@ npt_exp_master.stop()
 
 现在，为了更好地衡量，让我们用 Keras 默认的“Adam”优化器来训练我们的模型，作为最后一个实验:
 
-```
+```py
 npt_exp_5 = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project='YourUserName/YourProjectName',

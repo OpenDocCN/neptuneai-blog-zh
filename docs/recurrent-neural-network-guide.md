@@ -459,7 +459,7 @@ RNN 在 Keras / Tensorflow 和 Python 中的实现
 
 数据预处理是必要的，因为数据包含 ASCII 字符，这可能会干扰我们的建模过程并给出不正确的结果。
 
-```
+```py
 import numpy as np
 
 from tensorflow.keras.layers.recurrent import SimpleRNN
@@ -469,7 +469,7 @@ from tensorflow.keras.layers import Dense, Activation
 
 清理完数据后，我们可以创建一个查找表。查找表基本上从数据中创建唯一字符的表。该表将把文本中的字符转换成数字，然后将数字输入到 RNNs 中。
 
-```
+```py
 INPUT_FILE = "data/wonderland.txt"
 ```
 
@@ -477,7 +477,7 @@ INPUT_FILE = "data/wonderland.txt"
 
 例如，如果我们输入“加密货币是下一件大事”，那么:
 
-```
+```py
 print("Extracting text from input")
 file = open(INPUT_FILE, 'rb')
 lines = []
@@ -493,7 +493,7 @@ text = " ".join(lines)
 
 After the data is cleaned, we can create a look-up table. The look-up table basically creates a table of unique characters from the data. This table will convert the characters in the text to numbers, which will then be fed into the RNNs. 
 
-```
+```py
 chars = set([c for c in text])
 nb_chars = len(chars)
 char2index = dict((c, i) for i, c in enumerate(chars))
@@ -502,7 +502,7 @@ index2char = dict((i, c) for i, c in enumerate(chars))
 print(index2char)
 ```
 
-```
+```py
 {0: '!',
  1: 's',
  2: '7',
@@ -541,14 +541,14 @@ Now, we’ll create inputs and labels. It’s important to understand that in se
 
 定义模型:
 
-```
+```py
 print("Creating input and label")
 SEQ_LEN = 10 
 STEP = 1
 print("The table is ready")
 ```
 
-```
+```py
 input_chars = []
 label_chars = []
 for i in range(0, len(text) - SEQ_LEN, STEP):
@@ -558,7 +558,7 @@ for i in range(0, len(text) - SEQ_LEN, STEP):
 print(input_chars)
 ```
 
-```
+```py
 ['project gu',
  'roject gut',
  'oject gute',
@@ -574,7 +574,7 @@ print(input_chars)
 
 永远记住，密集层应该等于文本中唯一字符的数量
 
-```
+```py
 print("Vectorizing input and label text...")
 X = np.zeros((len(input_chars), SEQ_LEN, nb_chars), dtype=np.bool)
 y = np.zeros((len(input_chars), nb_chars), dtype=np.bool)
@@ -591,7 +591,7 @@ for i, input_char in enumerate(input_chars):
 1.  在本文中，我们讨论了:
 2.  如何有效地模拟序列以捕捉结构和上下文。
 
-```
+```py
 HIDDEN_SIZE = 128
 BATCH_SIZE = 128
 NUM_ITERATIONS = 25
@@ -610,7 +610,7 @@ model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
 
 ### 上下文向量如何提供一种有效的方法来概括一个序列
 
-```
+```py
 for iteration in range(NUM_ITERATIONS):
     print("=" * 50)
     print("Iteration #: %d" % (iteration))

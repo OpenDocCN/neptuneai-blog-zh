@@ -44,7 +44,7 @@ Neptune 中的项目可以有多个角色不同的成员(查看者、贡献者�
 *   您的所有数据都记录到云中，或者，如果您愿意，也可以记录到本地
 *   你所要做的就是简单地将 NeptuneObserver 添加到实验中:
 
-```
+```py
 ex = Experiment('image_classification', interactive=True)
 
 ex.observers.append(NeptuneObserver(run=neptune_run))

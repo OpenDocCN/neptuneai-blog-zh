@@ -65,7 +65,7 @@ DALEX(在 R 和 Python 中可用)是一个工具，**帮助你理解**复杂模�
 
 为任何模型创建一个解释器真的很容易，正如你在这个例子中看到的使用 *sklearn* ！
 
-```
+```py
 import dalex as dx
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -105,7 +105,7 @@ DALEX 为您提供了一系列方法来显示每个变量的局部影响:
 
 按照我们在 Titanic 数据集上创建的示例随机森林模型，我们可以很容易地创建上面提到的图。
 
-```
+```py
 observation = pd.DataFrame({'gender': ['male'],
                    	    'age': [25],
                    	    'class': ['1st'],
@@ -139,7 +139,7 @@ cp.plot(variable_type = "categorical")
 
 现在让我们为我们的例子创建一些全局解释。
 
-```
+```py
 
 vi = exp.model_parts()
 vi.plot(max_vars=5)
@@ -204,7 +204,7 @@ ale_cat.plot(pdp_cat)
 
 您只需在脚本中添加几行代码:
 
-```
+```py
 import neptune
 from neptunecontrib.api import *
 from neptunecontrib.versioning.data import *
@@ -264,7 +264,7 @@ log_pickle('model.pkl', clf)
 *   创建您的 DALEX 解释器对象
 *   将它们从`neptunecontrib`传递给`log_local_explanations`函数
 
-```
+```py
 from neptunecontrib.api import log_local_explanations
 
 observation = pd.DataFrame({'gender': ['male'],
@@ -298,7 +298,7 @@ log_local_explanations(expl, observation)
 *   从`neptunecontrib`传递给`log_global_explanations`函数
 *   (可选)指定要绘制的分类特征
 
-```
+```py
 from neptunecontrib.api import log_global_explanations
 
 log_global_explanations(expl, categorical_features=["gender", "class"])
@@ -328,7 +328,7 @@ log_global_explanations(expl, categorical_features=["gender", "class"])
 
 这非常简单:
 
-```
+```py
 from neptunecontrib.api import log_explainer
 
 log_explainer('explainer.pkl', expl)
@@ -342,7 +342,7 @@ log_explainer('explainer.pkl', expl)
 
 首先，如果你把你的解释器登录到 Neptune，你可以直接把它提取到你的脚本或者笔记本中:
 
-```
+```py
 import neptune
 from neptunecontrib.api import get_pickle
 
@@ -391,7 +391,7 @@ explainer = get_pickle(filename='explainer.pkl', experiment=experiment)
 更好的是，Neptune 允许您访问您以编程方式记录的所有信息，包括模型解释器。
 你可以**获取每个实验的讲解对象并进行比较**。只需使用`neptunecontrib`中的`get_pickle`函数，然后用 DALEX `.plot`可视化多个解释器:
 
-```
+```py
 experiments =project.get_experiments(id=['DAL-68','DAL-69','DAL-70','DAL-71'])
 
 shaps = []
@@ -450,14 +450,14 @@ shaps[0].plot(shaps[1:])
 
 ##### 2\. Install Neptune client library
 
-```
+```py
 pip install neptune-client
 
 ```
 
 ##### 3\. Add logging to your script
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init_run("Me/MyProject")

@@ -98,7 +98,7 @@
 
 如上所述，由于观察是确定这些问题的关键部分，我们将使用 [Neptune.ai](https://web.archive.org/web/20230103154738/https://docs.neptune.ai/getting-started/how-to-add-neptune-to-your-code) 来跟踪我们的建模管道:
 
-```
+```py
 import neptune.new as neptune
 import os
 myProject = 'YourUserName/YourProjectName'
@@ -113,7 +113,7 @@ project.stop()
 
 *   记录梯度和重量:
 
-```
+```py
 def getBatchGradWgts(grads, wgts, lossVal,
                       gradHist, lossHist, wgtsHist,
                       recordWeight=True, npt_exp=None):
@@ -137,7 +137,7 @@ npt_exp[f'MeanGrads{layerName.upper()}'].log(np.mean(grad.numpy()))
       wgtsHist.append(dataWeight)
 ```
 
-```
+```py
 def fitModel(X, y, model, optimizer,
               n_epochs=n_epochs, curBatch_size=batch_size, npt_exp=None):
 
@@ -172,7 +172,7 @@ def fitModel(X, y, model, optimizer,
 
 *   可视化各层的平均梯度:
 
-```
+```py
 def gradientsVis(curGradHist, curLossHist, modelName):
     fig, ax = plt.subplots(1, 1, sharex=True, constrained_layout=True, figsize=(7,5))
     ax.set_title(f"Mean gradient {modelName}")
@@ -186,15 +186,15 @@ def gradientsVis(curGradHist, curLossHist, modelName):
 
 现在，我们将模拟一个数据集，并构建我们的基线**二元**分类神经网络:
 
-```
+```py
 X, y = make_moons(n_samples=3000, shuffle=True , noise=0.25, random_state=1234)
 ```
 
-```
+```py
 batch_size, n_epochs = 32, 100
 ```
 
-```
+```py
 npt_exp = neptune.init(
         api_token=os.getenv('NEPTUNE_API_TOKEN'),
         project=myProject,
@@ -250,7 +250,7 @@ npt_exp = neptune.init(
 
 为了实现 ReLU 激活，我们可以简单地在如下所示的模型函数中指定` *relu* ':
 
-```
+```py
 model = binaryModel(curName="Relu", curInitializer=curInitializer, curActivation="relu")
 
 model.compile(optimizer=curOptimizer, loss='binary_crossentropy', metrics=['accuracy'])
@@ -268,7 +268,7 @@ model.compile(optimizer=curOptimizer, loss='binary_crossentropy', metrics=['accu
 
 由于消失梯度的根本原因在于一堆小梯度的相乘，直观上，通过减少梯度的数量，即减少我们网络中的层数来解决这个问题是有意义的。例如，与基线模型中指定 3 个隐藏层不同，我们可以只保留 1 个隐藏层，以使我们的模型更简单:
 
-```
+```py
 def binaryModel(curName, curInitializer, curActivation, x_tr=None):
         model = Sequential()
         model.add(InputLayer(input_shape=(2, ), name=curName+"0"))
@@ -297,7 +297,7 @@ def binaryModel(curName, curInitializer, curActivation, x_tr=None):
 
 回到具有 3 个隐藏层的原始模型，我们将模型权重初始化为 *glorot_uniform* :
 
-```
+```py
 def binaryModel(curName, curInitializer, curActivation, x_tr=None):
         model = Sequential()
         model.add(InputLayer(input_shape=(2, ), name=curName+"0"))
@@ -329,7 +329,7 @@ def binaryModel(curName, curInitializer, curActivation, x_tr=None):
 
 此外，作为一个高效的优化器，Adam 可以快速收敛或发散。因此，稍微降低学习率将有助于防止你的网络太容易发散，从而降低梯度接近零的可能性。要使用 Adam 优化器，我们需要修改的只是 *`curOptimizer`* arg。：
 
-```
+```py
 curOptimizer = keras.optimizers.Adam(learning_rate=0.008) 
 
 curInitializer = RandomUniform(-1, 1)
@@ -356,7 +356,7 @@ model.compile(optimizer=curOptimizer, loss='binary_crossentropy', metrics=['accu
 
 对于爆炸梯度问题，让我们看看这个回归模型。
 
-```
+```py
 nfeatures = 15
 X, y = make_regression(n_samples=1500, n_features=nfeatures, noise=0.2, random_state=42)
 
@@ -378,7 +378,7 @@ def regressionModel(X, y, curInitializer, USE_L2REG, secondLayerAct='relu'):
 
 为了编译该模型，我们将使用统一的[4，5]权重初始化器以及 ReLu 激活，目的是创建爆炸梯度情况:
 
-```
+```py
 sgd = tf.keras.optimizers.SGD()
 curOptimizer = sgd
 
@@ -390,7 +390,7 @@ model.compile(loss='mean_squared_error', optimizer=curOptimizer, metrics=['mse']
 curModelName = 'Relu_Raw'
 ```
 
-```
+```py
 curGradHist, curLossHist, curWgtHist = fitModel(X, y, model, optimizer=curOptimizer,                                                modelType = 'regression',                                                npt_exp=npt_exp)
 
 npt_exp['Comparing All Layers'].upload(neptune.types.File.as_image(gradientsVis(curGradHist, curLossHist,
@@ -410,7 +410,7 @@ npt_exp.stop()
 
 可以通过` *clipvalue* '参数指定将渐变限制为某个值。如下图所示:
 
-```
+```py
 sgd = tf.keras.optimizers.SGD(clipvalue=50)
 curOptimizer = sgd
 curInitializer = 'glorot_normal'
@@ -436,7 +436,7 @@ curModelName = 'GradClipping'
 
 这是该模型的渐变图，修复了渐变爆炸问题:
 
-```
+```py
 curOptimizer = tf.keras.optimizers.SGD()
 
 curInitializer = 'glorot_normal'
@@ -460,7 +460,7 @@ L2 范数正则化
 
 根据 Razvan 等人的建议，我们将这个模型的初始权重设置为 glorot normal。，2013 初始化小值和方差的参数。这里显示了每层的损耗曲线和梯度:
 
-```
+```py
 curInitializer = 'glorot_normal'
 x = Dense(35, activation='tanh', kernel_initializer=curInitializer,
           kernel_regularizer=regularizers.l2(0.01),

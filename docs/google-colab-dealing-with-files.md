@@ -87,7 +87,7 @@ Colab 提供了(几乎)开始编码所需的所有设置，但是它没有开箱
 
 这一步要求您首先从`google.colab library`导入`files`模块:
 
-```
+```py
 from google.colab import files
 
 ```
@@ -96,7 +96,7 @@ from google.colab import files
 
 您使用了`files`对象的上传方法:
 
-```
+```py
 uploaded = files.upload()
 
 ```
@@ -115,14 +115,14 @@ uploaded = files.upload()
 
 上传完成后，您可以像阅读 colab 中的任何其他文件一样阅读它:
 
-```
+```py
 df4 = pd.read_json("News_Category_Dataset_v2.json", lines=True)
 
 ```
 
 或者使用`io`库直接从`uploaded`字典中读取:
 
-```
+```py
 import io
 df5 = pd.read_json(io.BytesIO(uploaded['News_Category_Dataset_v2.json']), lines=True)
 ```
@@ -141,7 +141,7 @@ files 对象的`download`方法可用于将任何文件从 colab 下载到您的
 
 1.执行下面的代码，它将为您提供一个身份验证链接
 
-```
+```py
 from google.colab import drive
 drive.mount('/content/gdrive')
 ```
@@ -164,7 +164,7 @@ drive.mount('/content/gdrive')
 
 你甚至可以使用通常的文件/目录操作从 Colab 直接写入 Google Drive。
 
-```
+```py
 !touch "/content/gdrive/My Drive/sample_file.txt"
 
 ```
@@ -177,7 +177,7 @@ drive.mount('/content/gdrive')
 
 1.您需要首先通过运行以下代码来验证要与 Colab 链接的 Google 帐户:
 
-```
+```py
 from google.colab import auth
 auth.authenticate_user()
 ```
@@ -194,7 +194,7 @@ auth.authenticate_user()
 
 要与 Google Sheets 交互，需要导入预装的`gspread`库。为了授权`gspread`访问您的谷歌账户，您需要预装`oauth2client.client`库中的`GoogleCredentials`方法:
 
-```
+```py
 import gspread
 from oauth2client.client import GoogleCredentials
 
@@ -211,7 +211,7 @@ gc = gspread.authorize(GoogleCredentials.get_application_default())
 
 1.使用`gc`对象的 create 方法来`create`工作簿:
 
-```
+```py
 wb = gc.create('demo')
 
 ```
@@ -222,7 +222,7 @@ wb = gc.create('demo')
 
 3.若要将值写入工作簿，请先打开一个工作表:
 
-```
+```py
 ws = gc.open('demo').sheet1
 ```
 
@@ -246,7 +246,7 @@ ws = gc.open('demo').sheet1
 
 1.使用`gc`对象的`open`方法打开工作簿:
 
-```
+```py
 wb = gc.open('demo')
 
 ```
@@ -265,14 +265,14 @@ wb = gc.open('demo')
 
 1.首先指定您的项目 ID:
 
-```
+```py
 project_id = '<project_ID>'
 
 ```
 
 2.要访问 GCS，您必须验证您的 Google 帐户:
 
-```
+```py
 from google.colab import auth
 auth.authenticate_user()
 ```
@@ -289,14 +289,14 @@ auth.authenticate_user()
 
 7.然后您配置`gsutil`来使用您的项目:
 
-```
+```py
 !gcloud config set project {project_id}
 
 ```
 
 8.您可以使用 make bucket ( `mb`)命令创建一个存储桶。GCP 存储桶必须有一个全球唯一的名称，所以使用预安装的`uuid`库来生成一个全球唯一的 ID:
 
-```
+```py
 import uuid
 bucket_name = f'sample-bucket-{uuid.uuid1()}'
 !gsutil mb gs://{bucket_name}
@@ -304,14 +304,14 @@ bucket_name = f'sample-bucket-{uuid.uuid1()}'
 
 9.一旦创建了 bucket，您就可以从您的 colab 环境向它上传一个文件:
 
-```
+```py
 !gsutil cp /tmp/to_upload.txt gs://{bucket_name}/
 
 ```
 
 10.上传完成后，该文件将出现在您项目的 GCS 浏览器中:[https://console.cloud.google.com/storage/browser?project=**T4【project _ id**>](https://web.archive.org/web/20230213035612/https://console.cloud.google.com/storage/browser?project=Your_project_ID_here)
 
-```
+```py
 !gsutil cp gs://{bucket_name}/{filename} {download_location}
 ```
 
@@ -323,7 +323,7 @@ bucket_name = f'sample-bucket-{uuid.uuid1()}'
 
 1.安装`awscli`库
 
-```
+```py
 !pip install awscli
 
 ```
@@ -336,7 +336,7 @@ bucket_name = f'sample-bucket-{uuid.uuid1()}'
 
 然后你可以从 S3 下载任何文件:
 
-```
+```py
 !aws s3 cp s3://{bucket_name} ./{download_location} --recursive --exclude "*" --include {filepath_on_s3}
 ```
 
@@ -346,7 +346,7 @@ bucket_name = f'sample-bucket-{uuid.uuid1()}'
 
 要上传文件，只需颠倒源和目标参数:
 
-```
+```py
 !aws s3 cp ./{upload_from} s3://{bucket_name} --recursive --exclude "*" --include {file_to_upload}
 
 ```
@@ -365,7 +365,7 @@ bucket_name = f'sample-bucket-{uuid.uuid1()}'
 
 3.然后在 Colab 中运行以下命令:
 
-```
+```py
 !mkdir ~/.kaggle 
 !echo '<PASTE_CONTENTS_OF_KAGGLE_API_JSON>' > ~/.kaggle/kaggle.json 
 !chmod 600 ~/.kaggle/kaggle.json  
@@ -374,13 +374,13 @@ bucket_name = f'sample-bucket-{uuid.uuid1()}'
 
 4.一旦在 Colab 中创建了 kaggle.json 文件，并且安装了 kaggle 库，就可以使用
 
-```
+```py
 !kaggle datasets list -s {KEYWORD}
 ```
 
 5.然后使用下载数据集
 
-```
+```py
 !kaggle datasets download -d {DATASET NAME} -p /content/kaggle/
 
 ```
@@ -391,14 +391,14 @@ bucket_name = f'sample-bucket-{uuid.uuid1()}'
 
 1.您需要导入预先安装的`sqlalchemy`库来使用关系数据库:
 
-```
+```py
 import sqlalchemy
 
 ```
 
 2.输入连接详细信息并创建引擎:
 
-```
+```py
 HOSTNAME = 'ENTER_HOSTNAME'
 USER = 'ENTER_USERNAME'
 PASSWORD = 'ENTER_PASSWORD'
@@ -411,7 +411,7 @@ engine = sqlalchemy.create_engine(connection_string)
 
 3.最后，只需创建 SQL 查询，并使用`pd.read_sql_query():`将查询结果加载到 dataframe 中
 
-```
+```py
 query = f"SELECT * FROM {DATABASE}.{TABLE}"
 
 import pandas as pd

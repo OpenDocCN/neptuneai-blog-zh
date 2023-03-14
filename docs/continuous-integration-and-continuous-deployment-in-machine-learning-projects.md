@@ -72,7 +72,7 @@ MLOps 级的大部分 ML 团队都存在以上三个问题。所以，你可以�
 
 为了将 Neptune 集成到项目中，我们需要在多大程度上改变项目的代码？如果我们删除所需的注册过程(花了我们大约 3 分钟)并省略安装部分(又花了我们 3 分钟)，答案将是–**只添加了几行额外的代码来实现完整的集成。**为了实现集成，我们需要额外的代码:
 
-```
+```py
 import neptune
 import neptune_tensorboard as neptune_tb
 from neptunecontrib.monitoring.keras import NeptuneMonitor
@@ -87,7 +87,7 @@ Neptune 文档很棒，所以你可以在里面找到你需要的任何东西。
 
 让我回到整合上来。下一个变化是使用标准进行培训的模型发布。拟合方法。除了标准之外我们唯一要做的。fit 将传递一个新的回调函数(NeptuneMonitor())来完成所有的集成工作。以下是模型拟合的完整代码:
 
-```
+```py
 workers_num = 6
 
 model.fit_generator(generator=train_data_gen,

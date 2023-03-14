@@ -73,7 +73,7 @@ MLOps 可以被描述为机器学习或数据科学项目的生命周期。生�
 
 MLOps 项目的一般结构如下所示:
 
-```
+```py
 Machine-translation
 ├── kube
 ├── metadata
@@ -95,7 +95,7 @@ Machine-translation
 
 首先，我们必须安装三个库: **Tensorflow-datasets** 用于下载数据， **Tensorflow** 用于深度学习，以及 **Neptune-client** 用于监控和保存元数据。
 
-```
+```py
 !pip install tensorflow_datasets
 !pip install -U 'tensorflow-text==2.8.*'
 
@@ -108,7 +108,7 @@ Machine-translation
 
 我们将使用的数据集，即将葡萄牙语翻译成英语，可以直接从 TensorFlow-datasets 库中下载。一旦数据集被下载，我们就可以把它分成训练数据集和验证数据集。
 
-```
+```py
 examples, metadata = tfds.load('ted_hrlr_translate/pt_to_en', with_info=True,
                                as_supervised=True)
 train_examples, val_examples = examples['train'], examples['validation']
@@ -120,7 +120,7 @@ Requirements.txt 是一个重要的文件，因为它包含了所有的库。这
 
 要创建一个 **requirement.txt** 文件，我们需要做的就是运行:
 
-```
+```py
 !pip freeze > requirements.txt 
 ```
 
@@ -128,7 +128,7 @@ Requirements.txt 是一个重要的文件，因为它包含了所有的库。这
 
 requirements.txt 文件应该是这样的:
 
-```
+```py
 matplotlib==3.2.2
 neptune-client==0.16.1
 numpy==1.21.6
@@ -140,7 +140,7 @@ tensorflow==2.8.0
 
 [登录 neptune.ai](https://web.archive.org/web/20221203090558/https://docs.neptune.ai/you-should-know/logging-metadata) 仪表盘相当简单。首先，我们创建一个类，[存储所有的超参数](https://web.archive.org/web/20221203090558/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display#parameters-and-model-configuration)。这种方法在创建单独的 python 模块时非常方便(我们将在后面看到)。
 
-```
+```py
 class config():
  BUFFER_SIZE = 20000
  BATCH_SIZE = 64
@@ -161,7 +161,7 @@ class config():
 
 然后我们可以创建一个存储所有超参数的字典。
 
-```
+```py
 params = {
    'BUFFER_SIZE': config.BUFFER_SIZE,
    'BATCH_SIZE' : config.BATCH_SIZE,
@@ -183,7 +183,7 @@ params = {
 
 一旦创建了字典，我们就可以使用 [API 令牌](https://web.archive.org/web/20221203090558/https://docs.neptune.ai/getting-started/installation#authentication-neptune-api-token)初始化 Neptune 客户端，并将参数作为字典传递。
 
-```
+```py
 run = neptune.init(
    project="nielspace/machine-translation",
    api_token="eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiJkYjRhYzI0Ny0zZjBmLTQ3YjYtOTY0Yi05ZTQ4ODM3YzE0YWEifQ==",
@@ -206,21 +206,21 @@ run["parameters"] = params
 
 要做到这一点，我们只需要定义精度和损失函数，并将它们传递到训练循环中。
 
-```
+```py
 train_loss = tf.keras.metrics.Mean(name=config.TRAIN_LOSS)
 train_accuracy = tf.keras.metrics.Mean(name=config.TRAIN_ACCURACY)
 ```
 
 在训练循环中，我们将使用与之前相同的方法来记录准确性和损失。
 
-```
+```py
 run['Training Accuracy'].log(train_accuracy.result())
 run['Training Loss'].log(train_loss.result())
 ```
 
 让我们将它们整合到培训循环中。
 
-```
+```py
 for epoch in range(config.MAX_EPOCHS):
  start = time.time()
 
@@ -262,7 +262,7 @@ Neptune-client API 的一个好处是，您可以记录几乎任何事情。
 
 这里有一个例子:
 
-```
+```py
 class Translator(tf.Module):
  def __init__(self, tokenizers, transformer):
    self.tokenizers = tokenizers
@@ -311,7 +311,7 @@ class Translator(tf.Module):
 
 如您所见，预处理和预测所需的步骤包含在同一个类对象中。现在我们测试我们的模型在看不见的数据上的表现。
 
-```
+```py
 def print_translation(sentence, tokens, ground_truth):
  print(f'{"Input:":15s}: {sentence}')
  print(f'{"Prediction":15s}: {tokens.numpy().decode("utf-8")}')
@@ -328,7 +328,7 @@ print_translation(sentence, translated_text, ground_truth)
 
 输出:
 
-```
+```py
 Input:         : este é um problema que temos que resolver.
 Prediction     : this is a problem that we have to solve .
 Ground truth   : this is a problem we have to solve .
@@ -340,7 +340,7 @@ Ground truth   : this is a problem we have to solve .
 
 例如，你可以看到所有的目录已经完全被它们各自的文件和元数据填满了。
 
-```
+```py
 machine-translation
 ├── metadata
 │   ├── checkpoints
@@ -391,7 +391,7 @@ machine-translation
 *   2 加载保存在翻译目录中的重量。
 *   3 定义获得预测的端点。
 
-```
+```py
 import flask
 from flask import Flask
 import logging
@@ -453,7 +453,7 @@ dockerfile 使我们能够创建一个容器*，这是一种包装应用程序�
 
 在下面的例子中，你会看到我是如何构建 Docker 配置的。相当简约极简。
 
-```
+```py
 FROM python:3.7-slim
 RUN apt-get update
 
@@ -503,12 +503,12 @@ deployment.yaml 的目的是配置部署设置。它由两部分组成:
 
 *   API 版本和操作种类
 
-```
+```py
 apiVersion: apps/v1
 kind: Deployment
 ```
 
-```
+```py
 metadata:
  name: translation
 
@@ -544,12 +544,12 @@ service.yaml 将整个应用程序暴露给网络。它类似于 deployment.yaml
 
 *   API 版本和操作种类
 
-```
+```py
 apiVersion: v1
 kind: Service
 ```
 
-```
+```py
 metadata:
  name: machinetranslation
 spec:
@@ -588,7 +588,7 @@ spec:
 
 要启动 Kubernetes 引擎，请在您的云 shell 中编写以下代码。
 
-```
+```py
 !gcloud config set project tensor-machine-translation
 !gcloud config set compute/zone us-central1
 !gcloud container clusters create tensorflow-machine-translation --num-nodes=2
@@ -617,7 +617,7 @@ cloudbuild.yaml 文件将所有进程同步在一起。这很容易理解。配�
 *   3 配置入口点。
 *   4 在 Kubernetes 引擎中部署整个应用程序。
 
-```
+```py
 steps:
 - name: 'gcr.io/cloud-builders/docker'
  args: ['build', '-t', 'gcr.io/tensor-machine-translation/translation', '.']
@@ -642,7 +642,7 @@ steps:
 
 配置完 cloudbuild.yaml 文件后，您可以返回到 Google-Cloud Shell 并运行以下命令:
 
-```
+```py
 !gcloud builds submit --config cloudbuild.yaml
 
 ```

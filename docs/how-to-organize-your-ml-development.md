@@ -16,25 +16,25 @@
 
 首先，让我们创建一个 conda 虚拟环境，我们将在其中安装所有需要的 neptune 库:
 
-```
+```py
 conda create --name neptune python=3.6
 ```
 
 安装 neptune 客户端库:
 
-```
+```py
 pip  install neptune-client
 ```
 
 安装 Neptune 笔记本，将我们所有的工作保存到 Neptune 的 web 客户端:
 
-```
+```py
 pip install -U neptune-notebooks
 ```
 
 使用以下扩展启用 jupyter 集成:
 
-```
+```py
 jupyter nbextension enable --py neptune-notebooks
 ```
 
@@ -44,7 +44,7 @@ jupyter nbextension enable --py neptune-notebooks
 
 要完成设置，请在笔记本中导入 neptune 客户端库，并调用 neptune.init()方法初始化连接:
 
-```
+```py
 import neptune
 neptune.init(project_qualified_name='aymane.hachcham/CaseStudyOnlineRetail')
 ```
@@ -65,7 +65,7 @@ neptune.init(project_qualified_name='aymane.hachcham/CaseStudyOnlineRetail')
 
 为了开始加载数据集，我创建了一个小的 python***data manager***类来下载 CSV 文件，提取主要特征并将它们转换成可用的熊猫数据帧:
 
-```
+```py
 class DataETLManager:
     def __init__(self, root_dir: str, csv_file: str):
         if os.path.exists(root_dir):
@@ -127,7 +127,7 @@ class DataETLManager:
 
  *首先使用 DataETLManager 加载数据集:
 
-```
+```py
 etl_manager = DataETLManager(root_dir='./Data', csv_file='OnlineRetail.csv')
 etl_manager.extract_data()
 etl_manager.transform_data()
@@ -137,14 +137,14 @@ dataset = etl_manager.data_transfomed
 
 对于零售企业来说，核心价值依赖于平台通过客户订单产生的收入。我们可以将单价和数量结合起来形成月收入，并按发票日期汇总:
 
-```
+```py
 dataset['Profit'] = dataset['Quantity'] * dataset['UnitPrice']
 revenue = dataset.groupby(['InvoiceDate'])['Profit'].sum().reset_index()
 ```
 
 我们还可以通过绘制下图来直观显示收入在几个月内的变化情况:
 
-```
+```py
 import chart_studio.plotly as py
 import plotly.graph_objects as go
 import plotly.offline as pyoff
@@ -169,7 +169,7 @@ pyoff.iplot(fig)
 
 为了研究主动客户保持，我们需要检查每个月有多少客户订单:
 
-```
+```py
 uk_customers = dataset.query("Country=='United Kingdom'").reset_index(drop=True)
 activeCustomers = dataset.groupby(['InvoiceDate'])['CustomerID'].nunique().reset_index()
 ```
@@ -190,7 +190,7 @@ activeCustomers = dataset.groupby(['InvoiceDate'])['CustomerID'].nunique().reset
 
 首先初始化这个实验的参数，并调用 create _ experiment()方法。
 
-```
+```py
 params = {
     'n_clusters':4,
     'max_iterations': 1000,
@@ -226,21 +226,21 @@ neptune.create_experiment(
 这个想法是测量自上次购买以来的天数，从而测量平台上记录的不活动天数。我们可以将其计算为所有客户的最大购买日期减去该范围内的总最大日期。
 **创建我们将在**工作的客户数据框架:
 
-```
+```py
 customers = pd.DataFrame(dataset['CustomerID'].unique())
 customers.columns = ['CustomerID']
 ```
 
 **合计最大发票日期:**
 
-```
+```py
 aggregatR = {'InvoiceDate': 'max'}
 customers['LastPurchaseDate']=dataset.groupby(['CustomerID'],as_index=False).agg(aggregatR)['InvoiceDate']
 ```
 
 **生成最近得分:**
 
-```
+```py
 customers['Recency'] = (customers['LastPurchaseDate'].max() - customers['LastPurchaseDate']).dt.days
 ```
 
@@ -250,14 +250,14 @@ customers['Recency'] = (customers['LastPurchaseDate'].max() - customers['LastPur
 
 为此，我们可以调用 neptune.log_table()方法，如下所示:
 
-```
+```py
 from neptunecontrib.api import log_table
 log_table('Recency English Users', recency_UK)
 ```
 
 现在，您可以继续应用 K-Means 来对我们的最近分布进行聚类。在此之前，我们需要定义最适合我们需求的集群数量。一种方法是肘法。肘方法简单地告诉最佳惯性的最佳簇数。
 
-```
+```py
 K-means_metrics = {}
 
 for k in range(1, 10):
@@ -268,7 +268,7 @@ for k in range(1, 10):
 
 让我们画出海王星的值，这样我们可以彻底检查曲线如何演变的细节:
 
-```
+```py
 for val in kmeans_metrics.values():
     neptune.log_metric('Kmeans_Intertia_Values', val)
 ```
@@ -279,7 +279,7 @@ Neptune 自动记录日志部分的值，并相应地生成一个图表。
 
 **K-表示最近:**
 
-```
+```py
 kmeans = KMeans(n_clusters=4)
 kmeans.fit(customers[['Recency']])
 customers['RecencyCluster'] = kmeans.predict(customers[['Recency']])
@@ -287,7 +287,7 @@ customers['RecencyCluster'] = kmeans.predict(customers[['Recency']])
 
 让我们记录最近的分布和预测的集群。
 
-```
+```py
 for cluster in customers['RecencyCluster']:
     neptune.log_metric('UK Recency Clusters', cluster)
 
@@ -306,7 +306,7 @@ for rec in customers['Recency']:
 
 **汇总客户订单数:**
 
-```
+```py
 customers = pd.DataFrame(dataset['CustomerID'].unique())
 customers.columns = ['CustomerID']
 
@@ -317,7 +317,7 @@ customers = pd.merge(customers, freq, on='CustomerID')
 
 **K-频率得分的均值:**
 
-```
+```py
 kmeans = KMeans(n_clusters=4)
 kmeans.fit(customers[['Frequency']])
 customers['FrequencyCluster'] = kmeans.predict(customers[['Frequency']]
@@ -327,7 +327,7 @@ customers['FrequencyCluster'] = kmeans.predict(customers[['Frequency']]
 
 **合计每个客户产生的利润总和:**
 
-```
+```py
 dataset['Profit'] = dataset['UnitPrice'] * dataset['Quantity']
 aggregatMV = {'Profit': 'sum'}
 mv = dataset.groupby('CustomerID', as_index=False).agg(aggregatMV)
@@ -341,7 +341,7 @@ customers.columns = ['CustomerID', 'lastPurchase', 'Recency', 'Frequency', 'Mone
 
 **K-表示货币价值:**
 
-```
+```py
 kmeans = KMeans(n_clusters=4)
 kmeans.fit(customers[['MonetaryValue']])
 customers['MonetaryCluster'] = kmeans.predict(customers[['MonetaryValue']])
@@ -355,7 +355,7 @@ customers['MonetaryCluster'] = kmeans.predict(customers[['MonetaryValue']])
 *   **中间值:3-6 分**
 *   **高值:6-9 分**
 
-```
+```py
 customers['RFMScore'] = customers['RecencyCluster'] + customers['FrequencyCluster'] + customers['MonetaryCluster']
 customers['UserSegment'] = 'Low'
 
@@ -387,7 +387,7 @@ e**X**treme**G**radient**B**oosting 是梯度增强的优化和并行化开源�
 
 **3 个月用户:**
 
-```
+```py
 from datetime import datetime, date
 
 uk = dataset.query("Country=='United Kingdom'").reset_index(drop=True)
@@ -398,7 +398,7 @@ users_3m = uk[(uk['InvoiceDate'].dt.date >= date(2010, 12, 1)) & (uk['InvoiceDat
 
 **6 个月用户:**
 
-```
+```py
 users_6m = uk[(uk['InvoiceDate'].dt.date >= date(2011, 4, 1)) & (uk['InvoiceDate'].dt.date < date(2011, 12, 1))].reset_index(drop=True)
 ```
 
@@ -406,7 +406,7 @@ users_6m = uk[(uk['InvoiceDate'].dt.date >= date(2011, 4, 1)) & (uk['InvoiceDate
 
 为了创建终身价值指标，我们将按 6 个月用户组每月产生的收入进行汇总:
 
-```
+```py
 users_6m['Profit'] = users_6m['UnitPrice'] * users_6m['Quantity']
 aggr = {'Profit': 'sum'}
 customers_6 = users_6m.groupby('CustomerID', as_index=False).agg(aggr) customers_6.columns = ['CustomerID', 'LTV']
@@ -414,7 +414,7 @@ customers_6 = users_6m.groupby('CustomerID', as_index=False).agg(aggr) customers
 
 然后根据该度量生成 K 均值聚类:
 
-```
+```py
 kmeans = KMeans(n_clusters=3)
 kmeans.fit(customers_6[['LTV']])
 customers_6['LTVCluster'] = kmeans.predict(customers_6[['LTV']])
@@ -424,7 +424,7 @@ customers_6['LTVCluster'] = kmeans.predict(customers_6[['LTV']])
 
 将 3 个月的表与 6 个月的表合并，您将拥有相同的数据框，以及我们将在后续步骤中使用的训练集和验证集。
 
-```
+```py
 classification = pd.merge(customers_3, customers_6, on='CustomerID', how='left')
 classification.fillna(0, inplace=True)
 ```
@@ -443,11 +443,11 @@ classification.fillna(0, inplace=True)
 
 **相关矩阵:**
 
-```
+```py
 classification.corr()['LTVCluster'].sort_values(ascending=False)
 ```
 
-```
+```py
 import pandas as pd
 import seaborn as sn
 import matplotlib.pyplot as plt
@@ -465,7 +465,7 @@ Neptune 与[可视化库](https://web.archive.org/web/20221206091240/https://doc
 
 最后，为了进行进一步的训练，我们需要将分类变量转换成数字。一种快速的方法是使用 pd.get_dummies():
 
-```
+```py
 classification = pd.get_dummies(customers)
 ```
 
@@ -479,7 +479,7 @@ classification = pd.get_dummies(customers)
 
 最后，我们将尝试比较不同的实验，以获得更多的见解。你可以随时查看 Neptune docs，找到任何相关的资源和文档，以备不时之需。
 
-```
+```py
 params = {
     'max_depth':5,
     'learning_rate':0.1,
@@ -501,18 +501,18 @@ neptune.create_experiment(
 
 将数据分成训练集和测试集:
 
-```
+```py
 X = classification.drop(['LTV', 'LTVCluster', 'lastPurchase'], axis=1)
 Y = classification['LTVCluster'] 
 ```
 
-```
+```py
 x_train, x_test, y_train, y_test = train_test_split(X,Y, test_size=0.05, random_state=56) 
 ```
 
 实例化 ***XGB DMatrix*** 数据加载器，以便我们可以方便地将数据传递给模式:
 
-```
+```py
 dtrain = xgb.DMatrix(x_train, label=y_train)
 dtest = xgb.DMatrix(x_test, label=y_test)
 ```
@@ -521,7 +521,7 @@ dtest = xgb.DMatrix(x_test, label=y_test)
 
 是时候让数据符合我们的模型了。我们将使用 XGBClassifier，并在实验仪表板中实时记录所有指标。利用 Neptune 与所有不同种类的梯度增强算法的紧密集成，我们能够非常容易地监控性能和进度。
 
-```
+```py
 multi_class_XGB = xgb.XGBClassifier(**params3)
 multi_class_XGB.fit(x_train, y_train, eval_set=[(x_test, y_test)], callbacks=[neptune_callback()])
 
@@ -538,7 +538,7 @@ neptune.stop()
 
 如果我们想看看我们的模型在测试集上的得分，我们可以使用 sklearn.metrics 包打印一个分类报告。
 
-```
+```py
 from sklearn.metrics import classification_report,confusion_matrix
 predict = multi_class_XGB.predict(x_test)
 print(classification_report(y_test, predict))
@@ -546,7 +546,7 @@ print(classification_report(y_test, predict))
 
 尽管我们对之前的结果非常满意，但我们仍然可以创建另一个实验，并调整或更改一些超参数以获得更好的结果。
 
-```
+```py
 params2 = {
     'max_depth':5,
     'learning_rate':0.1,
@@ -568,7 +568,7 @@ neptune.create_experiment(
 
 让我们来训练:
 
-```
+```py
 multi_class_XGB = xgb.XGBClassifier(**params2)
 multi_class_XGB.fit(
     x_train,
@@ -581,7 +581,7 @@ neptune.stop()
 
 检查训练集和测试集的准确性:
 
-```
+```py
 print('Accuracy on Training Set: ', multi_class_XGB.score(x_train, y_train))
 print('Accuracy on Testing Set: ', multi_class_XGB.score(x_test[x_train.columns], y_test))
 ```
@@ -598,7 +598,7 @@ Neptune 允许我们选择多个实验，并在仪表板上进行比较:
 
 Neptune 的一个有趣特性是能够对模型二进制文件进行版本控制，这样我们就可以在进行实验时跟踪不同的版本。
 
-```
+```py
 neptune.log_artifact('xgb_classifier.pkl')
 ```
 

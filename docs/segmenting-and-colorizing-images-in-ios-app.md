@@ -118,20 +118,20 @@ DeepLab V3+版本包括建立在 CNN 架构主干之上的模型，但该模型�
 
 2.创建您的虚拟环境:
 
-```
+```py
 conda create --name seg_env python=3.6
 
 ```
 
 3.激活虚拟环境:
 
-```
+```py
 conda activate seg_env
 ```
 
 4.安装所需的库:
 
-```
+```py
 conda install pytorch torchvision cudatoolkit=10.2 -c pytorch
 
 pip install opencv-python
@@ -151,7 +151,7 @@ https://github.com/jantic/DeOldify.git
 
 在开始编码 Python 模块来包装模型行为之前，我们需要编码一个数据加载器来处理输入图像文件。数据加载器的主要目的是预处理所有图像输入文件，将它们转换为具有特定属性和特性的高级对象，这将有助于在我们想要针对一批原始输入训练或评估模型时简化工作。
 
-```
+```py
 class SegmentationSample(Dataset):
 
     def __init__(self, root_dir, image_file, device):
@@ -201,7 +201,7 @@ class SegmentationSample(Dataset):
 
 此外，该模型还将实现自定义背景的方法。
 
-```
+```py
 class SemanticSeg(nn.Module):
     def __init__(self, pretrained: bool, device):
         super(SemanticSeg, self).__init__()
@@ -236,7 +236,7 @@ class SemanticSeg(nn.Module):
 
 之后，我们将添加后处理方法来帮助在模型预测的顶部重新映射定制的背景。请记住，输出张量有 21 个通道与模型训练的每个目标类的预测结果相匹配。因此，我们需要解码张量形状以输出正确的图像结果。
 
-```
+```py
 def background_custom(self, input_image, source, background_source,number_channels=21):
 
         label_colors = np.array([(0, 0, 0),  
@@ -290,7 +290,7 @@ def background_custom(self, input_image, source, background_source,number_channe
 
 ### 将 Deoldify 添加到模块中
 
-```
+```py
 from deoldify import device
 from deoldify.device_id import DeviceId
 import torch
@@ -317,13 +317,13 @@ def colorize_image(self, input_image, output_image, render_factor=35):
 
 安装 Django 和 Django Rest 框架:
 
-```
+```py
 pip install django djangorestframework
 ```
 
 一旦正确安装了依赖项，转到根文件夹并初始化 Django 应用程序:
 
-```
+```py
 django-admin startproject semantic-seg
 ```
 
@@ -332,7 +332,7 @@ django-admin startproject semantic-seg
 *   启动您的 api 应用程序:python manage.py startapp api
 *   将新创建的 api 文件夹的路径添加到 general settings.py 文件中:
 
-```
+```py
 INSTALLED_APPS = [
 'api.apps.ApiConfig',
 'django.contrib.admin',
@@ -375,7 +375,7 @@ API 文件夹的树结构应该如下所示:
 *   `models.CharField`:命名每个对象实例的方法
 *   `models.DateTimeField`:保存它们被存储或更新的准确时间
 
-```
+```py
 from django.db import models
 from API.utils import get_input_image_path, get_output_image_path
 
@@ -394,11 +394,11 @@ class ImageSegmentation(models.Model):
 
 编写完类的代码后，将您的更改迁移到 SQL 数据库:
 
-```
+```py
 python manage.py makemigrations
 ```
 
-```
+```py
 python manage.py migrate
 ```
 
@@ -406,7 +406,7 @@ python manage.py migrate
 
 用 image 对象的相应属性定义 Django 序列化程序。我们将制作两个序列化器来处理传入和传出的图像对象。
 
-```
+```py
 class InputImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageSegmentation
@@ -420,7 +420,7 @@ class OutputImageSerializer(serializers.ModelSerializer):
 
 最后，在完成所有更改后，您需要在管理门户中注册您的新模型。只需转到 admin.py 文件并添加以下行即可:
 
-```
+```py
 admin.site.register(ImageSegmentation)
 ```
 
@@ -430,7 +430,7 @@ admin.site.register(ImageSegmentation)
 
 *   ***贴背景定制*** :发送两张文件图片，原始照片，匹配背景。它处理它们并把它们保存到相应的文件夹中。
 
-```
+```py
 @api_view(['POST'])
 @never_cache
 def run_inference(request):
@@ -459,7 +459,7 @@ def run_inference(request):
         return Response(serializer.data)
 ```
 
-```
+```py
 @api_view(['POST'])
 @never_cache
 def run_grayscale_inference(request):
@@ -472,7 +472,7 @@ def run_grayscale_inference(request):
 
 *   ***POST for the Colorizing de oldify model***:解析请求，提取 base64 图像字符串。对 base64 字符串进行解码，并在将其保存到输出图像文件夹之前执行彩色化滤镜。
 
-```
+```py
 @api_view(['POST'])
 @never_cache
 def colorize_image(request):
@@ -490,7 +490,7 @@ def colorize_image(request):
 
 ***GET 方法*** 将简单地检索我们存储在数据库中的转换后的图像，并将它们作为静态文件提供。
 
-```
+```py
 @api_view(['GET'])
 @never_cache
 def get_images(request):
@@ -519,7 +519,7 @@ def get_images(request):
 
 1.在 urls.py 文件中设置 URL 模式的路径:
 
-```
+```py
 app_name = 'api'
 
 urlpatterns = [
@@ -534,7 +534,7 @@ urlpatterns = [
 
 2.在 api.urls.py 文件中创建 API 端点的地址:
 
-```
+```py
 urlpatterns = [
  path(r'test/', views.test_api, name='test_api_communication'),
  path(r'images/', views.get_images, name='get_images'),
@@ -553,7 +553,7 @@ urlpatterns = [
 1.  删除文件中的故事板名称
 2.  相应更改 SceneDelegate 文件:
 
-```
+```py
 func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
 
@@ -576,7 +576,7 @@ func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options conn
 
 *   小 UIImageView 作为应用程序的徽标
 
-```
+```py
 let logo: UIImageView = {
     let image = UIImageView(image: 
     image.translatesAutoresizingMaskIntoConstraints = false
@@ -586,7 +586,7 @@ let logo: UIImageView = {
 
 #### 小跟班
 
-```
+```py
 lazy var openCameraBtn : CustomButton = {
    let btn = CustomButton()
     btn.translatesAutoresizingMaskIntoConstraints = false
@@ -602,7 +602,7 @@ lazy var openCameraBtn : CustomButton = {
 
 *   图片上传按钮:
 
-```
+```py
 lazy var openToUploadBtn : CustomButton = {
    let btn = CustomButton()
     btn.addTarget(self, action: 
@@ -613,7 +613,7 @@ lazy var openToUploadBtn : CustomButton = {
 
 #### 为每个 UI 元素设置常规布局和约束
 
-```
+```py
 fileprivate func addButtonsToSubview() {
     view.addSubview(logo)
     view.addSubview(openCameraBtn)
@@ -639,7 +639,7 @@ fileprivate func setupView() {
 
 *   处理打开相机动作:
 
-```
+```py
 @objc func openCamera() {
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             let imagePicker = UIImagePickerController()
@@ -653,7 +653,7 @@ fileprivate func setupView() {
 
 *   处理从库上传操作:
 
-```
+```py
 @objc func uploadLibrary() {
         if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
             let imagePicker = UIImagePickerController()
@@ -667,7 +667,7 @@ fileprivate func setupView() {
 
 *   从***UIImagePickerControllerDelegate***中覆盖***imagePickerController***:
 
-```
+```py
 func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let image = info[.originalImage] as? UIImage {
             let segmentationController = ImageSegmentationViewController()
@@ -694,7 +694,7 @@ POST 方法需要一个[String: String]类型的字典，键是图像，值是�
 4.  处理 API 结果，
 5.  用筛选后的图像更新 UIImageView。
 
-```
+```py
 func colorizeImages() {
     let imageDataBase64 = inputImage.image!.jpegData(compressionQuality: 1)!.base64EncodedString(options: .lineLength64Characters)
     let parameters: Parameters = ["image": imageDataBase64]

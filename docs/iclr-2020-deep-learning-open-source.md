@@ -49,7 +49,7 @@ AmpliGraph 降低了知识图嵌入的门槛，使这种模型可以被没有经
 
 AmpliGraph 最初由埃森哲都柏林实验室开发，用于各种工业项目。
 
-```
+```py
 from ampligraph.datasets import load_fb15k_237
 from ampligraph.latent_features import TransE
 
@@ -100,13 +100,13 @@ model.predict_proba(X['test'][42])
 
 使用默认参数运行自动列车组处理的位置:
 
-```
+```py
 pip install Automunge
 ```
 
 为了测试数据的后续一致处理，使用从相应的`automunge(.)`调用中填充的`postprocess_dict`字典，运行:
 
-```
+```py
 from Automunge import Automunger
 am = Automunger.AutoMunge()
 
@@ -114,7 +114,7 @@ am = Automunger.AutoMunge()
 
 用户可以通过`assigncat`和`assigninfill`参数在`automunge(.)`调用中指定转换或填充类型。例如，对于具有列标题“列 1”和“列 2”的训练集，可以将具有 ML 填充的最小-最大缩放(“mnmx”)分配给列 1，将具有模式填充的单热编码(“text”)分配给列 2。任何未明确指定的列都将遵从自动化。
 
-```
+```py
 train, trainID, labels,
 validation1, validationID1, validationlabels1,
 validation2, validationID2, validationlabels2,
@@ -126,7 +126,7 @@ featureimportance, postprocess_dict
 
 [网站](https://web.archive.org/web/20221206133724/http://automunge.com/) [](https://web.archive.org/web/20221206133724/https://github.com/Automunge/AutoMunge)| [GitHub](https://web.archive.org/web/20221206133724/https://github.com/Automunge/AutoMunge) | [简介](https://web.archive.org/web/20221206133724/https://medium.com/automunge/automunge-explained-in-brief-354c9b92aa1c)
 
-```
+```py
 test, testID, testlabels,
 labelsencoding_dict, postreports_dict
 = am.postmunge(postprocess_dict, df_test)
@@ -135,7 +135,7 @@ labelsencoding_dict, postreports_dict
 
 **DynaML**
 
-```
+```py
 train, trainID, labels,
 validation1, validationID1, validationlabels1,
 validation2, validationID2, validationlabels2,
@@ -223,7 +223,7 @@ Scala 中的机器学习
 
 您可能希望在两种不同的数据库配置之间进行切换:
 
-```
+```py
 db:
   driver: mysql
   user: omry
@@ -232,7 +232,7 @@ db:
 
 创建此目录结构:
 
-```
+```py
 import hydra
 from omegaconf import DictConfig
 
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 
 **config.yaml:**
 
-```
+```py
 $ python my_app.py db.user=root db.pass=1234
 db:
   driver: mysql
@@ -261,7 +261,7 @@ db:
 
 此外，一些激动人心的新功能即将推出:
 
-```
+```py
 ├── db
 │ ├── mysql.yaml
 │ └── postgresql.yaml
@@ -271,7 +271,7 @@ db:
 
 强类型配置(结构化配置)
 
-```
+```py
 defaults:
   - db: mysql
 
@@ -281,7 +281,7 @@ website:
 
 通过 Ax 和 Nevergrad 插件优化超参数
 
-```
+```py
 $ python my_app.py db=postgresql db.timeout=20
 db:
   driver: postgresql

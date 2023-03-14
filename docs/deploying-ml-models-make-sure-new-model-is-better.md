@@ -310,7 +310,7 @@ Canary deployment 提供了一种根据生产中的真实数据测试新模型�
 
 将出现如何连接到实例的说明。可以通过浏览器连接 EC2 实例，但是通常我们使用 SSH 连接从本地机器进行连接。在这种情况下，它是
 
-```
+```py
 ssh -i "sentiment_analysis.pem" ec2-user@ec2-54-208-121-4.compute-1.amazonaws.com
 
 ```
@@ -319,7 +319,7 @@ ssh -i "sentiment_analysis.pem" ec2-user@ec2-54-208-121-4.compute-1.amazonaws.co
 
 在这个例子中，我们使用一个 EC2 Red Hat Linux 实例，在连接到该实例后，我们需要更新包并安装 python 和 git。
 
-```
+```py
 sudo yum update -y
 sudo yum install python3 -y
 sudo yum install git -y
@@ -328,7 +328,7 @@ sudo yum install git -y
 
 此外，我们将使用 python 环境直接在机器上运行我们的项目。为此，我们需要安装 virtualenv 并创建一个环境。
 
-```
+```py
 pip3 install --user virtualenv
 virtualenv venv
 
@@ -336,7 +336,7 @@ virtualenv venv
 
 为了从 EC2 机器访问 S3 存储区，我们需要使用命令[安装 AWS CLI](https://web.archive.org/web/20221002071951/https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
-```
+```py
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
@@ -345,14 +345,14 @@ sudo ./aws/install
 
 并使用配置凭据
 
-```
+```py
 aws configure
 
 ```
 
 在这里，我们需要输入在创建 IAM 用户步骤中下载的凭证中的访问密钥 ID 和秘密访问密钥。要测试 S3 访问，请使用命令
 
-```
+```py
 aws s3 ls
 ```
 
@@ -360,40 +360,40 @@ aws s3 ls
 
 要设置 cron 作业，请使用命令
 
-```
+```py
 crontab -e
 ```
 
 按“I”进入插入模式并写入
 
-```
+```py
 * * * * * cd ~/sentiment_analysis_neptunel/src; ~/venv/bin/python ~/sentiment_analysis_neptune/src/main.py
 ```
 
 其中“* * * * *”是一个 cron 模式，可以从[https://crontab.guru/.](https://web.archive.org/web/20221002071951/https://crontab.guru/.)中定义，路径“~/情操 _ 分析 _neptunel/src”是我们需要运行主脚本的地方，“venv/bin/python”是我们使用的 python 环境。之后，按 ESC，然后按:wq，然后按 ENTER。要仔细检查创建的 cron 作业，请使用命令–
 
-```
+```py
 crontab -l
 
 ```
 
 要使用“nohup”运行 python 脚本，请使用命令激活您的 python 环境“venv”
 
-```
+```py
 source venv/bin/activate
 
 ```
 
 然后跑
 
-```
+```py
 nohup python main.py > logs.out &
 
 ```
 
 我们的主脚本看起来像
 
-```
+```py
 if __name__ == '__main__':
 	data_sample = get_data()
 	run_model(data_sample)
@@ -402,7 +402,7 @@ if __name__ == '__main__':
 
 其中“get_data”函数准备数据样本，围绕模型和预测的整个逻辑由“run_model”函数完成。现在，如果我们想要影子部署另一个模型，可能只需在主脚本中添加一行代码即可:
 
-```
+```py
 if __name__ == '__main__':
 	data_sample = get_data()
 	run_model(data_sample)

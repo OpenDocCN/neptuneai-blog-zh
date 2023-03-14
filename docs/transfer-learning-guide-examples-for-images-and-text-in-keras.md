@@ -76,7 +76,7 @@
 
 冻结预训练模型的层是至关重要的。这是因为您不希望这些层中的**权重被重新初始化**。如果是，那么你将会失去所有已经发生的学习。这将与从头开始训练模型没有什么不同。
 
-```
+```py
 base_model.trainable = False
 ```
 
@@ -106,7 +106,7 @@ base_model.trainable = False
 
 Keras 提供了 20 多种预先训练好的模型。它们是通过 [**Keras 应用**](https://web.archive.org/web/20230131180149/https://keras.io/api/applications/) **送达的。**每个模特旁边都有预先训练好的重量。下载模型时，重量会自动下载。它们将存储在` ~/中。keras/models/`所有的 keras 应用程序都用于图像任务。例如，下面是如何初始化在 ImageNet 上训练的 MobileNet 架构。
 
-```
+```py
 model = tf.keras.applications.MobileNet(
     input_shape=None,
     alpha=1.0,
@@ -125,7 +125,7 @@ model = tf.keras.applications.MobileNet(
 
 值得一提的是，Keras 应用程序并不是迁移学习任务的唯一选择。也可以使用来自 [**TensorFlow Hub**](https://web.archive.org/web/20230131180149/https://www.tensorflow.org/hub) 的模型。
 
-```
+```py
 model = tf.keras.Sequential([
  hub.KerasLayer("https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/feature_vector/4",
                    trainable=False),
@@ -152,11 +152,11 @@ model = tf.keras.Sequential([
 
 这里有一个例子，你可以用拥抱脸来区分否定句和肯定句。
 
-```
+```py
 from transformers import pipeline
 ```
 
-```
+```py
 classifier = pipeline('sentiment-analysis')
 classifier('We are very happy to include pipeline into the transformers repository.')
 [{'label': 'POSITIVE', 'score': 0.9978193640708923}]
@@ -176,7 +176,7 @@ classifier('We are very happy to include pipeline into the transformers reposito
 
 [ImageNet](https://web.archive.org/web/20230131180149/https://en.wikipedia.org/wiki/ImageNet) 是一个广泛的图像集合，用于训练模型，包括 ResNet50。该数据集中有超过 100 万幅图像和 1000 个类。
 
-```
+```py
 from tensorflow.keras.applications.resnet50 import ResNet50
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
@@ -229,7 +229,7 @@ print('Predicted:', decode_predictions(preds, top=3)[0])
 
 首先，将数据集下载到 Colab 的虚拟机中。
 
-```
+```py
 !wget --no-check-certificate
     https://namespace.co.ke/ml/dataset.zip
     -O /content/catsdogs.zip
@@ -237,7 +237,7 @@ print('Predicted:', decode_predictions(preds, top=3)[0])
 
 之后，解压缩数据集，并设置训练和验证集的路径。
 
-```
+```py
 import os
 import zipfile
 with zipfile.ZipFile('catsdogs.zip', 'r') as zip_ref:
@@ -257,7 +257,7 @@ validation_dir = os.path.join(base_dir, 'test_set')
 
 导入所需的模块并加载培训和验证集。
 
-```
+```py
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.preprocessing import image_dataset_from_directory
@@ -285,7 +285,7 @@ val_dataset = image_dataset_from_directory(validation_dir,
 
 您可以在加载数据时应用这些转换。或者，正如你在下面看到的，你可以通过引入独特的层来增加。
 
-```
+```py
 data_augmentation = keras.Sequential(
     [       keras.layers.experimental.preprocessing.RandomFlip("horizontal"),
    keras.layers.experimental.preprocessing.RandomRotation(0.1),
@@ -297,7 +297,7 @@ data_augmentation = keras.Sequential(
 
 通过将图层应用到同一张图像，您可以看到上述变换的结果。代码如下:
 
-```
+```py
 import numpy as np
 import matplotlib.pyplot as plt
 for images, labels in training_set.take(1):
@@ -320,7 +320,7 @@ for images, labels in training_set.take(1):
 
 **`include_top=False`** 表示您对模型的最后一层不感兴趣。因为模型是自下而上可视化的，所以这一层被称为顶层。**排除顶层对于特征提取很重要**。
 
-```
+```py
 base_model = keras.applications.Xception(
     weights='imagenet',
     input_shape=(150, 150, 3),
@@ -331,7 +331,7 @@ base_model = keras.applications.Xception(
 
 由于许多预训练模型都有一个“TF . keras . layers . batch normalization”层，因此冻结这些层非常重要。否则，将更新层均值和方差，这将破坏模型已经学习的内容。让我们冻结这种情况下的所有层。
 
-```
+```py
 base_model.trainable = False
 ```
 
@@ -341,13 +341,13 @@ base_model.trainable = False
 
 让我们从标准化输入图像的大小开始。
 
-```
+```py
 inputs = keras.Input(shape=(150, 150, 3))
 ```
 
 之后，应用数据扩充。
 
-```
+```py
 x = data_augmentation(inputs) 
 ```
 
@@ -355,7 +355,7 @@ x = data_augmentation(inputs)
 
 幸运的是，大多数预先训练好的模型都提供了这样的功能。
 
-```
+```py
 x = tf.keras.applications.xception.preprocess_input(x)
 ```
 
@@ -366,7 +366,7 @@ x = tf.keras.applications.xception.preprocess_input(x)
 *   应用辍学正规化；
 *   **添加一个最终的密集层** r(当你使用` include_top=False 时，最终的输出层不包括在内，所以你必须自己定义)。
 
-```
+```py
 x = base_model(x, training=False)
 x = keras.layers.GlobalAveragePooling2D()(x)
 x = keras.layers.Dropout(0.2)(x)
@@ -380,7 +380,7 @@ model = keras.Model(inputs, outputs)
 
 ![Transfer learning epoch](img/a3d41a35065d8f0aef68caf1e257a30a.png)
 
-```
+```py
 model.compile(optimizer='adam', loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),metrics=keras.metrics.BinaryAccuracy())
 model.fit(training_set, epochs=20, validation_data=val_dataset)
 ```
@@ -391,13 +391,13 @@ model.fit(training_set, epochs=20, validation_data=val_dataset)
 
 您需要监控这一步，因为错误的实现会导致过度拟合。首先，解冻基本模型。
 
-```
+```py
 base_model.trainable = True
 ```
 
 更新可训练属性后，必须再次编译模型**以实现更改。**
 
-```
+```py
 model.compile(optimizer=keras.optimizers.Adam(1e-5),
               loss=keras.losses.BinaryCrossentropy(from_logits=True),
               metrics=keras.metrics.BinaryAccuracy())
@@ -405,7 +405,7 @@ model.compile(optimizer=keras.optimizers.Adam(1e-5),
 
 为了防止过度拟合，让我们通过回调来监控培训损失。当模型连续五个纪元没有改善时，Keras 将停止训练。让我们也用 TensorBoard 来监控损耗和精度。
 
-```
+```py
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 rm -rf logs
 %load_ext tensorboard
@@ -418,7 +418,7 @@ callbacks = [
 
 好了，到了**重新训练模型**的时候了。当它完成时，你会注意到与以前的模型相比有了一点改进。
 
-```
+```py
 model.fit(training_set, epochs=15,validation_data=val_dataset,callbacks=callbacks)
 ```
 
@@ -442,7 +442,7 @@ model.fit(training_set, epochs=15,validation_data=val_dataset,callbacks=callback
 
 本图将使用一个情感分析数据集。在加载它之前，让我们导入这个任务需要的所有模块。
 
-```
+```py
 import tensorflow as tf
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -454,7 +454,7 @@ import pandas as pd
 
 接下来，下载数据集并使用 Pandas 加载它。
 
-```
+```py
 !wget --no-check-certificate
     https://drive.google.com/uc?id=13ySLC_ue6Umt9RJYSeM2t-V0kCv-4C-P -O /tmp/sentiment.csv
     -O /tmp/sentiment.csv
@@ -467,7 +467,7 @@ df = pd.read_csv('/tmp/sentiment.csv')
 
 选择特征，然后目标将数据分成训练集和测试集。
 
-```
+```py
 X = df['text']
 y = df['sentiment']
 from sklearn.model_selection import train_test_split
@@ -484,7 +484,7 @@ X_train, X_test , y_train, y_test = train_test_split(X, y , test_size = 0.20)
 
 只需创建一个“tokenizer”实例，并使其适合训练集。你必须定义你想要的词汇量。还定义了一个词外标记来表示测试集中词汇表中找不到的词。
 
-```
+```py
 vocab_size = 10000
 oov_token = "<OOV>"
 tokenizer = Tokenizer(num_words = vocab_size, oov_token=oov_token)
@@ -493,7 +493,7 @@ tokenizer.fit_on_texts(X_train)
 
 您可以使用单词索引来查看单词是如何映射到数字的。
 
-```
+```py
 word_index = tokenizer.word_index
 ```
 
@@ -501,7 +501,7 @@ word_index = tokenizer.word_index
 
 让我们把单词转换成序列，这样一个完整的数字序列就可以代表每个句子。这是通过使用来自记号赋予器的“texts_to_sequences”完成的。
 
-```
+```py
 X_train_sequences = tokenizer.texts_to_sequences(X_train)
 ```
 
@@ -511,7 +511,7 @@ X_train_sequences = tokenizer.texts_to_sequences(X_train)
 
 使用“post”进行填充会在序列末尾添加零。截断类型的“post”将在末尾截断长度超过 100 的句子。
 
-```
+```py
 padding_type='post'
 truncation_type='post'
 max_length = 100
@@ -523,7 +523,7 @@ max_length = 100
 
 现在，这是**特定于自然语言处理**中的迁移学习。首先，让我们下载预先训练好的单词嵌入。
 
-```
+```py
 !wget --no-check-certificate
     http://nlp.stanford.edu/data/glove.6B.zip
     -O /tmp/glove.6B.zip
@@ -531,14 +531,14 @@ max_length = 100
 
 接下来，将它们提取到一个临时文件夹中。
 
-```
+```py
 with zipfile.ZipFile('/tmp/glove.6B.zip', 'r') as zip_ref:
     zip_ref.extractall('/tmp/glove')
 ```
 
 现在，使用这些[单词嵌入](https://web.archive.org/web/20230131180149/https://keras.io/examples/nlp/pretrained_word_embeddings/)到**创建你自己的嵌入层**。加载手套嵌入，并将它们添加到字典中。
 
-```
+```py
 embeddings_index = {}
 f = open('/tmp/glove/glove.6B.100d.txt')
 for line in f:
@@ -553,7 +553,7 @@ print('Found %s word vectors.' % len(embeddings_index))
 
 使用此字典为训练集中的每个单词创建嵌入矩阵。为此，使用‘embedding _ index’获得每个单词的嵌入向量。
 
-```
+```py
 embedding_matrix = np.zeros((len(word_index) + 1, max_length))
 for word, i in word_index.items():
     embedding_vector = embeddings_index.get(word)
@@ -564,7 +564,7 @@ for word, i in word_index.items():
 
 如果找不到某个单词，零将表示它。例如，这是单词 bakery 的嵌入向量。
 
-```
+```py
 embeddings_index.get("bakery")
 ```
 
@@ -579,7 +579,7 @@ embeddings_index.get("bakery")
 *   ` len(word_index) + 1 '是加上 1 的词汇表的大小，因为 0 被保留用于填充；
 *   “输入长度”是输入序列的长度。
 
-```
+```py
 embedding_layer = Embedding(len(word_index) + 1,
                             max_length,
                             weights=[embedding_matrix],
@@ -591,7 +591,7 @@ embedding_layer = Embedding(len(word_index) + 1,
 
 现在，您可以使用这个嵌入层来创建模型。双向 LSTMs 用于确保信息来回传递。
 
-```
+```py
 model = Sequential([
     embedding_layer,
     Bidirectional(LSTM(150, return_sequences=True)),
@@ -605,17 +605,17 @@ model = Sequential([
 
 您现在可以编译和训练模型了。
 
-```
+```py
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
 ```
 
 当模型训练停止改进时，可以使用早期停止回调来停止训练过程。您可以使用 TensorBoard 回调来监控模型损失和准确性。
 
-```
+```py
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 ```
 
-```
+```py
 %load_ext tensorboard
 rm -rf logs
 log_folder = 'logs'
@@ -629,7 +629,7 @@ history = model.fit(X_train_padded, y_train, epochs=num_epochs, validation_data=
 
 使用“评估”功能可以评估模型的性能。
 
-```
+```py
 loss, accuracy = model.evaluate(X_test_padded,y_test)
 print('Test accuracy :', accuracy)
 ```

@@ -65,7 +65,7 @@
 
 scikit-learn 中的分解算法涉及维数约减算法。我们可以使用以下命令调用各种技术:
 
-```
+```py
 from sklearn.decomposition import PCA, KernelPCA, NMF
 ```
 
@@ -77,7 +77,7 @@ PCA 变换是线性变换。它包括寻找主成分的过程，即把特征矩�
 
 让我们用 python 代码来理解 PCA。
 
-```
+```py
 def pca(X=np.array([]), no_dims=50):
 
     print("Preprocessing the data using PCA...")
@@ -102,7 +102,7 @@ PCA 的实现非常简单。我们可以将整个过程定义为四个步骤:
 
 我们可以从加载最多的数据集开始:
 
-```
+```py
 from sklearn.datasets import load_digits
 digits = load_digits()
 digits.data.shape
@@ -112,7 +112,7 @@ digits.data.shape
 
 数据由 8×8 像素图像组成，这意味着它们是 64 维的。为了了解这些点之间的关系，我们可以使用 PCA 将它们投影到更低的维度，如 2-D:
 
-```
+```py
 from sklearn.decomposition import PCA
 
 pca = PCA(2)  
@@ -127,7 +127,7 @@ print(projected.shape)
 
 现在，让我们画出前两个主要成分。
 
-```
+```py
 plt.scatter(projected[:, 0], projected[:, 1],
             c=digits.target, edgecolor='none', alpha=0.5,
             cmap=plt.cm.get_cmap('spectral', 10))
@@ -160,7 +160,7 @@ plt.colorbar();
 
 为了更直观地理解内核 PCA，让我们定义一个不能线性分离的特征空间。
 
-```
+```py
 ​​from sklearn.datasets import make_circles
 from sklearn.decomposition import KernelPCA
 np.random.seed(0)
@@ -169,7 +169,7 @@ X, y = make_circles(n_samples=400, factor=.3, noise=.05)
 
 现在，让我们绘制并查看我们的数据集。
 
-```
+```py
 plt.figure(figsize=(15,10))
 plt.subplot(1, 2, 1, aspect='equal')
 plt.title("Original space")
@@ -190,7 +190,7 @@ plt.ylabel("$x_2$")
 
 正如您在该数据集中看到的，这两个类不能线性分离。现在，让我们定义内核 PCA，看看它是如何分离这个特征空间的。
 
-```
+```py
 kpca = KernelPCA(kernel="rbf", fit_inverse_transform=True, gamma=10, )
 X_kpca = kpca.fit_transform(X)
 plt.subplot(1, 2, 2, aspect='equal')
@@ -219,14 +219,14 @@ SVD 的优点是正交矩阵捕获了原始矩阵 A 的结构，这意味着当�
 
 现在让我们用代码来理解 SVD。为了更好地理解该算法，我们将使用 scikit-learn 提供的人脸数据集。
 
-```
+```py
 from sklearn.datasets import fetch_lfw_people
 lfw_people = fetch_lfw_people(min_faces_per_person=70, resize=0.4)
 ```
 
 绘制图像以了解我们正在处理的内容。
 
-```
+```py
 X = lfw_people.images.reshape(img_count, img_width * img_height)
 X0_img = X[0].reshape(img_height, img_width)
 
@@ -235,7 +235,7 @@ plt.imshow(X0_img, cmap=plt.cm.gray)
 
 创建一个函数，以便于图像的可视化。
 
-```
+```py
 def draw_img(img_vector, h=img_height, w=img_width):
    plt.imshow( img_vector.reshape((h,w)), cmap=plt.cm.gray)
    plt.xticks(())
@@ -245,7 +245,7 @@ draw_img(X[49])
 
 在应用 SVD 之前，最好将数据标准化。
 
-```
+```py
 from sklearn.preprocessing import StandardScaler
 
 scaler = StandardScaler(with_std=False)
@@ -256,14 +256,14 @@ Xstd = scaler.fit_transform(X)
 
 值得注意的是，我们总是可以通过执行逆变换来恢复原始图像。
 
-```
+```py
 Xorig = scaler.inverse_transform(Xstd)
 draw_img(Xorig[49])
 ```
 
 现在，我们可以应用 NumPy 中的 SVD 函数，并将矩阵分解为三个矩阵。
 
-```
+```py
 from numpy.linalg import svd
 
 U, S, VT = svd(Xstd)
@@ -271,7 +271,7 @@ U, S, VT = svd(Xstd)
 
 为了检查这个函数是否有效，我们总是可以执行三个矩阵的矩阵乘法。
 
-```
+```py
 US = U*S
 Xhat = US @ VT[0:1288,:]
 
@@ -281,7 +281,7 @@ draw_img(Xhat_orig[49])
 
 现在，让我们进行降维。为此，我们只需减少正交矩阵的特征数量。
 
-```
+```py
 Xhat_500 = US[:, 0:500] @ VT[0:500, :]
 
 Xhat_500_orig = scaler.inverse_transform(Xhat_500)
@@ -291,7 +291,7 @@ draw_img(Xhat_500_orig[49])
 
 我们可以进一步减少更多的功能，看看结果。
 
-```
+```py
 Xhat_100 = US[:, 0:100] @ VT[0:100, :]
 
 Xhat_100_orig = scaler.inverse_transform(Xhat_100)
@@ -301,7 +301,7 @@ draw_img(Xhat_100_orig[49])
 
 现在，让我们创建一个函数，允许我们减少图像的尺寸。
 
-```
+```py
 def dim_reduce(US_, VT_, dim=100):
 
    Xhat_ = US_[:, 0:dim] @ VT_[0:dim, :]
@@ -311,7 +311,7 @@ def dim_reduce(US_, VT_, dim=100):
 
 用不同数量的特征绘制图像。
 
-```
+```py
 dim_vec = [50, 100, 200, 400, 800]
 
 plt.figure(figsize=(1.8 * len(dim_vec), 2.4))
@@ -341,7 +341,7 @@ NMF 是一种无监督的机器学习算法。当一个维数为 mXn 的非负�
 
 首先，我们将使模型符合数据。
 
-```
+```py
 from sklearn.decomposition import NMF
 model = NMF(n_components=200, init='nndsvd', random_state=0)
 W = model.fit_transform(X)
@@ -350,7 +350,7 @@ V = model.components_
 
 NMF 需要一点时间来分解数据。一旦数据被分解，我们就可以可视化分解的组件。
 
-```
+```py
 num_faces = 20
 plt.figure(figsize=(1.8 * 5, 2.4 * 4))
 
@@ -377,7 +377,7 @@ for i in range(0, num_faces):
 
 流形学习是一种无监督学习，旨在对非线性数据集进行降维。同样，scikit-learn 提供了一个由各种非线性降维技术组成的模块。我们可以通过这个命令调用这些类或技术:
 
-```
+```py
 from sklearn.manifold import TSNE, LocallyLinearEmbedding, SpectralEmbedding
 ```
 
@@ -393,7 +393,7 @@ t-分布式随机邻居嵌入或 t-SNE 是一种非常适合数据可视化的�
 
 现在我们用代码来理解一下。对于 SNE 霸王龙，我们将再次使用 MNIST 数据集。首先，我们导入 TSNE，然后导入数据。
 
-```
+```py
 from sklearn.manifold import TSNE
 from sklearn.datasets import load_digits
 
@@ -412,20 +412,20 @@ for i in range(0,5):
 
 然后我们将使用 np.vstack 按顺序存储这些数字。
 
-```
+```py
 X = np.vstack([digits.data[digits.target==i] for i in range(10)])
 Y = np.hstack([digits.target[digits.target==i] for i in range(10)])
 ```
 
 我们将对数据集应用 t-SNE。
 
-```
+```py
 digits_final = TSNE(perplexity=30).fit_transform(X)
 ```
 
 我们现在将创建一个函数来可视化数据。
 
-```
+```py
 def plot(x, colors):
     palette = np.array(sb.color_palette("hls", 10))  
 
@@ -446,7 +446,7 @@ def plot(x, colors):
 
 现在，我们对转换后的数据集执行数据可视化。
 
-```
+```py
 plot(digits_final,Y)
 ```
 
@@ -492,7 +492,7 @@ LLE 优化速度更快，但在噪音数据上失败。
 
 判别分析是 scikit-learn 提供的另一个模块。可以使用以下命令调用它:
 
-```
+```py
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 ```
 

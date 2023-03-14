@@ -62,7 +62,7 @@
 
 您可以用 pip 安装它:
 
-```
+```py
 pip install neptune-client
 
 ```
@@ -73,7 +73,7 @@ pip install neptune-client
 
 首先，通过在脚本顶部添加以下内容，将脚本连接到 Neptune:
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init_run(
@@ -105,7 +105,7 @@ run = neptune.init_run(
 
 要创建结构化名称空间，请使用正斜杠/
 
-```
+```py
 run["metrics/f1_score"] = 0.67
 run["metrics/test/roc"] = 0.82 
 ```
@@ -123,7 +123,7 @@ run["metrics/test/roc"] = 0.82
 
 简而言之，登录 Neptune 非常简单:
 
-```
+```py
 run["WHAT_YOU_WANT_TO_LOG"] = ITS_VALUE
 ```
 
@@ -140,7 +140,7 @@ run["WHAT_YOU_WANT_TO_LOG"] = ITS_VALUE
 
 在这种情况下，只要做:
 
-```
+```py
 params = {
     "activation": "sigmoid",
     "dropout": 0.25,
@@ -151,7 +151,7 @@ params = {
 
 在其他场景中，有一个训练循环，您可能希望在其中记录一系列值。为此，我们使用。log()函数。
 
-```
+```py
 for epoch in range(params["n_epochs"]):
     # this would normally be your training loop
     run["train/loss"].log(0.99**epoch)
@@ -181,7 +181,7 @@ Neptune–Keras 集成会自动记录以下元数据:
 
 要在使用 Keras 训练模型时记录元数据，可以按以下方式使用 NeptuneCallback。
 
-```
+```py
 from neptune.new.integrations.tensorflow_keras import NeptuneCallback
 
 run = neptune.init_run()
@@ -210,7 +210,7 @@ Prophet 是一个流行的时间序列预测库。通过 Neptune-Prophet 集成�
 
 这里有一个如何一次性记录关于你的先知模型的相关元数据的例子。
 
-```
+```py
 import pandas as pd
 from prophet import Prophet
 import neptune.new as neptune
@@ -239,7 +239,7 @@ run["prophet_summary"] = npt_utils.create_summary(
 
 参数调整框架 [Optuna 也有一个回调系统，您可以很好地将 Neptune](https://web.archive.org/web/20221206002423/https://docs.neptune.ai/integrations/optuna/) 插入其中。每次参数搜索迭代后，所有结果都会被记录和更新。
 
-```
+```py
 import neptune.new.integrations.optuna as optuna_utils
 
 run = neptune.init_run()
@@ -269,7 +269,7 @@ study.optimize(objective, n_trials=20, callbacks=[neptune_callback])
 
 您可以使用= assignment 将分数和度量记录为单个值，或者使用 log()方法将分数和度量记录为一系列值。
 
-```
+```py
 # Log scores (single value)
 run["score"] = 0.97
 run["test/acc"] = 0.97
@@ -294,7 +294,7 @@ for epoch in range(100):
 
 这些实际上是自动记录到 Neptune 的:
 
-```
+```py
 run = neptune.init_run(capture_hardware_metrics=True)
 ```
 
@@ -308,7 +308,7 @@ run = neptune.init_run(capture_hardware_metrics=True)
 
 您可以记录单个图像或一系列图像(如下例所示)。
 
-```
+```py
 from neptune.new.types import File
 
 for name in misclassified_images_names:
@@ -327,7 +327,7 @@ for name in misclassified_images_names:
 
 你可以通过使用`upload()`方法从任何深度学习框架中保存模型权重。在下面的例子中，它们被记录在名称空间`model_checkpoints`中名为`my_model`的字段下。
 
-```
+```py
 # Log PyTorch model weights
 my_model = ...
 torch.save(my_model, "my_model.pt")

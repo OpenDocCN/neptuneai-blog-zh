@@ -185,7 +185,7 @@ LightGBM 和 XGBoost 都只接受数字特征。这意味着我们数据中的�
 
 让我们快速虚拟数据集，样本大小从 1，000 一直到 20，000 个样本。我们将从每个虚拟数据集抽取 20%的测试规模来衡量模型性能。对于每一次具有 1000 个样本的不同样本大小的迭代，我们想要检查与 LightGBM 分类器相比，XGBoost 分类器训练所花费的时间。
 
-```
+```py
 import neptune.new as neptune
 
 from xgboost import XGBClassifier

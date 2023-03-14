@@ -49,14 +49,14 @@
 
 为了使用`venv`创建一个新环境，在您的*终端*窗口中键入以下命令:
 
-```
+```py
 pip install venv
 
 ```
 
 一旦执行完毕，`venv`将创建一个名为`tf2_api_env`的新虚拟环境。
 
-```
+```py
 python -m venv tf2_api_env
 
 ```
@@ -67,14 +67,14 @@ python -m venv tf2_api_env
 
 为了激活您的虚拟环境，从您的*终端*窗口运行以下命令:
 
-```
+```py
 pwd
 
 ```
 
 如果您在您的*终端*窗口的命令行开头看到您的环境的名称，那么您就一切就绪了。它应该是这样的:
 
-```
+```py
 source tf2_api_env/bin/activate
 ```
 
@@ -86,7 +86,7 @@ source tf2_api_env/bin/activate
 
 **注:**在我写这篇文章的时候，最新的 TensorFlow 版本是 2.3。您可以使用这个版本，但这不是必需的。我们在本指南中所做的一切都是与 2.3 兼容的，它也可能适用于以后的更新。这取决于你去尝试。如果有任何问题，您可以随时降级到 2.3 并继续前进。
 
-```
+```py
 pip install tensorflow==2.*
 
 ```
@@ -109,7 +109,7 @@ pip install tensorflow==2.*
 
 **4。下载、安装并编译 Protobuf**
 
-```
+```py
 Tensorflow/
 └─ tf2_api_env/
    ├─ bin/
@@ -135,7 +135,7 @@ Tensorflow/
 
 确保在你的*终端*窗口中，你位于`Tensorflow`目录中。要编译 proto 文件，请执行以下命令:
 
-```
+```py
 Tensorflow/
 └─ protoc/
    ├─ bin/
@@ -155,7 +155,7 @@ Tensorflow/
 
 **5。安装 COCO API**
 
-```
+```py
 protoc/bin/protoc models/research/object_detection/protos/*.proto
 --python_out=.
 
@@ -169,7 +169,7 @@ protoc/bin/protoc models/research/object_detection/protos/*.proto
 
 *   如果您使用的是 Linux:
 
-```
+```py
 pip install cython
 pip install git+https://github.com/philferriere/cocoapi.git
 
@@ -179,7 +179,7 @@ pip install git+https://github.com/philferriere/cocoapi.git
 
 *   在这一步结束时，您的`Tensorflow`目录结构应该如下所示:
 
-```
+```py
 pip install cython
 git clone https://github.com/cocodataset/cocoapi.git
 cd cocoapi/PythonAPI
@@ -190,7 +190,7 @@ cp -r pycocotools ./models/research/
 
 **6。对象检测 API 安装**
 
-```
+```py
 Tensorflow/
 └─ cocoapi/
    ├─ common/
@@ -222,7 +222,7 @@ Tensorflow/
 
 *   **注意:****第二个命令可能会给你一个错误。一点也不担心。只需再运行一次，直到你看到一个完整的安装。**
 
-```
+```py
 cp object_detection/packages/tf2/setup.py .
 python -m pip install .
 
@@ -232,7 +232,7 @@ python -m pip install .
 
 *   一旦测试完成，您将在您的*终端*窗口中看到一条打印出来的消息。如果所有 20 个测试都运行了，并且它们的状态是“OK”(有些可能会被跳过，这完全没问题)，那么您就完成了安装！
 
-```
+```py
 python object_detection/builders/model_builder_tf2_test.py
 ```
 
@@ -271,7 +271,7 @@ python object_detection/builders/model_builder_tf2_test.py
 
 现在回到数据转换。使用流行的图像注释工具创建的大多数注释文件都有两种格式:JSON 或 XML。
 
-```
+```py
 Tensorflow/
 └─ cocoapi/
 └─ protoc/
@@ -337,7 +337,7 @@ Tensorflow/
 
 *   现在，您的项目目录应该如下所示:
 
-```
+```py
 Tensorflow/
 └─ cocoapi/
 └─ protoc/
@@ -394,7 +394,7 @@ TensorFlow 对象检测 API 允许通过预训练模型附带的`pipeline.config
 
 转到`Tensorflow/workspace/pre_trained_models`并打开包含您想要配置的模型的目录
 
-```
+```py
 Tensorflow/
 └─ ...
 └─ workspace/
@@ -515,7 +515,7 @@ Tensorflow/
 
 *   至于我们的例子，我们的 **`parameter_name`** 就是 **`classification_loss`** 。你需要从`pipeline.config`文件中粘贴一个精确的参数名。在我们的示例中，您的搜索请求如下:
 
-```
+```py
 parameter_name path:research/object_detection/protos
 
 ```
@@ -563,7 +563,7 @@ parameter_name path:research/object_detection/protos
 
 *   其中:
 
-```
+```py
 python model_main_tf2.py
   --pipeline_config_path=<path to your config file>
   --model_dir=<path to a directory with your model>
@@ -582,26 +582,26 @@ python model_main_tf2.py
 
 其中<gpus>根据订单编号定义要使用的 GPU。比如我有两个 GPU。第一个订单编号为 0，第二个订单编号为 1。如果我想在我的第 0 个 GPU 上训练一个模型，我执行以下命令:</gpus>
 
-```
+```py
 export CUDA_VISIBLE_DEVICES= <GPUs>
 ```
 
 如果我想在我的两个 GPU 上训练，我使用以下命令:
 
-```
+```py
 export CUDA_VISIBLE_DEVICES=0
 ```
 
 如果我决定只使用 CPU 来训练我的模型，我的命令应该是这样的:
 
-```
+```py
 export CUDA_VISIBLE_DEVICES=0,1
 
 ```
 
 现在，你该躺下来放松一下了。剩下的工作就交给电脑了！
 
-```
+```py
 export CUDA_VISIBLE_DEVICES=-1
 ```
 

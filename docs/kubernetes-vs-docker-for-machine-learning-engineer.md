@@ -48,7 +48,7 @@
 
 让我们创建一个名为`model.py`的文件，并输入下面的代码:
 
-```
+```py
 Import TensorFlow as tf
 
 data=tf.constant([[1,1],[0,0],[2,0],[2,1],[3,0],[0,4],[5,6],[0,10]])
@@ -74,7 +74,7 @@ model.fit(data,label,batch_size=2, epochs=5)
 
 在创建和训练模型后，需要以一种可以使用 TensorFlow 服务的方式保存模型，因此我们不会只保存模型权重。
 
-```
+```py
 Import time
 
 Save_time = int(time.time()) 
@@ -101,20 +101,20 @@ model.save(path, save_format=’tf’)
 
 **注:**Neptune . ai 上有一篇文章，详细解释了 Tensorflow 服务的[。](/web/20221206024243/https://neptune.ai/blog/how-to-serve-machine-learning-models-with-tensorflow-serving-and-docker)
 
-```
+```py
 docker pull tensorflow/serving
 ```
 
 现在让我们运行张量流/服务图像:
 
-```
+```py
 docker run -p 8501:8501 --mount type=bind,source=path/to/directory/saved_models,target=/saved_models/1602624873 -e MODEL_NAME=1602624873 -e MODEL_BASE_PATH=/saved_models -t tensorflow/serving
 
 ```
 
 上面的命令启动 tensorflow/serving 映像，首先使用以下命令将模型从我们的本地目录挂载到 Docker 容器中的文件路径:
 
-```
+```py
 ---mount type=bind,source=path/to/directory/saved_models,target=/saved_models/1602624873
 ```
 
@@ -132,7 +132,7 @@ docker run -p 8501:8501 --mount type=bind,source=path/to/directory/saved_models,
 
 但是在我们开始之前，不要忘记镜像仍在运行，以防我们想要停止镜像运行，下面是执行此操作的代码:
 
-```
+```py
 docker ps
 ```
 
@@ -142,7 +142,7 @@ docker ps
 
 复制要停止的图像的容器 id:
 
-```
+```py
 docker stop e74fe1336768
 
 ```
@@ -155,7 +155,7 @@ docker stop e74fe1336768
 
 以下是位于`index.html`的 UI 代码:
 
-```
+```py
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="../static/css/bootstrap-theme.min.css" />
@@ -194,7 +194,7 @@ docker stop e74fe1336768
 
 创建一个文件名 app.py，并输入下面的代码:
 
-```
+```py
 from flask import Flask, render_template, flash, request
 import requests
 from os import environ
@@ -207,7 +207,7 @@ app = Flask(__name__)
 
 添加到 app.py 的下一行代码是管理和调用 TensorFlow 服务 API 的代码。
 
-```
+```py
 def tfserving_request(req_input, model_name): 
     url = f"http://localhost:8501/v1/models/{model_name}:predict" 
     input_request = {"instances": [req_input]} 
@@ -225,7 +225,7 @@ def tfserving_request(req_input, model_name):
 
 下一步是添加将用于在浏览器中呈现 Web 界面的路由:
 
-```
+```py
 @app.route("/home",methods=["GET","POST"]) #1
 def home():
 
@@ -253,7 +253,7 @@ def home():
 
 最后，让我们添加代码行来启动 flask 服务器:
 
-```
+```py
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=int(environ.get('PORT', 8080)))
 
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 
 让我们使用以下代码运行 app.py:
 
-```
+```py
 python run app.py
 
 ```
@@ -276,7 +276,7 @@ python run app.py
 
 如果我们在渲染页面的文本框中键入输入内容并单击“提交”按钮，如果 TensorFlow 服务 docker 图像关闭，我们会得到一个错误页面。因此，我们需要启动张量流服务图像。
 
-```
+```py
 docker run -p 8501:8501 --mount type=bind,source=path/to/directory/saved_models,target=/saved_models/1602624873 -e MODEL_NAME=1602624873 -e MODEL_BASE_PATH=/saved_models -t tensorflow/serving
 ```
 
@@ -286,7 +286,7 @@ docker run -p 8501:8501 --mount type=bind,source=path/to/directory/saved_models,
 
 既然这样做效果很好，让我们创建一个 docker 映像来管理 flask 应用程序。在包含 flask 应用程序的同一个目录中，我们创建一个 Docker 文件:
 
-```
+```py
 FROM python:3.8-slim //1
 
 ENV PYTHONUNBUFFER ED True //2
@@ -312,7 +312,7 @@ CMD ["python","app.py"] //8
 
 在我们运行 docker 文件之前，让我们创建`requirements.txt`，一个简单的方法是通过下面的命令:
 
-```
+```py
 Pip freeze > requirements.txt
 
 ```
@@ -323,7 +323,7 @@ Pip freeze > requirements.txt
 
 创建 requirements.txt 后，让我们为 flask 应用程序创建一个图像:
 
-```
+```py
 docker build -t flaskweb .
 ```
 
@@ -331,7 +331,7 @@ docker build -t flaskweb .
 
 既然映像已成功创建，让我们运行映像:
 
-```
+```py
 docker run -p 8080:8080 -e PORT=8080  -t flaskweb
 ```
 
@@ -351,7 +351,7 @@ Docker-compose 使我们有机会用一个文件和命令创建两个 Docker 服
 
 复制后，`Dockerfile.dev`'将看起来像这样:
 
-```
+```py
 FROM python:3.8-slim
 
 ENV PYTHONUNBUFFERED True
@@ -368,7 +368,7 @@ CMD ["python","app.py"]
 
 创建完成后，让我们创建一个名为`docker-compose.yml`的 YAML 文件来定义 TensorFlow 服务和 flask web 服务。
 
-```
+```py
 version: "3.8"
 services:
  server:
@@ -403,7 +403,7 @@ services:
 
 为了启动服务，我们在包含`docker-compose.yml`的目录中运行以下命令。
 
-```
+```py
 docker-compose up
 
 ```
@@ -416,7 +416,7 @@ TensorFlow 服务和 flaskweb 服务正在运行，如果我们访问 URL http:l
 
 为了解决这个错误，我们没有在 app.py 的`tfserving_request`函数中使用 TensorFlow 服务 API 端点 define 中的`localhost`，而是用名为`server`的 TensorFlow 服务的名称来替换它:
 
-```
+```py
 
 def tfserving_request(req_input, model_name):
     url = f"http://server:8501/v1/models/{model_name}:predict"
@@ -428,13 +428,13 @@ def tfserving_request(req_input, model_name):
 
 要查看更改，我们需要使用以下命令停止服务运行:
 
-```
+```py
 docker-compose stop
 ```
 
 一旦两项服务都停止，我们将再次启动它:
 
-```
+```py
 docker -compose up
 
 ```
@@ -451,7 +451,7 @@ docker -compose up
 
 出于安全目的，将您的 docker 密码存储在一个文本文件中，给它取任意名称，我将自己的命名为“my_password.txt ”,然后运行下面的命令:
 
-```
+```py
 $ cat ~/my_password.txt | docker login --username steveoni --password-stdin
 
 ```
@@ -462,7 +462,7 @@ $ cat ~/my_password.txt | docker login --username steveoni --password-stdin
 
 让我们为 flask 应用程序创建一个图像，然后推送到 docker hub:
 
-```
+```py
 $ docker build -t steveoni/tfweb:1.0
 
 ```
@@ -471,7 +471,7 @@ $ docker build -t steveoni/tfweb:1.0
 
 映像准备就绪后，我们现在可以推送至 Docker hub:
 
-```
+```py
 $ docker push steveoni/tfweb:1.0
 
 ```
@@ -482,7 +482,7 @@ $ docker push steveoni/tfweb:1.0
 
 我们需要建立在 tensor flow/服务形象之上。让我们在`/saved_models`所在的目录中创建一个 docker 文件。
 
-```
+```py
 From tensorflow/serving
 
 ENV APP_HOME /saved_models/1602624873
@@ -494,14 +494,14 @@ COPY ./saved_models ./
 
 在构建和推送 docker hub 之前，让我们为本地测试构建映像。
 
-```
+```py
 $ docker build -t tfs .
 
 ```
 
 让我们测试一下图像是否工作正常:
 
-```
+```py
 $docker run -p 8501:8501 -e MODEL_NAME=1602624873 -e MODEL_BASE_PATH=/saved_models -t tfs
 
 ```
@@ -510,7 +510,7 @@ $docker run -p 8501:8501 -e MODEL_NAME=1602624873 -e MODEL_BASE_PATH=/saved_mode
 
 现在，我们可以正式创建映像，然后推送:
 
-```
+```py
 $ docker build -t steveoni/tfupdate:1.1
 $ docker push steveoni/tfupdate:1.1
 
@@ -542,7 +542,7 @@ $ docker push steveoni/tfupdate:1.1
 
 安装完成后，您可以使用下面的命令测试程序:
 
-```
+```py
 $ minikube version
 $ kubectl version
 
@@ -554,13 +554,13 @@ $ kubectl version
 
 以下命令有助于为 minikube 设置虚拟机管理程序:
 
-```
+```py
 $ minikube config set driver docker
 ```
 
 完成后，我们可以开始 minikube:
 
-```
+```py
 $ minikube start
 ```
 
@@ -609,7 +609,7 @@ Kubernetes 包含我们所说的节点。节点可以是分配特定任务虚拟
 
 记住我们已经开始了 minikube，现在让我们使用 tensorflow 服务图像创建我们的第一个 pod。
 
-```
+```py
 $ kubectl run tf-kube --image=steveoni/tfupdate:1.1 --port=8501 --env=”MODEL_NAME=1602624873”  --env="MODEL_BASE_PATH=/saved_models/"
 
 ```
@@ -618,7 +618,7 @@ $ kubectl run tf-kube --image=steveoni/tfupdate:1.1 --port=8501 --env=”MODEL_N
 
 然后，我们获得一条消息，表明 pod 已经创建。要查看已创建的 pod 列表，我们可以使用如下所示的`get pods`命令:
 
-```
+```py
 $ kubectl get pods
 ```
 
@@ -628,14 +628,14 @@ $ kubectl get pods
 
 要删除任何 pod，我们只需运行以下命令:
 
-```
+```py
 $ kubectl delete pod-name
 
 ```
 
 我们的`tf-kube` pod 正在运行，但我们无法从集群外部访问它。为了访问集群外部的 pod，让我们创建一个名为 **LoadBalancer 的服务。**该服务有助于将 pod 暴露在集群之外。
 
-```
+```py
 $ kubectl expose pod tf-kube --type=LoadBalancer --port=8501
 
 ```
@@ -644,7 +644,7 @@ $ kubectl expose pod tf-kube --type=LoadBalancer --port=8501
 
 一旦负载平衡器服务开始读取，我们就可以使用 minikube 启动“tf-kube”负载平衡器服务。
 
-```
+```py
 $ minikube service tf-kube
 
 ```
@@ -657,7 +657,7 @@ $ minikube service tf-kube
 
 要删除创建的服务:
 
-```
+```py
 $ kubectl delete service tf-kube
 ```
 
@@ -671,7 +671,7 @@ $ kubectl delete service tf-kube
 
 首先，让我们创建一个名为“tf-kube-pod.yml”的 YAML 文件，并输入以下代码:
 
-```
+```py
 apiVersion: v1
 kind: Pod
 metadata:
@@ -701,7 +701,7 @@ spec:
 
 现在让我们使用“tf-kube-pod.yml”文件创建一个 pod:
 
-```
+```py
 $ kubectl apply -f tf-kube-pod.yml
 ```
 
@@ -709,7 +709,7 @@ $ kubectl apply -f tf-kube-pod.yml
 
 现在，让我们为刚刚创建的 pod 创建负载平衡器服务配置文件。创建一个名为“tf-kube-load-balancer.yml”的文件。
 
-```
+```py
 apiVersion: v1
 kind: Service
 metadata:
@@ -728,13 +728,13 @@ spec:
 
 然后，我们使用下面的命令从“tf-kube-load-balancer.yml”创建服务:
 
-```
+```py
 $ kubectl apply -f tf-kube-load-balancer.yml
 ```
 
 我们还可以检查使用`kubectl get services`创建的服务列表。要启动服务运行，请执行以下操作:
 
-```
+```py
 $ minikube service tf-kube-load-balancer.yml
 ```
 
@@ -775,7 +775,7 @@ ClusterIP: ClusterIP 是另一种类型的服务，就像负载平衡器一样�
 
 在文件夹中创建一个文件名“tf-web-dev.yml ”,在文件中输入以下文本:
 
-```
+```py
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -810,7 +810,7 @@ spec:
 
 因此，让我们为上面定义的部署对象(我们的 flask web 应用程序)创建 LoadBalancer 服务。创建一个文件，并将其命名为“TF web-load-balancer-service . yml”。
 
-```
+```py
 apiVersion: v1
 kind: Service
 metadata:
@@ -829,7 +829,7 @@ spec:
 
 现在 flask web 对象已经准备好了。然后，让我们创建 Tensorflow 服务服务器。创建一个名为“tf-kube-dev.yml”的文件:
 
-```
+```py
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -861,7 +861,7 @@ spec:
 
 让我们为 Tensorflow 服务对象创建一个 CLusterIP 服务。创建一个文件，并将其命名为“tf-cluster-ip-service.yml ”:
 
-```
+```py
 apiVersion: v1
 kind: Service
 metadata:
@@ -880,14 +880,14 @@ spec:
 
 应用程序架构已经设置好，可以在 Kubernetes 上部署了。以下命令同时初始化 Flask web app 服务(web)和 Tensorflow 服务服务(server)的创建。
 
-```
+```py
 $ kubectl apply -f k8s
 
 ```
 
 如果您位于包含“k8s”文件夹的目录中，上述命令将会起作用。但是，如果您的工作目录在“k8s”中，使用下面的命令:
 
-```
+```py
 $ kubectl apply -f .
 
 ```
@@ -898,7 +898,7 @@ $ kubectl apply -f .
 
 让我们检查一下 pod 是否在运行:
 
-```
+```py
 $ kubectl get pods
 
 ```
@@ -907,7 +907,7 @@ $ kubectl get pods
 
 要查看部署对象:
 
-```
+```py
 $ kubectl get deployments
 ```
 
@@ -915,7 +915,7 @@ $ kubectl get deployments
 
 让我们检查为这两个对象创建的服务:
 
-```
+```py
 $ kubectl get services
 
 ```
@@ -924,7 +924,7 @@ $ kubectl get services
 
 现在我们已经设置好了一切，让我们启动“负载平衡器”服务:
 
-```
+```py
 $ minikube service tfweb-load-balancer-service
 
 ```
@@ -937,7 +937,7 @@ $ minikube service tfweb-load-balancer-service
 
 为了解决这个问题，我们需要将“app.py”中“tfserving_request”中使用的“server”主机替换为托管 TensorFlow 服务的 CLusterIP 服务名称。因此，我们将 app.py 中的“服务器”替换为“tf-cluster-ip-service”
 
-```
+```py
 def tfserving_request(req_input, model_name):
 ur="http://tf-cluster-ip-service:8501/v1/models/{}:predict".format(model_name)
 input_request = {"instances": [req_input]}
@@ -948,7 +948,7 @@ return response
 
 完成后，我们重建“tfweb”映像并将其推送到 docker-hub。现在新图像的版本为“1.2”。
 
-```
+```py
 $docker build -t steveoni/tfweb:1.2 .
 $ docker push steveoni/tfweb:1.2
 
@@ -958,7 +958,7 @@ $ docker push steveoni/tfweb:1.2
 
 让我们删除以前创建的部署对象和服务:
 
-```
+```py
 $ kubectl delete deployments --all
 $ kubectl delete services --all
 
@@ -966,14 +966,14 @@ $ kubectl delete services --all
 
 然后，我们再次创建新的部署对象和服务:
 
-```
+```py
 $ kubectl apply -f k8s
 
 ```
 
 然后，我们启动 LoadBalacer 服务:
 
-```
+```py
 $ minikube service tfweb-load-balancer-service
 ```
 
@@ -985,20 +985,20 @@ $ minikube service tfweb-load-balancer-service
 
 如果将这种方法应用于任何其他项目，并且您的 pod 拒绝启动，您可以通过运行以下命令来查看 pod 的全部详细信息:
 
-```
+```py
 $ kubectl describe pods
 ```
 
 这将给出所创建的整个 pod 的全部细节，但是要获取特定的 pod，请运行“kubectl get pods”。获取 pod 的名称，然后运行:
 
-```
+```py
 $ kubectl describe pod pod-name
 
 ```
 
 要查看任何 pod 的日志，我们使用下面的命令:
 
-```
+```py
 $ kubectl logs pod-name
 ```
 

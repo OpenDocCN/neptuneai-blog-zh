@@ -18,7 +18,7 @@
 
 这个项目的文件目录应该是这样的。已经安排实施干净编码最佳实践:
 
-```
+```py
 ├── README.md
 ├── converter.py
 ├── env
@@ -38,49 +38,49 @@
 
 首先，要在终端中创建一个新的开发文件夹，运行:
 
-```
+```py
 $ mkdir zoom-topic-modeling
 
 ```
 
 接下来，创建一个新的 Python 虚拟环境。如果您使用的是 Anaconda，可以运行以下命令:
 
-```
+```py
 $ conda create -n env python=3.6
 
 ```
 
 然后，您可以使用以下方式激活环境:
 
-```
+```py
 $ conda activate env
 
 ```
 
 如果您使用的是标准 Python 发行版，请通过运行以下命令创建一个新的虚拟环境:
 
-```
+```py
 $ python -m venv env
 
 ```
 
 要在 Mac 或 Linux 上激活新环境，请运行:
 
-```
+```py
 $ source env/bin/activate
 
 ```
 
 如果您使用的是 Windows，请按如下方式激活环境:
 
-```
+```py
 $ venvScriptsactivate
 
 ```
 
 无论您使用何种方法创建和激活虚拟环境，您的提示都应该修改为:
 
-```
+```py
 (zoom-topic-modeling) $
 ```
 
@@ -88,7 +88,7 @@ $ venvScriptsactivate
 
 接下来，随着环境的建立，我们将安装项目依赖项的特定版本(这些版本是我撰写本文时的最新版本)。为了重现我的结果，您应该使用相同版本的软件包:
 
-```
+```py
 gensim==3.8.3
 google-api-core==1.24.1
 google-api-python-client==1.12.8
@@ -107,12 +107,12 @@ pyLDAvis==2.1.2
 
 或者，您可以按如下方式安装所有软件包:
 
-```
+```py
 pip install en_core_web_sm gensim google-api-core google-api-pyton-client google-auth google-auth-httplib2 google-cloud-speech googleapis-common-protos nltk pandas pyLDAvis
 
 ```
 
-```
+```py
 conda install -c conda-forge en_core_web_sm gensim google-api-core google-api-pyton-client google-auth google-auth-httplib2 google-cloud-speech googleapis-common-protos nltk pandas pyLDAvis
 ```
 
@@ -120,7 +120,7 @@ conda install -c conda-forge en_core_web_sm gensim google-api-core google-api-py
 
 我们将积极地生成 API 凭证，这些凭证是存在于我们源代码之外的变量，对每个用户都是唯一的。首先，您需要创建一个环境文件(。env)，这可以在您的 IDE 中通过创建一个新文件并命名它来轻松完成。env 也可以通过终端完成，如下所示:
 
-```
+```py
 (zoom-topic-modeling) $ touch .env   
 (zoom-topic-modeling) $ nano .env    
 
@@ -130,7 +130,7 @@ conda install -c conda-forge en_core_web_sm gensim google-api-core google-api-py
 
 例如，的内容。env 文件看起来应该有点像这样:
 
-```
+```py
 user=Brain
 key=xxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
@@ -169,7 +169,7 @@ key=xxxxxxxxxxxxxxxxxxxxxxxxxx
 
 为了使这个项目无缝，我们将把所有的音频/视频文件转换成 FLAC 格式，这是一种由谷歌语音到文本 API 支持的[编码方案。Pyhub 库是一个强大的 python 库，可以快速完成这些转换。](https://web.archive.org/web/20230216014251/https://cloud.google.com/speech-to-text/docs/reference/rest/v1/RecognitionConfig#AudioEncoding)
 
-```
+```py
 import pydub
 
 class Converter:
@@ -195,7 +195,7 @@ class Converter:
 
 ***注意:**下载的 JSON 文件应该保存在与 transcribe.py 脚本相同的目录下。*
 
-```
+```py
 import time
 
 from google.cloud import speech
@@ -240,7 +240,7 @@ class Transcriber:
 
 transcribe.py 脚本为相应的音频文件返回一个 script.txt 文件。为了构建理解底层模式的 LDA 模型，我们需要为模型提供 CSV 格式的文本文件。在这里，我们将把抄本分成一个数据帧，用实例作为句子。为了做到这一点，我们将通过“.”来分割文本文件内容，语法上的意思是一句话的结尾。
 
-```
+```py
 import csv
 
 class Spliter():
@@ -270,7 +270,7 @@ class Spliter():
 
 作为一个好的 LDA 模型的经验法则，困惑分数应该低，而一致性应该高。Gensim 库有一个 CoherenceModel 类，可用于查找 LDA 模型的一致性。对于困惑，LdaModel 对象包含一个 log-perferency 方法，该方法将一包单词语料库作为参数，并返回相应的困惑。CoherenceModel 类将 LDA 模型、标记化的文本、词典和字典作为参数。为了获得一致性分数，使用 get_coherence 方法。
 
-```
+```py
 import nltk
 import pandas as pd
 import re
@@ -350,7 +350,7 @@ class LdaModeling():
 
 这是程序的执行点。在这里，我们导入所有的脚本类，并输入所需的参数。
 
-```
+```py
 from converter import Converter
 from transcribe import Transcriber
 from sentence-split import Spliter

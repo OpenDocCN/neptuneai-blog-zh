@@ -159,7 +159,7 @@ FPS (frames per second) on the X-axis is a metric that describes speed.
 
 查看回购的[“快速启动”部分](https://web.archive.org/web/20221117203617/https://github.com/taipingeric/yolo-v4-tf.keras)，您可以看到，要启动并运行一个模型，我们只需导入 YOLO 作为一个类对象，并加载模型权重:
 
-```
+```py
 from models import Yolov4
 model = Yolov4(weight_path='yolov4.weights',
                class_name_path='class_names/coco_classes.txt')
@@ -169,7 +169,7 @@ model = Yolov4(weight_path='yolov4.weights',
 
 紧接着，模型完全准备好在推理模式下处理图像。只需对您选择的图像使用 predict()方法。该方法是 TensorFlow 和 Keras 框架的标准。
 
-```
+```py
 pred = model.predict('input.jpg')
 
 ```
@@ -239,7 +239,7 @@ predict()方法中有多个参数，让我们指定是否要用预测的边界�
 
 YOLO 的注释是 txt 文件的形式。YOLO 的 txt 文件中的每一行必须具有以下格式:
 
-```
+```py
 image1.jpg 10,15,345,284,0
 image2.jpg 100,94,613,814,0 31,420,220,540,1
 ```
@@ -254,7 +254,7 @@ image2.jpg 100,94,613,814,0 31,420,220,540,1
 
 边界框坐标是一个清晰的概念，但是指定类标签的 *class_id* 数字呢？每个 *class_id* 都与另一个 txt 文件中的特定类相链接。例如，预先训练好的 YOLO 带有 *coco_classes.txt* 文件，看起来像这样:
 
-```
+```py
 person
 bicycle
 car
@@ -276,7 +276,7 @@ bus
 
 和往常一样，我们希望将数据集分成两个子集:用于训练和验证。这可以简单地做到:
 
-```
+```py
 from utils import read_annotation_lines
 
 train_lines, val_lines = read_annotation_lines('../path2annotations/annot.txt', test_size=0.1)
@@ -288,7 +288,7 @@ train_lines, val_lines = read_annotation_lines('../path2annotations/annot.txt', 
 
 以下是数据生成器的创建方式:
 
-```
+```py
 from utils import DataGenerator
 
 FOLDER_PATH = '../dataset/img'
@@ -300,7 +300,7 @@ data_gen_val = DataGenerator(val_lines, class_name_path, FOLDER_PATH)
 
 总而言之，下面是数据分割和生成器创建的完整代码:
 
-```
+```py
 from utils import read_annotation_lines, DataGenerator
 
 train_lines, val_lines = read_annotation_lines('../path2annotations/annot.txt', test_size=0.1)
@@ -338,7 +338,7 @@ data_gen_val = DataGenerator(val_lines, class_name_path, FOLDER_PATH)
 
 要为培训作业做好准备，请初始化 YOLOv4 模型对象。确保使用 *None* 作为 *weight_path* 参数的值。在这一步，您还应该提供类 txt 文件的路径。以下是我在项目中使用的初始化代码:
 
-```
+```py
 class_name_path = 'path2project_folder/model_data/scans_file.txt'
 
 model = Yolov4(weight_path=None,
@@ -361,7 +361,7 @@ model = Yolov4(weight_path=None,
 
 如果您想使用 Neptune 作为跟踪工具，您还应该初始化一次实验运行，如下所示:
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init(project='projects/my_project',
@@ -374,7 +374,7 @@ TensorFlow & Keras 让我们使用回调来监控训练进度、设置检查点�
 
 在拟合您的模型之前，定义对您的目的有用的回调。确保指定存储模型检查点和相关日志的路径。以下是我在我的一个项目中是如何做到的:
 
-```
+```py
 
 dir4saving = 'path2checkpoint/checkpoints'
 os.makedirs(dir4saving, exist_ok = True)
@@ -412,7 +412,7 @@ esCallBack = keras.callbacks.EarlyStopping(monitor = 'val_loss',
 
 你可能已经注意到，在上面的回调中，set TensorBoard 被用作跟踪工具。考虑使用海王星作为一个更先进的实验跟踪工具。如果是这样的话，不要忘记初始化另一个回调来支持与 Neptune 的集成:
 
-```
+```py
 from neptune.new.integrations.tensorflow_keras import NeptuneCallback
 
 neptune_cbk = NeptuneCallback(run=run, base_namespace='metrics')
@@ -422,7 +422,7 @@ neptune_cbk = NeptuneCallback(run=run, base_namespace='metrics')
 
 要开始训练工作，只需使用 TensorFlow / Keras 中的标准 *fit()* 方法来拟合模型对象。我是这样开始训练我的模型的:
 
-```
+```py
 model.fit(data_gen_train,
           initial_epoch=0,
           epochs=10000,
@@ -449,7 +449,7 @@ model.fit(data_gen_train,
 
 您初始化一个模型对象，传递到最佳检查点的路径以及带有类的 txt 文件的路径。下面是我的项目的模型初始化的样子:
 
-```
+```py
 from models import Yolov4
 model = Yolov4(weight_path='path2checkpoint/checkpoints/epoch_48-val_loss-0.061.hdf5',
                class_name_path='path2classes_file/my_yolo_classes.txt')

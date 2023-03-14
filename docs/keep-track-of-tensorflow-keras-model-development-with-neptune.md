@@ -54,7 +54,7 @@
 
 我们将在 Jupyter 笔记本中使用 Neptune，因此我们需要 Neptune 客户端和 Neptune jupyter 扩展。为 jupyter 笔记本配置 Neptune，它将帮助我们将笔记本检查点保存到 Neptune。按照下面的命令来做这件事。
 
-```
+```py
 !pip install neptune-client numpy~=1.19.2 tensorflow nltk
 !pip install -U neptune-notebooks
 !jupyter nbextension enable --py neptune-notebooks
@@ -64,7 +64,7 @@
 
 现在我们已经安装了必要的依赖项，让我们导入它们。
 
-```
+```py
 import tensorflow as tfl
 import numpy as np
 import csv
@@ -79,7 +79,7 @@ STOPWORDS = set(stopwords.words('english'))
 
 将您的项目连接到 Neptune 客户端。如果您是该平台的新手，请阅读[指南](https://web.archive.org/web/20221206061349/https://docs.neptune.ai/getting-started/hello-world)开始使用。
 
-```
+```py
 run = neptune.init(project='aravindcr/Tensorflow-Text-Classification',
                    api_token=’YOUR TOKEN’) 
 ```
@@ -88,7 +88,7 @@ run = neptune.init(project='aravindcr/Tensorflow-Text-Classification',
 
 ### 保存超参数(每次迭代)
 
-```
+```py
 run['parameters'] = {'embed_dims': 64,
                     'vocab_size': 5000,
                     'max_len': 200,
@@ -105,13 +105,13 @@ run['parameters'] = {'embed_dims': 64,
 
 这将帮助我们在进行实验时跟踪数据集的不同版本。这可以用 Python 中的 Neptune 的 **set_property** 函数和 **hashlib** 模块来完成。
 
-```
+```py
 run['dataset'].upload('news-docs-bbc.csv')
 ```
 
 在下面的部分，我创建了一个名为标签和文本的列表，它将帮助我们存储新闻文章的标签和与之相关的实际文本。我们还使用 [nltk](https://web.archive.org/web/20221206061349/https://www.nltk.org/) 删除了停用词。
 
-```
+```py
 labels = []
 texts = []
 
@@ -133,7 +133,7 @@ train_size = int(len(texts) * training_portion)
 
 让我们将数据分成训练集和验证集。如果您查看上述参数，我们将 80%用于培训，20%用于验证我们为此用例构建的模型。
 
-```
+```py
 train_text = texts[0: train_size]
 train_labels = labels[0: train_size]
 
@@ -145,7 +145,7 @@ validaiton_labels = labels[train_size: ]
 
 <00V>将用于在 ***word_index*** 中找不到的单词。 ***fit_on_texts*** 将根据文本列表更新内部词汇。该方法基于词频创建词汇索引。
 
-```
+```py
 tokenizer = Tokenizer(num_words = vocab_size, oov_token=oot_tok)
 tokenizer.fit_on_texts(train_text)
 word_index = tokenizer.word_index
@@ -160,7 +160,7 @@ dict(list(word_index.items())[0:8])
 现在我们已经创建了一个基于频率的词汇索引，让我们将这些标记转换成序列列表，
 ***text _ to _ sequence***将文本转换成一个整数序列。简单来说，它将文本中的单词转换成 **word_index** 字典中对应的整数值。
 
-```
+```py
 train_sequences = tokenizer.texts_to_sequences(train_text)
 print(train_sequences[16])
 
@@ -172,7 +172,7 @@ train_padded = pad_sequences(train_sequences, maxlen=max_len, padding=padding_ty
 
 序列长度小于或大于 ***max_len*** 的文章将被截断为 200。例如，如果序列长度为 186，它将被填充到 200，并带有 14 个零。通常，我们拟合数据一次，但转换序列多次，所以我们没有合并训练集和验证集。
 
-```
+```py
 valdn_sequences = tokenizer.texts_to_sequences(validation_text)
 valdn_padded = pad_sequences(valdn_sequences,
                              maxlen=max_len,
@@ -185,7 +185,7 @@ print(valdn_padded.shape)
 
 让我们看看我们的标签。标签需要被标记化，所有的训练标签都应该是 NumPy 数组的形式。我们将用下面的代码将它们转换成一个 NumPy 数组。
 
-```
+```py
 label_tokenizer = Tokenizer()
 label_tokenizer.fit_on_texts(labels)
 
@@ -195,7 +195,7 @@ label_tokenizer.fit_on_texts(labels)
 
 在开始建模任务之前，让我们看看它们填充前后的样子。我们可以看到有些词变成<oov>是因为它们没有出现在顶部提到的 ***vocab_size*** 中。</oov>
 
-```
+```py
 word_index_reverse = dict([(value, key) for (key, value) in word_index.items()])
 
 def decode_article(text):
@@ -217,7 +217,7 @@ print(train_text[24])
 
 密集层增加了六个单元。最后一层是**‘soft max’**激活函数，它将网络输出归一化为预测输出类别的概率分布。
 
-```
+```py
 model = tfl.keras.Sequential([
     tfl.keras.layers.Embedding(vocab_size, embed_dims),
     tfl.keras.layers.Bidirectional(tfl.keras.layers.LSTM(embed_dims)),
@@ -233,7 +233,7 @@ model.summary()
 
 我这里用过的损失函数是***categorial _ cross _ entropy***，通常用于多类分类任务。它主要量化两个概率分布之间的差异。我们使用的优化器是 ***【亚当】*** ，梯度下降的一种变体。
 
-```
+```py
 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 ```
 
@@ -241,7 +241,7 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=
 
 为了将训练指标记录到 Neptune，我们使用来自 Neptune 库的回调。例如，如下图所示，来自 Tensorflow / Keras 和 **NeptuneCallback** 的日志元数据。这有助于您记录通常会在这些 ML 库中记录的大多数元数据:
 
-```
+```py
 from neptune.new.integrations.tensorflow_keras import NeptuneCallback
 
 neptune_clbk = NeptuneCallback(run=run, base_namespace='metrics')
@@ -261,7 +261,7 @@ history = model.fit(train_padded, training_label_seq, epochs=epochs_count, valid
 
 ### 模型版本控制
 
-```
+```py
 tfl.keras.models.save_model(model, 'classification.h5', overwrite=True, include_optimizer=True, save_format=None,
         signatures=None, options=None, save_traces=True)
 
@@ -274,7 +274,7 @@ run['my_model/saved_model'].upload('classification.h5')
 
 ### 记录项目中的任何内容
 
-```
+```py
 def graphs_plotting(history, string):
     plt.plot(history.history[string])
     plt.plot(history.history['val_'+string])
@@ -287,12 +287,12 @@ graphs_plotting(history, 'accuracy')
 graphs_plotting(history, 'loss')
 ```
 
-```
+```py
 run['train/plots/accuray'].upload('val_accuracy.png')
 run['train/plots/loss'].upload('val_loss.png')
 ```
 
-```
+```py
 
 PARAMS = {'epoch_num': 10,
           'batch_size': 64,

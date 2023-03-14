@@ -58,7 +58,7 @@ OpenAI Gym(或简称 Gym)是一个环境的集合。其中一些被称为连续�
 
 4.将此添加到您的`.bashrc / .zshrc`
 
-```
+```py
 export PATH="/usr/local/opt/llvm/bin:$PATH"
 export CC="/usr/local/opt/llvm/bin/clang"
 export CXX="/usr/local/opt/llvm/bin/clang++"
@@ -87,7 +87,7 @@ export CPPFLAGS="-I/usr/local/opt/llvm/include"
 1.  运行`pip3 install gym[mujoco,robotics]`或`pip3 install gym[all]`
 2.  通过运行以下命令检查安装:
 
-```
+```py
 python3 -c "import gym; env = gym.make('Humanoid-v2'); print('nIt is OKAY!' if env.reset() is not None else 'nSome problem here...')"
 
 ```

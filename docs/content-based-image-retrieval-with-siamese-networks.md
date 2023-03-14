@@ -103,7 +103,7 @@ d 是使用的距离函数(即欧几里德距离)，
 
 对于模型的收敛来说,**确切的差值并不重要。**
 
-```
+```py
 import torch.nn as nn
 criterion = nn.TripletMarginLoss(margin=0.1)
 ```
@@ -114,7 +114,7 @@ criterion = nn.TripletMarginLoss(margin=0.1)
 
 其中三元组样本表示总是按照该顺序。
 
-```
+```py
 loss = criterion(anchor, positive, negative)
 loss.backward()
 ```
@@ -166,7 +166,7 @@ loss.backward()
 
 一个**创建硬负**的策略，可以和上一个结合，就是从正属性向量中改变一些属性。举个例子:
 
-```
+```py
 while True:
     att_negative = random.choice(self.attribute_vectors)
     if not np.array_equal(att_n, att_positive):
@@ -175,7 +175,7 @@ while True:
 
 用这些硬负三元组训练迫使模型区分除了 1、2 或 3 之外所有属性都相似的属性向量。
 
-```
+```py
 num_changes = random.randint(1,3)
 att_negative = np.copy(att_positive)
 
@@ -203,7 +203,7 @@ for c in range(0,num_changes):
 
 注意`att_positive`和`att_negative`是由同一个 MLP 处理的:我们为它们使用了暹罗网络。
 
-```
+```py
 anchor = self.CNN(img_anchor)
 positive = self.MLP(att_positive)
 negative = self.MLP(att_negative)

@@ -144,7 +144,7 @@ GPT [论文](https://web.archive.org/web/20230124065338/https://s3-us-west-2.ama
 
 在预处理中，我们将结构化数据，以便神经网络可以处理它。我们首先指定一个原始文本进行训练。
 
-```
+```py
 text = (
        'Hello, how are you? I am Romeo.n'
        'Hello, Romeo My name is Juliet. Nice to meet you.n'
@@ -160,7 +160,7 @@ text = (
 *   把句子变成小写。
 *   创造词汇。**词汇表**是文档中唯一单词的列表。
 
-```
+```py
   sentences = re.sub("[.,!?-]", '', text.lower()).split('n')  
    word_list = list(set(" ".join(sentences).split()))
 
@@ -190,7 +190,7 @@ text = (
 
 这些标记应该包含在单词字典中，其中词汇表中的每个标记和单词都分配有一个索引号。
 
-```
+```py
 word_dict = {'[PAD]': 0, '[CLS]': 1, '[SEP]': 2, '[MASK]': 3}
 for i, w in enumerate(word_list):
    word_dict[w] = i + 4
@@ -230,7 +230,7 @@ for i, w in enumerate(word_list):
 
 第一句话的长度等于第二句话的长度。
 
-```
+```py
 def make_batch():
    batch = []
    positive = negative = 0
@@ -314,11 +314,11 @@ BERT 具有以下组件:
 
 如果您还记得，我们还没有创建一个函数来接收输入并对其进行格式化以进行位置嵌入，但是标记和段的格式化已经完成。因此，我们将接受输入，并为序列中的每个单词创建一个位置。它看起来像这样:
 
-```
+```py
 print(torch.arange(30, dtype=torch.long).expand_as(input_ids))
 ```
 
-```
+```py
 Output:
 
 tensor([[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
@@ -337,7 +337,7 @@ tensor([[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
 
 在前向函数中，我们总结了所有的嵌入，并对它们进行归一化。
 
-```
+```py
 class Embedding(nn.Module):
    def __init__(self):
        super(Embedding, self).__init__()
@@ -360,7 +360,7 @@ class Embedding(nn.Module):
 
 它会将[PAD]转换为 1，其他地方为 0。
 
-```
+```py
 def get_attn_pad_mask(seq_q, seq_k):
    batch_size, len_q = seq_q.size()
    batch_size, len_k = seq_k.size()
@@ -369,11 +369,11 @@ def get_attn_pad_mask(seq_q, seq_k):
    return pad_attn_mask.expand(batch_size, len_q, len_k)  
 ```
 
-```
+```py
 print(get_attn_pad_mask(input_ids, input_ids)[0][0], input_ids[0])
 ```
 
-```
+```py
 Output:
 (tensor([False, False, False, False, False, False, False, False, False, False,
          False, False, False,  True,  True,  True,  True,  True,  True,  True,
@@ -391,7 +391,7 @@ Output:
 
 编码器的工作是从输入和注意屏蔽中找到表示和模式。
 
-```
+```py
 class EncoderLayer(nn.Module):
    def __init__(self):
        super(EncoderLayer, self).__init__()
@@ -415,7 +415,7 @@ class EncoderLayer(nn.Module):
  *多头注意力需要四个输入:**查询**、**键**、**值、**和**注意力屏蔽**。嵌入作为输入提供给查询、键和值参数，而注意掩码作为输入提供给注意掩码参数。
 这三个输入和注意屏蔽用点积运算操作，产生两个输出:**上下文向量**和**注意**。然后上下文向量通过一个线性层，最后产生输出。
 
-```
+```py
 class MultiHeadAttention(nn.Module):
    def __init__(self):
        super(MultiHeadAttention, self).__init__()
@@ -447,7 +447,7 @@ return nn.LayerNorm(d_model)(output + residual), attn
 
 接下来我们使用 scores.masked_fill_(attn_mask，-1e9)。该属性用-1e9 填充 scores 的元素，其中注意力掩码为**真**，而其余元素得到一个**注意力分数**，该分数然后通过 softmax 函数传递，该函数给出 0 到 1 之间的分数。最后，我们执行注意力和值之间的矩阵乘法，这给出了上下文向量。
 
-```
+```py
 class ScaledDotProductAttention(nn.Module):
    def __init__(self):
        super(ScaledDotProductAttention, self).__init__()
@@ -460,7 +460,7 @@ class ScaledDotProductAttention(nn.Module):
        return score, context, attn
 ```
 
-```
+```py
 emb = Embedding()
 embeds = emb(input_ids, segment_ids)
 
@@ -475,7 +475,7 @@ print()
 print('Scores: ', S[0][0],'nnAttention Scores after softmax: ', A[0][0])
 ```
 
-```
+```py
 Output:
 
 Masks tensor([False, False, False, False, False, False, False, False, False, False,
@@ -525,7 +525,7 @@ multihead 的输出进入前馈网络，构成编码器部分。
 虽然变压器中的解码器部分被替换为浅网络，该浅网络可用于分类，如下面的代码所示。
 同样，BERT 输出两个结果:一个是针对**分类器**的，另一个是针对**屏蔽**的。
 
-```
+```py
 class BERT(nn.Module):
    def __init__(self):
        super(BERT, self).__init__()
@@ -567,7 +567,7 @@ class BERT(nn.Module):
 1.  您可以指定编码器的数量。在原始论文中，基本模型有 12 个。
 2.  有两个激活函数:Tanh 和 GELU(**G**aussian**E**rror**L**linear**U**nit)。
 
-```
+```py
 def gelu(x):
    return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
 ```
@@ -580,7 +580,7 @@ def gelu(x):
 
 说到优化，我们将使用 **Adam** 优化器。
 
-```
+```py
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 ```
@@ -589,7 +589,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 最后，我们将开始训练。
 
-```
+```py
 model = BERT()
 batch = make_batch()
 input_ids, segment_ids, masked_tokens, masked_pos, isNext = map(torch.LongTensor, zip(*batch))
@@ -620,7 +620,7 @@ input_ids, segment_ids, masked_tokens, masked_pos, isNext = map(torch.LongTensor
    print('predict isNext : ',True if logits_clsf else False)
 ```
 
-```
+```py
 Output:
 
 Hello, how are you? I am Romeo.
@@ -656,7 +656,7 @@ predict isNext :  True
 
 例如:
 
-```
+```py
 import transformers
 
 class BERTClassification(nn.Module):

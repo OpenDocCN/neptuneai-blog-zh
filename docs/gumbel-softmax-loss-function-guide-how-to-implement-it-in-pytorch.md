@@ -73,7 +73,7 @@ Gumbel Max trick 是一种允许在神经网络正向传递期间从分类分布
 
 首先，让我们导入所需的依赖项。
 
-```
+```py
 import numpy as np
 from typing import Union, Optional, List, Tuple, Text, BinaryIO
 import io
@@ -96,7 +96,7 @@ run = neptune.init(project='common/pytorch-integration',
 
 尽早定义一些超参数总是很方便的。
 
-```
+```py
 batch_size = 100
 epochs = 10
 temperature = 1.0
@@ -108,7 +108,7 @@ hard = False
 
 **如前所述，我们将利用 MNIST 来实施。还是导入吧。**
 
-```
+```py
 is_cuda = not no_cuda and torch.cuda.is_available()
 torch.manual_seed(seed)
 if is_cuda:
@@ -127,7 +127,7 @@ batch_size=batch_size, shuffle=True, **kwargs)
 
 现在，我们将定义 Gumbel-softmax 采样辅助函数。
 
-```
+```py
 def sample_gumbel(shape, eps=1e-20):
     U = torch.rand(shape)
     if is_cuda:
@@ -159,7 +159,7 @@ def gumbel_softmax(logits, temperature, hard=False):
 
 接下来，让我们定义 VAE 结构和损失函数。
 
-```
+```py
 def loss_function(recon_x, x, qy):
     BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), size_average=False) / x.shape[0]
 
@@ -202,7 +202,7 @@ class VAE_gumbel(nn.Module):
 
 **更多超参数的时间到了。**
 
-```
+```py
 latent_dim = 30
 categorical_dim = 10  
 
@@ -221,7 +221,7 @@ optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 在测试函数中，我们将应用图像的重建，基本上是为了测试一个看不见的数据样本的采样和建模效率。
 
-```
+```py
 def train(epoch):
     model.train()
     train_loss = 0
@@ -280,7 +280,7 @@ def test(epoch):
 
 最后，我们将定义事件循环来联合运行所有的单个函数。
 
-```
+```py
 for epoch in range(1, epochs + 1):
     train(epoch)
     test(epoch)

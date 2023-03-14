@@ -22,7 +22,7 @@
 
 让我们看看我们的数据，
 
-```
+```py
 import pandas as pd
 
 tweet= pd.read_csv('../input/nlp-getting-started/train.csv')
@@ -34,7 +34,7 @@ tweet.head(3)
 
 数据包含 id、关键字、位置、文本和二进制目标。我们只会考虑推文来预测目标。
 
-```
+```py
 print('There are {} rows and {} columns in train'.format(tweet.shape[0],tweet.shape[1]))
 print('There are {} rows and {} columns in test'.format(test.shape[0],test.shape[1]))
 ```
@@ -51,7 +51,7 @@ print('There are {} rows and {} columns in test'.format(test.shape[0],test.shape
 *   **删除停用词**:删除单词“a”或“the”
 *   **:将每个单词的屈折形式化为一个共同的基或根(*“学”，“学”——>“学”)*)。**
 
-```
+```py
 def preprocess_news(df):
 	'''Function to preprocess and create corpus'''
 	new_corpus=[]
@@ -80,7 +80,7 @@ Countvectorizer 提供了一种简单的方法来矢量化并表示一组文本�
 
 让我们用一个例子来理解它，
 
-```
+```py
 text = ["She sells seashells in the seashore"]
 
 vectorizer = CountVectorizer()
@@ -98,7 +98,7 @@ print(vector.toarray())
 
 您可以看到，Coutvectorizer 已经从给定的文本中构建了一个词汇表，然后使用一个 [numpy 稀疏矩阵](https://web.archive.org/web/20221206095902/https://machinelearningmastery.com/sparse-matrices-for-machine-learning/)来表示单词。我们可以试着用这个词汇翻译另一篇文章，并观察输出结果以获得更好的理解。
 
-```
+```py
 vector=vectorizer.transform(["I sell seashells in the seashore"])
 vector.toarray()
 ```
@@ -109,7 +109,7 @@ vector.toarray()
 
 现在您已经了解了 Coutvectorizer 的工作原理，我们可以使用它来调整和转换我们的语料库。
 
-```
+```py
 vec=CountVectorizer(max_df=10,max_features=10000)
 vec.fit(df.question_text.values)
 vector=vec.transform(df.question_text.values)
@@ -132,7 +132,7 @@ Countvectorizer 的一个问题是，像“the”这样的常见单词会出现�
 
 让我们看一个例子:
 
-```
+```py
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 text = ["She sells seashells by the seashore","The sea.","The seashore"]
@@ -177,7 +177,7 @@ Word2vec 由两种不同的模型组成:
 
 单词嵌入的基本思想是在相似上下文中出现的单词在向量空间中倾向于彼此更接近。我们来看看如何用 python 实现 word2vec。
 
-```
+```py
 import gensim
 from gensim.models import Word2Vec
 
@@ -195,7 +195,7 @@ model = gensim.models.Word2Vec(corpus,
 
 首先，你必须从[这里](https://web.archive.org/web/20221206095902/https://github.com/mmihaltz/word2vec-GoogleNews-vectors)下载训练好的向量。然后，您可以使用 gensim 加载向量。
 
-```
+```py
 from  gensim.models.KeyedVectors import load_word2vec_format
 
 def load_word2vec():
@@ -212,7 +212,7 @@ def load_word2vec():
 
 让我们检查一下嵌入，
 
-```
+```py
 w2v_model=load_word2vec()
 w2v_model['London'].shape
 ```
@@ -241,7 +241,7 @@ orange 的单词**嵌入向量(文本表示)将是这些 n 元文法的总和。
 
 这个文件的每一行都包含一个单词，它是一个对应的 n 维向量。我们将使用这个文件创建一个字典，将每个单词映射到它的向量表示。
 
-```
+```py
 from gensim.models import FastText
 
 def load_fasttext():
@@ -265,7 +265,7 @@ embeddings_index=load_fastext()
 
 让我们检查一个单词的嵌入，
 
-```
+```py
 embeddings_index['london'].shape
 
 ```
@@ -282,7 +282,7 @@ GloVe 代表单词表示的全局向量。它是由斯坦福大学开发的无�
 
 让我们为我们的目的创建一个。
 
-```
+```py
 def load_glove():
     embedding_dict = {}
     path = '../input/glove-global-vectors-for-word-representation/glove.6B.100d.txt'
@@ -301,7 +301,7 @@ embeddings_index = load_glove()
 
 现在，我们有一个字典，其中包含手套中的每个单词、预训练向量以及它们在字典中的对应向量。让我们检查一个单词的嵌入。
 
-```
+```py
 embeddings_index['london'].shape
 
 ```
@@ -326,7 +326,7 @@ embeddings_index['london'].shape
 
 我们将使用 TensorFlow hub 加载模块。
 
-```
+```py
 module_url = "../input/universalsentenceencoderlarge4"
 
 embed = hub.load(module_url)
@@ -334,7 +334,7 @@ embed = hub.load(module_url)
 
 接下来，我们将为列表中的每个句子创建嵌入。
 
-```
+```py
 sentence_list=df.question_text.values.tolist()
 sentence_emb=embed(sentence_list)['outputs'].numpy()
 ```
@@ -353,7 +353,7 @@ sentence_emb=embed(sentence_list)['outputs'].numpy()
 
 让我们创建一个单词索引并确定一个最大句子长度，使用 **Keras Tokenizer** 和 *pad_sequences* 填充我们语料库中的每个句子。
 
-```
+```py
 MAX_LEN=50
 tokenizer_obj=Tokenizer()
 tokenizer_obj.fit_on_texts(corpus)
@@ -367,14 +367,14 @@ tweet_pad=pad_sequences(sequences,
 
 让我们检查一下语料库中独特单词的数量，
 
-```
+```py
 word_index=tokenizer_obj.word_index
 print('Number of unique words:',len(word_index))
 ```
 
 使用这个单词索引字典和嵌入字典，您可以为我们的语料库创建一个**嵌入矩阵**。这个嵌入矩阵被传递到神经网络的**嵌入层**以学习单词表示。
 
-```
+```py
 def prepare_matrix(embedding_dict, emb_size=300):
     num_words = len(word_index)
     embedding_matrix = np.zeros((num_words, emb_size))
@@ -392,7 +392,7 @@ def prepare_matrix(embedding_dict, emb_size=300):
 
 我们可以定义我们的神经网络，并将这个嵌入索引传递给网络的嵌入层。我们将向量传递到嵌入层，并设置***trainible = False***以防止权重被更新。
 
-```
+```py
 def new_model(embedding_matrix):
     inp = Input(shape=(MAX_LEN,))
 
@@ -417,7 +417,7 @@ def new_model(embedding_matrix):
 
 例如，要使用 word2vec 嵌入来运行模型，
 
-```
+```py
 embeddings_index=load_word2vec()
 embedding_matrix=prepare_matrix(embeddings_index)
 model=new_model(embedding_matrix)

@@ -32,7 +32,7 @@
 
 你如何用代码做到这一点？新的 Neptune API 依赖于一个类似字典的接口。您可以用一种统一的方式跟踪所有元数据，而不是在那里传递参数，在那里传递属性，以这种方式传递度量，以那种方式传递工件。
 
-```
+```py
 import neptune.new as neptune
 run = neptune.init()
 
@@ -121,7 +121,7 @@ run["test/total_accuracy"] = calculate_test_accuracy()
 
 **将 Neptune 客户端**库至少更新到 0.9 版本。只需在您的环境中运行:
 
-```
+```py
 pip install --upgrade neptune-client
 ```
 
@@ -147,13 +147,13 @@ pip install --upgrade neptune-client
 
 **2。安装 Neptune 客户端库**
 
-```
+```py
 pip install neptune-client
 ```
 
 **3。将日志添加到您的脚本中**
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init(project="your_workspace/your_project")

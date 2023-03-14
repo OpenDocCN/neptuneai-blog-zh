@@ -52,26 +52,26 @@
 
 让我们用一些代码来理解这一点:
 
-```
+```py
 import numpy as np
 import matplotlib.pyplot as plt
 ```
 
 首先，我们将创建一个数据集:
 
-```
+```py
 X = np.sort(np.random.rand(100))
 ```
 
 然后我们将定义一个**真函数**。监督学习中的真正函数是已经将输入映射到输出的函数。这将帮助我们评估我们的机器学习算法对分布的建模有多正确。
 
-```
+```py
 true_f = lambda X: np.cos(3.5 * np.pi * X)
 ```
 
 然后我们定义一个 y，它是真函数的输出:
 
-```
+```py
 y = true_f(X) + np.random.randn(100) * 0.1
 ```
 
@@ -81,7 +81,7 @@ y = true_f(X) + np.random.randn(100) * 0.1
 
 现在让我们定义我们的机器学习模型:
 
-```
+```py
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
@@ -89,13 +89,13 @@ from sklearn.linear_model import LinearRegression
 
 为了解决容量问题，我们将使用“度”这个术语。与度数为 15 的模型相比，度数为 1 的模型容量较低。
 
-```
+```py
 degrees = [1,15]
 ```
 
 在这个循环中，我们将用 1 度和 15 度两个度数来迭代模型。这将向我们展示容量如何帮助我们实现能够产生良好结果的良好模式。
 
-```
+```py
 plt.figure(figsize=(15, 10))
 for i in range(len(degrees)):
    ax = plt.subplot(1, len(degrees), i+1)
@@ -156,7 +156,7 @@ plt.show()
 
 让我们定义一个非线性函数和一个简单的线性模型，该函数捕捉数据的真实特征或表示。
 
-```
+```py
 non_linear_func = lambda X: np.cos(3.5 * np.pi * X)
 Simple_Model = 2**(X)
 ```
@@ -230,7 +230,7 @@ Simple_Model = 2**(X)
 
 首先，我们将构建四个决策树。每个决定将有不同的最大深度。接下来，我们将训练他们:
 
-```
+```py
 from sklearn.tree import DecisionTreeRegressor
 
 tree_reg1 = DecisionTreeRegressor(random_state=42, max_depth=2)
@@ -246,7 +246,7 @@ tree_reg4.fit(X_train, y_train)
 
 现在，让我们看看所有四个模型在训练和测试数据集上的准确性:
 
-```
+```py
 The training and testing scores of model 1: 0.7732058844148597 and 0.770360248173112,
 The training and testing scores of model 2: 0.8523996532650688 and 0.8476275950133408,
 The training and testing scores of model 3: 0.8964495771468475 and 0.8907512124389504,
@@ -262,7 +262,7 @@ The training and testing scores of model 4: 0.9254890162488267 and 0.88958155756
 
 这个过程重复 k 次，使得 k 个折叠中的每一个被用作测试集一次。然后将从这 k 次训练和测试中获得的分数进行平均，以获得最终分数。
 
-```
+```py
 for index, (train, test) in enumerate(fold.split(X_train,y_train)):
    X_train_folds = X_train[train]
    y_train_folds = y_train[train]
@@ -278,7 +278,7 @@ for index, (train, test) in enumerate(fold.split(X_train,y_train)):
 
 k-fold 的目的是帮助模型很好地对测试数据进行概括。
 
-```
+```py
 Fold 1
 Accuracy Comparison on model 1 :  0.7664370565884211 0.7801300087611103
 Accuracy Comparison on model 2 :  0.8485031490397249 0.8586081582213081
@@ -331,7 +331,7 @@ Accuracy Comparison on model 4 :  0.9290267746532016 0.8859361597163452
 
 在这个例子中，我们将看到如何使用**网格搜索**为我们的随机森林算法找到最佳参数，以减少过度拟合:
 
-```
+```py
 from sklearn.metrics import make_scorer
 from sklearn.model_selection import GridSearchCV
 
@@ -348,14 +348,14 @@ def performance_metric(y_true, y_predict):
 
 为了进行完美的网格搜索，我们需要确保在字典中定义了所有的参数(我们想要更改的参数):
 
-```
+```py
 params = {'max_depth':np.arange(1,11),
          'n_estimators' : [10, 50, 100, 200],
          'oob_score' : [False, True],
          'max_features': ['auto', 'sqrt']}
 ```
 
-```
+```py
 scoring_fnc = make_scorer(performance_metric)
 regressor_tree = RandomForestRegressor(random_state=42, n_jobs = -1)
 grid = GridSearchCV(estimator=regressor_tree,param_grid=params,cv=5,scoring=scoring_fnc)
@@ -363,12 +363,12 @@ grid = GridSearchCV(estimator=regressor_tree,param_grid=params,cv=5,scoring=scor
 
 让我们拟合模型，并检查训练和测试数据集的准确性:
 
-```
+```py
 grid.fit(X_train, y_train)
 grid.score(X_train, y_train), grid.score(X_test, y_test)
 ```
 
-```
+```py
  (0.9597848908613165, 0.9481551892881535)
 ```
 
@@ -388,7 +388,7 @@ grid.score(X_train, y_train), grid.score(X_test, y_test)
 
 这次，我们将使用一个**随机森林算法**。随机森林是决策树的组合，其中参数 n_estimators 定义了我们在模型中需要的树的数量。默认情况下，它设置为 100。
 
-```
+```py
 from sklearn.ensemble import RandomForestRegressor
 
 regressor_for = RandomForestRegressor(random_state=42, n_jobs=-1)
@@ -425,7 +425,7 @@ print('The training and testing scores of model 1: {} and {}'.format(grid.score(
 
 岭回归是线性回归的正则化版本:
 
-```
+```py
 from sklearn.linear_model import Ridge, LinearRegression
 ```
 

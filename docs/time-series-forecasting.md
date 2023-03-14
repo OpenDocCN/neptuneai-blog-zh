@@ -104,13 +104,13 @@
 
 我们将分别构建虚拟趋势、季节性和剩余成分。这个例子展示了如何使用 Pandas 模块构建一个简单的时间序列数据集。
 
-```
+```py
 time = np.arange(1, 51)
 ```
 
 现在我们需要创造一种趋势。假设我们有一个测量电力需求的传感器。为了简单起见，我们将忽略单位。
 
-```
+```py
 trend = time * 2.75
 ```
 
@@ -120,7 +120,7 @@ trend = time * 2.75
 
 ![Time series forcasting plot trend](img/89944ea05cd722a017eb714cdc0bad74.png)
 
-```
+```py
 seasonal = 10 + np.sin(time) * 10
 ```
 
@@ -130,7 +130,7 @@ seasonal = 10 + np.sin(time) * 10
 
 现在，让我们构造剩余分量。
 
-```
+```py
 np.random.seed(10)  
 residual = np.random.normal(loc=0.0, scale=1, size=len(time))
 
@@ -152,7 +152,7 @@ T[T]=趋势
 **R [t]** =残差
 **[t]** =代表特定时间点的变量
 
-```
+```py
 additive = trend + seasonal + residual
 ```
 
@@ -327,7 +327,7 @@ AR 模型对过去的实际值进行回归。
 
 我们将生成数据，以深入了解 AR 模型的工作原理。
 
-```
+```py
 np.random.seed(123)
 
 time = np.arange(100)
@@ -344,12 +344,12 @@ plt.fill_between(time,ar1_sample)
 
 在这里，我们为生成的数据创建了一个预测，以表明我们提出了一个大约为 ar(1)且 phi ≈ 0.7 的模型。
 
-```
+```py
 model = sm.tsa.ARMA(ar1_sample, (1, 0)).fit(trend='nc', disp=0)
 model.params
 ```
 
-```
+```py
 np.random.seed(112)
 
 ar2_sample = np.zeros(100)
@@ -388,7 +388,7 @@ plt.fill_between(time,ar2_sample)
 
 我们将生成数据，以便了解 MA 系列的生成过程。
 
-```
+```py
 np.random.seed(12)
 
 time = np.arange(100)
@@ -405,7 +405,7 @@ for t in time[1:]:
 plt.fill_between(time,ma1_sample)
 ```
 
-```
+```py
 
 model = sm.tsa.ARMA(ma1_sample, (0, 1)).fit(trend='nc', disp=0)
 model.params
@@ -419,7 +419,7 @@ out:数组([0.34274651])
 
 要回答这个问题，我们需要了解自相关函数(ACF)。让我们首先展示不同模拟系列的 ACF 图示例。
 
-```
+```py
 fig = sm.tsa.graphics.plot_acf(ar1_sample, lags=range(1,30), alpha=0.05,title = 'ar1 ACF')
 fig = sm.tsa.graphics.plot_acf(ma1_sample, lags=range(1,15), alpha=0.05,title = 'ma1 ACF')
 ```
@@ -448,7 +448,7 @@ fig = sm.tsa.graphics.plot_acf(ma1_sample, lags=range(1,15), alpha=0.05,title = 
 
 因此，识别 AR(1)模型或 MA(1)模型的一个简单方法是看一个模型的相关性是否会影响下一个模型。
 
-```
+```py
 fig = sm.tsa.graphics.plot_acf(ar2_sample, lags=range(1,15), alpha=0.05,title = 'ar2 ACF')
 fig = sm.tsa.graphics.plot_acf(ma2_sample, lags=range(1,15), alpha=0.05,title = 'ma2 ACF')
 ```

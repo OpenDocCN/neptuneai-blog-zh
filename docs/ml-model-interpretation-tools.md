@@ -109,7 +109,7 @@
 
 由于我们没有来自测试数据集的正确标签，让我们通过训练分类报告和 K 倍交叉验证分数来看看我们的模型是如何执行的。
 
-```
+```py
 From sklearn.ensemble import RandomForestClassifier
 rfc = RandomForestClassifier()
 rfc.fit(train_X,y)
@@ -117,7 +117,7 @@ rfc.fit(train_X,y)
 
 ### 培训分类报告:
 
-```
+```py
 testpred = rfc.predict(test_X)
 
 ```
@@ -153,14 +153,14 @@ ELI5 更多地以局部/全局范围的方式解释模型，而不是我们上�
 
 让我们首先导入所需的依赖项
 
-```
+```py
 pip install eli5
 
 ```
 
 答:**特征权重和重要性**
 
-```
+```py
 conda install -c conda-forge eli5
 ```
 
@@ -168,7 +168,7 @@ conda install -c conda-forge eli5
 
 这是从另一端出来的。
 
-```
+```py
 Import eli5
 
 ```
@@ -177,7 +177,7 @@ Import eli5
 
 这里，我们使用 vect(Tf-Idf 矢量器)和包含工程特性的可变列来获取特性名称。然后，特性名称作为* *参数传递给同一个函数。这是我们现在得到的。
 
-```
+```py
 eli5.show_weights(rfc)
 ```
 
@@ -185,7 +185,7 @@ eli5.show_weights(rfc)
 
 我们还可以:
 
-```
+```py
 columns = ['Source','weekday','hour','text_num_words']
 feature_names = list(vect.get_feature_names()) + columns
 eli5.show_weights(rfc, feature_names = feature_names)
@@ -209,7 +209,7 @@ eli5.show_weights(rfc, feature_names = feature_names)
 
 现在让我们来看一个真否定的例子。
 
-```
+```py
 eli5.show_prediction(rfc,train_X.toarray()[1],
 feature_names=feature_names, top=20, show_feature_values=True)
 
@@ -246,14 +246,14 @@ feature_names=feature_names, top=20, show_feature_values=True)
 
 LIME 主要提供三种解释方法，这三种方法处理不同类型的数据:
 
-```
+```py
 pip install lime
 
 ```
 
 表格解释，
 
-```
+```py
 conda install -c conda-forge lime
 ```
 
@@ -267,7 +267,7 @@ conda install -c conda-forge lime
 
 通过切换原始文本中随机选择的单词的存在/不存在来创建新文本。
 
-```
+```py
 rfc.fit(vectorized_train_text,y)
 ```
 
@@ -282,7 +282,7 @@ rfc.fit(vectorized_train_text,y)
 
 就像 ELI5 一样，让我们先检查一个真正的正实例。
 
-```
+```py
 Import lime
 From sklearn.pipeline import make_pipeline
 
@@ -290,7 +290,7 @@ From sklearn.pipeline import make_pipeline
 
 让我们画出实例结果，看看我们会得到什么。
 
-```
+```py
 explainer = lime.lime_text.LimeTextExplainer(
 class_names=[‘Not Patient’, ‘Patient’])
 pl = make_pipeline(vect,rfc)
@@ -301,7 +301,7 @@ pl = make_pipeline(vect,rfc)
 
 现在让我们看看一个真正的负实例的解释图是什么样子的。
 
-```
+```py
 exp = explainer.explain_instance(
 train[‘combined_text’][689], pl.predict_proba)
 
@@ -309,7 +309,7 @@ train[‘combined_text’][689], pl.predict_proba)
 
 第一眼看到突出显示的关键词，如“冷”、“脂肪”、“烧伤”等。，该数据点看起来与“患者”类别相关联。在实际阅读时，我们理解文本是在谈论洗冷水澡的好处，显然，我们的模型也理解这一点。
 
-```
+```py
 exp.show_in_notebook()
 
 ```
@@ -364,14 +364,14 @@ e 是具有连续值的从属属性，而 A，B，C，D 是我们的分类值预
 
 导入所需的依赖项:
 
-```
+```py
 pip install shape
 
 ```
 
 根据您的型号，您可以使用 SHAP 提供的不同解释器。因为我们正在处理一个随机的森林分类器，我们将使用 SHAP 的树解释器。
 
-```
+```py
 conda install -c conda-forge shap
 
 ```
@@ -380,21 +380,21 @@ conda install -c conda-forge shap
 
 shap_values 是一个包含 2 个数组作为元素的列表，对应于我们数据集中的 2 个类。所以，我们可以从这两个类的角度来解释这个预测。
 
-```
+```py
 Import shap
 
 ```
 
 按照我们的方法，让我们首先从解释一个真实的正例开始。为了展示一致性，我们将检查与 LIME 相同的数据点。
 
-```
+```py
 explainer = shap.TreeExplainer(rfc)
 
 ```
 
 情节是这样的:
 
-```
+```py
 shap_values =
 explainer.shap_values(vectorized_train_text.toarray(),check_additivity=False)
 
@@ -404,7 +404,7 @@ explainer.shap_values(vectorized_train_text.toarray(),check_additivity=False)
 
 与“患者”类相关的值出现在 expected_value 和 shap_values 的第一个索引处，因此该图是从“患者”类的角度绘制的。
 
-```
+```py
 shap.initjs()
 shap.force_plot(explainer.expected_value[1], shap_values = shap_values[1][689], features = vectorized_train_text.toarray()[0:][689], feature_names = vect.get_feature_names())
 
@@ -426,7 +426,7 @@ shap.force_plot(explainer.expected_value[1], shap_values = shap_values[1][689], 
 
 因此，所有出现在粉红色(红色)中的特征已经切换到蓝色，并且现在对“非患者”类别的预测产生负面影响。
 
-```
+```py
 shap.initjs()
 shap.force_plot(explainer.expected_value[1], shap_values = shap_values[1][689], features = vectorized_train_text.toarray()[0:][689], feature_names = vect.get_feature_names())
 
@@ -440,7 +440,7 @@ shap.force_plot(explainer.expected_value[1], shap_values = shap_values[1][689], 
 
 除了局部解释，SHAP 还可以通过全局解释来解释模型的一般行为。
 
-```
+```py
 shap.initjs()
 shap.force_plot(explainer.expected_value[1], shap_values = shap_values[1][120], features = vectorized_train_text.toarray()[0:][120], feature_names = vect.get_feature_names())
 
@@ -452,7 +452,7 @@ shap.force_plot(explainer.expected_value[1], shap_values = shap_values[1][120], 
 
 我们将查看另一个解释库，MLXTEND。
 
-```
+```py
 shap.summary_plot(shap_values = shap_values[1], features = vectorized_train_text.toarray(), feature_names = vect.get_feature_names())
 
 ```
@@ -473,14 +473,14 @@ MLxtend 或机器学习扩展是一个用于日常数据科学和机器学习任
 
 导入所需的依赖项:
 
-```
+```py
 pip install mlxtend
 
 ```
 
 MLXTEND 提供不同的功能，例如:
 
-```
+```py
 python setup.py install
 
 ```
@@ -489,7 +489,7 @@ python setup.py install
 
 一种有趣的观察结果的方式是通过主成分分析。
 
-```
+```py
 Import mlxtend
 
 ```
@@ -507,7 +507,7 @@ MLXTEND 允许您使用 plot_pca_correlation_graph 函数绘制 PCA 相关圆。
 
 **2。偏差-方差分解**
 
-```
+```py
 from mlxtend.plotting import plot_pca_correlation_graph
 from sklearn.preprocessing import StandardScaler
 X = StandardScaler().fit_transform(train[['text_num_words', 'weekday','hour','Source']].values)
@@ -531,7 +531,7 @@ fig, corr_matrix = plot_pca_correlation_graph(
 
 在这个练习中，我们根据文本特征来训练模型。
 
-```
+```py
 from mlxtend.evaluate import bias_variance_decomp
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(vectorized_train_text, y,test_size=0.25,
@@ -541,7 +541,7 @@ random_state=1,shuffle=True,stratify=y)
 
 根据我们得到的分数，我们可以推断我们的模型可能擅长泛化，也就是说，它没有过度拟合。
 
-```
+```py
 avg_expected_loss, avg_bias, avg_var = bias_variance_decomp(
         clf2, X_train, y_train, X_test, y_test,
         loss='mse',
@@ -571,7 +571,7 @@ print(f"Average variance: {avg_var.round(3)}")
 
 这是我们得到的结果:
 
-```
+```py
 from mlxtend.plotting import plot_decision_regions
 from mlxtend.classifier import EnsembleVoteClassifier
 import matplotlib.gridspec as gridspec
@@ -582,7 +582,7 @@ import matplotlib.pyplot as plt
 
 我们可以清楚地看到，这是一个非常糟糕的决策边界。输入要素不是很好的区分因素，因此巩固了我们用其他工具获得的结果。
 
-```
+```py
 Clf = RandomForestClassifier(random_state=1)
 value=1.5
 width=0.75
@@ -594,7 +594,7 @@ labels = ['Random Forest']
 
 包扎
 
-```
+```py
 for clf, lab, grd in zip([clf2], labels, itertools.product([0],[0])):
 clf.fit(train[['Source', 'weekday']].values, y)
 ax = plt.subplot(gs[grd[0], grd[1]])

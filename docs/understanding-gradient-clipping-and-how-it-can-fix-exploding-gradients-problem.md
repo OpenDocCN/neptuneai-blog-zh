@@ -233,7 +233,7 @@
 
 ### 数据加载
 
-```
+```py
 import tensorflow as tf
 from tensorflow.keras import Model, layers
 import numpy as np
@@ -248,7 +248,7 @@ run = neptune.init(project='common/tf-keras-integration',
 
 我们建议您安装 Tensorflow 2 的最新版本，在撰写本文时是 2.3.0，但此代码将与任何未来版本兼容。确保您安装了 2.3.0 或更高版本。在这段摘录中，**我们像往常一样导入了 TensorFlow 依赖项，使用 NumPy 作为我们的矩阵计算库**。
 
-```
+```py
 from tensorflow.keras.datasets import mnist
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -268,7 +268,7 @@ train_data = train_data.repeat().shuffle(5000).batch(batch_size).prefetch(1)
 
 ### TensorFlow
 
-```
+```py
 class Net(Model):
 
     def __init__(self):
@@ -295,7 +295,7 @@ network = Net()
 
 现在，让我们定义要监控和分析的其他超参数和度量函数。
 
-```
+```py
 num_classes = 10 
 num_features = 784 
 
@@ -329,7 +329,7 @@ optimizer = tf.optimizers.Adam(learning_rate)
 
 现在，让我们定义优化函数，我们将计算梯度，损失，并优化我们的权重。注意**这里我们将应用渐变剪辑。**
 
-```
+```py
 def run_optimization(x, y):
 
     with tf.GradientTape() as tape:
@@ -352,14 +352,14 @@ def run_optimization(x, y):
 
 要实现梯度裁剪，只需将第 14 行改为:
 
-```
+```py
 gradients = [(tf.clip_by_norm(grad, clip_norm=2.0)) for grad in gradients]
 
 ```
 
 让我们定义一个培训循环并记录指标:
 
-```
+```py
 for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
 
     run_optimization(batch_x, batch_y)
@@ -379,7 +379,7 @@ for step, (batch_x, batch_y) in enumerate(train_data.take(training_steps), 1):
 
 Keras 作为 TensorFlow API 的包装器，使事情更容易理解和实现。Keras API 让你专注于定义的东西，并负责梯度计算，在后台反向传播。**渐变裁剪可以简单到在函数中传递一个超参数。**我们来看看具体情况。
 
-```
+```py
 from tensorflow.keras.layers import Dense, LSTM
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import SGD
@@ -400,7 +400,7 @@ model.add(Dense(num_classes))
 
 我们现在要声明渐变裁剪因子，最后用 Keras 的“awesome”来拟合模型。适合”的方法。
 
-```
+```py
 optimizer = SGD(lr=0.01, momentum=0.9, clipvalue=1.0)
 model.compile(loss='binary_crossentropy', optimizer=optimizer)
 
@@ -413,7 +413,7 @@ Keras 优化器负责额外的梯度计算请求(如背景中的裁剪)。开发
 
 为了实现按范数裁剪，只需将第 11 行中的超参数改为:
 
-```
+```py
 optimizer = SGD(lr=0.01, momentum=0.9, clipnorm=1.0)
 
 ```
@@ -424,7 +424,7 @@ optimizer = SGD(lr=0.01, momentum=0.9, clipnorm=1.0)
 
 因此，在使用 [Pytorch](/web/20221206101301/https://neptune.ai/integrations/pytorch-lightning) 实现的这一部分中，我们将再次加载数据，但现在使用 Pytorch DataLoader 类，并使用 pythonic 语法计算梯度，并使用我们学习的两种方法裁剪它们。
 
-```
+```py
 import os
 import argparse
 import torch
@@ -444,7 +444,7 @@ run = neptune.init(project='common/pytorch-integration',
 
 现在，让我们在 PyTorch 中声明一些超参数和数据加载器类。
 
-```
+```py
 n_epochs = 2
 batch_size_train = 64
 batch_size_test = 1000
@@ -490,7 +490,7 @@ test_loader = torch.utils.data.DataLoader(
 
 **模特时间！我们将声明相同的模型，将 LSTM 作为输入图层，将 Dense 作为 logit 图层。**
 
-```
+```py
 class Net(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
         super(Net, self).__init__()
@@ -518,7 +518,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 **现在，我们将定义训练循环，其中梯度计算以及优化器步骤将被定义。这里我们还将定义我们的裁剪指令。**
 
-```
+```py
 total_step = len(train_loader)
 for epoch in range(num_epochs):
     for i, (images, labels) in enumerate(train_loader):
@@ -546,7 +546,7 @@ for epoch in range(num_epochs):
 
 **要应用按规范裁剪，您可以将此行改为:**
 
-```
+```py
 nn.utils.clip_grad_norm_(model.parameters(), max_norm=2.0, norm_type=2)
 ```
 
@@ -558,7 +558,7 @@ nn.utils.clip_grad_norm_(model.parameters(), max_norm=2.0, norm_type=2)
 
 让我们从通常的依赖项导入开始。
 
-```
+```py
 import time
 from tqdm import tqdm
 import numpy as np
@@ -577,7 +577,7 @@ run = neptune.init(project='common/pytorch-integration',
 
 为了保持处理小的规范，我们将只为我们的神经网络定义两个线性/密集层。
 
-```
+```py
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -594,7 +594,7 @@ class Net(nn.Module):
 
 我们创建了" *ordered_layers"* 变量，以便循环访问它们来提取规范。
 
-```
+```py
 def train_model(model,
                 criterion,
                 optimizer,
@@ -651,7 +651,7 @@ def train_model(model,
 
 这是一个基本的训练函数，包含包含梯度计算和优化步骤的主事件循环。这里，我们从所说的*“ordered _ layers”*变量中提取范数。现在，我们只需要初始化模型并调用这个函数。
 
-```
+```py
 def init_weights(m):
     if type(m) == nn.Linear:
         torch.nn.init.xavier_uniform(m.weight)

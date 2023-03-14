@@ -30,7 +30,7 @@
 
 此外，您从*试验*对象中抽取超参数。因此，**参数空间是在执行**时定义的。对于那些因为这种**命令式方法而喜欢 Pytorch 的人来说，** Optuna 会感觉很自然。
 
-```
+```py
 def objective(trial):
     params = {'learning_rate': trial.suggest_loguniform('learning_rate', 0.01, 0.5),
               'max_depth': trial.suggest_int('max_depth', 1, 30),
@@ -43,7 +43,7 @@ def objective(trial):
 
 然后，创建*研究*对象并对其进行优化。最棒的是**你可以选择**是否要**最大化或最小化**你的目标。这在优化 AUC 等指标时非常有用，因为您不必在训练前改变目标的符号，然后在训练后转换最佳结果以获得正分数。
 
-```
+```py
 study = optuna.create_study(direction='maximize')
 study.optimize(objective, n_trials=100)
 
@@ -63,7 +63,7 @@ study.optimize(objective, n_trials=100)
 
 首先定义参数搜索空间:
 
-```
+```py
 SPACE = {'learning_rate': 
 hp.loguniform('learning_rate',np.log(0.01),np.log(0.5)),
          'max_depth': 
@@ -76,14 +76,14 @@ hp.uniform('subsample', 0.1, 1.0)}
 
 然后，创建一个想要最小化的目标函数。这意味着你将不得不**翻转你的目标**的符号，以获得更高更好的指标，如 AUC。
 
-```
+```py
 def objective(params):
     return -1.0 * train_evaluate(params)
 ```
 
 最后，实例化 *Trials()* 对象，并在参数搜索*空间*最小化*目标*。
 
-```
+```py
 trials = Trials()
 _ = fmin(objective, SPACE, trials=trials, algo=tpe.suggest, max_evals=100)
 ```
@@ -135,7 +135,7 @@ optina
 
 太棒了，你可以做任何事情！
 
-```
+```py
 def objective(trial):
     classifier_name = trial.suggest_categorical('classifier', ['SVC', 'RandomForest'])
     if classifier_name == 'SVC':
@@ -164,7 +164,7 @@ def objective(trial):
 
 通过将 *hp.choice* 与其他采样方法相结合，我们可以拥有条件空间。当你在为涉及预处理、特征工程和模型训练的机器学习管道优化超参数时，这**是有用的。**
 
-```
+```py
 SPACE = hp.choice('classifier_type', [
     {
         'type': 'naive_bayes',
@@ -236,7 +236,7 @@ Skopt 提供了许多基于树的方法作为代理模型的选择。
 *   将*采样器*实例传递给 *optuna.create_study* 方法
 *   ***梅干。成功 halvingpruner***
 
-```
+```py
 from optuna.integration import SkoptSampler
 
 sampler = SkoptSampler(skopt_kwargs={'base_estimator':'RF',
@@ -262,7 +262,7 @@ study.optimize(objective, n_trials=100)
 
 简单明了。
 
-```
+```py
 from optuna.pruners import SuccessiveHalvingPruner
 
 optuna.create_study(pruner=SuccessiveHalvingPruner())
@@ -287,7 +287,7 @@ study.optimize(objective, n_trials=100)
 
 希望在未来的多臂 bandid 方法，如 Hyperband，BOHB，或基于树的方法，如 SMAC3 也将包括在内。
 
-```
+```py
 from hyperopt import fmin, atpe
 
 best = fmin(objective, SPACE, 
@@ -316,7 +316,7 @@ best = fmin(objective, SPACE,
 
 **10 / 10**
 
-```
+```py
 def neptune_monitor(study, trial):
     neptune.log_metric('run_score', trial.value)
     neptune.log_text('run_parameters', str(trial.params))
@@ -332,7 +332,7 @@ study.optimize(objective, n_trials=100, callbacks=[neptune_monitor])
 
 **2010 年 6 月**
 
-```
+```py
 def monitor_callback(params, score):
     neptune.send_metric('run_score', score)
     neptune.send_text('run_parameters', str(params))
@@ -364,7 +364,7 @@ Optuna 让*回调*参数变得非常简单，而在 Hyperopt 中，你必须修�
 
 保存和加载您的超参数搜索可以节省您的时间和金钱，并有助于获得更好的结果。让我们比较一下这两个框架。
 
-```
+```py
 import neptune
 import neptunecontrib.monitoring.optuna as opt_utils
 
@@ -385,14 +385,14 @@ opt_utils.log_study(study)
 
 就是这样。
 
-```
+```py
 study.optimize(objective, n_trials=100)
 joblib.dump(study, 'artifacts/study.pkl')
 ```
 
 对于**分布式设置**,您可以使用研究的**名称**,以及数据库的 **URL，在此您将分布式研究用于实例化新研究。例如:**
 
-```
+```py
 study = joblib.load('../artifacts/study.pkl')
 study.optimize(objective, n_trials=200)
 ```
@@ -401,7 +401,7 @@ study.optimize(objective, n_trials=200)
 
 关于在[速度和并行化](/web/20221007120429/https://neptune.ai/blog/optuna-vs-hyperopt#11)部分使用 Optuna 运行分布式超参数优化的更多信息。
 
-```
+```py
 study = optuna.create_study(
                     study_name='example-study', 
                     storage='sqlite:///example.db', 
@@ -419,7 +419,7 @@ study = optuna.create_study(
 
 简单和工程没有问题。
 
-```
+```py
 trials = Trials()  
 _ = fmin(objective, SPACE, trials=trials, 
          algo=tpe.suggest, max_evals=100)
@@ -428,7 +428,7 @@ joblib.dump(trials, 'artifacts/hyperopt_trials.pkl')
 
 如果您正在以一种**分布式**方式优化超参数，您可以加载连接到 MongoDB 的 *MongoTrials()* 对象。在[速度和并行化](/web/20221007120429/https://neptune.ai/blog/optuna-vs-hyperopt#11)一节中有更多关于使用 Hyperopt 运行分布式超参数优化的信息。
 
-```
+```py
 trials = joblib.load('artifacts/hyperopt_trials.pkl')
 _ = fmin(objective, SPACE, trials=trials, 
          algo=tpe.suggest, max_evals=200)
@@ -470,7 +470,7 @@ Optuna =远视
 
 **>远视**
 
-```
+```py
 def train_evaluate(X, y, params, pruning_callback=None):
     X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=1234)
 
@@ -518,7 +518,7 @@ def objective(trial):
 
 **>远视**
 
-```
+```py
 def objective(trial):
     params = {'learning_rate': trial.suggest_loguniform('learning_rate', 0.01, 0.5),
               'max_depth': trial.suggest_int('max_depth', 1, 30),
@@ -613,7 +613,7 @@ API 参考与所有的函数包含美丽的文件字符串。为了给你一个�
 
 *   *plot_slice:* 展示了搜索的**演变。你可以看到在超参数空间中你的搜索去了哪里，以及**空间的哪些部分被探索得更多。****
 
-```
+```py
 plot_contour(study, params=['learning_rate',
                             'max_depth',
                             'num_leaves',
@@ -624,19 +624,19 @@ plot_contour(study, params=['learning_rate',
 
 *   总的来说，Optuna 中的**可视化是不可思议的**！
 
-```
+```py
 plot_optimization_history(study)
 ```
 
 *   它们允许您放大超参数交互，并帮助您决定如何运行下一次参数扫描。了不起的工作。
 
-```
+```py
 plot_parallel_coordinate(study)
 ```
 
 *   **10 / 10**
 
-```
+```py
 plot_slice(study)
 ```
 
@@ -678,7 +678,7 @@ optina
 
 容易和工作像一个魅力！
 
-```
+```py
 study.optimize(objective, n_trials=100, n_jobs=12)
 ```
 
@@ -686,7 +686,7 @@ study.optimize(objective, n_trials=100, n_jobs=12)
 
 远视
 
-```
+```py
 optuna create-study \
     --study-name "distributed-example" \
     --storage "sqlite:///example.db"
@@ -696,7 +696,7 @@ optuna create-study \
 
 **启动一个装有 MongoDB** 的服务器，它将从您的工人培训脚本中获取结果，并发送下一个参数集进行尝试，
 
-```
+```py
 study = optuna.create_study(
     study_name='distributed-example', 
     storage='sqlite:///example.db',
@@ -706,11 +706,11 @@ study.optimize(objective, n_trials=100)
 
 在您的训练脚本中，创建一个指向您在上一步中启动的数据库服务器的 *MongoTrials()* 对象，而不是 *Trials()* ，
 
-```
+```py
 terminal-1$ python run_worker.py
 ```
 
-```
+```py
 terminal-25$ python run_worker.py
 ```
 
@@ -732,7 +732,7 @@ terminal-25$ python run_worker.py
 
 **>远视**
 
-```
+```py
 best = hyperopt.fmin(fn = objective,
                      space = search_space,
                      algo = hyperopt.tpe.suggest,
@@ -764,7 +764,7 @@ best = hyperopt.fmin(fn = objective,
 
 我做了 6 个实验:
 
-```
+```py
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 
@@ -797,7 +797,7 @@ def train_evaluate(X, y, params):
 
 来自 Optuna 的 TPE，带有修剪回调，用于更多运行，但在相同的时间范围内。结果是，有修剪的 400 次运行与没有修剪的 100 次运行花费的时间一样多。
 
-```
+```py
 import pandas as pd
 
 N_ROWS=10000

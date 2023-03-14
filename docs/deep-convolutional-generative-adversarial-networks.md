@@ -90,7 +90,7 @@
 
 现在，我们需要开始预处理部分。转换我们的数据并初始化 Torch DataLoader 类，该类将在训练过程中负责数据批次的洗牌和加载。
 
-```
+```py
 import torchvision.datasets as datasets
 def data_preprocessing(root_dir, batch_size=128, image-size=64, num_workers=2):
   data = datasets.ImageFolder(root=root_dir,
@@ -111,11 +111,11 @@ def data_preprocessing(root_dir, batch_size=128, image-size=64, num_workers=2):
 
 开始你的实验:
 
-```
+```py
 run = neptune.init(project='aymane.hachcham/DCGAN', api_token='ANONYMOUS') 
 ```
 
-```
+```py
 run['config/dataset/path'] = 'Documents/DCGAN/dataset'
 run['config/dataset/size'] = 202599
 run['config/dataset/transforms'] = {
@@ -142,7 +142,7 @@ run['config/dataset/transforms'] = {
 
 ***注*** *:你可以跟着教程看完整的 colab 笔记本，这里- >* [*Colab 笔记本*](https://web.archive.org/web/20221206093145/https://colab.research.google.com/drive/1gtByk_8aKTAlVQn0C7X3-2Gv8JKhT_-O?usp=sharing)
 
-```
+```py
 def weights_init(model):
   model_classname = model.__class__.__name__
 
@@ -162,7 +162,7 @@ def weights_init(model):
 
 值得注意的是，在转置卷积之后添加的批范数层在很大程度上有助于训练期间的梯度流，因此它们构成了整体训练性能的重要部分。
 
-```
+```py
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
@@ -202,7 +202,7 @@ class Generator(nn.Module):
 
 让我们实例化生成器并应用权重初始化:
 
-```
+```py
 model_name = "Generator"
 device = "cuda"
 generator = Generator().to(device)
@@ -212,7 +212,7 @@ generator.apply(weights_init)
 
 现在我们可以打印总体架构并将其保存到 Neptune artifacts 文件夹:
 
-```
+```py
 with open(f"./{model_name}_arch.txt", "w") as f:
   f.write(str(generator))
 
@@ -225,7 +225,7 @@ run[f"io_files/artifacts/{model_name}_arch"].upload(f"./{model_name}_arch.txt")
 
 官方论文声称，为了下采样，使用跨卷积比池化更好，因为它有助于网络学习自己的池化功能。此外，LeakyReLU 激活促进健康的梯度流。查看这篇文章，了解更多关于死亡 ReLU 问题的信息，以及泄漏的 ReLU 激活如何帮助解决这个问题。
 
-```
+```py
 class Discriminator(nn.Module):
     def __init__(self):
         super(Discriminator, self).__init__()
@@ -260,7 +260,7 @@ class Discriminator(nn.Module):
 
 接下来，让我们初始化鉴别器，应用权重初始化，并将架构记录到工件文件夹中:
 
-```
+```py
 disc_name = "Discriminator"
 device = "cuda"
 discriminator = Discriminator().to(device)
@@ -284,7 +284,7 @@ run[f"io_files/artifacts/{disc_name}_arch"].upload(f"./{disc_name}_arch.txt")
 原纸中使用的另一个约定俗成的是真假标签。在计算 ***D*** 和 ***G*** 损失时使用。
 最后，我们为 ***G*** 和 ***D*** 设置了两个不同的优化器。根据论文中的规范，两个优化器都是学习率为 0.0002 且β1 = 0.5 的 Adam，并且还生成从高斯分布导出的固定批次的潜在向量。
 
-```
+```py
 criterion = nn.BCELoss()
 
 fixed_noise = torch.randn(64, nz, 1, 1, device=device)
@@ -318,7 +318,7 @@ dataloader =数据预处理(数据目录)
 
 *   **鉴别器训练部分:**
 
-```
+```py
 
         discriminator.zero_grad()
 
@@ -350,7 +350,7 @@ dataloader =数据预处理(数据目录)
         optimizerD.step()
 ```
 
-```
+```py
         generator.zero_grad()
         label.fill_(real_label)  
 
@@ -366,7 +366,7 @@ dataloader =数据预处理(数据目录)
 
 *   **调用训练循环内的两部分:**
 
-```
+```py
 img_list = [] 
 G_losses = [] 
 D_losses = [] 

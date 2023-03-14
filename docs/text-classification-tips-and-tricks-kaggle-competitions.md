@@ -103,7 +103,7 @@ k 折叠交叉验证有不同的变体，如应相应选择的 k 折叠组。
 
 在本文中，我们将使用来自 Kaggle 的百万新闻标题数据集。如果您想一步一步地进行分析，您可能需要安装以下库:
 
-```
+```py
 pip install \
    pandas matplotlib numpy \
    nltk seaborn sklearn gensim pyldavis \
@@ -112,7 +112,7 @@ pip install \
 
 现在，我们可以看看数据。
 
-```
+```py
 news= pd.read_csv('data/abcnews-date-text.csv',nrows=10000)
 news.head(3)
 ```

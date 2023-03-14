@@ -27,7 +27,7 @@
 
 注意，在这个练习中，我们将使用 PyTorch 来训练我们的模型，使用 neptune.ai 的仪表板来进行实验跟踪。这里是我所有实验的链接。我在 colab 和 Neptune 中运行脚本，使得跟踪所有实验变得非常容易。
 
-```
+```py
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
@@ -48,7 +48,7 @@ from neptune.new.types import File
 
 我们将批次大小保持为 1024，我们将运行 100 个时期。潜在维度被初始化以生成用于生成器输入的随机数据。和样本大小将用于推断每个时期的 64 个图像，因此我们可以在每个时期之后可视化图像的质量。k 是我们打算运行 discriminator 的步骤数。
 
-```
+```py
 run = neptune.init(
    project="project name",
    api_token="You API token",
@@ -57,7 +57,7 @@ run = neptune.init(
 
 现在，我们下载 MNIST 数据并创建 Dataloader 对象。
 
-```
+```py
 batch_size = 1024
 epochs = 100
 sample_size = 64
@@ -74,7 +74,7 @@ transform = transforms.Compose([
 
 最后，我们定义了一些用于训练的超参数，并使用 run object 将它们传递给 Neptune 仪表板。
 
-```
+```py
 train_data = datasets.MNIST(
    root='../input/data',
    train=True,
@@ -86,7 +86,7 @@ train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 
 这是我们定义发生器和鉴别器网络的地方。
 
-```
+```py
 params = {"learning_rate": 0.0002,
          "optimizer": "Adam",
          "optimizer_betas": (0.5, 0.999),
@@ -104,7 +104,7 @@ run["parameters"] = params
 *   随后是具有 tanh 激活的卷积层，以生成具有一个通道和 28×28 高度和宽度的图像。
 *   鉴别器网络
 
-```
+```py
 class Generator(nn.Module):
    def __init__(self, latent_space):
        super(Generator, self).__init__()
@@ -137,7 +137,7 @@ class Generator(nn.Module):
 *   后面是分类器层，通过鉴别器对图像预测是真的还是假的进行分类。
 *   现在我们初始化发生器和鉴别器网络，以及优化器和损失函数。
 
-```
+```py
 class Discriminator(nn.Module):
    def __init__(self):
        super(Discriminator, self).__init__()
@@ -164,7 +164,7 @@ class Discriminator(nn.Module):
 
 发电机培训功能
 
-```
+```py
 generator = Generator(latent_dim).to(device)
 discriminator = Discriminator().to(device)
 
@@ -192,7 +192,7 @@ def create_noise(sample_size, latent_dim):
 *   从这个函数中，我们将观察发电机损耗。
 *   鉴别器训练功能
 
-```
+```py
 def train_generator(optimizer, data_fake):
    b_size = data_fake.size(0)
    real_label = label_real(b_size)
@@ -211,7 +211,7 @@ def train_generator(optimizer, data_fake):
 *   一个接一个，我们通过假的和真的图像，计算损失和反馈。我们将观察到两个鉴别器损耗；实像损失(loss_real)和伪像损失(loss_fake)。
 *   甘模特培训
 
-```
+```py
 def train_discriminator(optimizer, data_real, data_fake):
    b_size = data_real.size(0)
    real_label = label_real(b_size)
@@ -236,7 +236,7 @@ def train_discriminator(optimizer, data_real, data_fake):
 *   我已经使用[点]上传功能在 Neptune 元数据中保存了每个纪元后生成的图像。
 *   让我们看看中间的图像。
 
-```
+```py
 noise = create_noise(sample_size, latent_dim)
 generator.train()
 discriminator.train()

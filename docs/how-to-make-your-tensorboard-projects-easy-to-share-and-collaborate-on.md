@@ -34,7 +34,7 @@ We want to build a classifier to predict orientation.*
 
 我们有很多方法可以做到这一点。为了简单起见，我决定微调基于 ResNet50 的模型来解决这个问题。由于我们使用 TensorFlow/Keras 框架，我使用下面的代码片段创建了我的模型架构:
 
-```
+```py
 backbone = ResNet50(include_top = False,
                     input_shape = input_shape,
                     pooling = 'avg')
@@ -61,7 +61,7 @@ model.add(Softmax())
 
 首先，我定义了一个目录的路径，我的日志将存储在这个目录中。然后我创建一个 [TensorBoard 回调](https://web.archive.org/web/20221206012644/https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/TensorBoard)对象。它会将日志存储在先前指定的目录中。
 
-```
+```py
 logdir = './logs_import/'
 os.makedirs(logdir, exist_ok = True)
 
@@ -77,13 +77,13 @@ tbCallBack = keras.callbacks.TensorBoard(log_dir = logdir,
 
 为了启动 TensorBoard，我打开了一个新的*终端*窗口，并导航到我的项目目录。从那里，我执行以下命令:
 
-```
+```py
 tensorboard --logdir=./logs_import
 ```
 
 TensorBoard 现在将在我默认的网络浏览器的新标签页中自动启动。它现在是空的，因为我们还没有开始伐木。为了开始日志记录，我拟合了模型并开始训练工作，如下面的代码片段所示。
 
-```
+```py
 model.fit_generator(generator = train_generator,
                     steps_per_epoch = training_steps_per_epoch,
                     epochs = 100,
@@ -171,31 +171,31 @@ model.fit_generator(generator = train_generator,
 
 通过执行以下 bash 命令来安装它们:
 
-```
+```py
 pip install tensorboard==2.4.0 neptune-tensorboard==0.5.1
 ```
 
 *   [获取您的 API 令牌](https://web.archive.org/web/20221206012644/https://docs.neptune.ai/getting-started/installation#authentication-neptune-api-token)并将其设置为 NEPTUNE_API_TOKEN:
     *   对于 Linux/iOS 用户，用于 api 令牌设置的 bash 命令是:
 
-```
+```py
 export NEPTUNE_API_TOKEN='YOUR_API_TOKEN'
 ```
 
-```
+```py
 set NEPTUNE_API_TOKEN="YOUR_API_TOKEN"
 ```
 
 *   在海王星托管您的 TensorBoard 日志:
     *   导航到您的 TensorBoard 日志目录并运行:
 
-```
+```py
 neptune tensorboard --project USER_NAME/PROJECT_NAME
 ```
 
 *   或者，您可以将 Neptune 指向您的 TensorBoard 日志目录:
 
-```
+```py
 neptune tensorboard /PATH/TO/TensorBoard_logdir
 --project  USER_NAME/PROJECT_NAME
 
@@ -253,13 +253,13 @@ CPU 和 GPU 利用率显示为一个示例。
 
 您可以通过执行以下 bash 命令轻松安装它们:
 
-```
+```py
 pip install tensorflow==2.3.1 neptune-contrib==0.4.129 neptune-client==0.25.0
 ```
 
 *   通过向您工作的脚本或 Jupyter 笔记本添加初始化代码片段来初始化 Neptune。下面是我的项目中初始化是如何完成的:
 
-```
+```py
 import neptune
 import neptune_tensorboard as neptune_tb
 
@@ -279,7 +279,7 @@ neptune_tb.integrate_with_tensorflow()
 
 *   我的项目代码的其余部分和以前一样，除了我拟合模型的方式。现在看起来是这样的:
 
-```
+```py
 params = {
     'backbone': backbone.name,
     'dense_layer': dense_count,
@@ -367,7 +367,7 @@ To do that, you can invite teammates to your teamworkspace. Invited members will
 
 *将特定实验运行的模型最佳检查点上传到 Neptune*
 
-```
+```py
 from sklearn.metrics import confusion_matrix
 import scikitplot as skplt
 from itertools import chain
@@ -394,7 +394,7 @@ Now, within the “**Artifacts”** tab of my project workspace, I see an upload
 
 在测试集上评估我的训练模型
 
-```
+```py
 p = eval_model.predict_generator(test_generator)
 ```
 
@@ -402,7 +402,7 @@ p = eval_model.predict_generator(test_generator)
 
 Since I worked on a classifier, I’d like to evaluate it by looking at the confusion matrix and at the ROC-AUC curve. Let’s create them and attach them to our experiment:
 
-```
+```py
 fig_roc, ax = plt.subplots(1, 1)
 skplt.metrics.plot_roc_curve(y_true, np.flip(p, axis=0), ax=ax)
 

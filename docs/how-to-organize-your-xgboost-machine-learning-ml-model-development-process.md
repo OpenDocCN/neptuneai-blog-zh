@@ -20,7 +20,7 @@ XGBoost 是一个顶级的渐变增强库，可以在 Python、Java、C++、R �
 
 在训练任何模型之前，我们需要一个数据集。对于这个示例，我们将使用 Scikit-learn 生成一个分类数据集。在现实生活中，你可能已经准备好了一些特性，你将会加载它们。
 
-```
+```py
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 
@@ -37,7 +37,7 @@ X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.33, rando
 
 接下来，我们将导入 XGBoost，设置我们的[参数](https://web.archive.org/web/20221206005417/https://xgboost.readthedocs.io/en/latest/parameter.html)。由于这是一个二元分类，我们使用`logistic`目标。之后，我们用这些参数初始化分类器。您也可以使用 YAML 文件传入参数。
 
-```
+```py
 params = {"objective":"binary:logistic",'colsample_bytree': 0.3,'learning_rate': 0.1,
                 'max_depth': 5, 'alpha': 10}
 classification = xgb.XGBClassifier(**params)
@@ -45,21 +45,21 @@ classification = xgb.XGBClassifier(**params)
 
 下一步是用训练测试来训练模型。
 
-```
+```py
 classification.fit(X_train, y_train)
 
 ```
 
 培训之后，我们需要保存模型，以便在部署过程中使用它。
 
-```
+```py
 from sklearn.externals import joblib
 joblib.dump(classification, 'classifier.pkl')
 ```
 
 接下来，我们在测试集上评估模型，并显示分类报告。
 
-```
+```py
 from sklearn.metrics import classification_report
 
 print(classification_report(predictions,y_test))
@@ -68,7 +68,7 @@ print(classification_report(predictions,y_test))
 
 最后，我们将获得的预测转换成数据帧，并保存为 csv 文件以供将来参考，或者进行一些[深层错误分析](/web/20221206005417/https://neptune.ai/blog/deep-dive-into-error-analysis-and-model-debugging-in-machine-learning-and-deep-learning)。
 
-```
+```py
 import pandas as pd
 pd.DataFrame(predictions, columns=["Predictions"]).to_csv("predict.csv")
 ```
@@ -83,7 +83,7 @@ pd.DataFrame(predictions, columns=["Predictions"]).to_csv("predict.csv")
 
 在您的终端中运行以下命令来安装 Neptune:
 
-```
+```py
 pip install neptune-client
 
 ```
@@ -92,14 +92,14 @@ pip install neptune-client
 
 接下来，设置笔记本扩展:
 
-```
+```py
 pip install neptune-notebooks
 
 ```
 
 安装后，您必须启用扩展，以便与您的 Jupyter 笔记本电脑集成:
 
-```
+```py
 jupyter nbextension enable --py neptune-notebooks
 
 ```
@@ -108,7 +108,7 @@ jupyter nbextension enable --py neptune-notebooks
 
 因为我们正在安装软件包，所以让我们也把 Neptune Contrib 软件包去掉。它包含一个回调函数，让我们在训练 XGBoost 模型时记录度量、模型和特性对 Neptune 的重要性。
 
-```
+```py
 pip install neptune-contrib[monitoring]
 ```
 
@@ -126,7 +126,7 @@ pip install neptune-contrib[monitoring]
 
 之后，我们使用‘neptune . init’来初始化通信，并将当前脚本/笔记本与您在 Neptune 中的项目连接起来。
 
-```
+```py
 import neptune
 
 neptune.init(project_qualified_name='mwitiderrick/sandbox', api_token='YOUR_API_KEY')
@@ -141,7 +141,7 @@ neptune.init(project_qualified_name='mwitiderrick/sandbox', api_token='YOUR_API_
 
 让我们创建一个实验并记录模型超参数。
 
-```
+```py
 experiment = neptune.create_experiment(name='xgb', tags=['train'], params=params)
 ```
 
@@ -161,13 +161,13 @@ experiment = neptune.create_experiment(name='xgb', tags=['train'], params=params
 
 有了回调设置，海王星照顾其余的。
 
-```
+```py
 from neptunecontrib.monitoring.xgboost import neptune_callback
 ```
 
 我们通过调用`fit`方法并传入我们之前定义的参数来训练模型，包括 Neptune 回调。
 
-```
+```py
 classification.fit(X_train, y_train,callbacks=[neptune_callback()],eval_set=[(X_test, y_test)])
 ```
 
@@ -191,7 +191,7 @@ classification.fit(X_train, y_train,callbacks=[neptune_callback()],eval_set=[(X_
 
 在 Neptune 中对数据集哈希进行版本控制也非常有用。这将使您能够在执行实验时跟踪数据集的不同版本。这可以借助 Python 的`hashlib`模块和 Neptune 的`set_property`函数来完成。
 
-```
+```py
 import hashlib
 neptune.set_property('x_train_version', hashlib.md5(X_train.values).hexdigest())
 neptune.set_property('y_train_version', hashlib.md5(y_train.values).hexdigest())
@@ -210,7 +210,7 @@ neptune.set_property('y_test_version', hashlib.md5(y_test.values).hexdigest())
 
 我们还可以记录我们之前保存的模型。
 
-```
+```py
 neptune.log_artifact('classifier.pkl')
 
 ```
@@ -221,7 +221,7 @@ Neptune 还提供了记录其他东西的能力，比如模型解释器和交互
 
 记录[解释者](https://web.archive.org/web/20221206005417/https://modeloriented.github.io/DALEX/)是使用`log_explainer`函数完成的。
 
-```
+```py
 from neptunecontrib.api import log_explainer, log_global_explanations
 import dalex as dx
 
@@ -259,7 +259,7 @@ log_explainer('explainer.pkl', expl)
 
 使用 Neptune，您可以从您的实验中下载文件，甚至直接从您的 python 代码中下载单个项目。例如，您可以使用`download_artifact`方法下载单个文件。我们可以通过获取实验对象并下载该实验的所有文件来下载模型。在这种情况下，我们下载之前上传的分类器。分类器存储在我们当前工作目录的模型文件夹中。
 
-```
+```py
 project = neptune.init('mwitiderrick/sandbox',api_token='YOUR_TOKEN',
 )
 my_exp = project.get_experiments(id='SAN-21')[0]

@@ -31,7 +31,7 @@
 
 在上面的代码中，我们有两种类型的图像
 
-```
+```py
 import cv2
 
 img = cv2.imread('damaged_image.png')
@@ -72,7 +72,7 @@ OpenCV 的图像修复最大的问题是，我们需要为我们想要修复的�
 
 ### 3.独立成分分析
 
-```
+```py
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -116,7 +116,7 @@ plt.show()
 
 ### **ICA using sklearn**
 
-```
+```py
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
@@ -169,7 +169,7 @@ plt.show()
 
 ### 输出:
 
-```
+```py
 import cv2
 
 input = cv2.imread('cat.png')
@@ -207,7 +207,7 @@ cv2.waitKey(0)
 
 ### 输出:
 
-```
+```py
 import cv2 as cv
 import numpy as np
 from matplotlib import pyplot as plt

@@ -104,7 +104,7 @@
 
 第一步:索引单词。我们从索引单词开始。对于**句子中的每个单词**，我们会给它分配一个数字。
 
-```
+```py
 word_list = " ".join(raw_sentence).split()
 word_list = list(set(word_list))
 word2id = {w: i for i, w in enumerate(word_list)}
@@ -116,7 +116,7 @@ n_class = len(word2id)
 
 我们将完全按照论文中的描述来构建模型。
 
-```
+```py
 class NNLM(nn.Module):
    def __init__(self):
        super(NNLM, self).__init__()
@@ -144,7 +144,7 @@ class NNLM(nn.Module):
 
 如果您还记得原始论文中的图表，那么来自嵌入层的输出也被传递到最终的隐藏层，在那里 tanh 的输出被加在一起。
 
-```
+```py
 output = self.b + self.hidden3(X) + self.hidden2(tanh)
 ```
 
@@ -156,7 +156,7 @@ output = self.b + self.hidden3(X) + self.hidden2(tanh)
 
 我们使用交叉熵损失。
 
-```
+```py
 criterion = nn.CrossEntropyLoss()
 ```
 
@@ -214,7 +214,7 @@ Mikolov 等人在 2013 年提出了两个模型:
 
 **第一步:定义一个函数，用目标词左右 n 个词创建一个上下文窗口。**
 
-```
+```py
 def CBOW(raw_text, window_size=2):
    data = []
    for i in range(window_size, len(raw_text) - window_size):
@@ -235,7 +235,7 @@ for 循环:for i in range(window_size，len(raw _ text)–window _ size):从窗�
 
 设 i =窗口大小= 2，则:
 
-```
+```py
 context = [raw_text[2 - 2], raw_text[2 - (2 - 1)], raw_text[i + (2 - 1)], raw_text[i + 2]]
 
 target = raw_text[2]
@@ -244,12 +244,12 @@ target = raw_text[2]
 
 让我们调用该函数并查看输出。
 
-```
+```py
 data = CBOW(raw_text)
 print(data[0])
 ```
 
-```
+```py
 Output:
 (['The', 'dog', 'eating', 'and'], 'is')
 ```
@@ -260,7 +260,7 @@ Output:
 
 在 CBOW 模型中，我们将隐藏层减少到只有一层。所以我们总共有:一个嵌入层，一个穿过 ReLU 层的隐藏层，和一个输出层。
 
-```
+```py
 class CBOW_Model(torch.nn.Module):
    def __init__(self, vocab_size, embedding_dim):
        super(CBOW_Model, self).__init__()
@@ -287,7 +287,7 @@ class CBOW_Model(torch.nn.Module):
 
 对于优化，我们使用随机梯度下降。你也可以使用 Adam 优化器。在 NLP 中，Adam 是首选的优化器，因为它比 SGD 收敛得更快。
 
-```
+```py
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 ```
 
@@ -295,7 +295,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
 培训与 NNLM 模式相同。
 
-```
+```py
 for epoch in range(50):
    total_loss = 0
 
@@ -335,7 +335,7 @@ skipgram 模型与 CBOW 模型相同，但有一点不同。区别在于创造�
 
 由于 skipgram 只需要一个上下文单词和 n 个目标变量，我们只需要从前面的模型中翻转 CBOW。
 
-```
+```py
 def skipgram(sentences, window_size=1):
    skip_grams = []
    for i in range(window_size, len(word_sequence) - window_size):
@@ -353,11 +353,11 @@ def skipgram(sentences, window_size=1):
 
 当我们调用该函数时，输出如下所示:
 
-```
+```py
 print(skipgram(word_sequence)[0:2])
 ```
 
-```
+```py
 Output:
 [['my', 'During'], ['my', 'second']]
 ```
@@ -370,7 +370,7 @@ Output:
 
 这个模型非常简单。
 
-```
+```py
 class skipgramModel(nn.Module):
    def __init__(self):
        super(skipgramModel, self).__init__()
@@ -387,14 +387,14 @@ class skipgramModel(nn.Module):
 
 损失函数和优化保持不变。
 
-```
+```py
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 ```
 
 一旦我们定义了一切，我们就可以训练模型了。
 
-```
+```py
 for epoch in range(5000):
         input_batch, target_batch = random_batch()
         input_batch = torch.Tensor(input_batch)
@@ -464,17 +464,17 @@ skip-gram 模型增加了计算的复杂性，因为它必须根据相邻单词�
 
 以这段文字为例:“*猫在吃东西，狗在叫”*。为了创建霍夫曼树，我们需要从整个词汇表中计算单词的频率。
 
-```
+```py
 word_to_id = {w:i for i, w in enumerate(set(raw_text))}
 id_to_word = {i:w for w, i in word_to_id.items()}
 word_frequency = {w:raw_text.count(w) for w,i in word_to_id.items()}
 ```
 
-```
+```py
 print(word_frequency)
 ```
 
-```
+```py
 Output:
 
 {'and': 1, 'barking': 1, 'cat': 1, 'dog': 1, 'eating': 1, 'is': 2, 'the': 2}
@@ -488,11 +488,11 @@ Output:
 
 记住，所有出现频率最低的单词都在底部。
 
-```
+```py
 print(Tree.wordid_code)
 ```
 
-```
+```py
 Output:
 {0: [0, 1, 1],
  1: [0, 1, 0],
@@ -511,7 +511,7 @@ Output:
 
 正如您将在下面的代码中发现的，sigmoid 函数用于决定是向右还是向左。同样重要的是要知道所有单词的概率总和应该是 1。这确保了 H-softmax 在词汇表中的所有单词上具有归一化的概率分布。
 
-```
+```py
 class SkipGramModel(nn.Module):
    def __init__(self, emb_size, emb_dimension):
        super(SkipGramModel, self).__init__()

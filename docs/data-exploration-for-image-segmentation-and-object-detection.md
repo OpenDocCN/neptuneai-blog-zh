@@ -108,7 +108,7 @@ mmdetection 框架通过实现一个基于 AR 采样的 GroupSampler 来支持�
 
 根据你的建模方法**，大多数框架都有设计限制**。正如我前面提到的，这些模型旨在在基准数据集上表现良好。如果由于某种原因你的数据不同，训练他们可能是不可能的。让我们从 detectron2 来看看 Retinanet 的[默认配置:](https://web.archive.org/web/20220926092339/https://github.com/facebookresearch/detectron2/blob/master/configs/Base-RetinaNet.yaml#L8)
 
-```
+```py
 ANCHOR_GENERATOR:
  SIZES: !!python/object/apply:eval ["[[x, x * 2**(1.0/3), x * 2**(2.0/3) ] for x in [32, 64, 128, 256, 512 ]]"]
 ```
@@ -262,7 +262,7 @@ ANCHOR_GENERATOR:
 
 根据我的经验，对于自然外观的数据集(类似于 coco ),以下管道是一个很好的起点(没有空间变换):
 
-```
+```py
 transforms = [
     LongestMaxSize(max_size=500),
     HorizontalFlip(p=0.5),
@@ -283,7 +283,7 @@ transforms = [
 
 有一件事我还没有提到，但我觉得很重要:**总是加载整个数据集(连同你的预处理和增强管道)**。
 
-```
+```py
 %%timeit -n 1 -r 1
 for b in data_loader: pass
 ```
@@ -404,7 +404,7 @@ for b in data_loader: pass
 
 要使用 COCO 数据集资源管理器工具，您需要:
 
-```
+```py
 git clone https://github.com/i008/COCO-dataset-explorer.git
 ```
 
@@ -414,13 +414,13 @@ git clone https://github.com/i008/COCO-dataset-explorer.git
 
 如果您下载了示例数据，您将需要提取它。
 
-```
+```py
 tar -xvf coco_data.tar
 ```
 
 您应该具有以下目录结构:
 
-```
+```py
 COCO-dataset-explorer
  |coco_data
  |images
@@ -438,14 +438,14 @@ COCO-dataset-explorer
 
 *   设置包含所有依赖项的环境
 
-```
+```py
 conda env update;
 conda activate cocoexplorer
 ```
 
 *   运行 streamlit 应用程序，在 COCO 格式和图像目录中指定包含地面实况和预测的文件:
 
-```
+```py
 streamlit run coco_explorer.py -- \
     --coco_train coco_data/ground_truth_annotations.json \
     --coco_predictions coco_data/predictions.json  \
@@ -454,7 +454,7 @@ streamlit run coco_explorer.py -- \
 
 **注意:**您也可以使用 docker:
 
-```
+```py
 sudo docker run -p 8501:8501 -it -v "$(pwd)"/coco_data:/coco_data i008/coco_explorer  \
     streamlit run  coco_explorer.py -- \
     --coco_train /coco_data/ground_truth_annotations.json \

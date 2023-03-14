@@ -165,7 +165,7 @@ NLPAug 提供三种类型的增强:
 
 例如:
 
-```
+```py
 aug = naw.ContextualWordEmbsAug(
     model_path='bert-base-uncased', action="insert")
 augmented_text = aug.augment(text)
@@ -202,7 +202,7 @@ augmented_text = aug.augment(text)
 
 首先，让我们加载训练数据集并检查目标类分布。
 
-```
+```py
 …
 x=tweet.target.value_counts()
 sns.barplot(x.index,x)
@@ -215,13 +215,13 @@ plt.gca().set_ylabel('samples')
 
 在数据扩充之前，我们将数据分为训练集和验证集，以便验证集中没有样本用于数据扩充。
 
-```
+```py
 train,valid=train_test_split(tweet,test_size=0.15)
 ```
 
 现在，我们可以对训练数据集进行数据扩充。我已经选择从正类中生成 300 个样本。
 
-```
+```py
 def augment_text(df,samples=300,pr=0.2):
     aug_w2v.aug_p=pr
     new_text=[]

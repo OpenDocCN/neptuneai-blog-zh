@@ -26,7 +26,7 @@ API 太棒了。它是如此简单，以至于你几乎不用看文档就能猜�
 
 您定义搜索空间:
 
-```
+```py
 SPACE = [
    skopt.space.Real(0.01, 0.5, name='learning_rate', prior='log-uniform'),
    skopt.space.Integer(1, 30, name='max_depth'),
@@ -38,7 +38,7 @@ SPACE = [
 
 您定义想要最小化的目标函数(修饰它，以保留参数名称):
 
-```
+```py
 @skopt.utils.use_named_args(SPACE)
 def objective(**params):
     all_params = {**params, **STATIC_PARAMS}
@@ -47,7 +47,7 @@ def objective(**params):
 
 并运行优化:
 
-```
+```py
 results = skopt.forest_minimize(objective, SPACE, **HPO_PARAMS)
 
 ```
@@ -105,7 +105,7 @@ results = skopt.forest_minimize(objective, SPACE, **HPO_PARAMS)
 
 我真的很喜欢有一个通过回调的简单选项。例如，我可以通过简单地添加 3 行代码来监控我的训练:
 
-```
+```py
 def monitor(res):
     neptune.send_metric('run_score', res.func_vals[-1])
     neptune.send_text('run_parameters', 
@@ -127,7 +127,7 @@ results = skopt.forest_minimize(objective, SPACE,
 
 有*目的转储*和*目的加载*函数处理*结果*对象的保存和加载；
 
-```
+```py
 results = skopt.forest_minimize(objective, SPACE, **HPO_PARAMS)
 skopt.dump(results, 'artifacts/results.pkl')
 old_results = skopt.load('artifacts/results.pkl')
@@ -135,7 +135,7 @@ old_results = skopt.load('artifacts/results.pkl')
 
 您可以通过 *x0* 和 *y0* 参数从保存的结果重新开始训练。例如:
 
-```
+```py
 results = skopt.forest_minimize(objective, SPACE,
                                 x0=old_results.x_iters,
                                 y0=old_results.func_vals,
@@ -170,7 +170,7 @@ results = skopt.forest_minimize(objective, SPACE,
 
 *   *plot _ convergence*-它通过显示每次迭代的最佳结果来可视化您的优化进度。
 
-```
+```py
 import skopt.plots
 
 skopt.plots.plot_convergence(results)
@@ -178,7 +178,7 @@ skopt.plots.plot_convergence(results)
 
 它的酷之处在于，你可以通过简单地传递一个 *results* 对象列表或者一个(name，results)元组的**列表来比较许多策略的进展。**
 
-```
+```py
 results = [('random_results', random_results),
            ('forest_results', forest_results),
            ('gbrt_results', gbrt_results),
@@ -225,7 +225,7 @@ skopt.plots.plot_convergence(*results)
 
 为了让训练更快，我将**的助推轮数固定为 300，并提前 30 轮停止**。
 
-```
+```py
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 
@@ -258,7 +258,7 @@ def train_evaluate(X, y, params):
 
 要根据一组参数训练模型，您可以运行如下内容:
 
-```
+```py
 import pandas as pd
 
 N_ROWS=10000

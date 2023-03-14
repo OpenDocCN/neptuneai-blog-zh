@@ -14,7 +14,7 @@
 
 ### **灰度级**
 
-```
+```py
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,7 +38,7 @@ plt.show()
 
 以下代码分隔每个颜色通道:
 
-```
+```py
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -61,7 +61,7 @@ ax[2].set_title("Blue")
 
 ### **图像翻译**
 
-```
+```py
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -85,7 +85,7 @@ plt.show()
 
 ### **图像旋转**
 
-```
+```py
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -106,7 +106,7 @@ plt.show()
 
 ### **缩放和调整大小**
 
-```
+```py
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -159,7 +159,7 @@ ax[2].set_title("Skewed Interpolation Scale")
 
 下面的代码产生了上面的输出:
 
-```
+```py
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
@@ -201,7 +201,7 @@ ax[1].set_title("Active Contour Image")
 
 ### **用**[](https://web.archive.org/web/20221203093533/https://www.scipy.org/)**模糊图像**
 
-```
+```py
 from scipy import misc,ndimage
 from matplotlib import pyplot as plt
 
@@ -234,7 +234,7 @@ ax[1].set_yticks([])
 
 例如，让我们将下面的图像增强 30%的对比度。
 
-```
+```py
 from PIL import Image, ImageFilter
 
 im = Image.open('cat_inpainted.png')
@@ -258,7 +258,7 @@ enh.enhance(1.8).show("30% more contrast")
 
 我们可以使用 numpy，通过用零替换所有的像素值，一次“惩罚”一个通道。
 
-```
+```py
 from PIL import Image
 import numpy as np
 
@@ -287,7 +287,7 @@ Mahotas 最受欢迎的功能是
 
 下面的代码片段有助于在人群中找到 Wally。
 
-```
+```py
 from pylab import imshow, show
 import mahotas
 import mahotas.demos
@@ -326,7 +326,7 @@ Pgmagick 是 Python 的一个[**GraphicsMagick**](https://web.archive.org/web/20
 
  **### **模糊图像**
 
-```
+```py
 from pgmagick.api import Image
 
 img = Image('leena.jpeg')
@@ -336,7 +336,7 @@ img.blur(10, 5)
 
 ### **图像的缩放**
 
-```
+```py
 from pgmagick.api import Image
 
 img = Image('leena.png')

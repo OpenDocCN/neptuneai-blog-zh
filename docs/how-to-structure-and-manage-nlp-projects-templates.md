@@ -48,7 +48,7 @@
 
 然而，最简单快捷的方法之一就是使用[千篇一律的](https://web.archive.org/web/20221018044836/https://drivendata.github.io/cookiecutter-data-science/)模板。它会自动为您生成一个全面的项目目录。
 
-```
+```py
 ├── LICENSE
 ├── Makefile           <- Makefile with commands like `make data` or `make train`
 ├── README.md          <- The top-level README for developers using this project.

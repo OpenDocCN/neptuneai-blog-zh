@@ -30,7 +30,7 @@
 
 让我们看看如何用一小段代码实现这一点:
 
-```
+```py
 import pandas as pd
 import re
 
@@ -54,7 +54,7 @@ print({i: counts[i] for i in counts if counts[i]>50})
 
 **输出:**
 
-```
+```py
 {'miss': 182, 'mr': 521, 'mrs': 129, 'william': 64}
 ```
 
@@ -86,7 +86,7 @@ print({i: counts[i] for i in counts if counts[i]>50})
 
 让我们来看一个在 Scikit-learn 中使用 PCA 时的特征提取示例:
 
-```
+```py
 import pandas as pd
 from sklearn.decomposition import PCA
 
@@ -95,14 +95,14 @@ print(df)
 
 ```
 
-```
+```py
  dr = PCA(n_components=2)
 reduced_df = dr.fit_transform(df)
 print(reduced_df)
 
 ```
 
-```
+```py
 array([[ 5.47722558e+00,  6.66133815e-16],
        [-5.47722558e+00,  6.66133815e-16]])
 ```
@@ -131,19 +131,19 @@ F-score 可以找到特征和目标列之间的线性关系，并相应地创建
 
 现在，让我们来看一个非常简单的 F 分数示例:
 
-```
+```py
 import pandas as pd
 df = pd.DataFrame([[1,12,2], [2, 34, 4], [3,87,6] ])
 print(df)
 ```
 
-```
+```py
 from sklearn.feature_selection import f_regression
 scores, _ = f_regression(df.iloc[:,0:2], df.iloc[:,-1])
 print(scores)
 ```
 
-```
+```py
 [4.50359963e+15 1.75598335e+01]
 
 ```
@@ -195,7 +195,7 @@ print(scores)
 
 让我们解决一个使用 DFS 来理解 Featuretools API 的例子:
 
-```
+```py
 import featuretools as ft
 es = ft.demo.load_retail()
 print(es)
@@ -214,7 +214,7 @@ Entityset: demo_retail_data
 
 我从 Featuretools 加载了 load_retail 数据。现在我们有了实体集，让我们应用 DFS 并获得一些新特性:
 
-```
+```py
 feature_matrix, feature_defs = ft.dfs(entityset=es,
                                       target_entity="orders",
                                       agg_primitives=["sum", "mean"],

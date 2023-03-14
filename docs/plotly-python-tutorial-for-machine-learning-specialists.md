@@ -46,7 +46,7 @@ Plotly 直方图
 
 Plotly 条形图
 
-```
+```py
 import plotly.express as px
 fig = px.histogram(views, x="views")
 fig.show()
@@ -58,14 +58,14 @@ fig.show()
 
 Plotly 饼图
 
-```
+```py
 fig = px.bar(views_top, x='event', y='views')
 fig.show()
 ```
 
 饼图是显示每个类别中项目数量的另一种可视化类型。这种类型使用户能够快速确定特定项或值在整个数据集中所占的份额。这次让我们展示一下如何使用 Plotly 的 Graph 对象来绘制。
 
-```
+```py
 fig = px.bar(views_top, x='views', y='event',orientation='h')
 fig.show()
 
@@ -77,7 +77,7 @@ Plotly 圆环图
 
 Plotly 散点图
 
-```
+```py
 import plotly.graph_objects as go
 
 fig = go.Figure(
@@ -93,7 +93,7 @@ fig.show()
 
 折线图主要用于显示某一数值如何随时间或某一区间变化。
 
-```
+```py
 fig = go.Figure(
     data=[
         go.Pie(labels=labels, values=values, hole=0.2)
@@ -108,7 +108,7 @@ Plotly 注释
 
 Plotly 3D 散点图
 
-```
+```py
 fig = px.scatter(df,x='comments',y='views')
 fig.show()
 
@@ -120,7 +120,7 @@ fig.show()
 
 Plotly 还允许您将任何可视化保存到 HTML 文件中。这非常容易做到。
 
-```
+```py
 fig = px.line(talks, x="published_year", y="number_of_events")
 fig.show()
 ```
@@ -131,7 +131,7 @@ Plotly 3D 曲面
 
 Plotly 气泡图
 
-```
+```py
 fig = px.scatter(df,x='comments',y='views',color='duration',text="published_day")
 fig.show()
 ```
@@ -142,7 +142,7 @@ fig.show()
 
 Plotly 还可用于将数据框可视化为表格。我们可以使用 Plotly Graph Objects `Table`来实现这一点。我们将标题和单元格传递给表格。我们还可以指定如下所示的样式:
 
-```
+```py
 fig = px.scatter_3d(df,x='comments',y='views',z='duration',color='views')
 fig.show()
 ```
@@ -153,7 +153,7 @@ fig.show()
 
 情节动画
 
-```
+```py
 fig.write_html("3d.html")
 ```
 
@@ -163,7 +163,7 @@ Plotly 动画可用于制作特定值随时间变化的动画。为了实现这�
 
 箱线图显示了数据通过其四分位数的表示。落在第四个四分位数之外的值表示数据集中的异常值。
 
-```
+```py
 fig = go.Figure(data=[go.Surface(z=df[['duration','views','comments']].values)])
 
 fig.update_layout(title='3D Surface', autosize=False,
@@ -179,7 +179,7 @@ Plotly 地图
 
 情节复杂的次要情节
 
-```
+```py
 fig = px.scatter(df,x='comments',y='views',size='duration',color='num_speaker', log_x=True, size_max=60)
 fig.show()
 
@@ -191,7 +191,7 @@ fig.show()
 
 误差线用于显示可视化数据的可变性。一般来说，它们有助于显示估计误差或某一测量的精确度。误差线的长度揭示了不确定性的水平。误差线越长，表明数据点越分散，因此不确定性越大。它们可以应用于图表，如折线图、条形图和散点图。
 
-```
+```py
 fig = go.Figure(data=[go.Table(header=dict(values=views_top.columns,
                                            fill_color='yellow',
 ),
@@ -208,7 +208,7 @@ fig.show()
 
 交互性使您能够放大和缩小图表中的特定部分。这样，你可以看得更深一点，更详细地分析你的图表。具体来说，我们已经看到了如何在 Plotly 中使用流行的图表，如直方图、条形图和散点图。我们还看到，我们可以在同一个图形上构建多个图，并在地图上可视化数据。
 
-```
+```py
 fig = px.density_heatmap(df, x="published_year", y="views",z="comments")
 fig.show()
 
@@ -220,7 +220,7 @@ fig.show()
 
 Plotly Animations can be used to animate the changes in certain values over time. In order to achieve that, one has to define the `animation_frame`. In this case, it’s the year.
 
-```
+```py
 px.scatter(df, x="duration", y="comments",animation_frame="published_year", size="duration", color="published_day")
 ```
 
@@ -228,7 +228,7 @@ px.scatter(df, x="duration", y="comments",animation_frame="published_year", size
 
 A box plot shows the representation of data through their quartiles. Values falling outside the fourth quartile represent the outliers in your dataset.
 
-```
+```py
 fig = px.box(df, x="published_day", y="duration")
 fig.show()
 
@@ -238,7 +238,7 @@ fig.show()
 
 In order to work with maps in Plotly, you will need to head over to [Mapbox](https://web.archive.org/web/20221206044847/https://www.mapbox.com/) and grab your Mapbox API key. With the at hand, you can visualize your data on a map in Plotly. This is done using the `scatter_mapbox` while passing the latitude and the longitude. 
 
-```
+```py
 px.set_mapbox_access_token('YOURTOKEN')
 fig = px.scatter_mapbox(df, lat="lat", lon="lon",
                         color="region",
@@ -252,7 +252,7 @@ fig.show()
 
 With Plotly, we can also visualize multiple plots on the same graph. This is done using Plotly Subplots. The plots are created by defining a `facet_col`. The graphs will be broken into as many unique values as available from the `facet_col` column. 
 
-```
+```py
 px.scatter(df, x="duration", y="comments",
            animation_frame="published_month", animation_group="event",
            facet_col="published_day",width=1500, height=500,
@@ -264,7 +264,7 @@ px.scatter(df, x="duration", y="comments",
 
 Error bars are used to show the variability of data in a visualization. Generally, they help in showing the estimated error or the preciseness of a certain measure. The length of the error bar reveals the level of uncertainty. Longer error bars indicate that the data points are more spread out hence more uncertain. They can be applied to graphs such as line charts, bar graphs, and scatterplots.
 
-```
+```py
 fig =  go.Figure(
     data=[
         go.Bar(

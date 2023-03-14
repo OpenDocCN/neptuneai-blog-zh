@@ -166,7 +166,7 @@
 
 进行所需的进口。
 
-```
+```py
 import matplotlib.pyplot as plt
 from sklearn import tree
 from sklearn.datasets import load_iris
@@ -177,7 +177,7 @@ from sklearn.datasets import load_iris
 
 下一步是定义树并使之适合数据。
 
-```
+```py
 iris = load_iris()
 X, y = iris.data, iris.target
 clf = tree.DecisionTreeClassifier(max_depth=4)
@@ -187,7 +187,7 @@ clf = clf.fit(x, y)
 
 现在让我们画出拟合的树。
 
-```
+```py
 plt.figure(figsize=(12,8))
 tree.plot_tree(clf, filled=True, fontsize=10)
 plt.show()
@@ -209,7 +209,7 @@ plt.show()
 
 安装完成后，就可以进行所需的导入了。
 
-```
+```py
 from sklearn import tree
 from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
@@ -219,7 +219,7 @@ from dtreeviz.trees import *
 
 定义、拟合和绘制树。
 
-```
+```py
 classifier = tree.DecisionTreeClassifier(max_depth=4)
 iris = load_iris()
 classifier.fit(iris.data, iris.target)
@@ -244,7 +244,7 @@ viz.view()
 
 进行所需的进口。
 
-```
+```py
 import keras
 from keras.models import Sequential
 from keras.layers import Dense
@@ -254,7 +254,7 @@ from ann.visualizer.visualize import ann_viz
 
 现在让我们定义我们的神经网络。
 
-```
+```py
 network = Sequential()
 network.add(Dense(units=6, activation='relu',
 kernel_initializer='uniform', input_dim=7))
@@ -266,7 +266,7 @@ kernel_initializer='uniform'))
 
 绘制网络。
 
-```
+```py
 ann_viz(network, view=True, title=’Example ANN’)
 
 ```
@@ -281,7 +281,7 @@ ann_viz(network, view=True, title=’Example ANN’)
 
 首先，像往常一样，我们来定义一下 CNN。
 
-```
+```py
 def build_cnn_model():
 model=keras.models.Sequential()
 
@@ -351,7 +351,7 @@ return model
 
 因此，首先，TensorBoard 安装可以通过这两个命令中的任何一个来完成。
 
-```
+```py
 pip install tensorboard
 
 conda install -c conda-forge tensorboard
@@ -360,14 +360,14 @@ conda install -c conda-forge tensorboard
 
 现在让我们通过在单元格中运行这个命令来将 TensorBoard 加载到我们的笔记本中。
 
-```
+```py
 %load_ext tensorboard
 
 ```
 
 加载后，我们必须创建一个日志目录，TensorBoard 将在其中存储所有日志并从中读取，以显示各种可视化效果，之后 TensorBoard 必须重新加载更改。
 
-```
+```py
 log_folder=’logs’
 %reload_ext tensorboard
 
@@ -375,7 +375,7 @@ log_folder=’logs’
 
 现在让我们进行所需的导入并定义我们的模型。在这个练习中，我们将使我们的模型适合 MNIST 数据集。
 
-```
+```py
 import tensorflow as tf
 from tensorflow.keras.callbacks import TensorBoard
 
@@ -398,7 +398,7 @@ model.compile(optimizer='sgd',
 
 现在我们需要创建一个 TensorBoard 回调，它负责记录所有的事件，然后指定我们创建的日志目录。
 
-```
+```py
 callbacks = [TensorBoard(log_dir=log_folder, histogram_freq=1,
  write_graph=True, write_images=True,
  update_freq='epoch', profile_batch=2)]
@@ -407,7 +407,7 @@ callbacks = [TensorBoard(log_dir=log_folder, histogram_freq=1,
 
 最后，我们使模型适合我们的数据，并传入回调，以便以后可以可视化所有内容。
 
-```
+```py
 model.fit(X_train, y_train, epochs=5,
     validation_split=0.15, callbacks=callbacks)
 
@@ -415,7 +415,7 @@ model.fit(X_train, y_train, epochs=5,
 
 现在，让我们通过运行以下命令将 TensorBoard 窗口直接加载到 jupyter 笔记本中:
 
-```
+```py
 %tensorboard --logdir={log_folder}
 
 ```
@@ -460,7 +460,7 @@ Neptune 是一个[元数据存储库](/web/20221201170702/https://neptune.ai/pro
 
 让我们从安装所需的东西开始:
 
-```
+```py
 !pip install -q neptune-client
 !pip install -q neptune-contrib
 
@@ -470,7 +470,7 @@ Neptune 是一个[元数据存储库](/web/20221201170702/https://neptune.ai/pro
 
 为了在每个批次和时期之后记录度量，让我们创建一个 NeptuneLogger 回调。这部分类似于我们在前面的例子中创建的 TensorBoard 回调。
 
-```
+```py
 from tensorflow.keras.callbacks import Callback
 class NeptuneLogger(Callback):
     def on_batch_end(self, batch, logs={}):
@@ -487,14 +487,14 @@ class NeptuneLogger(Callback):
 
 现在让我们初始化 API。
 
-```
+```py
 run = neptune.init(project=YOUR_PROJECT_NAME,  api_token=YOUR_API_TOKEN)
 
 ```
 
 现在让我们来处理我们想要记录的任何内容。
 
-```
+```py
 EPOCHS = 5
 BATCH_SIZE = 32
 
@@ -507,7 +507,7 @@ run[ "sys/tags"].add("demo")
 
 太好了！现在剩下要做的就是将我们的 NeptuneLogger 作为 keras 回调函数传递。
 
-```
+```py
 history = model.fit(x=x_train, y=y_train,
       epochs=EPOCHS, batch_size=BATCH_SIZE,
       validation_data=(x_test, y_test),
@@ -535,7 +535,7 @@ history = model.fit(x=x_train, y=y_train,
 
 首先，在他们的[网站](https://web.archive.org/web/20221201170702/https://wandb.ai/)上注册，然后通过以下命令安装&登录:
 
-```
+```py
 pip install wandb
 wandb login
 
@@ -543,7 +543,7 @@ wandb login
 
 输入 API 密钥后，您应该就一切就绪了。现在，让我们为 Keras 模型创建所需的导入。
 
-```
+```py
 import wandb
 from wandb.keras import WandbCallback
 
@@ -551,14 +551,14 @@ from wandb.keras import WandbCallback
 
 让我们初始化 wandb 并开始我们的项目。
 
-```
+```py
 wandb.init(project=’blog-demo’)
 
 ```
 
 现在我们需要做的就是训练我们目前使用的模型，并将 WandbCallback 传递给 log metrics。
 
-```
+```py
 model.fit(X_train, y_train, validation_data=(X_test, y_test),
     callbacks=[WandbCallback()], epochs=5)
 
@@ -580,7 +580,7 @@ TensorWatch 是微软研究院提供的数据科学调试和可视化工具。�
 
 让我们从安装开始吧。
 
-```
+```py
 pip install tensorwatch
 
 ```
@@ -591,7 +591,7 @@ pip install tensorwatch
 
 它为训练和测试周期维护了单独的观察器，所以我们可以分别看到每个周期的度量。port 参数指定其套接字相对于基线端口的偏移量。
 
-```
+```py
 git clone https://github.com/sytelus/regim.git
 cd regim
 pip install -e .
@@ -600,7 +600,7 @@ pip install -e .
 
 然后，从安装 regim 的文件夹中运行您的培训脚本。
 
-```
+```py
 python mnist_main.py
 
 ```
@@ -609,7 +609,7 @@ python mnist_main.py
 
 它为训练和测试周期维护了单独的观察器，所以我们可以分别看到每个周期的度量。port 参数指定其套接字相对于基线端口的偏移量。
 
-```
+```py
 train = tw.WatcherClient(port=0)
 test = tw.WatcherClient(port=1)
 
@@ -617,7 +617,7 @@ test = tw.WatcherClient(port=1)
 
 现在，让我们绘制几个指标，如训练损失、训练准确性、测试损失和测试准确性。
 
-```
+```py
 loss_stream = train.create_stream(expr='lambda d:
                                  (d.metrics.epochf,
                                  d.metrics.batch_loss)', event_name='batch')
@@ -647,7 +647,7 @@ test_acc_plot.show()
 
 类似地，我们也可以通过以下方式绘制每层的平均重量梯度:
 
-```
+```py
 grads_stream = train.create_stream(expr='lambda
                                  d:grads_abs_mean(d.model)',
                                  event_name='batch', throttle=1)

@@ -20,7 +20,7 @@ Neptune 是为运行大量实验的研究和生产团队构建的 MLOps 的元�
 
 您可以用简单的命令`pip install neptune-client`安装 Neptune，并在训练和验证脚本中添加以下代码，以记录您的实验数据。
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init('work-space/MyProject', api_toke='Your_token')
@@ -50,7 +50,7 @@ Comet 也是一个跟踪机器学习项目的实验工具。Comet 提供了一�
 
 你可以用下面的代码安装 Comet`pip install comet_ml`
 
-```
+```py
 from comet_ml import Experiment
 
 experiment = Experiment(project_name="my-project", workspace="my-workspace")
@@ -71,7 +71,7 @@ Weights & Biases 通过帮助团队跟踪他们的模型、可视化模型性能
 
 您可以使用下面的代码`pip install wandb`安装 Weights & Biases，通过下面的代码片段将该工具与您的任何机器学习项目集成。
 
-```
+```py
 import wandb
 ‍
 
@@ -109,7 +109,7 @@ MLflow 是一个开源工具，可以部署在云和本地，用于管理机器�
 
 使用 MLflow 进行实验跟踪的线性回归示例:
 
-```
+```py
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
@@ -171,7 +171,7 @@ omni board–omni board 有助于可视化我们的实验，以便跟踪它们�
 
 用张量板显示图形的简化代码:
 
-```
+```py
 import tensorflow as tf
 
 writer = tf.summary.create_file_writer('./folder')
@@ -189,7 +189,7 @@ writer.close()
 
 启动网络服务器:
 
-```
+```py
 tensorboard --logdir='./folder'
 
 ```

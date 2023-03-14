@@ -104,7 +104,7 @@ COVID19 的爆发让世界措手不及，影响了全球的政府、公司和个
 
 为了构建无人机配置脚本，我们需要导入必要的库来实例化所需的操作。djitellopy 和 openCV 可以通过终端由 PyPI 包管理器轻松安装，如下所示:
 
-```
+```py
 $ pip install djitellopy
 $ pip install opencv-python
 
@@ -112,7 +112,7 @@ $ pip install opencv-python
 
 完全安装了用于与无人机和计算机视觉操作交互的库。我们开始如下:
 
-```
+```py
 from djitellopy import Tello
 
 import cv2
@@ -129,7 +129,7 @@ pkg.connect()
 
 上面的片段通过 WiFi 连接成功地与无人机和我们的 PC 建立了 UDP 连接。将创建一个无人机类，如下所示:
 
-```
+```py
 class Drone:
 
 	"""Wrapper class to setup the tello drone"""
@@ -148,7 +148,7 @@ class Drone:
 
 创建无人机类别时，将后退速度、侧向(左/右)速度、垂直速度和偏航速度的默认状态以及初始速度设置为零，以确保无人机在起飞前处于平衡状态。更多关于无人机的物理知识可以在这里阅读。drone 类还接受所需框架的宽度和高度值。
 
-```
+```py
 def get_status(self):
     	battery = pkg.get_battery()
     	fly_time = pkg.get_flight_time()
@@ -178,7 +178,7 @@ def get_status(self):
 
 无人机类有一个“get_status”方法，该方法返回一个字典，其中包含以百分比表示的电池电量、以秒为单位的飞行时间、以厘米为单位的无人机当前高度、以厘米为单位的高度([高度计](https://web.archive.org/web/20221206070317/https://en.wikipedia.org/wiki/Altimeter))、以摄氏度为单位的温度、以厘米/秒为单位的纱线速度、以厘米/为单位的 3d 空间(X、Y 和 Z 轴)中的速度以及以厘米/秒平方(cm/s2)为单位的 3D 空间(X、Y 和 Z 轴)中的加速度。
 
-```
+```py
 def get_stream_on(self):
     	pkg.streamon()
 
@@ -189,7 +189,7 @@ def get_stream_off(self):
 
 drone 类有一个“get_stream_on”和“get_stream_off”方法来打开和关闭视频流。在 AP 模式下(即当您的计算机连接到泰洛-XXXXXX WiFi 网络时)，所有 Tello 都支持视频流。
 
-```
+```py
 def get_frame(self):
     	frame_read = pkg.get_frame_read()
     	return frame_read.frame
@@ -198,7 +198,7 @@ def get_frame(self):
 
 drone 类有一个“get_frame”方法来捕获从无人机摄像机接收到的帧。
 
-```
+```py
 def get_video(self):
     	fourcc = cv2.VideoWriter_fourcc(*'XVID')
     	out = cv2.VideoWriter('drone_video.avi', fourcc, 20.0, (640, 480))
@@ -218,7 +218,7 @@ def get_video(self):
 
 drone 类的“get_video”方法用一个[保存视频流(逐帧处理)。avi 格式](https://web.archive.org/web/20221206070317/https://en.wikipedia.org/wiki/Audio_Video_Interleave)使用 OpenCV VideoWriter 类。帧大小为 640 x 480，采用 FourCC 编解码器。
 
-```
+```py
 def advance_movement(self):
     	pkg.takeoff()
     	pkg.move_forward(40)
@@ -245,7 +245,7 @@ def get_movement(self):
 
 各种运动方案，如“前进 _ 运动”、“后退 _ 运动”和“获得 _ 运动”都是以厘米为距离单位创建的。这些方案包括向前、向后、向左、向右、向上和向下的运动，以及顺时针和逆时针旋转。为了开始运动，启动“起飞”命令，为了结束飞行，启动“结束”命令。
 
-```
+```py
 def get_snap_shots(self, label, frame):
     	count = 0
     	if label.split(':')[0] == 'No Mask':

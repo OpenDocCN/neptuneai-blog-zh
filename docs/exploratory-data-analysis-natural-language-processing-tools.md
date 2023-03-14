@@ -10,7 +10,7 @@
 
 在本文中，我们将使用来自 Kaggle 的百万新闻标题数据集。如果您想一步一步地进行分析，您可能需要安装以下库:
 
-```
+```py
 pip install \
    pandas matplotlib numpy \
    nltk seaborn sklearn gensim pyldavis \
@@ -19,7 +19,7 @@ pip install \
 
 现在，我们可以看看数据。
 
-```
+```py
 news= pd.read_csv('data/abcnews-date-text.csv',nrows=10000)
 news.head(3)
 ```
@@ -49,7 +49,7 @@ news.head(3)
 
 首先，我将看看每个句子中出现的字符数。这可以让我们大致了解新闻标题的长度。
 
-```
+```py
 news['headline_text'].str.len().hist()
 
 ```
@@ -60,7 +60,7 @@ news['headline_text'].str.len().hist()
 
 现在，我们将转到单词级别的数据探索。让我们画出每个新闻标题中出现的字数。
 
-```
+```py
 text.str.split().\
     map(lambda x: len(x)).\
     hist()
@@ -72,7 +72,7 @@ text.str.split().\
 
 接下来，让我们检查一下每个句子的平均单词长度。
 
-```
+```py
 news['headline_text'].str.split().\
    apply(lambda x : [len(i) for i in x]). \
    map(lambda x: np.mean(x)).hist()
@@ -88,7 +88,7 @@ news['headline_text'].str.split().\
 
 要获得包含停用词的语料库，您可以使用 [nltk 库](https://web.archive.org/web/20220928195456/https://www.nltk.org/)。Nltk 包含许多语言的停用词。因为我们只处理英语新闻，所以我将从语料库中过滤掉英语停用词。
 
-```
+```py
 import nltk
 nltk.download('stopwords')
 stop=set(stopwords.words('english'))
@@ -96,7 +96,7 @@ stop=set(stopwords.words('english'))
 
 现在，我们将创建语料库。
 
-```
+```py
 corpus=[]
 new= news['headline_text'].str.split()
 new=new.values.tolist()
@@ -121,7 +121,7 @@ for word in corpus:
 
 We will use the [counter function](https://web.archive.org/web/20220928195456/https://pymotw.com/2/collections/counter.html) from the collections library to count and store the occurrences of each word in a list of tuples. This is a **very useful function when we deal with word-level analysis** in natural language processing.
 
-```
+```py
 counter=Counter(corpus)
 most=counter.most_common()
 
@@ -150,7 +150,7 @@ Ngram 探索
 
 现在我们知道了如何创建 n 元语法，让我们把它们可视化。
 
-```
+```py
 from nltk.util import ngrams
 list(ngrams(['I' ,'went','to','the','river','bank'],2))
 ```
@@ -163,7 +163,7 @@ list(ngrams(['I' ,'went','to','the','river','bank'],2))
 
 top _ n _ bigrams = get _ top _ ngram(news[' headline _ text ']，2)[:10] x，y=map(list，zip(* top _ n _ bigrams))SNS . bar plot(x = y，y=x)
 
-```
+```py
 def get_top_ngram(corpus, n=None):
     vec = CountVectorizer(ngram_range=(n, n)).fit(corpus)
     bag_of_words = vec.transform(corpus)
@@ -184,7 +184,7 @@ top_n_bigrams=get_top_ngram(news[‘headline_text’],2)[:10] x,y=map(list,zip(*
 
 我们可以看到，这些三元组中有许多是由*、*、*、【反战抗议】组合而成的。* **这意味着我们应该努力清理数据**，看看我们能否将这些同义词合并成一个干净的令牌。
 
-```
+```py
 top_tri_grams=get_top_ngram(news['headline_text'],n=3)
 x,y=map(list,zip(*top_tri_grams))
 sns.barplot(x=y,y=x)
@@ -213,7 +213,7 @@ pyLDAvis 主题建模探索
 
  **我们最终可以创建 LDA 模型:
 
-```
+```py
 import nltk
 nltk.download('punkt')
 nltk.download('wordnet')
@@ -235,14 +235,14 @@ corpus=preprocess_news(news)
 
 题目 0 表示与伊拉克战争和警察有关的东西。主题 3 显示澳大利亚卷入伊拉克战争。
 
-```
+```py
 dic=gensim.corpora.Dictionary(corpus)
 bow_corpus = [dic.doc2bow(doc) for doc in corpus]
 ```
 
 您可以打印所有的主题并尝试理解它们，但是有一些工具可以帮助您更有效地进行数据探索。一个这样的工具是 [pyLDAvis](https://web.archive.org/web/20220928195456/https://github.com/bmabey/pyLDAvis) ，它**交互地可视化 LDA 的结果。**
 
-```
+```py
 lda_model = gensim.models.LdaMulticore(bow_corpus, 
                                    num_topics = 4, 
                                    id2word = dic,                                    
@@ -257,7 +257,7 @@ The topic 0 indicates something related to the Iraq war and police. Topic 3 show
 
 在左侧，每个圆圈的**区域代表主题**相对于语料库的重要性。因为有四个主题，所以我们有四个圈。
 
-```
+```py
 pyLDAvis.enable_notebook()
 vis = pyLDAvis.gensim.prepare(lda_model, bow_corpus, dic)
 vis
@@ -279,7 +279,7 @@ Wordcloud is a great way to represent text data. The size and color of each word
 
 同样，您可以看到与战争相关的术语被突出显示，这表明这些词在新闻标题中频繁出现。
 
-```
+```py
 from wordcloud import WordCloud, STOPWORDS
 stopwords = set(STOPWORDS)
 
@@ -334,7 +334,7 @@ Textblob 是构建在 nltk 之上的 python 库。它已经存在了一段时间
 
 既然我们知道了如何计算这些情感分数**，我们就可以使用直方图来可视化它们，并进一步探索数据。**
 
-```
+```py
 from textblob import TextBlob
 TextBlob('100 people killed in Iraq').sentiment
 ```
@@ -345,7 +345,7 @@ TextBlob claims that the text *“100 people killed in Iraq”* is negative an
 
 可以看到极性主要在 0.00 到 0.20 之间。这表明大多数新闻标题是中性的。
 
-```
+```py
 def polarity(text):
     return TextBlob(text).sentiment.polarity
 
@@ -362,7 +362,7 @@ You can see that the polarity mainly ranges between 0.00 and 0.20\. This indicat
 
 是的，70 %的新闻是中性的，只有 18%是正面的，11%是负面的。
 
-```
+```py
 def sentiment(x):
     if x<0:
         return 'neg'
@@ -386,14 +386,14 @@ plt.bar(news.polarity.value_counts().index,
 
 是的，非常负面的新闻标题。
 
-```
+```py
 news[news['polarity']=='pos']['headline_text'].head()
 
 ```
 
 维德情感分析
 
-```
+```py
 news[news['polarity']=='neg']['headline_text'].head()
 
 ```
@@ -410,7 +410,7 @@ VADER sentiment analysis class **returns a dictionary that contains the probabi
 
 是的，在分布上有一点点不同。甚至更多的标题被归类为中性 85 %，负面新闻标题的数量有所增加(至 13 %)。
 
-```
+```py
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 nltk.download('vader_lexicon')
@@ -458,14 +458,14 @@ spaCy 的英语有三种[预训练模式。我将使用 *en_core_web_sm* 来完�
 
 Spacy 的一个好处是我们只需要应用 *nlp 函数*一次，整个后台管道就会返回我们需要的对象。
 
-```
+```py
 python -m spacy download en_core_web_sm
 
 ```
 
 我们可以看到，印度和伊朗被认为是地理位置(GPE)，Chabahar 是人，星期四是日期。
 
-```
+```py
 import spacy
 
 nlp = spacy.load("en_core_web_sm")
@@ -473,7 +473,7 @@ nlp = spacy.load("en_core_web_sm")
 
 我们也可以使用 spaCy 中的 *displacy* 模块来可视化输出。
 
-```
+```py
 doc=nlp('India and Iran have agreed to boost the economic viability \
 of the strategic Chabahar port through various measures, \
 including larger subsidies to merchant shipping firms using the facility, \
@@ -488,7 +488,7 @@ people familiar with the development said on Thursday.')
 
 现在我们知道了如何执行 NER，我们可以通过对从数据集中提取的命名实体进行各种可视化来进一步探索数据。
 
-```
+```py
 from spacy import displacy
 
 displacy.render(doc, style='ent')
@@ -500,7 +500,7 @@ displacy.render(doc, style='ent')
 
 First, we will **run the named entity recognition on our news** headlines and store the entity types.
 
-```
+```py
 def ner(text):
     doc=nlp(text)
     return [X.label_ for X in doc.ents]
@@ -515,7 +515,7 @@ count=counter.most_common()
 
 现在我们可以看到，GPE 和 ORG 占据了新闻标题，其次是 PERSON 实体。
 
-```
+```py
 x,y=map(list,zip(*count))
 sns.barplot(x=y,y=x)
 ```
@@ -528,7 +528,7 @@ Now we can see that the GPE and ORG dominate the news headlines followed by the 
 
 我想我们可以确认这样一个事实，即新闻标题中的“美国”指的是美国。让我们也找出新闻标题中最常见的名字。
 
-```
+```py
 def ner(text,ent="GPE"):
     doc=nlp(text)
     return [X.text for X in doc.ents if X.label_ == ent]
@@ -545,7 +545,7 @@ sns.barplot(y,x)
 
 萨达姆·侯赛因和乔治·布什是战时伊拉克和美国的总统。此外，我们可以看到，该模型在将*“维克政府”*或*“新南威尔士州政府”*归类为个人而非政府机构方面远非完美。
 
-```
+```py
 per=news['headline_text'].apply(lambda x: ner(x,"PERSON"))
 per=[i for x in per for i in x]
 counter=Counter(per)
@@ -579,7 +579,7 @@ sns.barplot(y,x)
 
 我们可以在这里观察到各种依赖标签。例如， *DET* 标签表示限定词“the”和名词“stories”之间的关系。
 
-```
+```py
 import nltk
 sentence="The greatest comeback stories in 2019"
 tokens=word_tokenize(sentence)
@@ -588,7 +588,7 @@ nltk.pos_tag(tokens)
 
 ![nltk pos tagging](img/5f5bebdd3b7c614d899a72b5012ce351.png)
 
-```
+```py
 doc = nlp('The greatest comeback stories in 2019')
 displacy.render(doc, style='dep', jupyter=True, options={'distance': 90})
 ```
@@ -601,7 +601,7 @@ You can check the list of dependency tags and their meanings [here](https://web
 
 我们可以清楚地看到，名词(NN)在新闻标题中占主导地位，其次是形容词(JJ)。这对于新闻文章来说是典型的，而对于艺术形式来说，更高的形容词(ADJ)频率可能发生得相当多。
 
-```
+```py
 def pos(text):
     pos=nltk.pos_tag(word_tokenize(text))
     pos=list(map(list,zip(*pos)))[1]
@@ -623,7 +623,7 @@ We can clearly see that the noun (NN) dominates in news headlines followed by th
 
 *“战争”、“伊拉克”、“人”*等名词在新闻标题中占据主导地位。您可以使用上面的函数可视化和检查其他词类。
 
-```
+```py
 def get_adjs(text):
     adj=[]
     pos=nltk.pos_tag(word_tokenize(text))
@@ -714,7 +714,7 @@ Textstat 是一个很酷的 Python 库，它提供了所有这些文本统计计
 
 几乎所有的可读性分数都在 60 分以上。这意味着一个普通的 11 岁学生可以阅读和理解新闻标题。让我们检查可读性分数低于 5 分的所有新闻标题。
 
-```
+```py
 from textstat import flesch_reading_ease
 
 news['headline_text'].\
@@ -727,7 +727,7 @@ news['headline_text'].\
 
 最后的想法
 
-```
+```py
 x=[i for i in range(len(reading)) if reading[i]<5]
 news.iloc[x]['headline_text'].head()
 ```

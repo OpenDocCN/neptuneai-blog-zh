@@ -86,7 +86,7 @@
 
 也就是说，我在下面的 Python 脚本中总结了所有这些过程，该脚本执行了上述步骤。
 
-```
+```py
 import pandas as pd
 import requests
 from datetime import datetime
@@ -141,7 +141,7 @@ for upload_day in upload_data:
 
 最后，我使用 GitHub Actions 自动化了这个工作流，这样每小时都会执行一次脚本并向数据库中插入新数据。这种自动化是通过以下 YAML 文件完成的:
 
-```
+```py
 name: update-ddbb
 
 on:
@@ -204,7 +204,7 @@ jobs:
 
 在我们的比特币每小时交易预测示例中，这个过程是使用以下 Python 脚本进行的:
 
-```
+```py
 import pandas as pd
 import pickle
 
@@ -325,7 +325,7 @@ pickle.dump(forecaster_rf, open(path_modelo, 'wb'))
 
 因此，在下面的脚本中，您可以看到我是如何创建 API 的:
 
-```
+```py
 from fastapi import FastAPI
 app = FastAPI()
 @app.post("/forecast")
@@ -429,7 +429,7 @@ def forecast(num_predictions = 168, return_predictions = True):
 
 一旦我们创建了 docker 文件，验证它是否正常工作是很重要的。为此，我们必须执行以下命令:
 
-```
+```py
 cd <folder_where_Dockerfile_is_located>
 docker build -t <image_name> .
 docker run -p <port:port> <image_name>
@@ -490,7 +490,7 @@ docker run -p <port:port> <image_name>
 
 我们将在一个. yaml 文件中定义所有这些内容，指出每一点都是要执行的步骤。在下面的代码中，我们看到。我在比特币交易示例中使用的 yaml 文件:
 
-```
+```py
 steps:
 - name: 'gcr.io/cloud-builders/docker'
    args: ['build', '-t', 'gcr.io/mlops-example/github.com/anderdecidata/mlops-example:$SHORT_SHA', '.']
@@ -530,7 +530,7 @@ steps:
 
 后者是我如何用 GitHub 将它组装到 MLOps 工作流中，以预测比特币的交易数量。使用以下代码，我们可以检查 MAE 是否低于特定阈值，并在低于特定阈值的情况下启动重新训练工作流:
 
-```
+```py
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -574,7 +574,7 @@ if data['mae'].mean() > max_mae:
 
 此外，我们可以通过下面的 GitHub 动作自动执行这个脚本:
 
-```
+```py
 name: Check retrain
 
 on:

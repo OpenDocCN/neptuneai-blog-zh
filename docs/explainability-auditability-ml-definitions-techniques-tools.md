@@ -71,7 +71,7 @@ ML 中的一些模型具有可解释的特性，即透明性、易理解性和�
 
 **2。决策树算法:**使用决策树的模型是通过学习从先验数据中得到的简单决策规则来训练的。因为它们遵循一套特定的规则，理解结果仅仅依赖于学习和理解导致结果的规则。使用 scikit-learn 中的 plot_tree 函数，您可以看到算法如何获得其输出的可视化。使用虹膜数据集:
 
-```
+```py
 fig = plt.figure(figsize=(25,20))
 _ = tree.plot_tree(clf,
                    feature_names=iris.feature_names,
@@ -110,7 +110,7 @@ _ = tree.plot_tree(clf,
 
 Scikit 学习检查模块提供了一个名为 plot _ partial _ dependence 的部分相关图函数，可创建单向和双向部分相关图:
 
-```
+```py
 from sklearn.datasets import make_hastie_10_2
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.inspection import plot_partial_dependence
@@ -132,7 +132,7 @@ plt.gcf()
 
 这为您提供了模型中某个特征相对于目标特征的效果的局部可视化表示。与 PDP 不同，ICE 以每个样本一行的方式显示对特征的依赖性的单独预测。它也是模型不可知的。您可以使用 [Python](https://web.archive.org/web/20221218081727/https://github.com/AustinRochford/PyCEbox) 和 [R](https://web.archive.org/web/20221218081727/https://github.com/kapelner/ICEbox) 用 PyCEbox 包创建一个冰图。使用 scikit-learn，您可以在您的模型上实现 ICE 绘图，它也使用 plot _ partial _ dependece 函数，并且您必须设置 kind='individual '。
 
-```
+```py
 X, y = make_hasplot_partial_dependence(clf, X, features,
     			kind='individual')
 ```
@@ -152,13 +152,13 @@ PDP、ICE 和 LOCO 都有一些缺点:
 
 ALE 图最初是由 D. Apley(等人)在论文“[可视化黑盒监督学习模型](https://web.archive.org/web/20221218081727/https://arxiv.org/abs/1612.08468)中预测变量的效果”中提出的。它与 PDP 的不同之处在于，它在特征上使用一个小窗口，并在预测之间产生差异而不是平均值。由于它不是基于比较平均值，ALE 的偏差更小，性能更好。ALE 的 python 版本可以通过以下方式安装:
 
-```
+```py
  pip install PyALE
 ```
 
 给定一个具有某些特征的已处理数据集，ALE 图将如下实现:
 
-```
+```py
 X[features]
 from PyALE import ALE
 ale_eff = ale(
@@ -200,13 +200,13 @@ Shapley 值 SHAP(Shapley Additive exPlanations)是一个特征值对所有可能
 
 联合是用于估计特定特征的 Shapley 值的特征组合。这是一种统一的方法来解释机器学习模型的输出，如线性和逻辑回归、 [NLP](https://web.archive.org/web/20221218081727/https://github.com/slundberg/shap#natural-language-example-transformers) 、[提升树模型](https://web.archive.org/web/20221218081727/https://github.com/slundberg/shap#treeexplainer)和上瘾模型。可以通过 [PyPI](https://web.archive.org/web/20221218081727/https://pypi.org/project/shap) 或 [conda-forge](https://web.archive.org/web/20221218081727/https://anaconda.org/conda-forge/shap) 安装；
 
-```
+```py
 pip install shap
 ```
 
 或者:
 
-```
+```py
 conda install -c conda-forge shap
 ```
 
@@ -224,7 +224,7 @@ DeepLIFT 是一种深度学习的可解释方法，它使用反向传播将每�
 
 DeepLIFT 位于 pypi 上，因此可以使用 pip 进行安装:
 
-```
+```py
 pip install deeplift
 
 ```
@@ -286,13 +286,13 @@ ELI5 是一个 python 包，用于理解和解释 sklearn 回归器和分类器�
 
 ELI5 在 python 2.7 和 3.4+中工作，它需要 scikit-learn 0.18+。然后，您可以使用以下命令安装它:
 
-```
+```py
 pip install eli5
 ```
 
 或者:
 
-```
+```py
 Conda install -c conda-forge eli5
 ```
 
@@ -369,7 +369,7 @@ Dalex 可与 xgboost、TensorFlow、h2o 配合使用。可以通过 Python 和 r
 
 r:
 
-```
+```py
 install.packages("DALEX")
 Dalex::explain
 
@@ -377,7 +377,7 @@ Dalex::explain
 
 Python:
 
-```
+```py
 pip install dalex -U
 import dalex as dx
 exp = dx.Explainer(model, X, y)

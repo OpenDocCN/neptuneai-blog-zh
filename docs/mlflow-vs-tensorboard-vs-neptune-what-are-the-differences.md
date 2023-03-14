@@ -132,7 +132,7 @@ Neptune 与 Jupyter 笔记本集成，因此无论何时运行包含`neptune.cre
 
 要将一个或多个图像记录到日志部分，您只需:
 
-```
+```py
 neptune.log_image('predictions', image)
 for image in validation_predications:
     neptune.log_image('predictions', image)
@@ -145,7 +145,7 @@ mlflow.serach_runs()API 返回熊猫数据帧中的 mlflow 运行。
 
 海王星允许你获取你或你的队友追踪和探索的任何信息。HiPlot 集成等探索性特性将帮助您做到这一点。
 
-```
+```py
 neptune.init('USERNAME/example-project')
 
 make_parallel_coordinates_plot(
@@ -169,13 +169,13 @@ make_parallel_coordinates_plot(
 
 将工作流程从:
 
-```
+```py
 mlflow ui
 ```
 
 收件人:
 
-```
+```py
 neptune mlflow
 
 ```
@@ -188,14 +188,14 @@ neptune mlflow
 
 首先，安装库:
 
-```
+```py
 pip install neptune - tensorboard
 
 ```
 
 在用 Tensorboard 日志创建了一个简单的训练脚本并初始化 Neptune 之后，您可以用两行简单的代码进行集成:
 
-```
+```py
 import neptune_tensorboard as neptune_tb
 neptune_tb.integrate_with_tensorflow()
 
@@ -203,7 +203,7 @@ neptune_tb.integrate_with_tensorflow()
 
 一定要创建实验！
 
-```
+```py
 with neptune.create_experiment(name=RUN_NAME, params=PARAMS):
 ```
 

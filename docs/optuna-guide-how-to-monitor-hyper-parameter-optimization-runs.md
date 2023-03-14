@@ -57,7 +57,7 @@
 
 Optuna 很容易安装。考虑论文中描述的情况:
 
-```
+```py
 import optuna
 import ...
 
@@ -93,7 +93,7 @@ study.optimize(objective , n trials =100)
 
 请注意，我们根本没有预定义模型架构。它是完全动态构建的。在另一个称为 ***远视*** 的框架中考虑同样的任务:
 
-```
+```py
 import hyperopt
 import ...
 
@@ -188,7 +188,7 @@ Optuna 使用之前实验的信息来做出决定。它问在这个时期中间�
 
 打开一个 jupyter 笔记本，导入这些包和函数。确保在 python 环境中安装这些包。
 
-```
+```py
 import sklearn
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
@@ -206,7 +206,7 @@ import time
 
 如上所述，我们加载数字数据集。Sklearn 会自动给你下载。我们将数据分成训练集和验证集。
 
-```
+```py
 data = datasets.load_digits()
 
 X = data.data
@@ -220,21 +220,21 @@ print("Validation data shape: ", X_val.shape)
 
 输出:
 
-```
+```py
 Train data shape:  (1437, 64)
 Validation data shape:  (360, 64)
 ```
 
 检查标签:
 
-```
+```py
 Counter(y_train)
 
 ```
 
 输出:
 
-```
+```py
 Counter({6: 142,
          4: 147,
          7: 143,
@@ -249,7 +249,7 @@ Counter({6: 142,
 
 我们选择准确性作为感兴趣的衡量标准，因为不存在等级不平衡:
 
-```
+```py
 def model_performance(model, X=X_val, y=y_val):
     """
     Get accuracy score on validation/test data from a trained model
@@ -262,7 +262,7 @@ def model_performance(model, X=X_val, y=y_val):
 
 在进行任何超参数搜索之前，让我们考虑一个简单的决策树，看看它在未调优时的性能。
 
-```
+```py
 model = DecisionTreeClassifier()
 model.fit(X_train, y_train)
 
@@ -271,7 +271,7 @@ print("Validation accuracy: ", model_performance(model))
 
 输出:
 
-```
+```py
 Validation accuracy:  0.861
 
 ```
@@ -282,7 +282,7 @@ Validation accuracy:  0.861
 
 我们最终开始创建我们的目标函数并研究:
 
-```
+```py
 def create_model(trial):
     model_type = trial.suggest_categorical('model_type', ['logistic-regression', 'decision-tree', 'svm'])
 
@@ -323,7 +323,7 @@ def objective(trial):
 
 在**目标**函数中，我们使用 **create_model** 来生成一个模型，并将其拟合到我们的训练数据上。我们返回模型精度:
 
-```
+```py
 study = optuna.create_study(direction='maximize', study_name="starter-experiment", storage='sqlite:///starter.db')
 ```
 
@@ -333,7 +333,7 @@ study = optuna.create_study(direction='maximize', study_name="starter-experiment
 
 *   导入 neptune 并创建跑步记录
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init(
@@ -345,7 +345,7 @@ run = neptune.init(
 
 *   导入并初始化 NeptuneCallback
 
-```
+```py
 import neptune.new.integrations.optuna as optuna_utils
 
 neptune_callback = optuna_utils.NeptuneCallback(run)
@@ -354,7 +354,7 @@ neptune_callback = optuna_utils.NeptuneCallback(run)
 
 使用 [Neptune-Optuna 集成](https://web.archive.org/web/20221206040852/https://docs.neptune.ai/integrations-and-supported-tools/hyperparameter-optimization/optuna)，Neptune 将自动记录所有有价值的信息，并为我们创建可视化效果。
 
-```
+```py
 study = optuna.create_study(direction='maximize', study_name="starter-experiment", storage='sqlite:///starter.db')
 
 ```
@@ -365,14 +365,14 @@ study = optuna.create_study(direction='maximize', study_name="starter-experiment
 
 最后，我们可以将 neptune_callback 传递给 study.optimize() callbacks 参数，并开始超参数优化过程。我已经设置了 300 次试验。
 
-```
+```py
 study.optimize(objective, n_trials=300, callbacks=[neptune_callback])
 
 ```
 
 输出:
 
-```
+```py
 [I 2020-12-12 16:06:18,599] A new study created in RDB with name: starter-experiment
 [I 2020-12-12 16:06:18,699] Trial 0 finished with value: 0.828 and parameters: {'model_type': 'decision-tree', 'max_depth': 12, 'min_samples_split': 16, 'min_samples_leaf': 19}. Best is trial 0 with value: 0.828.
 [I 2020-12-12 16:06:20,161] Trial 1 finished with value: 0.983 and parameters: {'model_type': 'svm', 'kernel': 'rbf', 'svm-regularization': 6.744450268290869, 'degree': 5.0}. Best is trial 1 with value: 0.983.
@@ -386,7 +386,7 @@ study.optimize(objective, n_trials=300, callbacks=[neptune_callback])
 
 最后，为了获得最佳模型:
 
-```
+```py
 best_model = create_model(study.best_trial)
 best_model.fit(X_train, y_train)
 print("Performance: ", model_performance(best_model))
@@ -394,7 +394,7 @@ print("Performance: ", model_performance(best_model))
 
 输出:
 
-```
+```py
 Performance:  0.989
 ```
 
@@ -424,7 +424,7 @@ Performance:  0.989
 
 *   **使用 RDB 后端恢复研究**–如果您创建了一个具有某个名称和某个数据库后端的研究，您可以在任何时间点恢复它。例子([链接](https://web.archive.org/web/20221206040852/https://optuna.readthedocs.io/en/stable/tutorial/003_rdb.html#rdb)):
 
-```
+```py
 import optuna
 study_name = 'example-study'  
 study = optuna.create_study(study_name=study_name, storage='sqlite:///example.db')
@@ -432,7 +432,7 @@ study = optuna.create_study(study_name=study_name, storage='sqlite:///example.db
 
 要加载该研究:
 
-```
+```py
 study = optuna.create_study(study_name='example-study', storage='sqlite:///example.db', load_if_exists=True)
 study.optimize(objective, n_trials=3)
 
@@ -440,7 +440,7 @@ study.optimize(objective, n_trials=3)
 
 *   **分布式优化【T1—**对于大规模实验，分布式优化可以让你的收敛时间减少几个数量级。最重要的是，使用它非常简单。当您使用终端运行脚本时(如下所示):****
 
-```
+```py
 $ python foo.py
 
 ```
@@ -451,7 +451,7 @@ $ python foo.py
 
 您的 python 脚本应该定义一个目标函数。
 
-```
+```py
 def objective(trial):
     x = trial.suggest_uniform('x', -10, 10)
     return (x - 2) ** 2
@@ -460,7 +460,7 @@ def objective(trial):
 
 在您的 CLI 中:
 
-```
+```py
 $ STUDY_NAME=`optuna create-study --storage sqlite:///example.db`
 $ optuna study optimize foo.py objective --n-trials=100 --storage sqlite:///example.db --study-name $STUDY_NAME
 
@@ -470,7 +470,7 @@ $ optuna study optimize foo.py objective --n-trials=100 --storage sqlite:///exam
 
 *   **多目标研究–**在我们的示例中，目标函数返回一个数字，我们选择将其最小化或最大化。然而，我们也可以返回多个值。我们只需要为它们中的每一个指定方向。考虑下面的例子([链接](https://web.archive.org/web/20221206040852/https://optuna.readthedocs.io/en/stable/reference/multi_objective/generated/optuna.multi_objective.study.create_study.html#optuna.multi_objective.study.create_study)):
 
-```
+```py
 import optuna
 def objective(trial):
     x = trial.suggest_float("x", 0, 5)

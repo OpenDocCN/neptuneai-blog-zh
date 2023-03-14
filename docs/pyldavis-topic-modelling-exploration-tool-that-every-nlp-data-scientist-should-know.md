@@ -16,7 +16,7 @@
 
 如果你输入模型数据，它会给你不同的单词集合，每一个单词集合都描述了主题。
 
-```
+```py
 (0, '0.024*"ban" + 0.017*"order" + 0.015*"refugee" + 0.015*"law" + 0.013*"trump" '
  '+ 0.011*"kill" + 0.011*"country" + 0.010*"attack" + 0.009*"state" + '
  '0.009*"immigration"')
@@ -45,7 +45,7 @@ PyLDAvis 允许我们解释如下主题模型中的主题:
 
 将 pyLDAvis 安装在:
 
-```
+```py
 pip install pyldavis
 ```
 
@@ -53,7 +53,7 @@ pip install pyldavis
 
 接下来，让我们导入相关的库:
 
-```
+```py
 import gensim
 import gensim.corpora as corpora
 from gensim.corpora import Dictionary
@@ -75,7 +75,7 @@ import pandas as pd
 
 如果您想访问上面的数据并阅读本文，请下载数据并将数据放在当前目录中，然后运行:
 
-```
+```py
 tweets = pd.read_csv('dp-export-8940.csv') 
 tweets = tweets.Tweets.values.tolist()
 
@@ -88,7 +88,7 @@ tweets = [t.split(',') for t in tweets]
 
 我们首先将一个单词集合转换成一个单词包，单词包是一个元组列表(word_id，word_frequency)。**gensim . corpora . dictionary**是一个很好的工具:
 
-```
+```py
 id2word = Dictionary(tweets)
 
 corpus = [id2word.doc2bow(text) for text in tweets]
@@ -99,7 +99,7 @@ print(corpus[:1])
 
 这些元组是什么意思？让我们将它们转换成人类可读的格式来理解:
 
-```
+```py
 [[(id2word[i], freq) for i, freq in doc] for doc in corpus[:1]]
 
 [[("'d", 1),
@@ -128,7 +128,7 @@ print(corpus[:1])
 
 现在让我们构建一个 LDA 主题模型。为此，我们将使用[gensim . models . LDA model . LDA model](https://web.archive.org/web/20221110095745/https://radimrehurek.com/gensim/models/ldamodel.html#gensim.models.ldamodel.LdaModel):
 
-```
+```py
 lda_model = LdaModel(corpus=corpus,
                    id2word=id2word,
                    num_topics=10, 
@@ -144,7 +144,7 @@ doc_lda = lda_model[corpus]
 
 这里好像有一些**模式**。第一个话题可能是政治，第二个话题可能是体育，但模式不清楚。
 
-```
+```py
 [(0,
  '0.017*"go" + 0.013*"think" + 0.013*"know" + 0.010*"time" + 0.010*"people" + '
  '0.008*"good" + 0.008*"thing" + 0.007*"feel" + 0.007*"need" + 0.007*"get"'),
@@ -186,7 +186,7 @@ doc_lda = lda_model[corpus]
 
 如果一个主题中的单词相似，我们的模型会更好，所以我们将使用主题连贯性来评估我们的模型。主题一致性通过测量主题中高分单词之间的语义相似度来评估单个主题。**好的模型会产生话题连贯性分数高的话题。**
 
-```
+```py
 coherence_model_lda = CoherenceModel(model=lda_model, texts=tweets, dictionary=id2word, coherence='c_v')
 coherence_lda = coherence_model_lda.get_coherence()
 print('\\nCoherence Score: ', coherence_lda)
@@ -199,7 +199,7 @@ Coherence Score:  0.3536443343685833
 
 让我们看看是否可以用 LDA Mallet 做得更好。
 
-```
+```py
 mallet_path = 'patt/to/mallet-2.0.8/bin/mallet' 
 ldamallet = gensim.models.wrappers.LdaMallet(mallet_path, corpus=corpus, num_topics=20, id2word=id2word)
 
@@ -214,7 +214,7 @@ Coherence Score:  0.38780981858635866
 
 **连贯性评分更好！**如果我们增加或减少题目数量，分数会更好吗？让我们通过微调模型来找出答案。[本教程](https://web.archive.org/web/20221110095745/https://www.machinelearningplus.com/nlp/topic-modeling-gensim-python/#16buildingldamalletmodel)很好地解释了如何调整 LDA 模型。下面是文章中的源代码:
 
-```
+```py
 def compute_coherence_values(dictionary, corpus, texts, limit, start=2, step=3):
     """
     Compute c_v coherence for various number of topics
@@ -256,7 +256,7 @@ plt.show()
 
 看起来**的连贯性分数随着话题**数量的增加而增加。我们将使用具有最高一致性分数的模型:
 
-```
+```py
 best_result_index = coherence_values.index(max(coherence_values))
 optimal_model = model_list[best_result_index]
 
@@ -271,7 +271,7 @@ of {coherence_values[best_result_index]}''')
 
 为了使用 pyLDAVis 可视化我们的模型，我们需要将 LDA Mallet 模型转换成 LDA 模型。
 
-```
+```py
 def convertldaGenToldaMallet(mallet_model):
     model_gensim = LdaModel(
         id2word=mallet_model.id2word, num_topics=mallet_model.num_topics,
@@ -286,7 +286,7 @@ optimal_model = convertldaGenToldaMallet(optimal_model)
 
 **您可以在这里** **访问调好的型号** [**。然后用 pyLDAvis 进行可视化:**](https://web.archive.org/web/20221110095745/https://github.com/khuyentran1401/Data-science/blob/master/data_science_tools/pyLDAvis/pyLDAvis.ipynb)
 
-```
+```py
 pyLDAvis.enable_notebook()
 p = pyLDAvis.gensim.prepare(optimal_model, corpus, id2word)
 p
@@ -331,7 +331,7 @@ Python 评估开发人员和数据科学家，喜欢尝试新的数据科学方�
 
 在本文中，我们将使用来自 Kaggle 的百万新闻标题数据集。如果您想一步一步地进行分析，您可能需要安装以下库:
 
-```
+```py
 pip install \
    pandas matplotlib numpy \
    nltk seaborn sklearn gensim pyldavis \
@@ -340,7 +340,7 @@ pip install \
 
 现在，我们可以看看数据。
 
-```
+```py
 news= pd.read_csv('data/abcnews-date-text.csv',nrows=10000)
 news.head(3)
 ```

@@ -163,7 +163,7 @@ A time series is a sequence of data points that are ordered in time. It is a ser
 
 除了使用 AWS web 控制台上传数据之外，还可以从 [AWS EC2](https://web.archive.org/web/20221206144902/https://aws.amazon.com/ec2/) 实例上传数据。基本上，使用 EC2 可以创建一个实例或虚拟机，我们可以从那里下载数据，并使用一个简单的命令直接复制到 S3 存储桶:
 
-```
+```py
 `python download-kline.py -s BTCUSDT -i 1h -startDate 2017-08-01 -endDate 2022-06-01`
 ```
 
@@ -173,7 +173,7 @@ A time series is a sequence of data points that are ordered in time. It is a ser
 
 ML 模型开发
 
-```
+```py
 `aws s3 cp LOCAL_DIRECTORY/ s3://BUCKET_NAME/DIRECTORY/ --recursive`
 ```
 
@@ -220,7 +220,7 @@ ML 模型开发
 
 在模型开发期间，我们将使用 [GitHub](https://web.archive.org/web/20221206144902/https://github.com/) 作为源代码管理工具。此外，基于一个项目及其需求，实现一些自动化测试是一个很好的实践。
 
-```
+```py
 def objective(self, trial):
 
     params = {
@@ -240,7 +240,7 @@ def objective(self, trial):
 
 作为自动化测试的一个例子，我们将创建一个简单的冒烟测试，使用 [GitHub actions](https://web.archive.org/web/20221206144902/https://github.com/features/actions) 运行整个项目。这是一个简单的自动化测试，检查我们的主要 python 脚本是否可以成功运行。
 
-```
+```py
 import optuna
 import neptune.new as neptune
 import neptune.new.integrations.optuna as optuna_utils
@@ -270,7 +270,7 @@ study.optimize(hb.objective, n_trials=n_trials, callbacks=[neptune_callback])
 
 操作->新建工作流->自行设置工作流:
 
-```
+```py
 def main():
 	pt = PaperTrader(config)
 	pt.execute_trade()
@@ -284,7 +284,7 @@ if __name__ == '__main__':
 
 ```
 
-```
+```py
 def log_in(self):
 
     	if self.debug:
@@ -513,7 +513,7 @@ GitHub 操作
 
 在这种情况下，这将自动记录元数据和结果的过程。同时，您还可以根据定义的指标，在不同的实验运行之间进行比较，如下一个屏幕截图所示。
 
-```
+```py
 import os
 aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
 
@@ -535,7 +535,7 @@ aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
 
 除了 Neptune 之外，还有一些更专用于 ML 监控的工具。例如， [Arize AI](https://web.archive.org/web/20221206144902/https://arize.com/) 通过帮助理解机器学习模型在现实世界中部署时的行为方式，使 ML 从业者能够更好地检测和诊断模型问题。
 
-```
+```py
 import neptune.new as neptune
 run = neptune.init(
         	project=os.environ.get('NEPTUNE_PROJECT'),
@@ -545,13 +545,13 @@ run = neptune.init(
 
 类似地， [WhyLabs](https://web.archive.org/web/20221206144902/https://whylabs.ai/) 是一个模型监控工具，帮助 ML 团队监控数据管道和 ML 应用程序。更多关于 ML 监控工具的信息可以在本文中找到:[做 ML 模型监控的最佳工具](/web/20221206144902/https://neptune.ai/blog/ml-model-monitoring-best-tools)。
 
-```
+```py
 fig = plt.figure(figsize =(4, 4))
 ```
 
 结论
 
-```
+```py
 run["static-img"].upload(neptune.types.File.as_image(fig))
 run["interactive-img"].upload(neptune.types.File.as_html(fig))
 
@@ -559,7 +559,7 @@ run["interactive-img"].upload(neptune.types.File.as_html(fig))
 
 在本教程中，我们介绍了一个简单的端到端 ML 时间序列项目，遵循 MLOps 实践。
 
-```
+```py
 run['data/results'].upload(neptune.types.File.as_html(df_results))
 ```
 

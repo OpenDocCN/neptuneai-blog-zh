@@ -43,7 +43,7 @@ AdaBoost 将一系列弱学习者与数据进行拟合。然后，它给不正�
 
 您可以使用 Scikit-learn 中的“AdaBoostClassifier”来实现 AdaBoost 模型以解决分类问题。正如您在下面看到的，基本估计器的参数可以根据您的喜好进行调整。分类器也接受您想要的估计数。这是模型所需的决策树数量。
 
-```
+```py
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 base_estimator=DecisionTreeClassifier(max_depth=1,criterion='gini', splitter='best', min_samples_split=2)
@@ -55,7 +55,7 @@ model.fit(X_train, y_train)
 
 将 AdaBoost 应用于回归问题类似于分类过程，只是做了一些表面上的改变。首先，您必须导入“AdaBoostRegressor”。然后，对于基本估计量，您可以使用“DecisionTreeRegressor”。就像上一个一样，你可以调整决策树回归器的参数。
 
-```
+```py
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import AdaBoostRegressor
 base_estimator = DecisionTreeRegressor(max_depth=1, splitter='best', min_samples_split=2)
@@ -82,7 +82,7 @@ model.fit(X_train, y_train)
 *   ` n_estimatorst '表示决策树的数量
 *   “最大深度”是每个估计器的最大深度
 
-```
+```py
 from sklearn.ensemble import GradientBoostingClassifier
 gbc = GradientBoostingClassifier(loss='deviance', learning_rate=0.1, n_estimators=100, subsample=1.0, criterion='friedman_mse', min_samples_split=2, min_samples_leaf=1)
 gbc.fit(X_train,y_train)
@@ -90,7 +90,7 @@ gbc.fit(X_train,y_train)
 
 拟合分类器后，您可以使用“feauture _ importances _”属性获得特征的重要性。这通常被称为基尼系数。
 
-```
+```py
 gbc.feature_importances_
 ```
 
@@ -111,7 +111,7 @@ Scikit-learn 梯度增强估计器可使用“GradientBoostingRegressor”实现
 
 …仅举几个例子。
 
-```
+```py
 from sklearn.ensemble import GradientBoostingRegressor
 params = {'n_estimators': 500,
           'max_depth': 4,
@@ -124,7 +124,7 @@ gbc.fit(X_train,y_train)
 
 像分类模型一样，您也可以获得回归算法的特征重要性。
 
-```
+```py
 gbc.feature_importances_
 ```
 
@@ -154,7 +154,7 @@ T2 的融合](/web/20230304041944/https://neptune.ai/blog/the-ultimate-guide-to-
 
 导入算法后，您可以定义想要使用的参数。因为这是一个分类问题，所以使用“二元:逻辑”目标函数。下一步是使用“XGBClassifier”并解包定义的参数。您可以调整这些参数，直到获得最适合您的问题的参数。
 
-```
+```py
 import xgboost as xgb
 params = {"objective":"binary:logistic",'colsample_bytree': 0.3,'learning_rate': 0.1,
                 'max_depth': 5, 'alpha': 10}
@@ -167,7 +167,7 @@ classification.fit(X_train, y_train)
 
 在回归中，使用“XGBRegressor”。在这种情况下，目标函数将是“reg:squarederror”。
 
-```
+```py
 import xgboost as xgb
 params = {"objective":"reg:squarederror",'colsample_bytree': 0.3,'learning_rate': 0.1,
                 'max_depth': 5, 'alpha': 10}
@@ -177,7 +177,7 @@ regressor.fit(X_train, y_train)
 
 XGBoost 模型还允许您通过“feature_importances_”属性获得特性的重要性。
 
-```
+```py
 regressor.feature_importances_
 ```
 
@@ -185,7 +185,7 @@ regressor.feature_importances_
 
 您可以使用 Matplotlib 轻松地将它们可视化。这是使用 XGBoost 中的“plot_importance”函数完成的。
 
-```
+```py
 import matplotlib.pyplot as plt
 xgb.plot_importance(regressor)
 plt.rcParams['figure.figsize'] = [5, 5]
@@ -194,7 +194,7 @@ plt.show()
 
 “保存模型”功能可用于保存您的模型。然后，您可以将这个模型发送到您的模型注册中心。
 
-```
+```py
 regressor.save_model("model.pkl")
 ```
 
@@ -227,7 +227,7 @@ regressor.save_model("model.pkl")
 
 数据集也被转换成 LightGBM 的“数据集”格式。然后使用“训练”功能完成模型训练。您还可以使用“valid_sets”参数传递验证数据集。
 
-```
+```py
 import lightgbm as lgb
 lgb_train = lgb.Dataset(X_train, y_train)
 lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
@@ -251,7 +251,7 @@ gbm = lgb.train(params,
 
 如果您愿意，您可以将其更改为随机森林，“dart ”-漏失符合多重加法回归树，或“Goss ”-基于梯度的单侧采样。
 
-```
+```py
 import lightgbm as lgb
 lgb_train = lgb.Dataset(X_train, y_train)
 lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
@@ -271,13 +271,13 @@ gbm = lgb.train(params,
 
 您还可以使用 LightGBM 来绘制模型的特征重要性。
 
-```
+```py
 lgb.plot_importance(gbm)
 ```
 
 LightGBM 还有一个用于保存模型的内置函数。该功能是“保存模型”。
 
-```
+```py
 gbm.save_model('mode.pkl')
 ```
 
@@ -318,7 +318,7 @@ gbm.save_model('mode.pkl')
 
 对于分类问题，使用“CatBoostClassifier”。在训练过程中设置“plot=True”将使模型可视化。
 
-```
+```py
 from catboost import CatBoostClassifier
 model = CatBoostClassifier()
 model.fit(X_train,y_train,verbose=False, plot=True)
@@ -328,7 +328,7 @@ model.fit(X_train,y_train,verbose=False, plot=True)
 
 在回归的情况下，使用“CatBoostRegressor”。
 
-```
+```py
 from catboost import CatBoostRegressor
 model = CatBoostRegressor()
 model.fit(X_train,y_train,verbose=False, plot=True)
@@ -336,7 +336,7 @@ model.fit(X_train,y_train,verbose=False, plot=True)
 
 您还可以使用“feature_importances_”来获得特性的重要性排名。
 
-```
+```py
 model.feature_importances_
 ```
 
@@ -346,7 +346,7 @@ model.feature_importances_
 
 通过“plot="True "”将使交叉验证过程可视化。“cv”函数要求数据集采用 CatBoost 的“Pool”格式。
 
-```
+```py
 from catboost import Pool, cv
 params = {"iterations": 100,
           "depth": 2,
@@ -364,7 +364,7 @@ scores = cv(cv_dataset,
 
 在此过程之前，您不应该拟合模型。传递“plot=True”参数将可视化网格搜索过程。
 
-```
+```py
 grid = {'learning_rate': [0.03, 0.1],
         'depth': [4, 6, 10],
         'l2_leaf_reg': [1, 3, 5, 7, 9]}
@@ -374,7 +374,7 @@ grid_search_result = model.grid_search(grid, X=X_train, y=y_train, plot=True)
 
 CatBoost 还使您能够可视化模型中的单棵树。这是通过使用“plot_tree”函数并传递您想要可视化的树的索引来完成的。
 
-```
+```py
 model.plot_tree(tree_idx=0)
 ```
 

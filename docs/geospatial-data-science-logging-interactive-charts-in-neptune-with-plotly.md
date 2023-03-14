@@ -135,20 +135,20 @@ r 和 Python 是流行的编程语言，因为它们为数据科学操作提供�
 
 **–地质公园**
 
-```
+```py
 pip install geopandas
 ```
 
 **–Plotly express**
 
-```
+```py
 pip install plotly-express
 
 ```
 
 **–海王星客户端**
 
-```
+```py
 pip install --upgrade --quiet neptune-client
 ```
 
@@ -156,19 +156,19 @@ pip install --upgrade --quiet neptune-client
 
 **–地质公园**
 
-```
+```py
 conda install geopandas
 ```
 
 **–Plotly express**
 
-```
+```py
 conda install -c plotly plotly_express 
 ```
 
 **–海王星客户端**
 
-```
+```py
  conda install -c conda-forge neptune-client
 ```
 
@@ -184,14 +184,14 @@ conda install -c plotly plotly_express
 
 在代码编辑器中，打开一个名为。env(注意前导点)并添加以下凭证:
 
-```
+```py
 API_KEY=<Your API key>
 
 ```
 
 出于安全目的，这一点很重要，因为你不应该将你的秘密硬编码到你的应用程序中。创建一个 gitignore 文件并添加一个. env 文件。
 
-```
+```py
 import neptune.new as neptune
 import os
 from dotenv import load_dotenv
@@ -212,7 +212,7 @@ run = neptune.init(project='codebrain/Geospatial-article',
 
 接下来，我们导入基本库并读取文件。要读入的文件格式都是 JSON。读取的数据框对应于卫生设施、行政边界和人口数据集。
 
-```
+```py
 import pandas as pd
 pd.set_option('display.max_columns', None)
 import geopandas as gpd
@@ -226,19 +226,19 @@ pop_df = gpd.read_file('../Datasets/NGA_population.json')
 
 了解每个数据集功能的概况是非常重要的。通过这种方式，您可以了解各种变量及其上下文含义和数据类型。
 
-```
+```py
 health_df.columns
 ```
 
 ![Geospatial data - dataset features ](img/e650b71e69c3aeb0dc09aea9bb38bb36.png)
 
-```
+```py
 Adminstrative_df.columns
 ```
 
 ![Geospatial data - dataset features ](img/d27b8c6ad787bc6c2263fc4878340103.png)
 
-```
+```py
 pop_df.columns
 ```
 
@@ -246,7 +246,7 @@ pop_df.columns
 
 让我们用与我们的分析相关的特征来清理各种数据框:
 
-```
+```py
 health_df = health_df[['latitude', 'longitude','functional_status','type', 'lga_name','state_name', 'geometry']]
 adminstrative_df = adminstrative_df[['lga_name','state_name','geometry']]
 pop_df = pop_df[['lganame','mean', 'statename','geometry']]
@@ -257,7 +257,7 @@ pop_df.drop('index', axis=1, inplace=True)
 
 就本指南而言，我们希望根据功能状态、每 100000 人口的医疗机构数量和医疗机构类型分布(一级、二级和三级)对医疗机构分布进行分析。因此，让我们从基础数据中创建这些特征:
 
-```
+```py
 health_pop = health_df.merge(pop_df, how='left', on='lga_name')
 health_pop.drop(columns=['statename','geometry_x'],axis=1, inplace=True)
 health_pop.rename(columns={'geometry_y':'geometry'}, inplace=True)
@@ -283,7 +283,7 @@ hosp_type_df.drop('index', axis=1, inplace=True)
 
 该图显示了基于坐标的点数据分布。这里的主要目标是根据卫生保健设施的功能状况绘制其分布图。
 
-```
+```py
 fig1 = px.scatter_mapbox(health_df, lat="latitude", lon="longitude", color="functional_status", hover_data=["type", "lga_name"],
                        zoom=8, height=300,
                       labels={'functional_status':'Functional status of Health Facilities'},
@@ -304,7 +304,7 @@ run['interactive__scatter_plot_img'] = neptune.types.File.as_html(fig1)
 
 这是一张由彩色多边形组成的地图。它用来表示一个量的空间变化。此处，目标是显示案例研究区域(在拉各斯被称为地方政府区域(LGAs ))的各个分区中每 100000 人口的医疗保健机构数量的分布。
 
-```
+```py
 import json
 
 f = open('/content/drive/MyDrive/Geospatial-article/Datasets/lga.geojson',)
@@ -338,7 +338,7 @@ run['interactive__chloropleth_map_img'] = neptune.types.File.as_html(fig2)
 *   2:二级保健设施
 *   3:三级保健设施
 
-```
+```py
 fig3 = px.density_mapbox(hosp_type_df, lat='latitude', lon='longitude', z='type', radius=10,
                        center={'lat': 6.5355, 'lon': 3.3087}, zoom=8.5,
                        labels={'type':'Health Facilities type'},
@@ -354,7 +354,7 @@ run['interactive__heatmap_map_img'] = neptune.types.File.as_html(fig3)
 
 有时为了在地图上进行分析，你可能需要在地图上画线，例如，解释距离或路线。这很容易做到，如下所示:
 
-```
+```py
 import plotly.graph_objects as go
 fig4 = go.Figure(go.Scattermapbox(
    mode = "markers+lines",
@@ -375,7 +375,7 @@ run['interactive__line_on_map_img'] = neptune.types.File.as_html(fig4)
 
 就像地图上的线条一样，有时我们希望隔离某些区域来进一步研究它们。根据所需隔离区域的坐标，这些隔离在形状(多边形)上可以有所不同。这种隔离可以按如下方式进行:
 
-```
+```py
 fig5 = go.Figure(go.Scattermapbox(
    fill = "toself",
    lon = [3.297806, 3.295470, 3.349685, 3.346413], lat = [6.539536,6.488922, 6.488922, 6.542322],

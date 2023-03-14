@@ -57,7 +57,7 @@ Brier 分数的数学公式取决于预测变量的类型。如果我们正在�
 
 **绘制多个模型的可靠性曲线使我们能够选择最佳模型，不仅基于其准确性，还基于其校准**。
 
-```
+```py
 import sklearn
 from sklearn.calibration import calibration_curve
 import matplotlib.lines as line
@@ -130,7 +130,7 @@ plt.show()
 
 **保序回归**
 
-```
+```py
 from sklearn.linear_model import LinearRegression
 
 model=LinearRegression()
@@ -151,7 +151,7 @@ calib_p=model.predict(p_test)[:,1]
 
 为了实现这种方法，我们将再次使用 sklearn(我们假设您已经构建并训练了您的“未校准模型”):
 
-```
+```py
 from sklearn.linear_model import IsotonicRegression
 
 model=IsotonicRegression()
@@ -170,7 +170,7 @@ calib_p=model.transform(p_test)
 
 我们刚刚创建了独特的随机数据，并将其分为训练集和测试集。
 
-```
+```py
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -183,7 +183,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
 
 **我们来预测一下结果:**
 
-```
+```py
 from sklearn.svm import SVC
 
 svc_model=SVC()
@@ -193,14 +193,14 @@ svc_model.fit(X_train, y_train)
 
 接下来，让我们绘制之前讨论过的校准曲线:
 
-```
+```py
 prob=svc_model.decision_function(X_test)
 
 ```
 
 **上面代码的结果是校准曲线或可靠性曲线:**
 
-```
+```py
 from sklearn.calibration import calibration_curve
 x_p, y_p=calibration_curve(y_test, prob, n_bins=10, normalize=’True’)
 plt.plot([0, 1], [0, 1])
@@ -215,7 +215,7 @@ plt.show()
 
 为此，我们得到 ROC AUC 分数等于 0.89(意味着良好的分类)和 Brief 分数等于 0.49。相当高！
 
-```
+```py
 from sklearn.metrics import brier_score_loss, roc_auc_score
 
 y_pred = svc_model.predict(X_test)
@@ -230,7 +230,7 @@ roc_auc_score(y_test, y_pred)
 
 **模型校准或校准后的可靠性曲线如下:**
 
-```
+```py
 from sklearn.calibration import CalibratedClassifierCV
 calib_model = CalibratedClassifierCV(svc_model, method='sigmoid', cv=5) calib_model.fit(X_train, y_train)
 prob = calib_model.predict_proba(X_test)[:, 1]
@@ -248,7 +248,7 @@ plt.show()
 
 Brier 评分在校准后下降(从 0.495 降至 0.35)，ROC AUC 评分增加，从 0.89 增至 0.91。
 
-```
+```py
 from sklearn.metrics import brier_score_loss, roc_auc_score
 
 y_pred = calib_model.predict(X_test)

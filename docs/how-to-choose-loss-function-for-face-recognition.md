@@ -38,7 +38,7 @@ softmax 损耗定义如下:
 
 ##### 代码示例
 
-```
+```py
 import tensorflow as tf
 
 def softmax_loss(y_true, W, b, x):
@@ -83,7 +83,7 @@ def softmax_loss(y_true, W, b, x):
 
 ##### 代码示例
 
-```
+```py
 import tensorflow as tf
 
 def circle_loss(W, b, lamda_center):
@@ -150,7 +150,7 @@ def circle_loss(W, b, lamda_center):
 
 ##### 大幅度余弦损失(又名余弦损失)
 
-```
+```py
 import tensorflow as tf
 
 def SphereFaceLoss(W, x, m):
@@ -201,7 +201,7 @@ def SphereFaceLoss(W, x, m):
 
 ##### 附加角裕度损失(又名弧面)
 
-```
+```py
 import tensorflow as tf
 
 def CosFaceLoss(W, m, s):
@@ -249,7 +249,7 @@ def CosFaceLoss(W, m, s):
 
 ##### 基于表征学习的损失函数
 
-```
+```py
 import tensorflow as tf
 
 def ArcFaceLoss(W, m):
@@ -310,7 +310,7 @@ def ArcFaceLoss(W, m):
 
 ##### 三重损失
 
-```
+```py
 import tensorflow as tf
 
 def contrastive_loss(m):
@@ -351,7 +351,7 @@ def contrastive_loss(m):
 
 ##### 圆形损失
 
-```
+```py
 import tensorflow as tf
 
 def triplet_loss(m):
@@ -399,7 +399,7 @@ def triplet_loss(m):
 
 *   没有明确的反面例子
 
-```
+```py
 import tensorflow as tf
 
 def circle_loss(s_pos, O_pos, s_neg, O_neg, gamma):
@@ -446,7 +446,7 @@ def circle_loss(s_pos, O_pos, s_neg, O_neg, gamma):
 
 ##### 背景/动机
 
-```
+```py
 import tensorflow as tf
 import tensorflow_probability as tfp
 
@@ -490,7 +490,7 @@ def barlow_twins_loss(lamda_bt):
 
 ##### 本文探讨的每种损失都有利弊。对于一个给定的问题，很难预测哪种损失效果最好。你需要在训练中进行大量的实验，以找到最适合你的情况的解决方案。
 
-```
+```py
 import tensorflow as tf
 
 def SimSiamLoss(p_1, p_2, z_1, z_2):
@@ -511,7 +511,7 @@ def SimSiamLoss(p_1, p_2, z_1, z_2):
 
 由于两种损失的函数形式不同，直接比较两种损失的绝对值意义不大(但它们的总体趋势可能会提供信息)。为了更好地比较性能，我们来看看结果的准确性。
 
-```
+```py
 import tensorflow as tf
 import neptune.new as neptune
 from neptune.new.integrations.tensorflow_keras import NeptuneCallback

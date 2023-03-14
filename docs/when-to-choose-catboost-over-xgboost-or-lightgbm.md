@@ -290,7 +290,7 @@ The percentage is metric difference measured against tuned CatBoost results | So
 
 导入已安装的库。
 
-```
+```py
 !pip install catboost
 !pip install xgboost
 !pip install lgb
@@ -299,7 +299,7 @@ The percentage is metric difference measured against tuned CatBoost results | So
 
 设置 Neptune 客户机来适当地记录项目的元数据。你可以在这里阅读更多相关信息[。](https://web.archive.org/web/20230219051826/https://docs.neptune.ai/setup/installation/)
 
-```
+```py
 import lightgbm as lgb
 import xgboost as xgb
 import catboost as cb
@@ -315,7 +315,7 @@ from sklearn.metrics import roc_auc_score
 
 数据预处理和争论操作可以在[参考笔记本](https://web.archive.org/web/20230219051826/https://github.com/codebrain001/Catboost-tutorial/blob/main/Catboost_vs_LightGBM_vs_XGBoost.ipynb)中找到。我们将使用 30%的数据作为测试集。
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init(project='<YOUR_WORKSPACE/YOUR_PROJECT>',
@@ -324,7 +324,7 @@ run = neptune.init(project='<YOUR_WORKSPACE/YOUR_PROJECT>',
 
 模型
 
-```
+```py
 X = data_df.drop(columns=['ARRIVAL_DELAY'])
 y = data_df['ARRIVAL_DELAY']
 
@@ -335,7 +335,7 @@ X_train, X_test,  y_train, y_test= train_test_split(X,y, random_state=2021, test
 
 现在转到模型执行函数，它接受四个主要参数:
 
-```
+```py
 def metrics(run, y_pred_test):
    score = roc_auc_score(y_test, y_pred_test)
    run['ROC AUC score'] = score
@@ -350,7 +350,7 @@ def metrics(run, y_pred_test):
 
 让我们在两种设置下运行相应模型的功能:
 
-```
+```py
 def run_model(run, model, description, key, cat_features=''):
  if key =='LGB':
 
@@ -408,7 +408,7 @@ def run_model(run, model, description, key, cat_features=''):
 
 ### 可以在 Neptune 仪表板上查看基于 LightGBM、XGBoost 和 CatBoost 算法的默认设置的比较分析。
 
-```
+```py
 model_lgb_def = lgb.LGBMClassifier()
 run_model(model_lgb_def,'Default LightGBM without categorical support', key='LGB')
 
@@ -467,7 +467,7 @@ n _ estimates:1000
 
 同样，基于调优设置的比较分析可以在 Neptune 仪表盘上查看。
 
-```
+```py
 params = {"max_depth": 7, "learning_rate" : 0.08, "num_leaves": 100,  "n_estimators": 1000}
 
 model_lgb_tun = lgb.LGBMClassifier(boosting_type='gbdt', objective='binary', metric='auc',**params)

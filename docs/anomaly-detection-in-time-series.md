@@ -72,7 +72,7 @@
 
 它适用于季节性时间序列，这也是最流行的时间序列数据类型。要生成 STL 分解图，我们只需使用令人惊叹的 *statsmodels* 来完成繁重的工作。
 
-```
+```py
 plt.rc('figure',figsize=(12,8))
 plt.rc('font',size=15)
 result = seasonal_decompose(lim_catfish_sales,model='additive')
@@ -85,7 +85,7 @@ fig = result.plot()
 
 如果我们分析**残差**的偏差并为其引入一些阈值，我们将得到一个异常检测算法。为了实现这一点，我们只需要来自分解的剩余数据。
 
-```
+```py
 plt.rc('figure',figsize=(12,6))
 plt.rc('font',size=15)
 fig, ax = plt.subplots()
@@ -127,7 +127,7 @@ plt.show()
 
 让我们一步一步来。首先，可视化时间序列数据:
 
-```
+```py
 plt.rc('figure',figsize=(12,6))
 plt.rc('font',size=15)
 catfish_sales.plot()
@@ -143,7 +143,7 @@ catfish_sales.plot()
 
 如何使用 [Neptune-sklearn 集成](https://web.archive.org/web/20220928190227/https://docs.neptune.ai/integrations-and-supported-tools/model-training/sklearn)跟踪您的分类器、回归器和 k 均值聚类结果
 
-```
+```py
 outliers_fraction = float(.01)
 scaler = StandardScaler()
 np_scaled = scaler.fit_transform(catfish_sales.values.reshape(-1, 1))
@@ -155,7 +155,7 @@ model.fit(data)
 
 最后，我们需要想象预测是怎样的。
 
-```
+```py
 catfish_sales['anomaly'] = model.predict(data)
 
 fig, ax = plt.subplots(figsize=(10,6))
@@ -208,13 +208,13 @@ plt.show();
 
 我们将利用与上述相同的异常数据。首先，让我们导入它并为环境做好准备:
 
-```
+```py
 from fbprophet import Prophet
 ```
 
 现在让我们定义预测函数。这里需要注意的一点是 *fbprophet* 将添加一些额外的指标作为特性，以便更好地识别异常。例如，预测的时间序列变量(通过模型)、目标时间序列变量的上限和下限以及趋势度量。
 
-```
+```py
 def fit_predict_model(dataframe, interval_width = 0.99, changepoint_range = 0.8):
    m = Prophet(daily_seasonality = False, yearly_seasonality = False, weekly_seasonality = False,
                seasonality_mode = 'additive',
@@ -230,7 +230,7 @@ pred = fit_predict_model(t)
 
 **我们现在必须将*预测*变量**推送到另一个函数，该函数将基于时间序列变量中的下限和上限阈值来检测异常。
 
-```
+```py
 def detect_anomalies(forecast):
    forecasted = forecast[['ds','trend', 'yhat', 'yhat_lower', 'yhat_upper', 'fact']].copy()
 forecasted['anomaly'] = 0
@@ -275,7 +275,7 @@ pred = detect_anomalies(pred)
 
 为了实现这一点，我们将使用 scikit-learn 的 K-means 实现。
 
-```
+```py
 data = df[['price_usd', 'srch_booking_window', 'srch_saturday_night_bool']]
 n_cluster = range(1, 20)
 kmeans = [KMeans(n_clusters=i).fit(data) for i in n_cluster]
@@ -294,7 +294,7 @@ plt.show();
 
 **现在我们需要找出**要保留的组件(特性)的数量。
 
-```
+```py
 data = df[['price_usd', 'srch_booking_window', 'srch_saturday_night_bool']]
 X = data.values
 X_std = StandardScaler().fit_transform(X)
@@ -334,7 +334,7 @@ plt.show();
 *   使用集群视图可视化异常。
 *   用时序视图可视化异常。
 
-```
+```py
 def getDistanceByPoint(data, model):
    distance = pd.Series()
    for i in range(0,len(data)):
@@ -359,7 +359,7 @@ plt.show();
 
 **现在，为了查看现实世界特征的异常**，我们处理上一步创建的数据帧。
 
-```
+```py
 df = df.sort_values('date_time')
 fig, ax = plt.subplots(figsize=(10,6))
 a = df.loc[df['anomaly1'] == 1, ['date_time', 'price_usd']] 
@@ -407,7 +407,7 @@ plt.show()
 
 对于数据部分，让我们使用 PyOD 的实用函数 generate_data()来生成 25 个变量、500 个观察值和 10%的异常值。
 
-```
+```py
 import numpy as np
 import pandas as pd
 from pyod.models.auto_encoder import AutoEncoder
@@ -426,7 +426,7 @@ X_test = pd.DataFrame(X_test)
 
 当您进行无监督学习时，标准化预测值总是一个安全的步骤，如下所示:
 
-```
+```py
 from sklearn.preprocessing import StandardScaler
 X_train = StandardScaler().fit_transform(X_train)
 X_train = pd.DataFrame(X_train)
@@ -436,7 +436,7 @@ X_test = pd.DataFrame(X_test)
 
 为了更好地理解数据的样子，让我们使用主成分分析法将数据降维，并相应地绘图。
 
-```
+```py
 from sklearn.decomposition import PCA
 pca = PCA(2)
 x_pca = pca.fit_transform(X_train)
@@ -460,7 +460,7 @@ plt.show()
 
 **步骤 1——构建您的模型**
 
-```
+```py
 clf = AutoEncoder(hidden_neurons =[25, 2, 2, 25])
 clf.fit(X_train)
 ```
@@ -469,7 +469,7 @@ clf.fit(X_train)
 
 让我们应用训练好的模型 *Clf* 来预测测试数据中每个观察值的异常分数。我们如何定义离群值？异常值是指远离其他点的点，因此异常值分数由距离定义。PyOD 函数。decision_function()计算每个数据点的距离或异常值。
 
-```
+```py
 y_train_scores = clf.decision_scores_
 
 y_test_scores = clf.decision_function(X_test)  
@@ -487,7 +487,7 @@ plt.show()
 
 让我们将那些异常分数低于 4.0 的观察值分配到聚类 0，将那些高于 4.0 的观察值分配到聚类 1。同样，让我们使用。groupby()。该模型已经识别了 50 个异常值(未示出)。
 
-```
+```py
 df_test = X_test.copy()
 df_test['score'] = y_test_scores
 df_test['cluster'] = np.where(df_test['score']<4, 0, 1)
@@ -537,14 +537,14 @@ df_test.groupby('cluster').mean()
 
 让我们实现同样的方法来获得一个清晰的图像。我们将使用与之前相同的鲶鱼销售数据。我们可以使用下面的脚本来调整**平均值**。
 
-```
+```py
 adjusted_data = lim_catfish_sales.copy()
 adjusted_data.loc[curr_anomaly] = december_data[(december_data.index != curr_anomaly) & (december_data.index < test_data.index[0])].mean()
 ```
 
 **绘制调整后的数据**和旧数据将如下所示:
 
-```
+```py
 plt.figure(figsize=(10,4))
 plt.plot(lim_catfish_sales, color='firebrick', alpha=0.4)
 plt.plot(adjusted_data)

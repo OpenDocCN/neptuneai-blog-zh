@@ -73,7 +73,7 @@
 
 让我们定义一个简单的 python 类来模拟这个游戏:
 
-```
+```py
 import random
 random.seed(0)
 class FairRoulette():
@@ -100,7 +100,7 @@ class FairRoulette():
 
 现在是一个把所有指令和规则放在一起的函数:
 
-```
+```py
 def playRoulette(game, numSpins, pocket, bet, toPrint):
    totalPocket = 0
    for i in range(numSpins):
@@ -117,7 +117,7 @@ def playRoulette(game, numSpins, pocket, bet, toPrint):
 
 现在让我们运行 100 次和 100 万次旋转。
 
-```
+```py
 game = FairRoulette()
 for numSpins in (100, 1000000):
    for i in range(3):
@@ -148,7 +148,7 @@ for numSpins in (100, 1000000):
 
 让我们模拟两者，并将其与公平轮盘模拟进行比较。
 
-```
+```py
 class EuRoulette(FairRoulette):
    def __init__(self):
        FairRoulette.__init__(self)
@@ -167,7 +167,7 @@ class AmRoulette(EuRoulette):
 
 我们只是继承了 FairRoulette 类，因为我们添加了额外的口袋，功能和属性保持不变。现在运行试验并保存回报的函数:
 
-```
+```py
 def findPocketReturn(game, numTrials, trialSize, toPrint):
    pocketReturns = []
    for t in range(numTrials):
@@ -179,7 +179,7 @@ def findPocketReturn(game, numTrials, trialSize, toPrint):
 
 为了进行比较，我们转动三个转盘，看每个转盘 20 次试验的平均回报。
 
-```
+```py
 numTrials = 20
 resultDict = {}
 games = (FairRoulette, EuRoulette, AmRoulette)

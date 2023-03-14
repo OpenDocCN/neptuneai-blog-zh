@@ -72,7 +72,7 @@ Vaswani 和团队在 2018 年推出的[变形金刚，为各种任务的深度�
 
 为了提高效率和便于导航，为项目创建目录结构总是一个好主意。
 
-```
+```py
 ViT Classification
 ├── notebooks
 │   └── ViT.ipynb
@@ -94,7 +94,7 @@ ViT Classification
 
 [配置文件](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/config.py)
 
-```
+```py
 class Config:
 
    IMG_SIZE = 32
@@ -145,7 +145,7 @@ class Config:
 
 [预处理. py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/preprocessing.py)
 
-```
+```py
 
 def Dataset(bs, crop_size, sample_size='full'):
       return train_data, valid_data, test_data
@@ -168,7 +168,7 @@ def Dataset(bs, crop_size, sample_size='full'):
 
 [embedding.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/embeddings.py)
 
-```
+```py
 class Embeddings(nn.Module):
 
    def __init__(self, img_size:int, hidden_size:int, in_channels:int):
@@ -199,7 +199,7 @@ class Embeddings(nn.Module):
 
 [attention.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/attention.py)
 
-```
+```py
 
 class Attention(nn.Module):
        return attention_output, weights
@@ -213,7 +213,7 @@ class Attention(nn.Module):
 
 [linear.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/linear.py)
 
-```
+```py
 
 class Mlp(nn.Module):
    def __init__(self, hidden_size, linear_dim, dropout_rate, std_norm):
@@ -234,7 +234,7 @@ class Mlp(nn.Module):
 
 [attention_block.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/attention_block.py)
 
-```
+```py
 
 class Block(nn.Module):
        return x, weights
@@ -245,7 +245,7 @@ class Block(nn.Module):
 
 现在让我们简单了解一下编码器。编码器本质上使我们能够创建多个注意块，给转换器更多对注意机制的控制。三个组件:编码器、变压器和 ViT 写在同一个模块中，即 [transformers.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/attention_block.py) 。
 
-```
+```py
 
 class Encoder(nn.Module):
        return encoded, attn_weights
@@ -255,7 +255,7 @@ class Encoder(nn.Module):
 
 组装好关注模块后，我们就可以对转换器进行编码了。注意块转换器是嵌入模块和编码器模块的组合。
 
-```
+```py
 class Transformer(nn.Module):
    def __init__(self, img_size, hidden_size, in_channels, num_layers,
                 num_attention_heads, linear_dim, dropout_rate, attention_dropout_rate,
@@ -277,7 +277,7 @@ class Transformer(nn.Module):
 
 最后，我们可以编码我们的视觉转换器，它包括两个组件:转换器和最终的线性层。最终的线性将帮助我们找到所有类别的概率分布。它可以被描述为:
 
-```
+```py
 class VisionTransformer(nn.Module):
    def __init__(self, img_size, num_classes, hidden_size, in_channels, num_layers,
                 num_attention_heads, linear_dim, dropout_rate, attention_dropout_rate,
@@ -307,7 +307,7 @@ class VisionTransformer(nn.Module):
 
 这是额外的小费。如果您想要查看模型的架构以及输入是如何操作的，那么使用下面的代码行。代码将为您生成一个完整的操作架构。
 
-```
+```py
 from torchviz import make_dot
 x = torch.randn(1,config.IN_CHANNELS*config.IMG_SIZE*config.IMG_SIZE)
 x = x.reshape(1,config.IN_CHANNELS,config.IMG_SIZE,config.IMG_SIZE)
@@ -329,7 +329,7 @@ make_dot(logits, params=dict(list(model.named_parameters()))).render("../metadat
 
 您可以稍后创建一个函数，从字典中删除不必要的属性。
 
-```
+```py
 def neptune_monitoring():
    PARAMS = {}
    for key, val in Config.__dict__.items():
@@ -344,7 +344,7 @@ def neptune_monitoring():
 
 [train.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/train.py)
 
-```
+```py
 def train_Engine(n_epochs, train_data, val_data, model, optimizer, loss_fn, device,
                 monitoring=True):
 
@@ -354,7 +354,7 @@ def train_Engine(n_epochs, train_data, val_data, model, optimizer, loss_fn, devi
 
 [train.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/train.py)
 
-```
+```py
 if __name__ == '__main__':
    from preprocessing import Dataset
    from config import Config
@@ -396,7 +396,7 @@ Neptune API 使您能够:
 
 如果您想在系统中记录您的元数据，那么导入 Neptune API 并调用 init 函数。接下来，输入为项目提供的 API 键，就可以开始了。在这里了解更多关于如何[开始使用 Neptune 的信息。另外，](https://web.archive.org/web/20221206144339/https://docs.neptune.ai/getting-started/installation)[这里是 Neptune 仪表板](https://web.archive.org/web/20221206144339/https://app.neptune.ai/nielspace/ViT-bird-classification/experiments?split=tbl&dash=charts&viewId=standard-view)，它有与这个项目相关的元数据。
 
-```
+```py
 run = neptune.init(project="nielspace/ViT-bird-classification",
 api_token="API_TOKEN")
 ```
@@ -442,14 +442,14 @@ api_token="API_TOKEN")
 
 [attention_viz.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/attention_viz.py) ( [来源](https://web.archive.org/web/20221206144339/https://github.com/jeonsworld/ViT-pytorch/blob/main/visualize_attention_map.ipynb))
 
-```
+```py
 def attention_viz(model, test_data, img_path=PATH, device='mps'):
 
 ```
 
 我们可以通过简单地调用 **attention_viz** 函数并传递相应的参数来运行这段代码。
 
-```
+```py
 if __name__ == '__main__':
    train_data, val_data, test_data = Dataset(config.BATCH_SIZE,config.IMG_SIZE, config.DATASET_SAMPLE)
    model = torch.load('metadata/models/model.pth', map_location=torch.device('cpu'))
@@ -466,7 +466,7 @@ if __name__ == '__main__':
 
 [test.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/test.py)
 
-```
+```py
 def test(model, test_data):
    return logits_, ground, confusion_matrix
 
@@ -480,7 +480,7 @@ def test(model, test_data):
 
 我们还可以生成精度和损失图，并将其存储在结果文件夹中。因此，我们可以使用 Sklearn 找到其他度量，但在此之前，我们必须将 tensors 数组转换为 NumPy 数组。
 
-```
+```py
 probs = torch.zeros(len(logits_))
 y_ = torch.zeros(len(ground))
 idx = 0
@@ -508,7 +508,7 @@ print(classification_report(y_, prob))
 
 [app.py](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/source/app.py)
 
-```
+```py
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -579,13 +579,13 @@ if file_up is not None:
 
 但是在部署之前，我们必须在本地进行测试。为了测试应用程序，我们将运行以下命令:
 
-```
+```py
 streamlit run app.py
 ```
 
 一旦执行了上述命令，您将得到以下提示:
 
-```
+```py
 You can now view your Streamlit app in your browser.
 
   Local URL: http://localhost:8501
@@ -606,7 +606,7 @@ You can now view your Streamlit app in your browser.
 
 随着 ViT 模型的训练和应用程序的准备，我们的目录结构应该看起来像这样:
 
-```
+```py
 .
 ├── README.md
 ├── metadata
@@ -643,7 +643,7 @@ You can now view your Streamlit app in your browser.
 
 首先，让我们格式化我们的 Python 脚本。为此，我们将使用黑色。Black 是一个 Python 脚本格式化程序。你所需要做的就是 pip 安装 black，然后运行 ***`black `*** 跟在 python 模块甚至整个目录的名字后面。对于这个项目，我运行 black，然后运行包含所有 python 模块的源目录。
 
-```
+```py
 ViT-Pytorch git:(main) black source
 Skipping .ipynb files as Jupyter dependencies are not installed.
 You can fix this by running ``pip install black[jupyter]``
@@ -697,7 +697,7 @@ requirements.txt 文件必须包含模型正在使用的所有库。有两种方
 
 该项目的 requirement.txt 文件如下所示:
 
-```
+```py
 numpy==1.22.3
 torch==1.12.0
 torchvision==0.12.0
@@ -714,7 +714,7 @@ neptune-client==0.16.3
 
 简而言之，Makefile 是一个命令提示符文件，它可以自动完成安装库和依赖项、运行 Python 脚本等等的整个过程。典型的 Makefile 如下所示:
 
-```
+```py
 setup:
    python3 -m venv ~/.visiontransformer
    source ~/.visiontransformer/bin/activate
@@ -751,7 +751,7 @@ all: install run
 
 [main.yml](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/Makefile)
 
-```
+```py
 name: Continuous Integration with Github Actions
 
 on:
@@ -829,7 +829,7 @@ jobs:
 
 激活云 shell 后，我们可以键入以下命令来创建 Kubernetes 集群:
 
-```
+```py
 gcloud container clusters create project-kube --zone "us-west1-b" --machine-type "n1-standard-1" --num-nodes "1"
 ```
 
@@ -851,7 +851,7 @@ yml 文件允许我们在云中部署模型。根据要求，部署可以是淡�
 
 [deployment.yml](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/kubernetes/deployment.yml)
 
-```
+```py
 
 apiVersion: apps/v1
 kind: Deployment
@@ -878,7 +878,7 @@ spec:
 
 [服务. yml](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/kubernetes/service.yml)
 
-```
+```py
 
 apiVersion: v1
 kind: Service
@@ -901,7 +901,7 @@ spec:
 
 [Dockerfile](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/Dockerfile)
 
-```
+```py
 FROM python:3.8.2-slim-buster
 
 RUN apt-get update
@@ -937,7 +937,7 @@ Dockerfile 包含一系列命令，这些命令:
 
 [云构建. yml](https://web.archive.org/web/20221206144339/https://github.com/Nielspace/ViT-Pytorch/blob/main/cloudbuild.yaml)
 
-```
+```py
 steps:
 - name: 'gcr.io/cloud-builders/docker'
  args: ['build', '-t', 'gcr.io/vision-transformer-pytorch/vit:v1', '.']
@@ -956,7 +956,7 @@ steps:
 
 创建文件后，整个项目的文件结构应该如下所示:
 
-```
+```py
 .
 ├── Dockerfile
 ├── .github/workflow/main.yml

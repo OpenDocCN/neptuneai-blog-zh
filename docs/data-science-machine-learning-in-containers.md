@@ -199,7 +199,7 @@ TensorFlow 在容器中的应用开发
 
 这类似于使用 Flask 或 Django 这样的框架来公开保存的模型，但 TensorFlow 服务更强大，是 MLOps 的更好选择，因为需要跟踪模型版本、代码分离和高效的模型服务。
 
-```
+```py
 import time
 from tensorflow.keras.models import load_model
 ts = int(time.time())
@@ -276,7 +276,7 @@ docker 合成文件将使用该文件来构建自定义服务图像。
 
 **PORT:** 这是 url 的服务器端口，对于 REST API，端口默认为 8501，如上面的架构所示。
 
-```
+```py
 tf_service_host = 'tf_model_serving'
 model_name = 'my_model'
 REST_API_port = '8501'
@@ -293,7 +293,7 @@ model_predict_url = 'http://'+tf_service_host+':'+REST_API_port+'/v1/models/'+mo
 
 然后，我们用关键字“prediction”从返回的 json 信息中获得预测。由于数据集中有 137 个类，我们可以使用 numpy argmax 函数获得准确的预测类，还可以获得模型预测置信度。这两个是作为 Python 元组返回的。
 
-```
+```py
 def model_predict(url,image):
     request_json = json.dumps({"signature_name": "serving_default", "instances": image.tolist()})
     request_headers = {"content-type": "application/json"}
@@ -313,7 +313,7 @@ GPU 和 Docker
 
 Docker 是一个很好的工具，可以为研究和实验创建容器化的机器学习和数据科学环境，但如果我们能够利用 GPU 加速(如果在主机上可用)来加速事情，尤其是深度学习，那就更好了。
 
-```
+```py
 predicted_classes = []
 for img in test_data:
     predicted_classes.append(model_predict(url = model_predict_url, image=np.expand_dims(img,0)))
@@ -332,7 +332,7 @@ This will return [(0, 0.75897634),
 
 GPU 加速计算的工作原理是将应用程序的计算密集型部分分配给 GPU，从而提供超级计算级别的并行性，绕过主流分析系统所采用的成本高昂的低级操作。
 
-```
+```py
 for pred_class,confidence_level in predicted_classes:
     print(f'predicted class= {Class_Name[pred_class]} with confidence level of {confidence_level}')
 With the output
@@ -370,7 +370,7 @@ GPU 支持包和软件
 
 ![](img/c3e8674f00fd30265d9a27397a94653f.png)
 
-```
+```py
 tf.config.experimental.list_physical_devices('GPU')
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
 

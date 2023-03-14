@@ -24,7 +24,7 @@ PIL 代表 Python 图像库。在本文中，我们将看看它的分叉:枕头�
 
 枕头可以通过 pip 安装。
 
-```
+```py
 pip install Pillow
 
 ```
@@ -43,7 +43,7 @@ pip install Pillow
 
 我们从 PIL 而不是枕头导入图像类，因为枕头是 PIL 叉子。因此，展望未来，你应该期待从 PIL 进口，而不是枕头。
 
-```
+```py
 from PIL import Image
 im = Image.open("peacock.png")
 ```
@@ -56,7 +56,7 @@ im = Image.open("peacock.png")
 
 下面是我们如何为上面导入的图像获取波段。
 
-```
+```py
 im.getbands()
 ('R', 'G', 'B')
 
@@ -73,7 +73,7 @@ im.getbands()
 
 下面是我们如何获取上面加载的图像的模式:
 
-```
+```py
 im.mode
 'RGB'
 
@@ -87,7 +87,7 @@ im.mode
 
 上面加载的图像非常大，所以我缩小了尺寸，以便在本文后面的部分更容易看到。
 
-```
+```py
 im.size
 (400, 600)
 
@@ -113,7 +113,7 @@ im.size
 
 为了演示如何使用 Pillow 读入图像字符串，我们将首先通过 [base64](https://web.archive.org/web/20220926102324/https://en.wikipedia.org/wiki/Base64) 将图像转换为字符串。
 
-```
+```py
 import base64
 
 with open("peacock.jpg", "rb") as image:
@@ -122,7 +122,7 @@ with open("peacock.jpg", "rb") as image:
 
 我们现在可以解码图像字符串，并使用 PIL 的`Image`类将其作为图像加载。
 
-```
+```py
 import io
 
 image = io.BytesIO(base64.b64decode(image_string))
@@ -137,7 +137,7 @@ Image.open(image)
 
 图像转换是通过读入图像并以新格式保存来实现的。这里是我们如何将孔雀 PNG 图像转换为 JPEG 格式。
 
-```
+```py
 im.save('peacock.jpg')
 ```
 
@@ -147,7 +147,7 @@ im.save('peacock.jpg')
 
 例如，为了获得图像的缩略图，可以缩小图像的尺寸。这可以通过定义缩略图的大小并将其传递给`thumbnail`图像函数来实现。
 
-```
+```py
 size = 128, 128
 im.thumbnail(size)
 im.save('thumb.png')
@@ -161,7 +161,7 @@ im.save('thumb.png')
 
 为了裁剪一个图像，我们首先定义一个框来指定我们想要裁剪的图像区域。接下来，我们将这个盒子传递给`Image`类的“crop”函数。
 
-```
+```py
 im = Image.open('peacock.jpg')
 box = (100, 150, 300, 300)
 cropped_image = im.crop(box)
@@ -173,7 +173,7 @@ cropped_image
 
 旋转图像是通过`Image`类的`rotate`函数完成的。
 
-```
+```py
 rotated = im.rotate(180)
 rotated
 ```
@@ -182,13 +182,13 @@ rotated
 
 该软件包还允许我们合并两个图像。让我们通过将一个徽标合并到孔雀图像中来说明这一点。我们从进口开始。
 
-```
+```py
 logo = Image.open('logo.png')
 ```
 
 现在让我们定义标志的位置，并合并两个图像。
 
-```
+```py
 position = (38, 469)
 im.paste(logo, position)
 im.save('merged.jpg')
@@ -196,13 +196,13 @@ im.save('merged.jpg')
 
 此操作将取代原始图像。所以，如果想保留原图，可以做一个拷贝。
 
-```
+```py
 image_copy = image.copy()
 ```
 
 现在，如果您使用 PNG 图像，您可以利用 Pillow 的遮罩功能来消除黑色背景。
 
-```
+```py
 im = Image.open("peacock.jpg")
 image_copy = im.copy()
 position = ((image_copy.width - logo.width), (image_copy.height - logo.height))
@@ -214,7 +214,7 @@ image_copy
 
 现在让我们看看如何翻转上面的图像。这是使用“翻转”方法完成的。一些翻转选项是`FLIP_TOP_BOTTOM`和`FLIP_LEFT_RIGHT`。
 
-```
+```py
 im.transpose(Image.FLIP_TOP_BOTTOM)
 ```
 
@@ -222,14 +222,14 @@ im.transpose(Image.FLIP_TOP_BOTTOM)
 
 Pillow 还允许我们将图像转换成 NumPy 数组。将图像转换为 NumPy 数组后，我们可以使用 PIL 读取它。
 
-```
+```py
 import numpy as np
 im_array = np.array(im)
 ```
 
 随着图像的转换，我们现在可以使用枕头加载它。这是使用 Pillow 的 Image 类的`fromarray`函数完成的。最后，我们使用 PIL `show`图像功能保存并显示图像。
 
-```
+```py
 img = Image.fromarray(im_array, 'RGB')
 img.save('image.png')
 img.show()
@@ -239,13 +239,13 @@ img.show()
 
 我们可以将彩色图像转换成黑白图像，反之亦然。这是通过 convert 函数并传递首选颜色格式来完成的。
 
-```
+```py
 im.convert('L')
 ```
 
 可以用类似的方式转换成彩色。
 
-```
+```py
 im.convert('RGBA')
 ```
 
@@ -253,20 +253,20 @@ im.convert('RGBA')
 
 我们马上就要结束了，在此之前让我们再看几个项目，包括图片上的[画](https://web.archive.org/web/20220926102324/https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html?highlight=Color%20Transformations)。Pillow 允许通过`ImageDraw`模块来完成，因此，我们从导入它开始。
 
-```
+```py
 from PIL import  ImageDraw
 ```
 
 我们将从定义一个大小为 400×400 的空白彩色图像开始。然后我们使用`ImageDraw`来绘制图像。
 
-```
+```py
 image = Image.new('RGB', (400, 400))
 img_draw = ImageDraw.Draw(image)
 ```
 
 现在我们可以使用`ImageDraw`对象在图像上绘制一个矩形。我们用白色填充它，给它一个红色的轮廓。使用相同的对象，我们可以在图像上写一些文字，如图所示。
 
-```
+```py
 img_draw.rectangle((100, 30, 300, 200), outline='red', fill='white')
 img_draw.text((150, 100), 'Neptune AI', fill='red')
 image.save('drawing.jpg')
@@ -278,13 +278,13 @@ Pillow 还附带了使我们能够执行图像增强的功能。这是一个提�
 
 我们从导入提供这些功能的模块开始。
 
-```
+```py
 from PIL import ImageEnhance
 ```
 
 例如，我们可以调整图像的锐度:
 
-```
+```py
 from PIL import ImageEnhance
 enhancer = ImageEnhance.Sharpness(im)
 enhancer.enhance(10.0)
@@ -292,7 +292,7 @@ enhancer.enhance(10.0)
 
 让我们再举一个例子，我们把图像的亮度加倍。
 
-```
+```py
 enhancer = ImageEnhance.Contrast(im)
 enhancer.enhance(2)
 ```
@@ -301,13 +301,13 @@ enhancer.enhance(2)
 
 我们可以用 Pillow 做的另一件超级酷的事情是给图像添加[滤镜](https://web.archive.org/web/20220926102324/https://pillow.readthedocs.io/en/stable/reference/ImageFilter.html?highlight=Filters#filters)。第一步是导入`ImageFilter`模块。
 
-```
+```py
 from PIL import ImageFilter
 ```
 
 例如，我们可以像这样模糊图像:
 
-```
+```py
 from PIL import ImageFilter
 im = Image.open("peacock.jpg")
 
@@ -317,25 +317,25 @@ im.filter(ImageFilter.BLUR)
 
 其他可用的过滤器包括:
 
-```
+```py
 im.filter(ImageFilter.CONTOUR)
 ```
 
-```
+```py
 im.filter(ImageFilter.DETAIL)
 
 ```
 
-```
+```py
 im.filter(ImageFilter.EDGE_ENHANCE)
 
 ```
 
-```
+```py
 im.filter(ImageFilter.EMBOSS)
 ```
 
-```
+```py
 im.filter(ImageFilter.FIND_EDGES)
 ```
 
@@ -343,13 +343,13 @@ im.filter(ImageFilter.FIND_EDGES)
 
 我们也可以加载图像序列，如 GIF 图像。先来导入[图像序列](https://web.archive.org/web/20220926102324/https://pillow.readthedocs.io/en/stable/reference/ImageSequence.html?highlight=image%20sequence)模块。
 
-```
+```py
 from PIL import ImageSequence
 ```
 
 接下来，我们将加载一个 GIF 文件，并将前两帧保存为 PNG 文件。因为帧太多，我们中断了循环。
 
-```
+```py
 im = Image.open("embeddings.GIF")
 
 frame_num = 1

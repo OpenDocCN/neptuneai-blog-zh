@@ -64,7 +64,7 @@ NLP 可以执行许多不同的任务，但是有一组基本任务在各种 NLP
 
  *可以用 NLTK 执行的一些任务的例子包括标记化、标记、词干化、词汇化、解析、分类等等。看看下面来自 [NLTK 文档](https://web.archive.org/web/20221206133311/https://www.nltk.org/)的代码片段。
 
-```
+```py
 import nltk
 
 sentence = """At eight o'clock on Thursday morning Arthur didn't feel very good."""
@@ -104,7 +104,7 @@ SpaCy 的首次发布是在 2015 年 2 月，使其成为 Python 自然语言处
 
 下面是 SpaCy 文档中 SpaCy 功能的一个例子。
 
-```
+```py
 import spacy
 
 nlp = spacy.load("en_core_web_sm")
@@ -151,7 +151,7 @@ Gensim 是一个专门的开源 Python 框架，用于以最有效、最轻松�
 
 下面是 Gensim [Word2Vec 教程](https://web.archive.org/web/20221206133311/https://radimrehurek.com/gensim/auto_examples/tutorials/run_word2vec.html#sphx-glr-auto-examples-tutorials-run-word2vec-py)文档页面上的一些代码示例。
 
-```
+```py
 import gensim.downloader as api
 wv = api.load('word2vec-google-news-300')
 
@@ -173,7 +173,7 @@ for index, word in enumerate(wv.index2entity):
 
 ```
 
-```
+```py
 pairs = [
     ('car', 'minivan'),   
     ('car', 'bicycle'),   
@@ -200,7 +200,7 @@ for w1, w2 in pairs:
 
 下面你可以看到如何使用这两个框架建立一个 LSTM 模型。首先是 tensor flow——完整的源代码，请访问 [Christian Versloot 机器曲线博客。](https://web.archive.org/web/20221206133311/https://www.machinecurve.com/index.php/2021/01/07/build-an-lstm-model-with-tensorflow-and-keras/)
 
-```
+```py
 import tensorflow as tf
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.layers import Embedding, Dense, LSTM
@@ -248,7 +248,7 @@ print(f'Test results - Loss: {test_results[0]} - Accuracy: {100*test_results[1]}
 
 这是 PyTorch 中的一个 LSTM——要获得完整的运行和源代码，请访问 PyTorch 文档中的[序列模型教程](https://web.archive.org/web/20221206133311/https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html)。
 
-```
+```py
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -342,7 +342,7 @@ tensor([[-0.0462, -4.0106, -3.6096],
 
 下面是一个用于情感分析的拥抱脸管道的例子——你可以在[文档](https://web.archive.org/web/20221206133311/https://huggingface.co/transformers/quicktour.html)中读到更多相关信息。
 
-```
+```py
 from transformers import pipeline
 
 clf = pipeline("sentiment-analysis")

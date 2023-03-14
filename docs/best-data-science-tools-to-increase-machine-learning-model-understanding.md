@@ -14,7 +14,7 @@
 
 要使用 Streamlit，您只需使用以下命令将它与 pip 一起安装:
 
-```
+```py
 pip install streamlit
 ```
 
@@ -28,7 +28,7 @@ Flask 有一个简单的架构，你可以非常容易地学习它。强烈建�
 
 要开始使用 Flask，请设置虚拟环境，并使用以下命令安装它:
 
-```
+```py
 pip install flask
 ```
 
@@ -40,7 +40,7 @@ Shiny 是一个用于构建交互式 web 应用程序的 R 包。如果你已经
 
 要开始使用 Shiny，请使用以下命令:
 
-```
+```py
 install.packages("shiny")
 ```
 
@@ -54,7 +54,7 @@ DABL 代表数据分析基线库。您可以使用它来自动化在模型开发
 
 要开始使用 DABL，请使用以下命令:
 
-```
+```py
 pip install dabl
 ```
 

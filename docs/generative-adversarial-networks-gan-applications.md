@@ -249,7 +249,7 @@ GAN 的实现
 
 ### 氮化镓的应用
 
-```
+```py
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers.core import Dense, Dropout
@@ -260,7 +260,7 @@ from tensorflow.keras import initializers
 from tensorflow.keras.layers import Activation, Dense
 ```
 
-```
+```py
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
 X_train = (X_train.astype(np.float32) - 127.5)/127.5
@@ -279,7 +279,7 @@ gan 有许多实际应用，其中一些是:
 
 ![Vanilla GAN output](img/52957a171d09c7bb66ac57e73590d8a4.png)
 
-```
+```py
 def get_optimizer():
     return Adam(lr=0.0002, beta_1=0.5)
 

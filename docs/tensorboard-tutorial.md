@@ -25,7 +25,7 @@
 
 在开始使用 TensorBoard 之前，您必须通过 pip 或 conda 安装它
 
-```
+```py
 pip install tensorboard
 conda install -c conda-forge tensorboard
 ```
@@ -34,37 +34,37 @@ conda install -c conda-forge tensorboard
 
 安装 TensorBoard 后，您现在可以将它加载到您的笔记本中。请注意，你可以在 **Jupyter 笔记本**或**谷歌的 Colab** 中使用它。
 
-```
+```py
 %load_ext tensorboard
 ```
 
 一旦完成，你必须设置一个**日志目录**。这是 TensorBoard 存放所有日志的地方。它将从这些日志中读取数据，以显示各种可视化效果。
 
-```
+```py
 log_folder = 'logs'
 ```
 
 如果你想重新加载 **TensorBoard 扩展**，下面的命令将会变魔术——没有双关语。
 
-```
+```py
 %reload_ext tensorboard
 ```
 
 您可能希望清除当前日志，以便可以将新日志写入该文件夹。你可以通过在 **Google Colab** 上运行这个命令来实现
 
-```
+```py
 !rm -rf /logs/
 ```
 
 在 Jupyter 笔记本上
 
-```
+```py
 rm -rf logs
 ```
 
 如果您正在运行多个**实验**，您可能想要存储所有日志，以便您可以比较它们的结果。这可以通过创建带有时间戳的**日志**来实现。为此，请使用下面的命令:
 
-```
+```py
 import datetime
 log_folder = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 ```
@@ -75,7 +75,7 @@ log_folder = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 现在让我们看一个例子，在这个例子中，您将使用 TensorBoard 来可视化模型指标。为此，您需要构建一个简单的图像分类模型。
 
-```
+```py
 import tensorflow as tf
 
 mnist = tf.keras.datasets.mnist
@@ -95,7 +95,7 @@ model.compile(optimizer='sgd',
 
 接下来，加载 **TensorBoard 笔记本扩展**并创建一个指向**日志文件夹**的变量。
 
-```
+```py
 %load_ext tensorboard
 log_folder = 'logs'
 ```
@@ -106,7 +106,7 @@ log_folder = 'logs'
 
 该回调负责记录事件，例如**激活直方图、** **度量概要图**、**剖析图**和**训练图可视化图**。
 
-```
+```py
 from tensorflow.keras.callbacks import TensorBoard
 ```
 
@@ -119,7 +119,7 @@ from tensorflow.keras.callbacks import TensorBoard
 *   **profile_batch** 决定要评测哪些批次。默认情况下，会分析第二批。例如，您也可以设置为从 5 到 10，以分析批次 5 到 10，即 profile_batch='5，10 '。将 profile_batch 设置为 0 将禁用分析。
 *   **embeddings_freq** 嵌入层可视化的频率。将此项设置为零意味着嵌入不会被可视化
 
-```
+```py
 callbacks = [TensorBoard(log_dir=log_folder,
                          histogram_freq=1,
                          write_graph=True,
@@ -131,7 +131,7 @@ callbacks = [TensorBoard(log_dir=log_folder,
 
 下一项是拟合模型并传入**回调**。
 
-```
+```py
 model.fit(X_train, y_train,
           epochs=10,
           validation_split=0.2,
@@ -142,19 +142,19 @@ model.fit(X_train, y_train,
 
 如果您通过 pip 安装了 TensorBoard，您可以通过命令行启动它
 
-```
+```py
 tensorboard -- logdir=log
 ```
 
 在笔记本电脑上，您可以使用以下方式启动它:
 
-```
+```py
 %tensorboard -- logdir={log_folder}
 ```
 
 TensorBoard 也可通过以下网址通过**浏览器**获得
 
-```
+```py
 http://localhost:6006
 ```
 
@@ -162,7 +162,7 @@ http://localhost:6006
 
 在远程服务器上工作时，可以使用 SSH 隧道将远程服务器的端口转发到本地机器的端口(在本例中是端口 6006)。这看起来是这样的:
 
-```
+```py
 ssh -L 6006:127.0.0.1:6006 your_user_name@my_server_ip
 ```
 
@@ -170,7 +170,7 @@ ssh -L 6006:127.0.0.1:6006 your_user_name@my_server_ip
 
 请记住，您在 tensorboard 命令中指定的端口(默认为 6006)应该与 ssh 隧道中的端口相同。
 
-```
+```py
 tensorboard --logdir=/tmp  --port=6006
 ```
 
@@ -212,13 +212,13 @@ tensorboard --logdir=/tmp  --port=6006
 
 现在，为图像创建一个新的日志目录，如下所示。
 
-```
+```py
 logdir = "logs/train_data/"
 ```
 
 下一步是创建一个**文件写入器**，并将其指向这个目录。
 
-```
+```py
 file_writer = tf.summary.create_file_writer(logdir)
 ```
 
@@ -226,7 +226,7 @@ file_writer = tf.summary.create_file_writer(logdir)
 
 在本例中，索引为 10 到 30 的图像将被写入 TensorBoard。
 
-```
+```py
 import numpy as np
 
 with file_writer.as_default():
@@ -240,11 +240,11 @@ with file_writer.as_default():
 
 从清除日志开始，或者您可以使用带有时间戳的日志文件夹。之后，指定日志目录并创建一个“tf.summary.create_file_writer ”,用于将图像写入 TensorBoard
 
-```
+```py
 !rm -rf logs 
 ```
 
-```
+```py
 import io
 import matplotlib.pyplot as plt
 
@@ -255,7 +255,7 @@ file_writer = tf.summary.create_file_writer(logdir)
 
 接下来，创建一个包含图像的网格。在这种情况下，网格将容纳 36 位数字。
 
-```
+```py
 def image_grid():
     figure = plt.figure(figsize=(12,8))
 
@@ -274,7 +274,7 @@ figure = image_grid()
 
 现在将这些数字转换成一个单独的图像，在张量板上可视化。
 
-```
+```py
 def plot_to_image(figure):
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
@@ -289,13 +289,13 @@ def plot_to_image(figure):
 
 下一步是使用 writer 和‘plot _ to _ image’在 TensorBoard 上显示图像。
 
-```
+```py
 with file_writer.as_default():
     tf.summary.image("MNIST Digits", plot_to_image(figure), step=0)
 
 ```
 
-```
+```py
 %tensorboard -- logdir logs/plots
 ```
 
@@ -303,7 +303,7 @@ with file_writer.as_default():
 
 使用相同的示例，您可以记录所有时期的混淆矩阵。首先，定义一个函数，该函数将返回一个 Matplotlib 图，其中保存着**混淆矩阵**。
 
-```
+```py
 import itertools
 
 def plot_confusion_matrix(cm, class_names):
@@ -331,11 +331,11 @@ def plot_confusion_matrix(cm, class_names):
 
 接下来，清除以前的日志，为混淆矩阵定义日志目录，并创建一个写入日志文件夹的 writer 变量。
 
-```
+```py
 !rm -rf logs
 ```
 
-```
+```py
 logdir = "logs"
 file_writer_cm = tf.summary.create_file_writer(logdir)
 ```
@@ -344,7 +344,7 @@ file_writer_cm = tf.summary.create_file_writer(logdir)
 
 之后，使用“文件写入器 cm”将混淆矩阵写入日志目录。
 
-```
+```py
 from tensorflow import keras
 from sklearn import metrics
 
@@ -366,7 +366,7 @@ def log_confusion_matrix(epoch, logs):
 
 由于您之前已经拟合了模型，建议您重新启动运行时，并确保只拟合一次模型。
 
-```
+```py
 callbacks = [
    TensorBoard(log_dir=log_folder,
                histogram_freq=1,
@@ -386,7 +386,7 @@ model.fit(X_train, y_train,
 
 现在运行 TensorBoard 并检查**图像**选项卡上的混淆矩阵。
 
-```
+```py
 %tensorboard -- logdir logs
 ```
 
@@ -398,11 +398,11 @@ model.fit(X_train, y_train,
 
 为此，您必须清除以前的日志并导入 hparams 插件。
 
-```
+```py
 !rm -rvf logs
 ```
 
-```
+```py
 logdir = "logs"
 
 from tensorboard.plugins.hparams import api as hp
@@ -410,7 +410,7 @@ from tensorboard.plugins.hparams import api as hp
 
 下一步是定义要调整的参数。在这种情况下，密集层中的单位、辍学率和优化器函数将被调整。
 
-```
+```py
 HP_NUM_UNITS = hp.HParam('num_units', hp.Discrete([300, 200,512]))
 HP_DROPOUT = hp.HParam('dropout', hp.RealInterval(0.1,0.5))
 HP_OPTIMIZER = hp.HParam('optimizer', hp.Discrete(['adam', 'sgd', 'rmsprop']))
@@ -419,7 +419,7 @@ HP_OPTIMIZER = hp.HParam('optimizer', hp.Discrete(['adam', 'sgd', 'rmsprop']))
 
 接下来，使用 tf.summary.create_file_writer 定义存储日志的文件夹。
 
-```
+```py
 METRIC_ACCURACY = 'accuracy'
 
 with tf.summary.create_file_writer('logs/hparam_tuning').as_default():
@@ -432,7 +432,7 @@ with tf.summary.create_file_writer('logs/hparam_tuning').as_default():
 
 这将在稍后运行实验时使用的函数中完成。
 
-```
+```py
 def create_model(hparams):
     model = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
@@ -452,7 +452,7 @@ def create_model(hparams):
 
 您需要创建的下一个函数将使用前面定义的参数运行上面的函数。然后它会记录精确度。
 
-```
+```py
 def experiment(experiment_dir, hparams):
 
     with tf.summary.create_file_writer(experiment_dir).as_default():
@@ -463,7 +463,7 @@ def experiment(experiment_dir, hparams):
 
 之后，您需要对上面定义的所有参数组合运行该函数。每个实验都将存储在自己的文件夹中。
 
-```
+```py
 experiment_no = 0
 
 for num_units in HP_NUM_UNITS.domain.values:
@@ -483,7 +483,7 @@ for num_units in HP_NUM_UNITS.domain.values:
 
 最后，运行 TensorBoard 来查看您在本节开始时看到的可视化效果。
 
-```
+```py
 %tensorboard -- logdir logs/hparam_tuning
 ```
 
@@ -497,7 +497,7 @@ for num_units in HP_NUM_UNITS.domain.values:
 
 您还可以使用 **[分析器](https://web.archive.org/web/20221207172226/https://www.tensorflow.org/tensorboard/tensorboard_profiling_keras)** 跟踪 TensorFlow 模型的性能。分析对于理解 TensorFlow 操作的硬件资源消耗至关重要。在此之前，您必须安装 profiler 插件。
 
-```
+```py
 pip install -U tensorboard-plugin-profile
 ```
 
@@ -507,7 +507,7 @@ pip install -U tensorboard-plugin-profile
 
 之后，当你符合模型时，你通过回调。别忘了给 TensorBoard 打电话，这样你就可以看到可视化效果。
 
-```
+```py
 callbacks = [tf.keras.callbacks.TensorBoard(log_dir=log_folder,
                                             profile_batch='10,20')]
 
@@ -517,7 +517,7 @@ model.fit(X_train, y_train,
           callbacks=callbacks)
 ```
 
-```
+```py
 %tensorboard --logdir=logs
 ```
 
@@ -608,7 +608,7 @@ model.fit(X_train, y_train,
 
 您也可以将[调试](https://web.archive.org/web/20221207172226/https://www.tensorflow.org/tensorboard/debugger_v2)信息转储到您的 TensorBoard。要做到这一点，你必须启用调试——它仍然处于实验模式
 
-```
+```py
 tf.debugging.experimental.enable_dump_debug_info(
    logdir,
    tensor_debug_mode="FULL_HEALTH",
@@ -629,7 +629,7 @@ tf.debugging.experimental.enable_dump_debug_info(
 
 您首先通过[定义一个 writer](https://web.archive.org/web/20221207172226/https://pytorch.org/tutorials/recipes/recipes/tensorboard_with_pytorch.html) 来指向您想要写入日志的文件夹。
 
-```
+```py
 from torch.utils.tensorboard import SummaryWriter
 
 writer = SummaryWriter(log_dir='logs')
@@ -637,7 +637,7 @@ writer = SummaryWriter(log_dir='logs')
 
 下一步是使用 summary writer 添加您希望在 TensorBoard 上看到的项目。
 
-```
+```py
 from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 
@@ -654,7 +654,7 @@ for n_iter in range(100):
 
 创建回拨:
 
-```
+```py
 from tensorflow.keras.callbacks import TensorBoard
 
 tb_callback = TensorBoard(log_dir=log_folder,...)
@@ -662,7 +662,7 @@ tb_callback = TensorBoard(log_dir=log_folder,...)
 
 将它传递给“model.fit ”:
 
-```
+```py
 model.fit(X_train, y_train,
           epochs=10,
           validation_split=0.2,
@@ -673,7 +673,7 @@ model.fit(X_train, y_train,
 
 使用 XGBoost 时，还可以将事件记录到 TensorBoard。为此需要使用 [tensorboardX](https://web.archive.org/web/20221207172226/https://github.com/lanpa/tensorboardX) 包。例如，要记录度量和损失，您可以使用“SummaryWriter”和日志标量。
 
-```
+```py
 from tensorboardX import SummaryWriter
 
 def TensorBoardCallback():
@@ -692,7 +692,7 @@ xgb.train(callbacks=[TensorBoardCallback()])
 
 Tensorboard.dev 是一个托管的 Tensorboard 平台，可以轻松托管、跟踪和共享 ML 实验。它允许人们发布他们的 TensorBoard 实验，排除故障以及与团队成员合作。一旦你有了一个 TensorBoard 实验，把它上传到 TensorBoard.dev 是非常简单的。
 
-```
+```py
 tensorboard dev upload --logdir logs
     --name "(optional) My latest experiment"
     --description "(optional) Simple comparison of several      hyperparameters"

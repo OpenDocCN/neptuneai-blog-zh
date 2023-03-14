@@ -61,14 +61,14 @@
 
 在终端/命令提示符下，键入:
 
-```
+```py
 pip3 list
 
 ```
 
 查看您已经安装在计算机上的 python 包。然后安装缺失的软件包:
 
-```
+```py
 pip3 install numpy matplotlib keras numpy pillow
 
 ```
@@ -79,7 +79,7 @@ pip3 install numpy matplotlib keras numpy pillow
 
 创建一个名为`data-aug-sample`的文件夹。在里面，创建一个名为 sample.py 的 python 文件，然后从网上下载一张狗的样本照片，并将其作为 dog.jpg 保存在这个文件夹中。然后像这样导入库:
 
-```
+```py
 import matplotlib.pyplot as plt 
 from keras.preprocessing.image import ImageDataGenerator 
 from numpy import expand_dims
@@ -110,7 +110,7 @@ plt.show()
 
 旋转变换在 1 到 359 之间的轴上从右向左旋转图像。在下面的例子中，我们将狗的图像旋转了 90 度。Keras `ImageDataGenerator`类允许我们为此传递一个`rotation_range`参数:
 
-```
+```py
 import matplotlib.pyplot as plt 
 from keras.preprocessing.image import ImageDataGenerator 
 from numpy import expand_dims
@@ -143,7 +143,7 @@ plt.show()
 
 将**垂直移动**变换应用到我们的狗图像:
 
-```
+```py
 from numpy import expand_dims
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
@@ -169,7 +169,7 @@ plt.show()
 
 将**水平移动**变换应用到我们的狗图像:
 
-```
+```py
 from numpy import expand_dims
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
@@ -197,7 +197,7 @@ plt.show()
 
 在这里，我们将应用我们的狗图像的颜色通道空间的转换。这里发生的事情是，它隔离了一个单一的颜色通道(R，G 或 B ),结果是图像的一个明亮或黑暗的版本。通过简单地在`ImageDataGenerator`类中指定`brightness_range`值(通常是一个元组或两个浮点数的列表),我们可以设置亮度偏移值进行选择。
 
-```
+```py
 from numpy import expand_dims
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
@@ -225,7 +225,7 @@ plt.show()
 
 顾名思义，我们可以通过简单地传入`ImageDataGenerator`类的`zoom_range`属性，对我们的狗图像应用变换来获得图像的放大/缩小版本。
 
-```
+```py
 from numpy import expand_dims
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
@@ -253,7 +253,7 @@ plt.show()
 
 应用翻转变换允许我们通过`setting vertical_flip=True`或`horizontal_flip=True`水平或垂直改变图像的方向。
 
-```
+```py
 from numpy import expand_dims
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array

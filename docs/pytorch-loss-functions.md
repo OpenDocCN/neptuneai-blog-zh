@@ -40,14 +40,14 @@ PyTorch 的 **torch.nn** 模块有多个标准损失函数，你可以在你的�
 
 要添加它们，您需要首先导入库:
 
-```
+```py
 import torch
 import torch.nn as nn
 ```
 
 接下来，定义您想要使用的损失类型。以下是定义平均绝对误差损失函数的方法:
 
-```
+```py
 loss = nn.L1Loss()
 ```
 
@@ -67,7 +67,7 @@ loss = nn.L1Loss()
 
 ### 1.PyTorch 平均绝对误差(L1 损失函数)
 
-```
+```py
 torch.nn.L1Loss
 
 ```
@@ -86,7 +86,7 @@ Pytorch L1 损失表示为:
 
 **例子**
 
-```
+```py
 import torch
 import torch.nn as nn
 
@@ -102,7 +102,7 @@ print('target: ', target)
 print('output: ', output)
 ```
 
-```
+```py
 ###################### OUTPUT ######################
 
 input:  tensor([[ 0.2423,  2.0117, -0.0648, -0.0672, -0.1567],
@@ -116,7 +116,7 @@ output:  tensor(1.2850, grad_fn=<L1LossBackward>)
 
 ### 2.PyTorch 均方误差损失函数
 
-```
+```py
 torch.nn.MSELoss
 
 ```
@@ -137,7 +137,7 @@ Pytorch L2 损失表示为:
 
 **例子**
 
-```
+```py
 import torch
 import torch.nn as nn
 
@@ -153,7 +153,7 @@ print('output: ', output)
 
 ```
 
-```
+```py
 ###################### OUTPUT ######################
 
 input:  tensor([[ 0.3177,  1.1312, -0.8966, -0.0772,  2.2488],
@@ -167,7 +167,7 @@ output:  tensor(2.3280, grad_fn=<MseLossBackward>)
 
 ### 3.PyTorch 负对数似然损失函数
 
-```
+```py
 torch.nn.NLLLoss
 
 ```
@@ -196,7 +196,7 @@ Pytorch NLL 损失表示为:
 
 **例子**
 
-```
+```py
 import torch
 import torch.nn as nn
 
@@ -214,7 +214,7 @@ print('target: ', target)
 print('output: ', output)
 ```
 
-```
+```py
 
 input:  tensor([[ 1.6430, -1.1819,  0.8667, -0.5352,  0.2585],
         [ 0.8617, -0.1880, -0.3865,  0.7368, -0.5482],
@@ -225,7 +225,7 @@ output:  tensor(2.9472, grad_fn=<NllLossBackward>)
 
 ### 4.PyTorch 交叉熵损失函数
 
-```
+```py
 torch.nn.CrossEntropyLoss
 
 ```
@@ -251,7 +251,7 @@ Pytorch 交叉熵损失表示为:
 
 **例子**
 
-```
+```py
 import torch
 import torch.nn as nn
 
@@ -267,7 +267,7 @@ print('target: ', target)
 print('output: ', output)
 ```
 
-```
+```py
 
 input:  tensor([[ 0.1639, -1.2095,  0.0496,  1.1746,  0.9474],
         [ 1.0429,  1.3255, -1.2967,  0.2183,  0.3562],
@@ -278,7 +278,7 @@ output:  tensor(1.0393, grad_fn=<NllLossBackward>)
 
 ### 5.PyTorch 铰链嵌入损失函数
 
-```
+```py
 torch.nn.HingeEmbeddingLoss
 
 ```
@@ -296,7 +296,7 @@ torch.nn.HingeEmbeddingLoss
 
 **例子**
 
-```
+```py
 import torch
 import torch.nn as nn
 
@@ -312,7 +312,7 @@ print('target: ', target)
 print('output: ', output)
 ```
 
-```
+```py
 ###################### OUTPUT ######################
 
 input:  tensor([[ 0.1054, -0.4323, -0.0156,  0.8425,  0.1335],
@@ -326,7 +326,7 @@ output:  tensor(1.2183, grad_fn=<MeanBackward0>)
 
 ### 6.PyTorch 边际排序损失函数
 
-```
+```py
 torch.nn.MarginRankingLoss
 
 ```
@@ -343,7 +343,7 @@ Pytorch 利润排名损失表示为:
 
 **例子**
 
-```
+```py
 import torch
 import torch.nn as nn
 
@@ -361,7 +361,7 @@ print('target: ', target)
 print('output: ', output)
 ```
 
-```
+```py
 
 input one:  tensor([1.7669, 0.5297, 1.6898], requires_grad=True)
 input two:  tensor([ 0.1008, -0.2517,  0.1402], requires_grad=True)
@@ -371,7 +371,7 @@ output:  tensor(1.3324, grad_fn=<MeanBackward0>)
 
 ### 7.PyTorch 三重边界损失函数
 
-```
+```py
 torch.nn.TripletMarginLoss
 
 ```
@@ -386,7 +386,7 @@ Pytorch 三线态余量损失表示为:
 
 **例子**
 
-```
+```py
 import torch
 import torch.nn as nn
 anchor = torch.randn(100, 128, requires_grad=True)
@@ -404,7 +404,7 @@ print('output: ', output)
 
 ```
 
-```
+```py
 
 anchor:  tensor([[ 0.6152, -0.2224,  2.2029,  ..., -0.6894,  0.1641,  1.7254],
         [ 1.3034, -1.0999,  0.1705,  ...,  0.4506, -0.2095, -0.8019],
@@ -436,7 +436,7 @@ output:  tensor(1.0755, grad_fn=<MeanBackward0>)
 
 ### 8.PyTorch Kullback-Leibler 散度损失函数
 
-```
+```py
 torch.nn.KLDivLoss
 
 ```
@@ -461,7 +461,7 @@ KL 发散损失表示为:
 
 **例子**
 
-```
+```py
 import torch
 import torch.nn as nn
 
@@ -477,7 +477,7 @@ print('target: ', target)
 print('output: ', output)
 ```
 
-```
+```py
 ###################### OUTPUT ######################
 
 input:  tensor([[ 1.4676, -1.5014, -1.5201],
@@ -495,7 +495,7 @@ PyTorch 允许您创建自己的自定义损失函数，并在项目中实现。
 
 ### 将自定义损失函数创建为 python 函数
 
-```
+```py
 def myCustomLoss(my_outputs, my_labels):
 
     my_batch_size = my_outputs.size()[0]
@@ -513,7 +513,7 @@ def myCustomLoss(my_outputs, my_labels):
 
 让我们修改计算两个样本之间相似性的 Dice 系数，作为二元分类问题的损失函数:
 
-```
+```py
 class DiceLoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(DiceLoss, self).__init__()
@@ -539,7 +539,7 @@ class DiceLoss(nn.Module):
 
 为获取数据集进行必要的导入。
 
-```
+```py
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -548,7 +548,7 @@ from sklearn.preprocessing import StandardScaler
 
 正在加载数据集。
 
-```
+```py
 iris = load_iris()
 X = iris['data']
 y = iris['target']
@@ -559,7 +559,7 @@ feature_names = iris['feature_names']
 
 对数据集进行缩放，使均值=0，方差=1，可以快速收敛模型。
 
-```
+```py
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
@@ -567,14 +567,14 @@ X_scaled = scaler.fit_transform(X)
 
 将数据集以 80:20 的比例分成训练和测试。
 
-```
+```py
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=2)
 
 ```
 
 为我们的神经网络及其训练做必要的导入。
 
-```
+```py
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
@@ -586,7 +586,7 @@ plt.style.use('ggplot')
 
 定义我们的网络。
 
-```
+```py
 class PyTorch_NN(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(PyTorch_NN, self).__init__()
@@ -604,7 +604,7 @@ class PyTorch_NN(nn.Module):
 
 定义用于获得精确度和训练网络的函数。
 
-```
+```py
 def get_accuracy(pred_arr,original_arr):
     pred_arr = pred_arr.detach().numpy()
     original_arr = original_arr.numpy()
@@ -653,7 +653,7 @@ def train_network(model, optimizer, criterion, X_train, y_train, X_test, y_test,
 
 创建模型、优化器和损失函数对象。
 
-```
+```py
 input_dim  = 4
 output_dim = 3
 learning_rate = 0.01
@@ -668,7 +668,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 现在，您一定注意到了 train_network 函数中的打印语句，用于监控损失和准确性。这是做这件事的一种方法。
 
-```
+```py
 X_train = torch.FloatTensor(X_train)
 X_test = torch.FloatTensor(X_test)
 y_train = torch.LongTensor(y_train)
@@ -682,7 +682,7 @@ train_loss, train_accuracy, test_accuracy = train_network(model=model, optimizer
 
 如果需要，我们也可以使用 Matplotlib 绘制这些值。
 
-```
+```py
 fig, (ax1, ax2, ax3) = plt.subplots(3, figsize=(12, 6), sharex=True)
 
 ax1.plot(train_accuracy)
@@ -712,13 +712,13 @@ ax3.set_xlabel("epochs")
 
 首先，让我们[安装需要的东西](https://web.archive.org/web/20230304142301/https://docs.neptune.ai/setup/installation/)。
 
-```
+```py
 pip install neptune-client
 ```
 
 现在让我们[初始化一次海王星运行](https://web.archive.org/web/20230304142301/https://docs.neptune.ai/logging/new_run/)。
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init_run()
@@ -726,7 +726,7 @@ run = neptune.init_run()
 
 我们还可以分配配置变量，例如:
 
-```
+```py
 run["config/model"] = type(model).__name__
 run["config/criterion"] = type(criterion).__name__
 run["config/optimizer"] = type(optimizer).__name__
@@ -736,7 +736,7 @@ run["config/optimizer"] = type(optimizer).__name__
 
 最后，我们可以通过在 train_network 函数中添加几行来记录我们的损失。请注意与“运行”相关的行。
 
-```
+```py
 def train_network(model, optimizer, criterion, X_train, y_train, X_test, y_test, num_epochs):
     train_loss=[]
     train_accuracy=[]

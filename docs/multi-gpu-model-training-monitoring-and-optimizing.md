@@ -67,7 +67,7 @@
 
 我们可以在一台拥有多个 GPU 的机器上训练一个模型。使用 DataParallel (DP)方法，一个批处理会在一个节点的所有选定 GPU 之间平均分配，之后根节点会聚合所有结果。但是 Pytorch lightning 开发人员不建议使用这种方法，因为它还不稳定，如果在 forward()或*_step()方法中为模块分配状态，您可能会看到错误或行为不当。
 
-```
+```py
 trainer = Trainer(gpus=4, accelerator="dp")
 ```
 
@@ -84,7 +84,7 @@ trainer = Trainer(gpus=4, accelerator="dp")
 
 我们可以通过两种方式使用该方法，即“ddp”和“ddp_spawn”。在“ddp”方法中，使用正确的环境变量多次调用脚本。
 
-```
+```py
 trainer = Trainer(gpus=8, accelerator="ddp")
 
 trainer = Trainer(gpus=8, accelerator="ddp", num_nodes=4)
@@ -98,7 +98,7 @@ trainer = Trainer(gpus=8, accelerator="ddp", num_nodes=4)
 *   Dataloader(num_workers=N)，其中 N 很大，使用 DDP 训练会遇到瓶颈，即它会非常慢或者根本不起作用。这是 PyTorch 的限制。
 *   这个方法强制所有东西都是可选择的。
 
-```
+```py
 trainer = Trainer(gpus=8, accelerator="ddp_spawn")
 ```
 
@@ -114,7 +114,7 @@ DDP2 在单台机器上的行为类似于 DP，但在多个节点上使用时，
 *   跨节点同步渐变。
 *   应用优化程序更新。
 
-```
+```py
 trainer = Trainer(gpus=8, accelerator="ddp2", num_nodes=4)
 ```
 
@@ -131,17 +131,17 @@ trainer = Trainer(gpus=8, accelerator="ddp2", num_nodes=4)
 
 Horovod 使用相同的训练脚本支持单 GPU、多 GPU 和多节点训练。它可以在培训脚本中配置为与任意数量的 GPUs 进程一起运行，如下所示:
 
-```
+```py
 trainer = Trainer(accelerator="horovod", gpus=1)
 ```
 
-```
+```py
 trainer = Trainer(accelerator="horovod")
 ```
 
 启动培训作业时，驱动程序应用程序将用于指定工作进程的总数:
 
-```
+```py
 horovodrun -np 4 python train.py
 
 horovodrun -np 8 -H hostname1:4,hostname2:4 python train.py
@@ -155,7 +155,7 @@ horovodrun -np 8 -H hostname1:4,hostname2:4 python train.py
 
 要使用分片训练，您需要首先使用下面的命令安装 [FairScale](https://web.archive.org/web/20221006025927/https://github.com/facebookresearch/fairscale) 。
 
-```
+```py
 pip install fairscale
 
 trainer = Trainer(strategy="ddp_sharded")
@@ -175,7 +175,7 @@ trainer = Trainer(strategy="ddp_sharded")
 
 这在训练较大的模型时节省了内存，但是，需要包装您想要使用激活检查点的模块。你可以在这里阅读更多相关信息[。](https://web.archive.org/web/20221006025927/https://pytorch-lightning.readthedocs.io/en/stable/advanced/model_parallel.html#fairscale-activation-checkpointing)
 
-```
+```py
 from fairscale.nn import checkpoint_wrapper
 
 class Model(LightningModule):
@@ -196,7 +196,7 @@ class Model(LightningModule):
 
 混合精度结合了 32 位和 16 位浮点的使用，提高了性能，并消除了我们可能面临的任何内存问题。Lightning 通过本机或 APEX amp 后端为 GPU 提供混合精度训练。
 
-```
+```py
 Trainer(precision=16, amp_backend="native")
 
 Trainer(amp_backend="apex", precision=16)
@@ -243,7 +243,7 @@ Pytorch 中的 DataLoader 类是加载和批处理数据的一种快速简便的
 
 我们可以通过覆盖 optimizer_zero_grad()方法并将其设置为 None 来提高性能和速度，而不是将梯度设置为零，这样通常会占用更少的内存。
 
-```
+```py
 class Model(LightningModule):
     def optimizer_zero_grad(self, epoch, batch_idx, optimizer, optimizer_idx):
         optimizer.zero_grad(set_to_none=True)
@@ -255,7 +255,7 @@ class Model(LightningModule):
 
 LightningOptimizer 为高级用户提供了一个 toggle_model()函数作为 contextlib.contextmanager()。这里有一个来自 PyTorch Lightning 官方文档的例子。
 
-```
+```py
 class SimpleGAN(LightningModule):
     def __init__(self):
         super().__init__()
@@ -324,7 +324,7 @@ Neptune 是一个可以在任何 MLOps 工作流中使用的[元数据存储库]
 
 将 Neptune 并入 PyTorch Lightning 代码非常简单，您所要做的就是创建一个 NeptuneLogger 对象并将其传递给 Trainer 对象，如下所示:
 
-```
+```py
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import NeptuneLogger
 

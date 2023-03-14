@@ -18,7 +18,7 @@
 
 **注意** : *在本例中，我们将使用 Scikit-learn datasets 模块中的 Iris 数据集。*
 
-```
+```py
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
@@ -101,7 +101,7 @@ plt.show()
 
 其中**δ**w 是包含每个权重系数的权重更新的向量 *w.* 下面的函数演示了如何在没有任何正则化的情况下在 Python 中实现梯度下降优化算法。
 
-```
+```py
 def param_init(X):
     """
     Initialize parameters for linear regression model
@@ -162,7 +162,7 @@ def gradient_descent(X, y, params, alpha, n_iter):
 
 为了更好地理解这一点，让我们建立一个人工数据集，以及一个没有正则化的线性回归模型来预测训练数据。Scikit-learn 有现成的线性回归实现，内置了梯度下降优化的优化实现。让我们来看看它的实际应用:
 
-```
+```py
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -235,7 +235,7 @@ L1 正则化，也称为 L1 范数或套索(在回归问题中)，通过将参�
 
 Python 中的套索回归示例:
 
-```
+```py
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -303,7 +303,7 @@ L2 正则化，或 L2 范数，或岭(在回归问题中)，通过迫使权重�
 
 Python 中的岭回归示例:
 
-```
+```py
 import warnings
 warnings.filterwarnings("ignore")
 

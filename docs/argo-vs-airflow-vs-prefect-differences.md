@@ -197,7 +197,7 @@ Argo 使用两个核心概念:
 
 1.  **容器**:用户可以在容器中安排工作流。由于应用程序在 Kubernetes 中是容器化的，所以 YAML 文件中定义的步骤是相同的。它也是最常用的模板之一。
 
-```
+```py
 - name: whalesay
     container:
       image: docker/whalesay
@@ -207,7 +207,7 @@ Argo 使用两个核心概念:
 
 2.  **脚本**:如果你想要一个容器包装器，那么脚本模板是完美的。脚本模板在结构上类似于容器模板，但添加了一个源字段。该字段允许您就地定义脚本。您可以根据自己的需求定义任何变量或命令。一旦定义，脚本将被保存到一个文件中，它将作为一个 Argo 变量为您执行。
 
-```
+```py
  - name: gen-random-int
     script:
       image: python:alpine3.6
@@ -221,7 +221,7 @@ Argo 使用两个核心概念:
 
 3.  **资源**:可以直接在 K8 集群上进行获取、创建、应用、删除等操作。
 
-```
+```py
 - name: k8s-owner-reference
     resource:
       action: create
@@ -236,7 +236,7 @@ Argo 使用两个核心概念:
 
 4.  **暂停**:基本上是给工作流引入一个时间维度。它可以在定义的持续时间内暂停工作流的执行，或者手动恢复工作流。
 
-```
+```py
  - name: delay
     suspend:
       duration: "20s"
@@ -313,7 +313,7 @@ Argo 使用两个核心概念:
 
 下面是一个代码块，描述了一个流对象的实现。
 
-```
+```py
 from prefect import flow
 
 @flow(name="GitHub Stars")
@@ -333,7 +333,7 @@ def github_stars(repos: List[str]):
 
 下面的代码演示了如何定义任务:
 
-```
+```py
 
 @task(retries=3)
 def get_stars(repo: str):

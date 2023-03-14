@@ -64,7 +64,7 @@
 
 通过 pip 安装 PyGAD，如下所示:
 
-```
+```py
 pip install pygad
 
 ```
@@ -81,7 +81,7 @@ pip install pygad
 
 下面是解决这个问题的 Python 代码:
 
-```
+```py
 import pygad
 import numpy
 
@@ -157,7 +157,7 @@ w4 = 3.2391401
 
 pygad 在 PyGAD 的构造函数中提供了一个名为 mutation_probability 的参数。GA 类提供一个恒定的变异概率，用于所有解决方案，而不考虑它们的适应性(即质量)。恒定概率是 0.6，这意味着如果基因的随机概率< =0.6，它就是突变的。
 
-```
+```py
 import pygad
 import numpy
 
@@ -216,14 +216,14 @@ ga_instance.plot_result()
 
 从 [2.10.0 版本](https://web.archive.org/web/20221203083445/https://github.com/ahmedfgad/GeneticAlgorithmPython/releases/tag/2.10.0)开始，PyGAD 支持自适应变异。确保您至少安装了 PyGAD 2.10.0:
 
-```
+```py
 pip install pygad==2.10.*
 
 ```
 
 您还可以通过打印 __version__ 属性来检查是否安装了 PyGAD 2.10.0，如下所示:
 
-```
+```py
 import pygad
 
 print(pygad.__version__)
@@ -237,7 +237,7 @@ print(pygad.__version__)
 
 下一段代码使用自适应变异来解决线性问题。
 
-```
+```py
 import pygad
 import numpy
 

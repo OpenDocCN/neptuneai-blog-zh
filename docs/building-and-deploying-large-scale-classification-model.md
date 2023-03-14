@@ -74,13 +74,13 @@
 
 三重损失
 
-```
+```py
  ```
 def contrastive_loss(output1, output2, target, margin):
    distances = tf.reduce_sum(tf.pow(output1 - output2, 2), keepdims=True)  
    losses = (1 - target) * 0.5 * tf.pow(distances,2) + target * 0.5 * tf.pow(tf.math.maximum(0, margin - distances), 2)
    return tf.reduce_mean(losses)
-``` 
+```py 
 ```
 
 ### 三联体损失对一组三联体起作用，其中每个三联体都有一个锚、正样本和负样本。它遵循与对比损失相同的基本原理，即最小化锚和正之间的距离，最大化锚和负之间的距离。
@@ -93,7 +93,7 @@ def contrastive_loss(output1, output2, target, margin):
 
 普通的 softmax 不是一个可行的选择
 
-```
+```py
  ```
 def triplet_loss(anchor, positive, negative, margin):
 
@@ -102,7 +102,7 @@ def triplet_loss(anchor, positive, negative, margin):
     distance2 = tf.sqrt(tf.reduce_sum(tf.pow(anchor - negative, 2), 1, keepdims=True))
 
     return tf.reduce_mean(tf.maximum(distance1 - distance2 + margin, 0))
-``` 
+```py 
 ```
 
 ### 当类的数量超过 100，000 或 100，000 时，我们需要超越普通的 Softmax。由于对大量类别求和，损失的计算变得昂贵。因此，这也导致了推理时间的增加。因此，不使用普通的 Softmax，而是使用分级 softmax 或噪声对比损失。
@@ -175,7 +175,7 @@ HNSW 是构建最近邻搜索图的最直接的方法之一，但就内存利用
 
 查看此以了解更多信息。
 
-```
+```py
  ```
 import faiss
 d = 128      
@@ -191,7 +191,7 @@ D, I = index.search(xq, k)
 
 #Source: https://github.com/facebookresearch/faiss
 
-``` 
+```py 
 ```
 
 扫描
@@ -202,7 +202,7 @@ D, I = index.search(xq, k)
 
 [来源](https://web.archive.org/web/20230106143819/https://github.com/google-research/google-research/tree/master/scann)
 
-```
+```py
  ```
 import scann
 
@@ -214,7 +214,7 @@ searcher = scann.scann_ops_pybind.builder(normalized_dataset, 10, "dot_product")
 
 neighbors, distances = searcher.search_batched(queries, leaves_to_search=150, pre_reorder_num_neighbors=250)
 
-``` 
+```py 
 ```
 
 请参考[本](https://web.archive.org/web/20230106143819/https://github.com/google-research/google-research/tree/master/scann)了解更多相关信息。

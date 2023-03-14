@@ -48,7 +48,7 @@ Spark 中的每个应用都会有自己的[执行程序](https://web.archive.org
 
 “findspark”是使 spark 可以在 Google Colab 上导入的包。您还需要下载 Spark 并提取它。
 
-```
+```py
 !apt-get install openjdk-8-jdk-headless -qq > /dev/null
 !wget -q https://www-us.apache.org/dist/spark/spark-3.0.1/spark-3.0.1-bin-hadoop2.7.tgz
 !tar xf spark-3.0.1-bin-hadoop2.7.tgz
@@ -57,7 +57,7 @@ Spark 中的每个应用都会有自己的[执行程序](https://web.archive.org
 
 下一步，根据 Spark 和 Java 的安装位置设置一些环境变量。
 
-```
+```py
 import os
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64"
 os.environ["SPARK_HOME"] = "/content/spark-3.0.1-bin-hadoop2.7"
@@ -65,14 +65,14 @@ os.environ["SPARK_HOME"] = "/content/spark-3.0.1-bin-hadoop2.7"
 
 接下来，使用“findspark”使 spark 可导入。
 
-```
+```py
 import findspark
 findspark.init()
 ```
 
 任何时候你想使用 Spark，你都需要创建 SparkContext。创建一个“SparkContext”实例，以确认 Spark 安装成功。
 
-```
+```py
 import pyspark
 sc = pyspark.SparkContext()
 ```
@@ -85,13 +85,13 @@ sc = pyspark.SparkContext()
 
 下一步是从 Docker Hub 中提取 Spark 图像。完成后，您将能够访问本地主机:8888 上的现成笔记本。
 
-```
+```py
 $ docker run -p 8888:8888 jupyter/pyspark-notebook
 ```
 
 当您导航到该笔记本时，您可以启动一个新的 SparkContext 来确认安装。
 
-```
+```py
 import pyspark
 sc = pyspark.SparkContext()
 ```
@@ -120,7 +120,7 @@ sc = pyspark.SparkContext()
 
 您可以通过并行化驱动程序中的集合或使用文件系统中的数据集来创建 RDD。Spark 将决定分割数据集的最佳分区数量。但是，您可以将它作为第二个参数传递给“并行化”函数:
 
-```
+```py
 my_list = [1, 2, 3, 4, 5,6]
 my_list_distributed = sc.parallelize(my_list,3)
 ```
@@ -133,7 +133,7 @@ my_list_distributed = sc.parallelize(my_list,3)
 
 转换将从现有的数据集创建新的数据集。这种操作的一个例子是“映射”。转换是懒惰的，这意味着它们不会立即返回计算结果。只有当动作请求结果时，计算才会发生。
 
-```
+```py
 my_list = [2,3,4,5,6]
 def power_two(x):
   return x**2
@@ -151,7 +151,7 @@ Spark 中的其他转换包括:
 
 在对数据集进行特定计算后，操作将返回值。例如,“减少”功能。
 
-```
+```py
 results = map(power_two,my_list)
 for result in results:
   print(result)
@@ -170,7 +170,7 @@ for result in results:
 
 Spark 允许您通过缓存数据集来提高应用程序的性能。计算结果可以保存在内存中，下次需要时可以从缓存中检索。Spark 中的缓存是容错的，因此任何丢失的分区都将使用创建它们的转换重新计算。
 
-```
+```py
 df.cache()
 ```
 
@@ -196,7 +196,7 @@ Spark 数据帧是不可变的，非常类似于[熊猫数据帧](https://web.ar
 
 ![Apache guide code ](img/d2c401843502da5e62f36673be4b08a8.png)
 
-```
+```py
 df = spark.read.csv('/FileStore/tables/heart.csv',sep=',',inferSchema='true',header='true')
 ```
 
@@ -208,7 +208,7 @@ df = spark.read.csv('/FileStore/tables/heart.csv',sep=',',inferSchema='true',hea
 
 在数据块上运行数据探索的最快方法是使用“显示(df)”功能。这个函数是 Databricks 独有的，所以如果你在 Google Colab 或你的本地机器上，它将不起作用。在这些平台上，您可以使用:
 
-```
+```py
 df.display()
 ```
 
@@ -218,7 +218,7 @@ df.display()
 
 如前所述，您可以运行过滤操作。
 
-```
+```py
 df.filter((df.age>20) & (df.target=='1')).show()
 ```
 
@@ -226,7 +226,7 @@ df.filter((df.age>20) & (df.target=='1')).show()
 
 Spark 还可以让你运行“分组”操作，就像你在熊猫身上做的那样。让我们看看如何做到这一点。
 
-```
+```py
 from pyspark.sql import functions as F
 df.groupBy(["sex"]).agg(
     F.mean("age").alias("Mean Age")
@@ -237,7 +237,7 @@ df.groupBy(["sex"]).agg(
 
 如果您来自 SQL 世界，您可能会对查询数据框感兴趣，就像查询 SQL 表一样。您可以通过使用“SQLContext”注册一个临时 SQL 表来实现这一点。之后，就可以正常运行 SQL 查询了。
 
-```
+```py
 from pyspark.sql import SQLContext
 sqlContext = SQLContext(sc)
 df.registerTempTable('df_table')
@@ -253,7 +253,7 @@ df_sql.show()
 
 这可以使用“VectorAssembler”来完成。让我们导入它，并使用数据集中的功能实例化它。
 
-```
+```py
 from pyspark.ml.feature import VectorAssembler
 feat_cols = ['age',
  'sex',
@@ -273,13 +273,13 @@ vec_assember = VectorAssembler(inputCols = feat_cols, outputCol='features' )
 
 下一步是用它来转换数据框。
 
-```
+```py
 final_data = vec_assember.transform(df)
 ```
 
 “take”功能可用于查看数据集的一部分。你会注意到一个叫做“特征”的向量，它包含了所有的特征。
 
-```
+```py
 final_data.take(2)
 ```
 
@@ -287,7 +287,7 @@ final_data.take(2)
 
 接下来，将数据集分成训练集和测试集。
 
-```
+```py
 training,testing = final_data.randomSplit([0.7,0.3],seed=42)
 ```
 
@@ -298,19 +298,19 @@ training,testing = final_data.randomSplit([0.7,0.3],seed=42)
 下一步是使这个数据集适合算法。这里我们用逻辑回归。
 从导入开始。你可以在这里访问更多的[算法。](https://web.archive.org/web/20221206001716/https://spark.apache.org/docs/latest/ml-guide.html)
 
-```
+```py
 from pyspark.ml.classification import LogisticRegression
 ```
 
 让我们创建一个算法实例，同时传递标签列名和特性名。
 
-```
+```py
 lr = LogisticRegression(labelCol='target',featuresCol='features')
 ```
 
 现在让模型适应训练集。
 
-```
+```py
 lrModel = lr.fit(training)
 ```
 
@@ -318,13 +318,13 @@ lrModel = lr.fit(training)
 
 在评估模型之前，您必须运行预测。使用“转换”功能。
 
-```
+```py
 predictions = lrModel.transform(testing)
 ```
 
 您可以通过选择一些列来查看这些预测。
 
-```
+```py
 predictions.select('target','prediction','probability','age','sex').show()
 ```
 
@@ -332,7 +332,7 @@ predictions.select('target','prediction','probability','age','sex').show()
 
 由于这是二元分类，因此可以使用“BinaryClassificationEvaluator”函数来评估模型。
 
-```
+```py
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 evaluator.evaluate(predictions)
 ```
@@ -343,7 +343,7 @@ evaluator.evaluate(predictions)
 
 Databricks 让你用 MLflow 服务你的机器学习模型。然而，为您的模型提供服务的最简单的方法是将其发送到像 Neptune 这样的模型注册中心。
 
-```
+```py
 lrModel.save("model.pkl")
 neptune.log_artifact(“model.pkl”)
 ```

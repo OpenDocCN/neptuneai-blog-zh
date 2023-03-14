@@ -55,7 +55,7 @@
 
 #### **PTD-Q 实施**
 
-```
+```py
  ```
 model_fp32 = M()
 
@@ -64,12 +64,12 @@ model_int8 = torch.quantization.quantize_dynamic(
     {torch.nn.Linear},  
     dtype=torch.qint8)  
 
-``` 
+```py 
 ```
 
 通过上面这个简单的方法，你可以在训练后直接创建一个量化的模型。为了展示量化的能力，我们可以用下面的代码来测量之前和之后的模型大小。
 
-```
+```py
  ```
 def print_size_of_model(model, label=""):
     torch.save(model.state_dict(), "m.p")
@@ -82,7 +82,7 @@ f=print_size_of_model(model_fp32,"fp32")
 q=print_size_of_model(model_int8,"int8")
 print("The model is {0:.2f} times smaller".format(f/q))
 
-``` 
+```py 
 ```
 
 例如，1024 个输入和 256 个输出声道的线性层在量化后将比小 **3.97 倍。你可以通过测量随机 torch 张量需要多长时间来推断时间，你也会看到量子化的显著改善。**
@@ -157,19 +157,19 @@ ONNX 是一个增加互操作性的库——来自不同库的每个模型都可
 
 对于 PyTorch 之类的库，修剪可以非常简单，例如:
 
-```
+```py
  ```
 import torch.nn.utils.prune as prune
 
-``` 
+```py 
 ```
 
 现在，给定一个模型，您可以简单地调用任何您想要的修剪函数，例如:
 
-```
+```py
  ```
 prune.random_unstructured(module, name="weight", amount=0.3)
-``` 
+```py 
 ```
 
 Tensorflow 中的修剪

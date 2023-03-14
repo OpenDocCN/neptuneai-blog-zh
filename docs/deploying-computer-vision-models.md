@@ -80,7 +80,7 @@ REST 框架通常有内置的解析器，用来检测请求中的数据类型。
 
 下面显示了一个带有 Flask 框架的文件上传解析器(在我们的例子中，是一个图像/视频等)的样本片段。当然，代码结构随着 Django 和 FastAPI 框架的不同而不同。
 
-```
+```py
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
@@ -267,7 +267,7 @@ Flask 是一个小型轻量级的 Python web 框架，它提供了有价值的�
 
 导入 Flask 模块并创建 Flask web 服务器
 
-```
+```py
 from flask import Flask, render_template
 
 app = Flask(__name__)

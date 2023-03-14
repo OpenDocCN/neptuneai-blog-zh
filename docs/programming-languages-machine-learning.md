@@ -166,7 +166,7 @@ Python 比其他编程语言更直观，因为它的语法非常简单，是团�
 
 **Java:**
 
-```
+```py
 
 main()
 {
@@ -176,7 +176,7 @@ main()
 
 Python 还具有难以置信的灵活性和平台无关性，因为它不需要 Python 解释器就能得到 Linux、Windows 和 macOS 的支持。这也使得在使用自己的 GPU 时，训练变得更加便宜和简单。57%的机器学习工程师报告使用 Python，其中 33%的人更喜欢将其用于开发。
 
-```
+```py
 public class HelloWorld {
    public static void main(String[] args) {
       System.out.println("Hello, World");

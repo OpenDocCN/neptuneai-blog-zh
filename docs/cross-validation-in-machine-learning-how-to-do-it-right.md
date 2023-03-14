@@ -58,7 +58,7 @@ CV 易于理解，易于实施，并且与用于计算模型效率得分的其�
 
 实施 hold-out 真的很容易。例如，您可以使用 sk learn . model _ selection . train _ test _ split 来完成。
 
-```
+```py
 import numpy as np
 from sklearn.model_selection import train_test_split
 
@@ -91,7 +91,7 @@ k 倍技术的算法:
 
 要执行 k-Fold 交叉验证，可以使用 sklearn.model_selection.KFold。
 
-```
+```py
 import numpy as np
 from sklearn.model_selection import KFold
 
@@ -126,7 +126,7 @@ LOOCV 技术的算法:
 
 对于 LOOCV，sklearn 也有一个内置的方法。可以在 model_selection 库–sk learn . model _ selection . leave one out 中找到。
 
-```
+```py
 import numpy as np
 from sklearn.model_selection import LeaveOneOut
 
@@ -162,7 +162,7 @@ LpOC 技术的算法；
 
 您可以使用 sk learn–sk learn . model _ selection . Leave pout 执行 Leave-p-out CV。
 
-```
+```py
 import numpy as np
 from sklearn.model_selection import LeavePOut
 
@@ -202,7 +202,7 @@ LpOC 具有 LOOCV 的所有缺点，但无论如何，它和 LOOCV 一样强大�
 
 分层 k-Fold 在 sklearn 中也有一个内置的方法——sk learn . model _ selection . stratifiedkfold。
 
-```
+```py
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
@@ -242,7 +242,7 @@ for train_index, test_index in skf.split(X, y):
 
 Sklearn 会帮你实现一个重复的 k 倍 CV。只需使用 sklearn . model _ selection . repeated kfold。在 sk learn 实现该技术时，您必须设置想要的折叠次数(n_splits)和将要执行的分割次数(n_repeats)。它保证您在每次迭代中都有不同的折叠。
 
-```
+```py
 import numpy as np
 from sklearn.model_selection import RepeatedKFold
 

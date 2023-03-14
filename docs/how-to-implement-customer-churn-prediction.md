@@ -107,7 +107,7 @@
 
 让我们首先为 EDA 导入库，加载数据，并打印前五行:
 
-```
+```py
 import numpy as np 
 import pandas as pd 
 pd.set_option('display.max_columns', None)
@@ -176,7 +176,7 @@ dataoveriew(data_df, 'Overview of the dataset')
 
 **让我们探索一下目标变量。**
 
-```
+```py
 target_instance = data_df["Churn"].value_counts().to_frame()
 target_instance = target_instance.reset_index()
 target_instance = target_instance.rename(columns={'index': 'Category'})
@@ -197,7 +197,7 @@ fig.show()
 
 让我们探索分类特征。
 
-```
+```py
 def bar(feature, df=data_df ):
 
     temp_df = df.groupby([feature, 'Churn']).size().reset_index()
@@ -257,7 +257,7 @@ def bar(feature, df=data_df ):
 
 现在，让我们画出人口统计特征。
 
-```
+```py
 bar('gender')
 
 data_df.loc[data_df.SeniorCitizen==0,'SeniorCitizen'] = "No"   
@@ -290,7 +290,7 @@ bar('Dependents')
 
 接下来，我们来了解一下每位客户已经注册的服务。
 
-```
+```py
 bar('PhoneService')
 bar('MultipleLines')
 bar('InternetService')
@@ -343,7 +343,7 @@ Output plot of the distribution of churn rate by streaming TV service
 
 是时候探索支付功能了。
 
-```
+```py
 bar('Contract')
 bar('PaperlessBilling')
 bar('PaymentMethod')
@@ -366,7 +366,7 @@ bar('PaymentMethod')
 
 现在，让我们探索数字特征。
 
-```
+```py
 Data_df.dtypes
 
 ```
@@ -375,7 +375,7 @@ Data_df.dtypes
 
 **可以观察到**total charges 具有对象数据类型，这意味着它包含字符串组件。我们来换算一下。
 
-```
+```py
 try:
     data_df['TotalCharges'] = data_df['TotalCharges'].astype(float)
 except ValueError as ve:
@@ -387,7 +387,7 @@ except ValueError as ve:
 
 **这表示一些**空值被存储为空白。让我们将该特征转换为数字格式，同时将这些空字符串空间等同为 NaN，如下所示:
 
-```
+```py
 data_df['TotalCharges'] = pd.to_numeric(data_df['TotalCharges'],errors='coerce')
 
 data_df['TotalCharges'] = data_df['TotalCharges'].fillna(data_df['TotalCharges'].median())
@@ -396,7 +396,7 @@ data_df['TotalCharges'] = data_df['TotalCharges'].fillna(data_df['TotalCharges']
 
 **接下来，让我们绘制所有数字特征的直方图**来了解分布情况。
 
-```
+```py
 def hist(feature):
     group_df = data_df.groupby([feature, 'Churn']).size().reset_index()
     group_df = group_df.rename(columns={0: 'Count'})
@@ -407,7 +407,7 @@ def hist(feature):
 
 **对数字特征运行功能**,如下所示:
 
-```
+```py
 hist('tenure')
 hist('MonthlyCharges')
 hist('TotalCharges')
@@ -430,7 +430,7 @@ hist('TotalCharges')
 
 让我们根据分位数将数字特征分成三个部分(低、中和高，以便从中获得更多信息)。
 
-```
+```py
 bin_df = pd.DataFrame()
 
 bin_df['tenure_bins'] =  pd.qcut(data_df['tenure'], q=3, labels= ['low', 'medium', 'high'])
@@ -462,7 +462,7 @@ bar('TotalCharges_bins', bin_df)
 
 在本节中，我们将获得更多见解，并将数据转换为适合各种机器学习算法的数据表示。
 
-```
+```py
 data_df.drop(["customerID"],axis=1,inplace = True)
 
 def binary_map(feature):
@@ -481,7 +481,7 @@ data_df = pd.get_dummies(data_df, drop_first=True)
 
 **我们来看看数值之间的相关性**。
 
-```
+```py
 corr = data_df.corr()
 
 fig = px.imshow(corr,width=1000, height=1000)
@@ -502,7 +502,7 @@ fig.show()
 
 让我们使用广义线性模型(GLM)来获得目标各自特征的一些统计数据。
 
-```
+```py
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 
@@ -530,7 +530,7 @@ print(res.summary())
 
 关于特征重要性的第二个问题可以通过查看指数系数值来回答。指数系数通过一个单位的变化来估计给定特征的预期流失变化。
 
-```
+```py
 np.exp(res.params)
 ```
 
@@ -540,7 +540,7 @@ np.exp(res.params)
 
 所有要素的范围应进行归一化，以便每个要素对最终距离的贡献大致成比例，因此我们进行要素缩放。
 
-```
+```py
 from sklearn.preprocessing import MinMaxScaler
 sc = MinMaxScaler()
 data_df['tenure'] = sc.fit_transform(data_df[['tenure']])
@@ -551,7 +551,7 @@ data_df['TotalCharges'] = sc.fit_transform(data_df[['TotalCharges']])
 
 让我们开始用逻辑回归算法创建一个基线模型，然后用其他机器学习模型进行预测，如支持向量分类器(SVC)、随机森林分类器、决策树分类器和朴素贝叶斯分类器。
 
-```
+```py
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -592,7 +592,7 @@ log_model = modeling(LogisticRegression, 'Logistic Regression')
 
 **接下来，我们进行特征选择**以使机器学习算法能够更快地训练，降低模型复杂性，增加可解释性，并且如果选择了正确的特征子集，则提高模型准确性。
 
-```
+```py
 from sklearn.feature_selection import RFECV
 from sklearn.model_selection import StratifiedKFold
 log = LogisticRegression()
@@ -603,7 +603,7 @@ rfecv.fit(X, y)
 
 ![](img/7ec08799fe1384f9243c5ece55871076.png)
 
-```
+```py
 plt.figure(figsize=(8, 6))
 plt.plot(range(1, len(rfecv.grid_scores_)+1), rfecv.grid_scores_)
 plt.grid()
@@ -617,7 +617,7 @@ print("The optimal number of features: {}".format(rfecv.n_features_))
 
 ```
 
-```
+```py
 X_rfe = X.iloc[:, rfecv.support_]
 
 print(""X" dimension: {}".format(X.shape))
@@ -629,7 +629,7 @@ print(""X_rfe" column list:", X_rfe.columns.tolist())
 
 ![](img/e6f6614e7daa66aa00cbdcee408911b2.png)
 
-```
+```py
 <pre class="hljs" style="display: block; overflow-x: auto; padding: 0.5em; color: rgb(51, 51, 51); background: rgb(248, 248, 248);"><span class="hljs-comment" style="color: rgb(153, 153, 136); font-style: italic;"># Splitting data with optimal features</span>
 X_train, X_test, y_train, y_test = train_test_split(X_rfe, y, test_size=<span class="hljs-number" style="color: teal;">0.3</span>, random_state=<span class="hljs-number" style="color: teal;">50</span>)
 
@@ -640,28 +640,28 @@ log_model = modeling(LogisticRegression, <span class="hljs-string" style="color:
 
 ![](img/42f501062309caf82c53de830b974e5c.png)
 
-```
+```py
 svc_model = modeling(SVC, 'SVC Classification')
 
 ```
 
 ![](img/2df16d9dd49a8db58da151f9c72ffa64.png)
 
-```
+```py
 rf_model = modeling(RandomForestClassifier, "Random Forest Classification")
 
 ```
 
 ![](img/e7b89daa24f46b694ef7c1e69570bd09.png)
 
-```
+```py
 dt_model = modeling(DecisionTreeClassifier, "Decision Tree Classification")
 
 ```
 
 ![](img/0f3d870abac22860d7305695fa88a0d9.png)
 
-```
+```py
 nb_model = modeling(GaussianNB, "Naive Bayes Classification")
 
 ```
@@ -670,7 +670,7 @@ nb_model = modeling(GaussianNB, "Naive Bayes Classification")
 
 **在选定的绩效指标中，**逻辑回归算法在所有选定的指标中得分最高。它可以通过各种技术来改进，但是我们将通过超参数调整(随机搜索)来快速改进它。
 
-```
+```py
 
 model = LogisticRegression()
 
@@ -698,7 +698,7 @@ log_model = modeling(LogisticRegression, 'Logistic Regression Classification', p
 
 模型略有改进。让我们保存这个模型，并使用这个模型开始部署我们的客户流失预测应用程序。
 
-```
+```py
 import joblib
 
 filename = 'model.sav'
@@ -717,7 +717,7 @@ joblib.dump(log_model, filename)
 
 部署脚本如下所示:
 
-```
+```py
 import streamlit as st
 import pandas as pd
 import numpy as np

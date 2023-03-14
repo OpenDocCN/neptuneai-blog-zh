@@ -22,7 +22,7 @@ TensorFlow Hub 是一个存储库，包含数百个经过训练的现成模型�
 
 要使用一个模型，首先需要在 [tfhub.dev](https://web.archive.org/web/20221206064514/https://tfhub.dev/) 中识别它。你需要检查它的文档。例如，下面是加载这个 [ImageNet 分类模型](https://web.archive.org/web/20221206064514/https://tfhub.dev/google/imagenet/inception_v1/classification/4)的说明。
 
-```
+```py
 model = tf.keras.Sequential([
     hub.KerasLayer("https://tfhub.dev/google/imagenet/inception_v1/classification/4")
 ])
@@ -33,7 +33,7 @@ model = tf.keras.Sequential([
 
 例如，我们可以通过将' trainable = True '传递给' hub.kerasLayer '来微调上面的模型。
 
-```
+```py
 hub.KerasLayer("https://tfhub.dev/google/imagenet/inception_v1/classification/4",
                trainable=True, arguments=dict(batch_norm_momentum=0.997))
 ```
@@ -55,7 +55,7 @@ hub.KerasLayer("https://tfhub.dev/google/imagenet/inception_v1/classification/4"
 
 设置 50%的稀疏度意味着 50%的权重将被置零。“修剪时间表”负责在训练期间控制[修剪](https://web.archive.org/web/20221206064514/https://www.tensorflow.org/model_optimization/api_docs/python/tfmot/sparsity/keras/PruningSchedule)。
 
-```
+```py
 from tensorflow_model_optimization.sparsity.keras import ConstantSparsity
 pruning_params = {
     'pruning_schedule': ConstantSparsity(0.5, 0),
@@ -67,7 +67,7 @@ pruning_params = {
 
 之后，您可以使用上述参数修剪整个模型。
 
-```
+```py
 from tensorflow_model_optimization.sparsity.keras import prune_low_magnitude
 model_to_prune = prune_low_magnitude(
     keras.Sequential([
@@ -78,7 +78,7 @@ model_to_prune = prune_low_magnitude(
 
 一种替代方案是使用量化感知训练，该训练使用较低精度，例如 8 位而不是 32 位浮点。
 
-```
+```py
 import tensorflow_model_optimization as tfmot
 quantize_model = tfmot.quantization.keras.quantize_model
 q_aware_model = quantize_model(model)
@@ -89,7 +89,7 @@ q_aware_model = quantize_model(model)
 
 编译和定型模型后，可以使用 TFLite 转换器创建量化模型。
 
-```
+```py
 converter = tf.lite.TFLiteConverter.from_keras_model(q_aware_model)
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
@@ -129,7 +129,7 @@ TensorFlow Federated 由两层组成:
 
 这里有一个来自官方文档的代码片段产生的输出的例子。
 
-```
+```py
 import numpy as np
 import tensorflow as tf
 import trimesh
@@ -175,7 +175,7 @@ threejs_visualization.triangular_mesh_renderer(mesh, width=400, height=400)
 
 这是一个基于伯努利分布的示例模型:
 
-```
+```py
 model = tfp.glm.Bernoulli()
 coeffs, linear_response, is_converged, num_iter = tfp.glm.fit(
     model_matrix=features[:, tf.newaxis],
@@ -189,7 +189,7 @@ TensorFlow Extended (TFX)是一个平台，您可以使用它将您的机器学�
 
 假设您已经安装并配置了该服务器，则可以通过运行以下命令来启动它:
 
-```
+```py
 $ tensorflow_model_server -- rest_api_port=8000 --   model_config_file=models.config -- model_config_file_poll_wait_seconds=300
 ```
 
@@ -210,7 +210,7 @@ $ tensorflow_model_server -- rest_api_port=8000 --   model_config_file=models.co
 
 例如，这里是你如何使用 Neptune 记录你的 Keras 实验。
 
-```
+```py
 PARAMS = {'lr': 0.01, 'epochs': 10}
 neptune.create_experiment('model-training-run', params=PARAMS)
 
@@ -227,7 +227,7 @@ neptune.log_artifact('model.h5')
 
 这个[笔记本](https://web.archive.org/web/20221206064514/https://colab.research.google.com/github/tensorflow/agents/blob/master/docs/tutorials/1_dqn_tutorial.ipynb#scrollTo=cKOCZlhUgXVK)展示了如何在 Cartpole 环境下训练一个 [DQN(深度 Q 网络)](https://web.archive.org/web/20221206064514/https://www.tensorflow.org/agents/tutorials/0_intro_rl)代理。初始化代码如下所示:
 
-```
+```py
 import tensorflow as tf
 from tf_agents.networks import q_network
 from tf_agents.agents.dqn import dqn_agent

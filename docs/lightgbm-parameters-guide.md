@@ -250,7 +250,7 @@ lightgbm 中有两个参数可以让你处理这个问题 **is_unbalance 和 sca
 
 使用此函数作为参数:
 
-```
+```py
 def feval_func(preds, train_data):
 
     return ('feval_func_name', eval_result, False)
@@ -258,7 +258,7 @@ def feval_func(preds, train_data):
 
 要使用 feval 函数而不是公制，您应该设置公制参数“无”。
 
-```
+```py
 print('Start training...')
 lgb_train = lgb.train(...,
                       metric=None,
@@ -421,7 +421,7 @@ python 中的 Lightgbm 参数调优示例(lightgbm 调优)
 
 通过这样做，您可以将基线值从搜索空间中分离出来！
 
-```
+```py
 SEARCH_PARAMS = {'learning_rate': 0.4,
                  'max_depth': 15,
                  'num_leaves': 20,
@@ -452,7 +452,7 @@ FIXED_PARAMS={'objective': 'binary',
 
 创建基准培训代码:
 
-```
+```py
 from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.model_selection import train_test_split
 import neptunecontrib.monitoring.skopt as sk_utils
@@ -502,7 +502,7 @@ def train_evaluate(search_params):
 
 使用您选择的超参数优化库(例如 scikit-optimize):
 
-```
+```py
 neptune.init('mjbahmani/LightGBM-hyperparameters')
 neptune.create_experiment('lgb-tuning_final', upload_source_files=['*.*'],
                               tags=['lgb-tuning', 'dart'],params=SEARCH_PARAMS)

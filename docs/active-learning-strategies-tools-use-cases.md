@@ -324,7 +324,7 @@ modAL 支持前面讨论的许多主动学习策略，比如基于概率/不确�
 
 使用 scikit-learn 分类器(例如 RandomForestClassifier)进行主动学习可以像下面这样简单。
 
-```
+```py
 from modAL.models import ActiveLearner
 from sklearn.ensemble import RandomForestClassifier
 
@@ -343,7 +343,7 @@ learner.teach(X_pool[query_idx], y_new)   code source
 
 [*libact*](https://web.archive.org/web/20221117203617/https://libact.readthedocs.io/en/latest/) 是一个 python 包，旨在让现实世界的用户更容易进行主动学习。该软件包不仅实现了几种流行的主动学习策略，还通过学习元策略实现了主动学习，使机器能够在运行中自动学习最佳策略。下面是 libact 的一个用法示例:
 
-```
+```py
 dataset = Dataset(X, y)
 query_strategy = QueryStrategy(dataset) 
 labler = Labeler() 

@@ -336,7 +336,7 @@
 
 **第二步**
 
-```
+```py
 import neptune.new as neptune
 run = neptune.init(...) 
 ```
@@ -345,7 +345,7 @@ run = neptune.init(...)
 
 **第三步**
 
-```
+```py
 from neptune.new.types import File
 run['accuracy'] = 0.92
 for prediction_image in worst_predictions:
@@ -356,7 +356,7 @@ for prediction_image in worst_predictions:
 
 就是这样！
 
-```
+```py
 python train.py
 
 ```

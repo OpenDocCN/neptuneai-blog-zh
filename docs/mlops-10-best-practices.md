@@ -22,7 +22,7 @@ MLOps 可能令人生畏。成千上万的课程可以帮助工程师提高他�
 
 这种做法有助于缓解“改变一切就改变一切”( CACE)原则的挑战。这也有助于团队成员快速熟悉您的项目。这是一个构建 Azure 机器学习管道的项目的例子。
 
-```
+```py
 from azureml.pipeline.core import PipelineData
 from azureml.pipeline.core import PipelineParameter
 from azureml.pipeline.steps import PythonScriptStep
@@ -124,7 +124,7 @@ Alexander Van Tol 关于代码质量的文章提出了高质量代码的三个�
 
 Pandera 是一个数据验证库，可以帮助你完成这项工作，以及其他复杂的统计验证，如假设检验。这里有一个使用 Pandera 定义的数据模式的例子。
 
-```
+```py
 import pandera as pa
 from azureml.core import Run
 
@@ -186,7 +186,7 @@ run.parent.log_table("liko_data_schema", liko_data_schema)
 
 这个简单的模式在项目中构建了许多数据验证功能。然后，可以在下游步骤中应用定义的模式，如下所示。
 
-```
+```py
 liko_data_schema.validate(data_sample)
 ```
 

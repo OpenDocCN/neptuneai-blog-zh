@@ -122,7 +122,7 @@ K-means++是 K-mean 算法的智能质心初始化方法。目标是通过随机
 
 加载数据并检查是否有任何缺失值:
 
-```
+```py
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -150,7 +150,7 @@ credit_data.isna().sum()
 
 我们来看看数据，看看是怎么分布的:
 
-```
+```py
 plt.scatter(customer_data['Annual Income (k$)'],customer_data['Spending Score (1-100)'])
 plt.xlabel('Annual Income (k$)')
 plt.ylabel('Spending Score (1-100)')
@@ -165,7 +165,7 @@ plt.show()
 
 首先，我们将随机初始化质心:
 
-```
+```py
 K=3
 centroids = customer_data.sample(n=K)
 plt.scatter(customer_data['Annual Income (k$)'],customer_data['Spending Score (1-100)'])
@@ -181,7 +181,7 @@ plt.show()
 
 接下来，我们将遍历每个质心和数据点，计算它们之间的距离，找到 K 个聚类并将数据点分配给一个重要的聚类。这个过程将继续，直到先前定义的质心和当前质心之间的差为零:
 
-```
+```py
 diff = 1
 j=0
 XD=X
@@ -218,7 +218,7 @@ while(diff!=0):
    centroids = X.groupby(["Cluster"]).mean()[["Spending Score (1-100)","Annual Income (k$)"]]
 ```
 
-```
+```py
 -27.971469513699734
 -22.726172762723042
 1.7620315282408434
@@ -228,7 +228,7 @@ while(diff!=0):
 
 现在，如果我们要查看数据集，所有数据点都应相应地进行聚类:
 
-```
+```py
 color=['grey','blue','orange']
 for k in range(K):
    data=X[X["Cluster"]==k+1]
@@ -249,7 +249,7 @@ plt.show()
 
 首先，我们将导入 K-Means 函数，然后通过将聚类数作为参数传递来调用该函数:
 
-```
+```py
 from sklearn.cluster import KMeans
 km_sample = KMeans(n_clusters=3)
 km_sample.fit(customer_data)
@@ -257,7 +257,7 @@ km_sample.fit(customer_data)
 
 就这样，您的集群数据就准备好了。我们再来看看数据:
 
-```
+```py
 labels_sample = km_sample.labels_
 customer_data['label'] = labels_sample
 sns.scatterplot(customer_data['Annual Income (k$)'],customer_data['Spending Score (1-100)'],hue=customer_data['label'],palette='Set1')
@@ -293,7 +293,7 @@ sns.scatterplot(customer_data['Annual Income (k$)'],customer_data['Spending Scor
 
 1.  使用所有 K 值执行 K 均值聚类。对于每个 K 值，我们计算所有数据点到质心的平均距离:
 
-```
+```py
 from sklearn.cluster import KMeans
 from sklearn import metrics
 from scipy.spatial.distance import cdist
@@ -315,7 +315,7 @@ for k in K:
 
 2.  标绘这些点，并找出平均距离突然下降的点(肘部):
 
-```
+```py
 plt.plot(K, distortions, 'bx-')
 plt.xlabel('k')
 plt.ylabel('Distortion')
@@ -348,7 +348,7 @@ plt.show()
 1.  计算一系列值的 K 均值聚类算法。
 2.  对于每个 K 值，找出数据点的平均轮廓分数:
 
-```
+```py
 from sklearn.metrics import silhouette_score
 
 sil_avg = []
@@ -363,7 +363,7 @@ for k in range_n_clusters:
 3.  绘制每个 K 值的轮廓分数集合
 4.  选择轮廓分数最大时的聚类数:
 
-```
+```py
 plt.plot(range_n_clusters,sil_avg,'bx-')
 plt.xlabel('Values of K')
 plt.ylabel('Silhouette score')

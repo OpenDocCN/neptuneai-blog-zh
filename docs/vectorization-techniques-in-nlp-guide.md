@@ -39,13 +39,13 @@
 
 让我们进行必要的进口。
 
-```
+```py
 from sklearn.feature_extraction.text import CountVectorizer
 ```
 
 考虑我们有下面的文档列表。
 
-```
+```py
 sents = ['coronavirus is a highly infectious disease',
    'coronavirus affects older people the most', 
    'older people are at high risk due to this disease']
@@ -54,14 +54,14 @@ sents = ['coronavirus is a highly infectious disease',
 
 让我们创建一个 CountVectorizer 的实例。
 
-```
+```py
 cv = CountVectorizer()
 
 ```
 
 现在让我们对输入进行矢量化，并将其转换为 NumPy 数组，以便于查看。
 
-```
+```py
 X = cv.fit_transform(sents) 
 X = X.toarray()
 
@@ -73,7 +73,7 @@ X = X.toarray()
 
 我们把词汇表打印出来，了解一下为什么会是这个样子。
 
-```
+```py
 sorted(cv.vocabulary_.keys())
 
 ```
@@ -88,7 +88,7 @@ sorted(cv.vocabulary_.keys())
 
 假设我们想考虑输入的二元模型表示。这可以通过在实例化 CountVectorizer 对象时简单地更改默认参数来实现:
 
-```
+```py
 cv = CountVectorizer(ngram_range=(2,2))
 ```
 
@@ -140,14 +140,14 @@ TF-IDF 的最终得分为:
 
 进行所需的进口。
 
-```
+```py
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 ```
 
 让我们再次使用同一套文件。
 
-```
+```py
 sents = ['coronavirus is a highly infectious disease',
    'coronavirus affects older people the most', 
    'older people are at high risk due to this disease']
@@ -156,14 +156,14 @@ sents = ['coronavirus is a highly infectious disease',
 
 创建 TfidfVectorizer 的实例。
 
-```
+```py
 tfidf = TfidfVectorizer()
 
 ```
 
 让我们现在转换我们的数据。
 
-```
+```py
 transformed = tfidf.fit_transform(sents)
 
 ```
@@ -172,13 +172,13 @@ transformed = tfidf.fit_transform(sents)
 
 进行所需的导入:
 
-```
+```py
 import pandas as pd
 ```
 
 创建以特征名称(即单词)作为索引、以排序的 TF-IDF 分数作为列的数据帧:
 
-```
+```py
 df = pd.DataFrame(transformed[0].T.todense(),
     	index=tfidf.get_feature_names(), columns=["TF-IDF"])
 df = df.sort_values('TF-IDF', ascending=False)
@@ -309,7 +309,7 @@ CBOW 代表连续单词包。在 CBOW 方法中，我们不是预测上下文单
 
 进行所需的进口。
 
-```
+```py
 from gensim import models
 
 ```
@@ -318,7 +318,7 @@ from gensim import models
 
 让我们先使用谷歌预先训练好的模型，看看我们能用它做些什么。你可以从[这里](https://web.archive.org/web/20221114162312/https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit?resourcekey=0-wjGZdNAUop6WykTtMip30g)下载这个模型，并在下面给出解压文件的路径，或者你可以通过下面的 Linux 命令得到它。
 
-```
+```py
 wget -c "https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz"
 
 gzip -d GoogleNews-vectors-negative300.bin.gz
@@ -327,7 +327,7 @@ gzip -d GoogleNews-vectors-negative300.bin.gz
 
 让我们现在加载模型，但是，请注意，这是一个非常沉重的模型，您的笔记本电脑可能会因为内存不足而死机。
 
-```
+```py
 w2v = models.KeyedVectors.load_word2vec_format(
 './GoogleNews-vectors-negative300.bin', binary=True)
 
@@ -335,7 +335,7 @@ w2v = models.KeyedVectors.load_word2vec_format(
 
 任何单词的矢量表示，比如健康，可以通过以下方式获得:
 
-```
+```py
 vect = w2v['healthy']
 ```
 
@@ -343,7 +343,7 @@ vect = w2v['healthy']
 
 我们还可以利用这个预先训练的模型来获得输入单词的相似意思的单词。
 
-```
+```py
 w2v.most_similar('happy')
 ```
 
@@ -355,7 +355,7 @@ w2v.most_similar('happy')
 
 让我们再次使用前面的句子集作为数据集来训练我们的自定义 word2vec 模型。
 
-```
+```py
 sents = ['coronavirus is a highly infectious disease',
    'coronavirus affects older people the most', 
    'older people are at high risk due to this disease']
@@ -364,7 +364,7 @@ sents = ['coronavirus is a highly infectious disease',
 
 Word2vec 需要标记化句子列表形式的训练数据集，因此我们将预处理 sents 并将其转换为:
 
-```
+```py
 sents = [sent.split() for sent in sents]
 
 ```
@@ -373,7 +373,7 @@ sents = [sent.split() for sent in sents]
 
 最后，我们可以用以下内容训练我们的模型:
 
-```
+```py
 custom_model = models.Word2Vec(sents, min_count=1,size=300,workers=4)
 ```
 
@@ -424,7 +424,7 @@ GloVe 通过对共现矩阵进行训练来获得语义。它建立在单词-单�
 
 首先，我们需要下载嵌入[文件](https://web.archive.org/web/20221114162312/https://www.kaggle.com/watts2/glove6b50dtxt)，然后我们将使用下面的代码创建一个查找嵌入字典。
 
-```
+```py
 Import numpy as np
 
 embeddings_dict={}
@@ -445,14 +445,14 @@ with open('./glove.6B.50d.txt','rb') as f:
 
 我们还可以定义一个函数来从这个模型中获取相似的单词，首先进行所需的导入。
 
-```
+```py
 From scipy import spatial
 
 ```
 
 定义功能:
 
-```
+```py
 def find_closest_embeddings(embedding):
    return sorted(embeddings_dict.keys(), key=lambda word: 
 spatial.distance.euclidean(embeddings_dict[word], embedding))
@@ -469,13 +469,13 @@ spatial.distance.euclidean(embeddings_dict[word], embedding))
 
 您可以通过以下方式安装 keras:
 
-```
+```py
 pip install keras
 ```
 
 我们将使用到目前为止一直在使用的同一组文档，但是，我们需要将它们转换成一个标记列表，以使它们适合矢量化。
 
-```
+```py
 sents = [sent.split() for sent in sents]
 
 ```
@@ -486,7 +486,7 @@ sents = [sent.split() for sent in sents]
 
 进行所需的进口:
 
-```
+```py
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 
@@ -494,7 +494,7 @@ from keras.preprocessing.sequence import pad_sequences
 
 以下代码将索引分配给单词，这些单词稍后将用于将嵌入映射到索引单词:
 
-```
+```py
 MAX_NUM_WORDS = 100
 MAX_SEQUENCE_LENGTH = 20
 tokenizer = Tokenizer(num_words=MAX_NUM_WORDS)
@@ -514,7 +514,7 @@ data = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)
 
 为此操作进行所需的导入。
 
-```
+```py
 from keras.layers import Embedding
 from keras.initializers import Constant
 
@@ -576,7 +576,7 @@ FastText 中使用的网络类似于我们在 Word2Vec 中看到的网络，就�
 
 你可以用 pip 安装 fasttext。
 
-```
+```py
 pip install fasttext
 
 ```
@@ -593,7 +593,7 @@ pip install fasttext
 
 我们也将为我们的数据集这样做。
 
-```
+```py
 all_texts = train['text'].tolist()
 all_labels = train['drug type'].tolist()
 prep_datapoints=[]
@@ -609,7 +609,7 @@ for i in range(len(all_texts)):
 
 让我们将这些准备好的数据点写入一个. txt 文件。
 
-```
+```py
 with open('train_fasttext.txt','w') as f:
     for datapoint in prep_datapoints:
         f.write(datapoint)
@@ -620,7 +620,7 @@ with open('train_fasttext.txt','w') as f:
 
 现在我们有了训练快速文本模型所需的一切。
 
-```
+```py
 model = fasttext.train_supervised('train_fasttext.txt')
 
 ```

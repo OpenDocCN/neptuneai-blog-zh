@@ -302,7 +302,7 @@ p(a)=2/10=0.2
 
 根据[本页](https://web.archive.org/web/20221206010842/https://docs.python.org/3/library/decimal.html#decimal.MAX_PREC)，32 位系统的最大精度为 425000000。对于 64 位系统，它是 99999999999999999。这足以编码巨大的信息。
 
-```
+```py
 import sys
 
 print(sys.float_info.dig)
@@ -310,7 +310,7 @@ print(sys.float_info.dig)
 
 下一小节创建一个十进制值。
 
-```
+```py
 print(float(123456789.12345678998))
 ```
 
@@ -318,7 +318,7 @@ print(float(123456789.12345678998))
 
 decimal 模块有一个名为 Decimal 的类，它创建十进制值。下面是一个例子。这样，可以创建任意精度的数。
 
-```
+```py
 from decimal import getcontext
 
 getcontext().prec 
@@ -327,14 +327,14 @@ getcontext().prec
 
 请注意，精度只在进行算术运算时才重要。即使创建的十进制值的精度超过 getcontext()中指定的精度。prec，十进制值将不受该精度的限制。只有在做算术运算的时候才会受到限制。
 
-```
+```py
 getcontext().prec = 1500
 
 ```
 
 在接下来的代码中，我们创建了一个存储大数的十进制值。打印时，将返回该值，不会丢失任何数字。
 
-```
+```py
 print(decimal.MAX_PREC)
 
 ```
@@ -345,7 +345,7 @@ print(decimal.MAX_PREC)
 
 **改变精度**
 
-```
+```py
 from decimal import Decimal
 
 a = Decimal(1.5)
@@ -356,13 +356,13 @@ decimal 模块允许您通过为 get context()prec 设置一个大于缺省值 2
 
 现在让我们构建算术编码算法的 Python 实现。
 
-```
+```py
 a = Decimal(‘123456789.12345679104328155517578125’)
 ```
 
 Python 实现
 
-```
+```py
 b = a + 1
 print(b) 
 
@@ -376,7 +376,7 @@ print(b)
 
 下面是 get_probability_table 方法的实现。它只是将每个符号的频率除以表中所有频率的总和。
 
-```
+```py
 getcontext().prec = 40
 
 a = Decimal('123456789.12345679104328155517578125')
@@ -393,7 +393,7 @@ print(b)
 
 msg:要编码的消息。
 
-```
+```py
 def __init__(self, frequency_table):
     self.probability_table = self.get_probability_table(frequency_table)
 
@@ -401,7 +401,7 @@ def __init__(self, frequency_table):
 
 概率表:概率表。
 
-```
+```py
 {"a": 2,
  "b": 3,
  "c": 1,
@@ -413,7 +413,7 @@ def __init__(self, frequency_table):
 
 在每次迭代中，使用 process_stage()方法在一个阶段中处理消息的一个符号。该方法简单地接受概率表和当前间隔，并返回当前阶段内每个符号的间隔的字典。
 
-```
+```py
 def get_probability_table(self, frequency_table):
     total_frequency = sum(list(frequency_table.values()))
 
@@ -426,7 +426,7 @@ def get_probability_table(self, frequency_table):
 
 这是第一次迭代后返回的字典。这个字典被附加到一个名为 encoder 的列表中，该列表保存了所有阶段的间隔。
 
-```
+```py
 {'a': 0.2,
  'b': 0.3,
  'c': 0.1,
@@ -445,7 +445,7 @@ def get_probability_table(self, frequency_table):
 
 encoded_msg:编码消息的值。
 
-```
+```py
 def encode(self, msg, probability_table):
     encoder = []
 
@@ -473,7 +473,7 @@ msg_length:原始消息长度。
 
 概率表:编码过程中使用的概率表。
 
-```
+```py
 {
     'a': [Decimal('0.0'), Decimal('0.2')],
     'b': [Decimal('0.2'), Decimal('0.5')],
@@ -488,7 +488,7 @@ msg_length:原始消息长度。
 
 一旦定位到间隔，其对应的符号就是原始消息中的下一个。
 
-```
+```py
 [
  {'a': [Decimal('0'),
         Decimal('0.2')],
@@ -552,7 +552,7 @@ pyae.py 模块的完整代码如下所示。要获得最新的代码，请查看
 
 准备一条信息
 
-```
+```py
 def decode(self, encoded_msg, msg_length, probability_table):
     decoder = []
     decoded_msg = ""
@@ -585,7 +585,7 @@ def decode(self, encoded_msg, msg_length, probability_table):
 
 下面是使用 frequency_table 变量中给出的频率表对消息 bdab 进行编码的示例代码。
 
-```
+```py
 from decimal import Decimal
 
 class ArithmeticEncoding:
@@ -707,7 +707,7 @@ class ArithmeticEncoding:
 
 结论
 
-```
+```py
 import pyae
 
 frequency_table = {"a": 2,
@@ -734,7 +734,7 @@ print("Message Decoded Successfully? {result}".format(result=original_msg == dec
 
 我对算术编码算法的介绍到此结束。AE 将整个消息编码成一个浮点数。
 
-```
+```py
 Original Message: bdab
 Encoded Message: 0.3884
 Decoded Message: bdab

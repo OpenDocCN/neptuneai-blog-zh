@@ -92,19 +92,19 @@ Sci-kit 学习
 
 *   激活您的康达虚拟环境:
 
-```
+```py
 conda create --name coreml-env python=3.6
 ```
 
 *   安装 conda-forge 的 coremltools
 
-```
+```py
 conda activate coreml-env
 ```
 
 *   或者使用 pip 和 virtualenv 软件包:
 
-```
+```py
 conda install -c conda-forge coremltools 
 ```
 
@@ -114,13 +114,13 @@ conda install -c conda-forge coremltools
 
 激活虚拟环境并安装 coremltools:
 
-```
+```py
 virtualenv coreml-env
 ```
 
 *   加载预训练版本的 MobileNetV2
 
-```
+```py
 source coreml-env/bin/activate
 pip install -u coremltools
 ```
@@ -129,7 +129,7 @@ pip install -u coremltools
 
 将模型设置为评估模式:
 
-```
+```py
 import torch
 Import torchvision
 
@@ -138,7 +138,7 @@ mobile_net  = torchvision.models.mobilenet_v2(pretrained=True)
 
 使用 torch.jit.trace 生成 Torchscript 对象
 
-```
+```py
 mobile_net.eval()
 ```
 
@@ -148,7 +148,7 @@ mobile_net.eval()
 
 从单独的文件下载分类标签:
 
-```
+```py
 import torch
 
 input = torch.randn(1, 3, 224, 224)
@@ -157,7 +157,7 @@ mobile_net_traced = torch.jit.trace(mobile_net, input)
 
 使用 coremltools 将 TorchScript 对象转换为 Core ML 格式
 
-```
+```py
 import urllib
 label_url = 'https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt'
 class_labels = urllib.request.urlopen(label_url).read().decode("utf-8").splitlines()
@@ -170,7 +170,7 @@ assert len(class_labels) == 1000
 
 ***MLModel*** 扩展封装了核心 ML 模型的预测方法、配置和模型描述。正如您所看到的，coremltools 包帮助您将来自各种训练工具的训练模型转换成核心 ML 模型。
 
-```
+```py
 import coremltools as ct
 
 model = ct.convert(
@@ -317,17 +317,17 @@ vision API 可分为三个主要部分:
 
 *   收集和分离培训数据
 
-```
+```py
 conda create --name face_recog python=3.6
 ```
 
 *   为了训练我们的分类器，我们需要一些人脸样本和其他与人脸不对应的事物样本，如动物图像、实物等。最终，我们将需要创建两个数据文件夹，包含我们的脸和其余图像的图像。
 
-```
+```py
 conda activate face_recog
 ```
 
-```
+```py
 pip install turicreate==5.03
 ```
 
@@ -349,7 +349,7 @@ Augmentor 将生成 1500 个额外的面部数据样本。
 
 模特培训
 
-```
+```py
 import Augmentor as augment
 
 def data_processing(root_dir: str):
@@ -373,7 +373,7 @@ def data_processing(root_dir: str):
 3.  模型将开始训练，并在整个过程中显示历元结果。
 4.  构建 IOS 应用程序
 
-```
+```py
 import turicreate as tc
 import os
 
@@ -407,7 +407,7 @@ model.export_coreml('face_recognition.mlmodel')
 
 *   ViewController 布局:
 
-```
+```py
 var window: UIWindow?
 func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -425,7 +425,7 @@ func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options conn
 
 *Application Mockup, Source: Author*
 
-```
+```py
 let logo: UIImageView = {
     let image = UIImageView(image: 
     image.translatesAutoresizingMaskIntoConstraints = false
@@ -433,7 +433,7 @@ let logo: UIImageView = {
 }()
 ```
 
-```
+```py
 let faceRecognitionButton: CustomButton = {
         let button = CustomButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -452,7 +452,7 @@ let faceRecognitionButton: CustomButton = {
 
 *   人脸识别视图控制器
 
-```
+```py
 override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -477,7 +477,7 @@ fileprivate func setupView() {
 
 *   该 ViewController 采用实时摄像机预览，并触发模型对摄像机流产生的每一帧进行实时推理。在操作每个视频帧时，我们应该格外小心，因为我们可能会由于实时推断而使可用资源迅速超载，并使应用程序崩溃，从而导致内存泄漏。
 
-```
+```py
 @objc func handleFaceRecognition() {
 
        let controller = FaceRecognitionViewController()
@@ -492,7 +492,7 @@ fileprivate func setupView() {
 
 实例化模型
 
-```
+```py
 var videoCapture: VideoCapture!
     let semaphore = DispatchSemaphore(value: 1)
 
@@ -536,7 +536,7 @@ var videoCapture: VideoCapture!
 
 定义对每一帧执行推理的预测函数。
 
-```
+```py
 func initModel() {
     if let faceRecognitionModel = try? VNCoreMLModel(for: face_recognition().model) {
         self.visionModel = visionModel
@@ -550,7 +550,7 @@ func initModel() {
 
 *   最后，在后处理阶段，在每个预测上画一个方框。
 
-```
+```py
 extension FaceRecognitionViewController: VideoCaptureDelegate {
     func videoCapture(_ capture: VideoCapture, didCaptureVideoFrame pixelBuffer: CVPixelBuffer?, timestamp: CMTime) {
         // the captured image from camera is contained on pixelBuffer
@@ -565,7 +565,7 @@ extension FaceRecognitionViewController: VideoCaptureDelegate {
 
 *   扩展 facecognitionviewcontroller { func visionrequestdiddomplete(请求:VNRequest，错误:error？){ if let predictions = request . results as？[VNRecognizedObjectObservation]{ dispatch queue . main . async { self。bounding box view . predicted objects = predictions self . is referencing = false } } else { self . is referencing = false } self . semaphore . signal()} }
 
-```
+```py
 extension FaceRecognitionViewController {
     func predictFaces(pixelBuffer: CVPixelBuffer) {
         guard let request = request else { fatalError() }

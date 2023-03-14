@@ -128,7 +128,7 @@ LSTM 细胞背后的主要思想是学习到目前为止看到的序列中的重
 
 特别是，我们跟踪 3、7 和 30 天内不同交易特征的移动平均线。此外，我们还考虑了月、周数和工作日等特性。因此，我们模型的输入是多维的。所用特征工程的一个小例子如下:
 
-```
+```py
 lag_features = ["High", "Low", "Volume", "Turnover", "Trades"]
 df_rolled_7d = df[lag_features].rolling(window=7, min_periods=0)
 df_mean_7d = df_rolled_7d.mean().shift(1).reset_index().astype(np.float32)
@@ -142,7 +142,7 @@ df_mean_7d = df_rolled_7d.mean().shift(1).reset_index().astype(np.float32)
 
 我们从公开可用的包 [pmdarima](https://web.archive.org/web/20221117203552/http://alkaline-ml.com/pmdarima/) 中实现了 ARIMA 版本。函数 [auto_arima](https://web.archive.org/web/20221117203552/http://alkaline-ml.com/pmdarima/modules/generated/pmdarima.arima.auto_arima.html#pmdarima.arima.auto_arima) 接受一列*外生*特征作为附加参数，其中我们提供了在特征工程步骤中创建的特征。auto_arima 的主要优点是，它首先执行几个测试，以确定时间序列是否是平稳的。此外，它采用智能电网搜索策略来确定上一节中讨论的 p、d 和 q 的最佳参数。
 
-```
+```py
 from pmdarima import auto_arima
 model = auto_arima(
 	df_train["VWAP"],
@@ -156,7 +156,7 @@ model = auto_arima(
 
 然后通过以下方式获得对测试集的预测
 
-```
+```py
 forecast = model.predict(n_periods=len(df_valid),  exogenous=df_valid[exogenous_features])
 ```
 
@@ -169,27 +169,27 @@ forecast = model.predict(n_periods=len(df_valid),  exogenous=df_valid[exogenous_
 
 我们将模型实例化为:
 
-```
+```py
 from prophet import Prophet
 model = Prophet()
 ```
 
 必须将特征工程期间创建的特征明确添加到模型中，如下所示:
 
-```
+```py
 for feature in exogenous_features:
 	model.add_regressor(feature)
 ```
 
 最后，我们拟合模型:
 
-```
+```py
 model.fit(df_train[["Date", "VWAP"] + exogenous_features].rename(columns={"Date": "ds", "VWAP": "y"}))
 ```
 
 并且测试集的预测如下获得:
 
-```
+```py
 forecast = model.predict(df_test[["Date", "VWAP"] + exogenous_features].rename(columns={"Date": "ds"}))
 ```
 
@@ -197,7 +197,7 @@ forecast = model.predict(df_test[["Date", "VWAP"] + exogenous_features].rename(c
 
 我们使用 LSTMs 的 [Keras 实现](https://web.archive.org/web/20221117203552/https://keras.io/api/layers/recurrent_layers/lstm/):
 
-```
+```py
 import tensorflow as tf
 from keras.layers import Dropout
 from tensorflow.keras.layers import Dense
@@ -208,7 +208,7 @@ from tensorflow.keras.models import Sequential
 
 该模型由以下函数定义。
 
-```
+```py
 def get_model(params, input_shape):
 	model = Sequential()
 	model.add(LSTM(units=params["lstm_units"], return_sequences=True, input_shape=(input_shape, 1)))
@@ -234,7 +234,7 @@ def get_model(params, input_shape):
 
 然后，我们用一组给定的参数实例化一个模型。我们使用时间序列中过去的 90 个观测值作为模型的输入序列。其他超参数描述了用于训练模型的架构和特定选择。
 
-```
+```py
 params = {
 	"loss": "mean_squared_error",
 	"optimizer": "adam",
@@ -256,7 +256,7 @@ model = get_model(params=params, input_shape=x_train.shape[1])
 
 然后，我们创建一个回调来实现[提前停止](https://web.archive.org/web/20221117203552/https://en.wikipedia.org/wiki/Early_stopping)，即，如果对于给定数量的时期(在我们的示例中为 10 个时期)验证数据集没有产生改进，则停止训练模型:
 
-```
+```py
 es_callback = tf.keras.callbacks.EarlyStopping(monitor='val_root_mean_squared_error',
                                            	mode='min',
 patience=params["es_patience"])
@@ -266,7 +266,7 @@ patience=params["es_patience"])
 
 最后，我们使用预定义的参数拟合模型:
 
-```
+```py
 model.fit(
 	x_train,
 	y_train,
@@ -302,14 +302,14 @@ Neptune 是 MLOps 的[元数据存储库，为运行大量实验的团队而构�
 
 如本教程中的[所述，我们首先创建一个 Neptune 项目，并记录我们帐户的 API:](https://web.archive.org/web/20221117203552/https://docs.neptune.ai/getting-started/hello-world)
 
-```
+```py
 run = neptune.init(project='<YOUR_WORKSPACE/YOUR_PROJECT>',
                	api_token='<YOUR_API_TOKEN>') 
 ```
 
 变量 *run* 可以看作一个文件夹，我们可以在其中创建包含不同信息的子文件夹。例如，我们可以创建一个名为 model 的子文件夹，并在其中记录模型的名称:
 
-```
+```py
 run["model/name"] = "Arima"
 ```
 
@@ -321,7 +321,7 @@ run["model/name"] = "Arima"
 
 请注意，可以通过设置相应的值将这些值记录到 Neptune 中，例如，设置:
 
-```
+```py
 run["test/mae"] = mae
  run["test/rmse"] = mse
 ```

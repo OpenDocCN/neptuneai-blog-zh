@@ -93,7 +93,7 @@
 
 接下来，我们加载我们的图像，通过我们的模型运行它，并获得相对于图像的损失梯度。
 
-```
+```py
 pretrained_model = tf.keras.applications.MobileNetV2(include_top=True,
                                                      weights='imagenet')
 pretrained_model.trainable = False
@@ -103,7 +103,7 @@ pretrained_model.trainable = False
 
 现在我们有了渐变，我们可以在与渐变方向相反的方向上轻推图像像素。
 
-```
+```py
 def display_images(image, info):
   _, label, prob = get_imagenet_label(pretrained_model.predict(image))
   plt.figure()
@@ -114,7 +114,7 @@ def display_images(image, info):
 
 换句话说，我们在最大化损失的方向上轻推图像像素。我们将对不同的ε值运行攻击，其中**ε= 0**表示没有运行攻击。
 
-```
+```py
 loss_object = tf.keras.losses.Categorical_Crossentropy()
 def create_adversarial_pattern(input_image, input_label):
   with tf.GradientTape() as tape:
@@ -135,7 +135,7 @@ def create_adversarial_pattern(input_image, input_label):
 
 我们成功地愚弄了一个最先进的模型，让它做出了错误的预测，而没有改变这个模型的任何东西。
 
-```
+```py
 epsilons = [0, 0.01, 0.1, 0.15]
 descriptions = [('Epsilon = {:0.3f}'.format(eps) if eps else 'Input')
                 for eps in epsilons]
@@ -154,7 +154,7 @@ for i, eps in enumerate(epsilons):
 
 后续步骤
 
-```
+```py
 epsilons = [0, 0.01, 0.1, 0.15]
 descriptions = [('Epsilon = {:0.3f}'.format(eps) if eps else 'Input')
                 for eps in epsilons]

@@ -68,7 +68,7 @@ Integrated 表示为了使数据稳定而必须应用的任何差异。可以对
 
 他们之间的区别是显而易见的。差分后，我们可以看到它明显比原始数据更稳定，并且多年来平均值和方差大致一致。我们可以使用下面的代码进行 dickey-fuller 测试。
 
-```
+```py
 def check_stationarity(ts):
     dftest = adfuller(ts)
     adf = dftest[0]
@@ -100,7 +100,7 @@ m[t]=[0]+[1]e[t-1]+[2]e[t-2]+[3]e[t-3]+…+[q]e[t-q]
 
 #### 导入依赖关系
 
-```
+```py
 from IPython.display import display
 
 import numpy as np
@@ -137,7 +137,7 @@ RANDOM_SEED = np.random.seed(0)
 
 #### 提取-转换-加载(ETL)
 
-```
+```py
 def parser(s):
     return datetime.strptime(s, '%Y-%m-%d')
 
@@ -165,7 +165,7 @@ plt.ylabel('Sales', fontsize=16)
 
 #### STL 分解
 
-```
+```py
 plt.rc('figure',figsize=(14,8))
 plt.rc('font',size=15)
 
@@ -184,7 +184,7 @@ fig = result.plot()
 
 #### ACF 和 PACF 图
 
-```
+```py
 plot_acf(lim_catfish_sales['Total'], lags=48);
 plot_pacf(lim_catfish_sales['Total'], lags=30);
 ```
@@ -210,7 +210,7 @@ plot_pacf(lim_catfish_sales['Total'], lags=30);
 
 我们将使用 statsmodels 模块来实现和使用 ARIMA。为此，我们从 statsmodels 中导入了 ARIMA 类。现在，让我们用上一节中讨论的参数来拟合。
 
-```
+```py
 arima = ARIMA(lim_catfish_sales['Total'], order=(12,1,1))
 predictions = arima.fit().predict()
 ```
@@ -223,7 +223,7 @@ predictions = arima.fit().predict()
 
 #### 可视化结果
 
-```
+```py
 plt.figure(figsize=(16,4))
 plt.plot(lim_catfish_sales.diff(), label="Actual")
 plt.plot(predictions, label="Predicted")
@@ -260,7 +260,7 @@ ETL 和依赖项将保持与 ARIMA 相同，因此我们将直接跳到建模部
 
 #### 安装 SARIMA
 
-```
+```py
 sarima = SARIMAX(lim_catfish_sales['Total'],
                 order=(1,1,1),
                 seasonal_order=(1,1,0,12))
@@ -271,7 +271,7 @@ predictions = sarima.fit().predict()
 
 #### 可视化结果
 
-```
+```py
 plt.figure(figsize=(16,4))
 plt.plot(lim_catfish_sales, label="Actual")
 plt.plot(predictions, label="Predicted")

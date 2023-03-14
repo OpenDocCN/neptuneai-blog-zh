@@ -121,14 +121,14 @@
 
 为了使用 Python 直接从 Pytorch 访问 Neptune 仪表板，Neptune.ai 的开发人员开发了一个易于访问的工具箱，可以使用 pip 安装:
 
-```
+```py
 pip install neptune-client
 
 ```
 
 安装完成后，可以通过将 Neptune 导入到主 Python 脚本来轻松完成实验初始化:
 
-```
+```py
 import neptune
 
 NEPTUNE_API_TOKEN="<api-token-here>"
@@ -151,7 +151,7 @@ neptune.create_experiment('Pytorch-Neptune-Example')
 
 数据集可以在 PyTorch 中轻松下载。导入 Torchvision 并使用以下命令:
 
-```
+```py
 import torchvision.datasets as datasets
 
 cifar_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
@@ -164,7 +164,7 @@ cifar_testset = datasets.CIFAR10(root='./data', train=False, download=True, tran
 
 本实验使用的 CNN 架构如下:
 
-```
+```py
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
@@ -200,7 +200,7 @@ class CNN(nn.Module):
 
 PyTorch python 脚本与 Neptune 的集成在 fit()函数中类似如下:
 
-```
+```py
 def fit(model, train_loader, test_loader, epochs, optimizer, loss):
     model.train()
     import neptune
@@ -265,7 +265,7 @@ neptune.stop()
 
 可以很容易地调用 fit()函数，这将生成一个链接，该链接将我们重定向到 Neptune 仪表板:
 
-```
+```py
 fit(cnn, train_loader, test_loader, epochs=100, optimizer='Adam', loss='CrossEntropy')
 
 ```
@@ -298,7 +298,7 @@ fit(cnn, train_loader, test_loader, epochs=100, optimizer='Adam', loss='CrossEnt
 
 **现在，让我们在代码中引入提前停止:**
 
-```
+```py
 valid_loss_array = np.array(valid_losses)
 min_valid_loss = np.min(valid_loss_array)
 

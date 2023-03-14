@@ -109,7 +109,7 @@ ROC_AUC 代表“受试者操作者特征 _ 曲线下面积”。它总结了预
 
 要在模型中使用这个函数，您可以从 scikit-learn 中导入它:
 
-```
+```py
 from sklearn.metrics import balanced_accuracy_score
 bal_acc=balanced_accuracy_score(y_test,y_pred)
 ```
@@ -122,7 +122,7 @@ bal_acc=balanced_accuracy_score(y_test,y_pred)
 
 假设我们有一个二元分类器，其混淆矩阵如下:
 
-```
+```py
 Accuracy = (TP + TN) / (TP+FN+FP+TN) = 20+5000 / (20+30+70+5000)
 Accuracy = ~98.05%.
 
@@ -132,7 +132,7 @@ Accuracy = ~98.05%.
 
 所以，让我们考虑平衡精度，这将说明类中的不平衡。下面是我们的分类器的平衡精度计算:
 
-```
+```py
 Sensitivity = TP / (TP + FN) = 20 / (20+30) = 0.4 = 40%
 Specificity = TN / (TN + FP) = 5000 / (5000 +70) = ~98.92%.
 
@@ -151,7 +151,7 @@ Balanced Accuracy = (Sensitivity + Specificity) / 2 = 40 + 98.92 / 2 = 69.46%
 
 让我们计算一下精确度:
 
-```
+```py
 Accuracy = TP + TN / (TP+FP+FN+TN)
 
 TP = 10 + 545 + 11 + 3 = 569
@@ -175,7 +175,7 @@ Accuracy = 0.803
 
 ***【回忆= TP / (TP + FN)***
 
-```
+```py
 For class P, given in the table above,
 
 Recallp = 10 / (10+57) = 0.054 = 5.4%, 
@@ -183,7 +183,7 @@ Recallp = 10 / (10+57) = 0.054 = 5.4%,
 
 如你所见，这个模型预测 P 类的真阳性率很低。
 
-```
+```py
 For class Q
 RecallQ = 545 / (545 + 40) = 0.932
 
@@ -208,7 +208,7 @@ Balanced Accuracy = (0.054 + 0.932 + 0.040 + 0.231) / 4 = 1,257 / 4 = 0.3143
 
 看看这个模型的准确性，我们可以说它很高，但是…它不会产生任何结果，因为它的预测能力为零(这个模型只能预测一个类别)。
 
-```
+```py
 Binary Accuracy:
 
 Sensitivity= TP / (TP + FN) = 0 / (0+10) = 0
@@ -233,7 +233,7 @@ Binary Accuracy = 0.5 = 50%
 
 *   F1 保持了精确度和召回率之间的平衡
 
-```
+```py
 F1 = 2 * ([precision * recall] / [precision + recall])
 Balanced Accuracy = (specificity + recall) / 2
 
@@ -249,7 +249,7 @@ Balanced Accuracy = (specificity + recall) / 2
 
 f1-得分和平衡准确度将为:
 
-```
+```py
 Precision = 5 / 15 = 0.33
 Sensitivity = 5 / 10 = 0.5
 Specificity = 990 / 1000 = 0.99
@@ -262,7 +262,7 @@ Balanced Accuracy = (0.5 + 0.99) / 2 = 0.745
 
 考虑另一种情况，数据中没有真正的负数:
 
-```
+```py
 Precision = 5 / 15 = 0.33
 Sensitivity = 5 / 10 = 0.5
 Specificity = 0 / 10 = 0
@@ -312,7 +312,7 @@ Roc_auc 类似于平衡精度，但有一些关键区别:
 
 像往常一样，我们从导入必要的库和包开始。
 
-```
+```py
 Import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -336,7 +336,7 @@ Train =pd.read_csv(data_file_path)
 
 让我们来看看剧情。
 
-```
+```py
 sns.countplot(train['fradulent'])
 plt.title('A plot of transaction')
 plt.xlabel('target')
@@ -352,7 +352,7 @@ plt.show()
 
 我们将通过下面的代码提取交易的年份和时间:
 
-```
+```py
 train['hour']=train['transaction time'].str.split('T',expand=True)[1].str.split(':',expand=True)[0]
 train['year']=train['transaction time'].str.split('-',expand=True)[0]
 
@@ -362,7 +362,7 @@ train['year']=train['transaction time'].str.split('-',expand=True)[0]
 
 下一步是将字符串(分类)变量编码成数字格式。我们将对其进行标记和编码。Sklearn 也为此提供了一个名为 LabelEncoder 的工具。
 
-```
+```py
 encode={'account type':{'saving':0,'current':1},
 
        'credit card type':{'master':0,'verve':1},
@@ -386,7 +386,7 @@ True / False 值列不需要编码，因为它们是布尔值。
 
 数据中不重要的列需要放到下面:
 
-```
+```py
 train.drop(['transaction time','id'],axis=1,inplace=True)
 ```
 
@@ -394,7 +394,7 @@ train.drop(['transaction time','id'],axis=1,inplace=True)
 
 我们需要调整数据，以确保每个特征的权重相同。为了缩放这些数据，我们将使用 StandardScaler。
 
-```
+```py
 X=train.drop(['fradulent'],axis=1)
 y=train['fradulent']
 
@@ -408,7 +408,7 @@ X=std.fit_transform(X)
 
 在拟合之前，我们需要将数据分为测试集和训练集，这使我们能够在部署之前了解模型在测试数据上的表现。
 
-```
+```py
 run = neptune.init(project=binaryaccuracy,
                    api_token=api_token)
 
@@ -417,7 +417,7 @@ x_train,x_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=0)
 
 在这种分割之后，我们现在可以在查看计算图时，用我们到目前为止讨论过的评分标准来拟合和评分我们的模型。
 
-```
+```py
 for epoch in range(100,3000,100):
               gb=GradientBoostingClassifier(n_estimators=epoch,learning_rate=epoch/5000)
     gb.fit(x_train,y_train)
@@ -445,7 +445,7 @@ for epoch in range(100,3000,100):
 
 要查看预测并存储在元数据中，请使用以下代码:
 
-```
+```py
 df = pd.DataFrame(data={'y_test': y_test, 'y_pred': y_pred, 'y_pred_probability': y_pred_proba.max(axis=1)})
 
 run['test/predictions'] = neptune.types.File.as_html(df)
@@ -456,7 +456,7 @@ run['test/predictions'] = neptune.types.File.as_html(df)
 
 此函数创建绘图并将其记录到元数据中，您可以从 scikitplot.metrics 中获得它处理的各种曲线。
 
-```
+```py
 def plot_curve(graph):
     fig, ax = plt.subplots()
     graph(y_test, y_pred_proba,ax=ax)

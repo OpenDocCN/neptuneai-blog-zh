@@ -88,7 +88,7 @@ NLTK 的多词表达式标记器(MWETokenizer)提供了一个函数 add_mwe()，
 
 让我们从安装 TextBlob 和 NLTK 语料库开始:
 
-```
+```py
 $pip install -U textblob 
 $python3 -m textblob.download_corpora
 
@@ -108,7 +108,7 @@ spaCy tokenizer 提供了指定特殊标记的灵活性，这些标记不需要�
 
 在使用 spaCy 之前，您需要安装它，下载英语语言的数据和模型。
 
-```
+```py
 $ pip install spacy
 $ python3 -m spacy download en_core_web_sm
 

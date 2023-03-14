@@ -181,7 +181,7 @@ RL 以其主流算法被用于解决几个具有超人性能的游戏而闻名�
 
 首先，我们以网格形式定义问题及其状态。
 
-```
+```py
 TRAFFIC = "T"
 AGENT = "A"
 HOME = "H"
@@ -200,7 +200,7 @@ for row in mdp_grid:
 
 代理只能向左、向右、向上和向下移动，这意味着他只能执行以下操作:
 
-```
+```py
 UP = 0
 DOWN = 1
 LEFT = 2
@@ -211,7 +211,7 @@ ACTIONS = [UP, DOWN, LEFT, RIGHT]
 
 既然知道了状态和动作，就该计算每个状态-动作对的奖励，并确认目标是否已经实现。对于每次迭代，它将状态和动作作为输入，并返回新的状态、动作和奖励。
 
-```
+```py
 def path(state, action):
 
     def new_pos(state, action):
@@ -261,7 +261,7 @@ def path(state, action):
 
 这里，我们定义了一些常数，稍后我们将使用贝尔曼公式来计算 Q 值。
 
-```
+```py
 N_STATES = 4
 N_EPISODES = 10
 
@@ -279,7 +279,7 @@ q_table = dict()
 
 为了创建 q_table，我们需要状态-动作和相应的 q 值。
 
-```
+```py
 def q(state, action=None):
 
     if state not in q_table:
@@ -293,7 +293,7 @@ def q(state, action=None):
 
 我们还需要决定什么是最好的行动。
 
-```
+```py
 def choose_action(state):
     if random.uniform(0, 1) < eps:
         return random.choice(ACTIONS)
@@ -303,7 +303,7 @@ def choose_action(state):
 
 让我们播放几集，看看代理人需要多长时间来决定回家的最佳方式。
 
-```
+```py
 for e in range(N_EPISODES):
 
     state = start_state
@@ -327,7 +327,7 @@ for e in range(N_EPISODES):
 
 如果你记得我们之前做的网格，代理在位置(1，1)。我们将从 1，1 开始旅程，看看代理接下来会去哪里——他会走繁忙的道路还是没有交通的道路？
 
-```
+```py
 r = q(start_state)
 print(f"up={r[UP]}, down={r[DOWN]}, left={r[LEFT]}, right={r[RIGHT]}")
 
@@ -336,7 +336,7 @@ up=98.13421151608904, down=42.67994031503147, left=-10.0, right=42.2540637718215
 
 因此，可以看到 UP 具有最高的 Q 值，即当代理开始时，他选择了没有交通流量的道路。让我们看看他下一步会做什么。
 
-```
+```py
 new_state, reward, done = path(start_state, UP)
 r = q(new_state)
 print(f"up={r[UP]}, down={r[DOWN]}, left={r[LEFT]}, right={r[RIGHT]}")
@@ -374,7 +374,7 @@ up=-1.0, down=0.9519170608828851, left=99.92190645654732, right=0.0
 
 创建一个 3 x 3 的井字游戏板，起初，它是空的。
 
-```
+```py
 def play_game():
     tree = MCTS()
     board = new_tic_tac_toe_board()
@@ -402,7 +402,7 @@ if __name__ == "__main__":
     play_game()
 ```
 
-```
+```py
 enter row,col: 3,1
 ```
 
@@ -410,7 +410,7 @@ enter row,col: 3,1
 
 现在是时候让电脑下他的棋了。它将首先进行 50 次滚转，然后移动。
 
-```
+```py
     def do_rollout(self, node):
         "Make the tree one layer better. (Train for one iteration.)"
         path = self._select(node)

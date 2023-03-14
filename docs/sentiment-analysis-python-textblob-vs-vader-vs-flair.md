@@ -55,14 +55,14 @@ Textblob 将忽略它不认识的单词，它将考虑它可以分配极性的�
 
 用于情感推理的效价感知词典(VADER) 是另一个流行的基于规则的情感分析器。
 
-```
+```py
 from textblob import TextBlob
 
 testimonial = TextBlob("The food was great!")
 print(testimonial.sentiment)
 ```
 
-```
+```py
  Sentiment(polarity=1.0, subjectivity=0.75)
 
 ```
@@ -92,7 +92,7 @@ Vader 针对社交媒体数据进行了优化，当与来自 twitter、facebook 
 
 嵌入型模型
 
-```
+```py
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 analyzer = SentimentIntensityAnalyzer()
 sentence = "The food was great!"
@@ -100,7 +100,7 @@ vs = analyzer.polarity_scores(sentence)
 print("{:-<65} {}".format(sentence, str(vs)))
 ```
 
-```
+```py
 {'compound': 0.6588, 'neg': 0.0, 'neu': 0.406, 'pos': 0.594}
 
 ```
@@ -136,7 +136,7 @@ Flair 预训练情感分析模型在 IMDB 数据集上进行训练。要加载�
 
 在本节中，您将学习何时以及如何使用 TensorFlow 从头开始构建情感分析模型。所以，我们来检查一下怎么做。
 
-```
+```py
 from flair.models import TextClassifier
 from flair.data import Sentence
 
@@ -148,7 +148,7 @@ print('Sentence above is: ', sentence.labels)
 
 ```
 
-```
+```py
 [POSITIVE (0.9961)
 
 ```

@@ -159,7 +159,7 @@ Scikit-learn 让我们实现一个`[打包分类器](https://web.archive.org/web
 *   导入一个基础评估器——决策树分类器，
 *   创建“BaggingClassifier”的实例。
 
-```
+```py
 from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
 bagging = BaggingClassifier(base_estimator=DecisionTreeClassifier(),n_estimators=10, max_samples=0.5, max_features=0.5)
@@ -174,14 +174,14 @@ bagging 分类器有几个参数:
 
 接下来，您可以在训练集上拟合这个分类器，并对其进行评分。
 
-```
+```py
 bagging.fit(X_train, y_train)
 bagging.score(X_test,y_test)
 ```
 
 回归问题的过程是一样的，唯一的不同是你将使用回归估计器。
 
-```
+```py
 from sklearn.ensemble import BaggingRegressor
 bagging = BaggingRegressor(DecisionTreeRegressor())
 bagging.fit(X_train, y_train)
@@ -200,7 +200,7 @@ model.score(X_test,y_test)
 
 在 Scikit-learn 中，可以通过“RandomForestClassifier”和“ExtraTreesClassifier”实现随机树的森林。回归问题也有类似的估计。
 
-```
+```py
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 clf = RandomForestClassifier(n_estimators=10, max_depth=None,  min_samples_split=2, random_state=0)
@@ -226,7 +226,7 @@ AdaBoost 可用于回归和分类问题。让我们花点时间看看如何使�
 
 默认情况下，决策树被用作基本估计器。为了获得更好的结果，可以调整决策树的参数。您还可以调整基本估计量的数量。
 
-```
+```py
 from sklearn.ensemble import AdaBoostClassifier
 model = AdaBoostClassifier(n_estimators=100)
 model.fit(X_train, y_train)
@@ -243,7 +243,7 @@ model.score(X_test,y_test)
 
 可以使用 Scikit-learn 建立一个基于梯度树提升的模型。
 
-```
+```py
 from sklearn.ensemble import GradientBoostingClassifier
 model = GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0)
 model.fit(X_train, y_train)
@@ -256,7 +256,7 @@ model.score(X_test,y_test)
 
 该算法对基础学习者使用回归树。它还内置了交叉验证。开发人员喜欢它的准确性、效率和可行性。
 
-```
+```py
 import xgboost as xgb
 params = {"objective":"binary:logistic",'colsample_bytree': 0.3,'learning_rate': 0.1,
                 'max_depth': 5, 'alpha': 10}
@@ -274,7 +274,7 @@ model.score(X_test,y_test)
 
 以下是如何将 LightGBM 应用于二进制分类问题。
 
-```
+```py
 import lightgbm as lgb
 lgb_train = lgb.Dataset(X_train, y_train)
 lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
@@ -307,7 +307,7 @@ gbm = lgb.train(params,
 
 以下是如何将 CatBoost 应用于分类问题的方法。
 
-```
+```py
 from catboost import CatBoostClassifier
 cat = CatBoostClassifier()
 cat.fit(X_train,y_train,verbose=False, plot=True
@@ -321,7 +321,7 @@ Scikit-learn 可用于堆叠估计量。让我们来看看如何对分类问题�
 
 首先，您需要设置您想要使用的基本估计量。
 
-```
+```py
 estimators = [
   ('knn', KNeighborsClassifier()),
    ('rf', RandomForestClassifier(n_estimators=10, random_state=42)),
@@ -336,7 +336,7 @@ estimators = [
 *   ` cv '交叉验证生成器。默认情况下使用 5 k 倍交叉验证，
 *   “stack_method ”,规定应用于每个估算器的方法。如果为“auto ”,它将依次尝试“predict_proba”、“decision_function”或“predict”。
 
-```
+```py
 from sklearn.ensemble import StackingClassifier
 clf = StackingClassifier(
  estimators=estimators, final_estimator=LogisticRegression()
@@ -345,7 +345,7 @@ clf = StackingClassifier(
 
 之后，您可以将数据拟合到训练集，并在测试集上对其进行评分。
 
-```
+```py
 clf.fit(X_train, y_train)
 clf.score(X_test,y_test)
 ```
@@ -359,7 +359,7 @@ Scikit-learn 还允许您实现投票估计器。它使用多数投票或基本�
 *   ‘软’意味着概率的平均值将被用于计算最终结果，
 *   ` hard '通知分类器使用预测类别进行多数表决。
 
-```
+```py
 from sklearn.ensemble import VotingClassifier
 voting = VotingClassifier(
     estimators=estimators,
@@ -374,7 +374,7 @@ voting = VotingClassifier(
 
 您还必须定义将用于汇总预测的最终模型。在这种情况下，它是逻辑回归模型。
 
-```
+```py
 knn = KNeighborsClassifier(n_neighbors=1)
 rf = RandomForestClassifier(random_state=1)
 gnb = GaussianNB()

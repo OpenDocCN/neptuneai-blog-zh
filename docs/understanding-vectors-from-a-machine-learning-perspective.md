@@ -28,21 +28,21 @@
 
 **标量**:对我们来说，标量只是数字。我们可以把它们想象成我们使用的任何常规值。我们数据集中的任何单个值都代表一个标量。例如，我们房价数据中的卧室数量将是一个标量。如果我们只使用一个特征作为房价数据的输入，那么我们可以将其表示为一个标量值。
 
-```
+```py
 print(house_price_df['bedrooms'].values[0])
 3
 ```
 
 **向量**:在我们的房价数据中，似乎有不止一个可用的特征。我们如何表示多个特征？当试图预测房价时，房子的总面积将是一条有用的信息。最简单的形式是，我们可以把向量看作一维数据结构。我们稍后将更详细地定义一个 vector，但是现在可以把它看作一个列表，让我们把更多的特性传递给我们的模型:
 
-```
+```py
 print(house_price_df[["bedrooms", "sqft_lot"]].values[:1])
 [[   3 5650]]
 ```
 
 我们还可以通过以列而不是行的格式排列数据来创建一维向量:
 
-```
+```py
 print(house_price_df[["bedrooms", "sqft_lot"]].values.T[:2, :1].shape)
 [[   3]
  [5650]]
@@ -50,7 +50,7 @@ print(house_price_df[["bedrooms", "sqft_lot"]].values.T[:2, :1].shape)
 
 矩阵:到目前为止，我们只看了数据集中的第一栋房子。如果我们需要批量通过多个房子，有他们的卧室和平方英尺/平方米的价值？这就是矩阵的用武之地。您可以将矩阵视为二维数据结构，其中两个维度指的是行数和列数:
 
-```
+```py
 print(house_price_df[["bedrooms", "sqft_lot"]].values[:2])
 [[   3 5650]
  [   3 7242]]
@@ -58,14 +58,14 @@ print(house_price_df[["bedrooms", "sqft_lot"]].values[:2])
 
 这是一个包含行和列的二维数据结构:
 
-```
+```py
 print(house_price_df[["bedrooms", "sqft_lot"]].values[:2].shape)
 (2, 2)
 ```
 
 我们可以添加更多的行，查看前 3 个房价数据，看看这如何改变我们矩阵的形状:
 
-```
+```py
 print(house_price_df[["bedrooms", "sqft_lot"]].values[:3].shape)
 (3, 2)
 ```
@@ -88,7 +88,7 @@ print(house_price_df[["bedrooms", "sqft_lot"]].values[:3].shape)
 
 该模型可能试图预测房价，使用我们之前使用的房价数据集来解释标量、向量和矩阵之间的差异。在这种情况下，我们可能会传递诸如房子大小、卧室数量、邮政编码之类的信息。这些都是可能有助于模型预测更准确的房价的特征。很容易看出我们如何为我们的房价模型创建一个输入向量。当我们创建一个包含卧室数量和房屋平方英尺/平方米值的向量时，我们已经展示了如何对这些数据进行编码:
 
-```
+```py
 print(house_price_df[["bedrooms", "sqft_lot"]].values[:1])
 [[   3 5650]]
 ```
@@ -111,7 +111,7 @@ print(house_price_df[["bedrooms", "sqft_lot"]].values[:1])
 
 为了尝试和确定我们的 Bowie 歌词向量的长度，我们可以用上面两行来代表我们的整个 Bowie 歌词语料库。然后我们有 9 个独特的词或特征。
 
-```
+```py
 def get_vocab(text):
     vocab = set()
     for line in text:
@@ -124,7 +124,7 @@ print(f'They are: {vocab}')
 
 ```
 
-```
+```py
 There are 9 unique words in these lyrics:
 They are: {'children', 'in', 'of', 'grass', 'gathered', 'the', 'end', "summer's", 'dampened'}
 ```
@@ -133,13 +133,13 @@ They are: {'children', 'in', 'of', 'grass', 'gathered', 'the', 'end', "summer's"
 
 我们的特征看起来像这样:
 
-```
+```py
 count_vector = vector_lookup(lyric_list[0:2])
 print(count_vector)
 
 ```
 
-```
+```py
 {0: 'children', 1: 'in', 2: 'of', 3: 'grass', 4: 'gathered', 5: 'the', 6: 'end', 7: "summer's", 8: 'dampened'}
 ```
 
@@ -147,12 +147,12 @@ print(count_vector)
 
 如果我们的输入句子是“在草地上玩耍的孩子们”，那么表示这个句子的输入向量将如下所示:
 
-```
+```py
 print(input_vector(count_vector, "The children played in the grass"))
 
 ```
 
-```
+```py
 [1, 1, 0, 1, 0, 2, 0, 0, 0]
 ```
 
@@ -160,7 +160,7 @@ print(input_vector(count_vector, "The children played in the grass"))
 
  *现在让我们使用“一个自由节日的记忆”中的所有歌词，看看我们对同一个句子的输入向量是什么样子的:
 
-```
+```py
 count_vector = vector_lookup(lyric_list)
 full_vec = input_vector(count_vector, "The children played in the grass")
 print(f'The new feture size is {len(count_vector)}')
@@ -169,7 +169,7 @@ print(full_vec)
 
 新的特征尺寸是 129
 
-```
+```py
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -190,7 +190,7 @@ print(full_vec)
 
 如前所述，这些向量包含 512 个特征或维度。有趣的是，向量的大小并不随[输入句子](https://web.archive.org/web/20221207160113/https://www.tensorflow.org/hub/tutorials/semantic_similarity_with_tf_hub_universal_encoder)的大小而变化:
 
-```
+```py
 sample_sentences = ["We scanned the skies with rainbow eyes",
                     "We looked up into the sky",
                     "It was raining and I saw a rainbow",
@@ -218,7 +218,7 @@ for i, sentence_embedding in enumerate(np.array(sentence_embeddings).tolist()):
 
 **鲍伊歌词矩阵**
 
-```
+```py
 import numpy as np
 np.set_printoptions(threshold=10)
 lyrics = []
@@ -233,7 +233,7 @@ print(lyric_matrix)
 
 ```
 
-```
+```py
 And fly it from the toppest top
 of all the tops that man has
 pushed beyond his Brain.
@@ -400,7 +400,7 @@ MathInsight 网站有一个[很好的工具](https://web.archive.org/web/2022120
 
 我们之前已经看到，向量范数是一种确定向量“大小”的方法。在为我们的向量生成嵌入之后，我们可以得到如下的 L1 和 L2 范数:
 
-```
+```py
 for sentence, vector in zip(sample_sentences, sentence_embeddings):
   l1 = norm(vector, 1)
   print(f"L1 norm of '{sentence}': is {l1:.4}")
@@ -409,7 +409,7 @@ for sentence, vector in zip(sample_sentences, sentence_embeddings):
 
 ![L1 norm code](img/653063569d7076a37e6ed96b77833f0e.png)
 
-```
+```py
 for sentence, vector in zip(sample_sentences, sentence_embeddings):
   l1 = norm(vector)
   print(f"L2 norm of '{sentence}': is {l1:.4}")
@@ -429,7 +429,7 @@ for sentence, vector in zip(sample_sentences, sentence_embeddings):
 
 作为一个不同的例子，让我们用一个不同的模型来得到我们的向量的 L2 范数，这个模型没有以同样的方式归一化向量。有一个很棒的库可以做到这一点，叫做[快速句子嵌入](https://web.archive.org/web/20221207160113/https://github.com/oborchers/Fast_Sentence_Embeddings/blob/master/notebooks/Tutorial.ipynb) (FSE)。这些向量的 L2 范数不都是 1:
 
-```
+```py
 for idx, sentence in enumerate(sample_sentences):
   l2 = norm(model.sv[idx])
   print(f"L2 norm of '{sentence}': is {l2:.4}")
@@ -444,7 +444,7 @@ for idx, sentence in enumerate(sample_sentences):
 
 如果大小本身不能告诉我们很多关于向量的信息，让我们试试内积。记住，这是两个向量乘积的和:
 
-```
+```py
 res = {}
 for sen in sample_sentences:
     res[sen] = []
@@ -466,7 +466,7 @@ pd.DataFrame(res, index=[s for s in sample_sentences])
 
 另一个得分是两个向量之间的余弦相似性得分。正如我们之前提到的，这忽略了向量的大小，所以它应该给内积一个不同的结果。但是请记住，我们的嵌入是标准化的，这意味着我们应该得到与内积相同的余弦相似性分数。知道这一点很有好处，因为如果要进行大量的相似性比较，内积运算会更有效。
 
-```
+```py
 def get_cos_sim(sen1, sen2):
   sts_encode1 = embed(tf.constant([sen1]))
   sts_encode2 = embed(tf.constant([sen2]))
@@ -494,7 +494,7 @@ pd.DataFrame(res, index=[s for s in sample_sentences])
 
 所以我们知道我们的嵌入已经被规范化了，或者，正如他们在 TF 页中所描述的，接近规范化了。在这种情况下，原始嵌入和我们对原始嵌入进行规范化应该没有区别。我们如何衡量这一点？为什么不用嵌入的大小，或者 L2 范数，就像我们之前做的那样。
 
-```
+```py
 non_normed_vector = embed(tf.constant([sample_sentences[0]]))
 
 normed_vector = tf.nn.l2_normalize(embed(tf.constant([sample_sentences[0]])), axis=1)
@@ -505,7 +505,7 @@ non_normed_vector - normed_vector
 
 是的，这两个向量之间的差很小，所以看起来它们已经被归一化了。当我们归一化一个向量时，我们只是将向量中的每个元素除以它的大小。所以你也可以这样做:
 
-```
+```py
 x = np.array([7, 6, 10])
 
 nrm = norm(x)
@@ -524,7 +524,7 @@ print(f'And the norm of this new vector should be 1.... {norm(normal_array)}')
 
 scikit-learn 中提供了实现这一点的代码，因此您可以相对容易地减少我们嵌入的维度:
 
-```
+```py
 from sklearn.decomposition import PCA
 import plotly.express as px
 

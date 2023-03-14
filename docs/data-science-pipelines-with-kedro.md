@@ -199,13 +199,13 @@ Kedro 管道
 
 我们可以通过将目录更改到我们的项目文件夹，然后输入 kedro info 来检查 Kedro 是否正确安装。如果安装正确，我们应该会看到以下输出:
 
-```
+```py
 conda create --name kedro-env python=3.7 -y
 ```
 
 此时，我们可以安装项目所需的其他包:
 
-```
+```py
 pip install kedro kedro-viz
 ```
 
@@ -213,13 +213,13 @@ pip install kedro kedro-viz
 
 步骤 2:项目设置
 
-```
+```py
 pip install scikit-learn matplotlib
 ```
 
 Kedro 的一个关键特性是创建标准的、可修改的和易于使用的项目模板。我们可以很容易地初始化一个新的 Kedro 项目:
 
-```
+```py
 git init
 ```
 
@@ -227,7 +227,7 @@ git init
 
 项目结构可以分为六个主文件夹:
 
-```
+```py
 kedro new
 ```
 
@@ -273,7 +273,7 @@ Kedro 自带众多[内置数据连接器](https://web.archive.org/web/2022092610
 
 每个管道文件夹都有相同的文件，包括 **nodes.py** (节点代码)和 **pipeline.py** (管道代码)。
 
-```
+```py
 kedro pipeline create data_engineering
 kedro pipeline create data_science
 kedro pipeline create model_evaluation
@@ -295,7 +295,7 @@ kedro pipeline create model_evaluation
 
 注意，在每个节点包装器的 ***节点(..)*** 上面，我们指定了一个节点名，函数(从 node.py 导入)，以及在数据目录中定义的输入输出数据集。
 
-```
+```py
 
 from typing import Any, Callable, Dict
 import pandas as pd
@@ -334,7 +334,7 @@ def train_test_split(processed_df: pd.DataFrame) -> pd.DataFrame:
 
 节点包装器中的参数应该与数据目录中的数据集名称和节点函数的参数相匹配。
 
-```
+```py
 
 from kedro.pipeline import Pipeline, node, pipeline
 from .nodes import merge_data, process_data, train_test_split
@@ -380,7 +380,7 @@ def create_pipeline(**kwargs) -> Pipeline:
 
 正如前面在数据目录中看到的，我们将把我们训练的隔离森林模型作为 **pickle** 文件保存在 ***data/06_models*** 中。
 
-```
+```py
 
 import numpy as np
 import pandas as pd
@@ -405,7 +405,7 @@ def predict(ml_model, test_df: pd.DataFrame):
 
 步骤 7:构建模型评估管道
 
-```
+```py
 
 from kedro.pipeline import Pipeline, node, pipeline
 from .nodes import train_model, predict
@@ -437,7 +437,7 @@ def create_pipeline(**kwargs) -> Pipeline:
 
 这个模型评估步骤与步骤 6 中的数据科学管道是分开的。这种分离是因为我们正在使用一种**无监督的**异常检测算法，并且我们并不期望总是得到真实的数据。
 
-```
+```py
 
 import numpy as np
 import pandas as pd
@@ -484,7 +484,7 @@ def evaluate_model(predictions: pd.DataFrame, test_labels: pd.DataFrame):
 
 步骤 8:在管道注册表中注册所有管道
 
-```
+```py
 from kedro.pipeline import Pipeline, node, pipeline
 from .nodes import evaluate_model
 
@@ -505,7 +505,7 @@ def create_pipeline(**kwargs) -> Pipeline:
 
 Kedro 的美妙之处在于，它的模块化结构让我们能够灵活地构建我们的管道。例如，如果我们没有基础事实标签，我们可以从缺省管线运行中排除 model_evaluation。
 
-```
+```py
 from typing import Dict
 from kedro.pipeline import Pipeline, pipeline
 
@@ -540,7 +540,7 @@ def register_pipelines() -> Dict[str, Pipeline]:
 
 步骤 10:运行管道
 
-```
+```py
 kedro viz
 ```
 
@@ -550,7 +550,7 @@ kedro viz
 
 我们还可以运行已经在管道注册表中注册的特定管道。例如，如果我们只想运行数据工程模块化管道(de)，我们可以在命令中添加*–管道<名称>* :
 
-```
+```py
 kedro run
 ```
 
@@ -558,7 +558,7 @@ kedro run
 
 最后，是时候评估我们异常检测管道的输出了。特别是，让我们回顾一下 matplotlib 评估图(保存在 ***数据/08 _ 报告*** )来看看该模型的性能如何。
 
-```
+```py
 kedro run --pipeline de
 ```
 
@@ -592,7 +592,7 @@ Kedro 的[管道切片功能](https://web.archive.org/web/20220926103904/https:/
 
 我们可以通过在项目的根目录下运行这个命令来生成特定于项目的文档(构建在 Sphinx 框架上)。
 
-```
+```py
 kedro run --from-nodes train-test-split --to-nodes train_model
 ```
 
@@ -600,13 +600,13 @@ kedro run --from-nodes train-test-split --to-nodes train_model
 
 最后，我们可以通过第三方插件 [Docker](https://web.archive.org/web/20220926103904/https://github.com/kedro-org/kedro-plugins/tree/main/kedro-docker) 和 [Airflow](https://web.archive.org/web/20220926103904/https://github.com/kedro-org/kedro-plugins/tree/main/kedro-airflow) 来[部署](https://web.archive.org/web/20220926103904/https://kedro.readthedocs.io/en/latest/10_deployment/01_deployment_guide.html)这些打包的数据科学管道。
 
-```
+```py
 kedro build-docs
 ```
 
 (4)通过 Jupyter 笔记本访问 Kedro
 
-```
+```py
 kedro package
 ```
 
@@ -616,7 +616,7 @@ kedro package
 
 下面是我们在本文中经历的内容:
 
-```
+```py
 kedro jupyter notebook
 ```
 

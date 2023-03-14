@@ -137,7 +137,7 @@ ML 框架和库在不断升级，用于实现某个特定结果的特定库版�
 *   Kubeflow 也将工件数据存储在其工件存储中；它使用工件来理解各种 Kubeflow 组件的管道是如何工作的。Kubeflow Pipeline 可以输出工件数据的简单文本视图和丰富的交互式可视化
 *   [WandB](https://web.archive.org/web/20221109101338/https://docs.wandb.ai/guides/artifacts/api) 允许您使用下面的代码为实验运行创建一个工件存储。
 
-```
+```py
 artifact = wandb.Artifact('my-dataset', type='dataset')
 
 ```
@@ -203,7 +203,7 @@ Git 是软件开发中 VCS 最流行的例子。Git 是一个免费的开源分�
 
 您可以按如下方式设置种子值:
 
-```
+```py
 import os
 os.environ['PYTHONHASHSEED'] = str(seed)
 random.seed(seed)
@@ -212,7 +212,7 @@ random.seed(seed)
 
 或者使用 numpy 伪随机生成器来设置固定的种子值:
 
-```
+```py
 import numpy as np
 np.random.seed(seed_value)
 from comet_ml import Experiment
@@ -221,7 +221,7 @@ from comet_ml import Experiment
 
 或者使用 TensorFlow 伪随机生成器来设置固定的种子值:
 
-```
+```py
 import tensorflow as tf
 tf.set_random_seed(seed_value)
 
@@ -229,7 +229,7 @@ tf.set_random_seed(seed_value)
 
 您还可以配置新的全局“tensorflow”会话:
 
-```
+```py
 from keras import backend as K
 session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
@@ -239,7 +239,7 @@ K.set_session(sess)
 
 In pytorch:
 
-```
+```py
 import torch
 torch.manual_seed(0)
 ```
@@ -286,7 +286,7 @@ Model registry 是一种跟踪机制，它记录和存储所有的模型元数�
 
 *   Pytorch 允许您通过使用[torch . use _ deterministic _ algorithms()](https://web.archive.org/web/20221109101338/https://pytorch.org/docs/stable/generated/torch.use_deterministic_algorithms.html#torch.use_deterministic_algorithms)来避免非确定性算法。每当使用非确定性算法时，此方法都会返回错误。
 
-```
+```py
 import torch
 torch.use_deterministic_algorithms(True)
 
@@ -296,7 +296,7 @@ torch.use_deterministic_algorithms(True)
 
 对于 NGC tensorflow 容器(版本 19.06–19.09)，通过以下方式实现:
 
-```
+```py
 import tensorflow as tf
 import os
 os.environ['TF_DETERMINISTIC_OPS'] = '1'
@@ -305,7 +305,7 @@ os.environ['TF_DETERMINISTIC_OPS'] = '1'
 
 对于 TensorFlow 版本 1.14、1.15 和 2.0，它是这样实现的:
 
-```
+```py
 import tensorflow as tf
 from tfdeterminism import patch
 patch()

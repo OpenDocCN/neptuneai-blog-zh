@@ -29,14 +29,14 @@
 
 拥抱脸支持超过 20 个库，其中一些非常受 ML 工程师的欢迎，如 TensorFlow，Pytorch 和 FastAI 等。我们将使用 pip 命令安装这些库来使用拥抱脸:
 
-```
+```py
 !pip install torch
 
 ```
 
 安装 PyTorch 后，我们可以使用下面的命令安装 transformer 库:
 
-```
+```py
 !pip install transformers
 ```
 
@@ -120,7 +120,7 @@ transformer 模型架构的一个关键特性是关注层。这一层会告诉�
 
 管道是开始熟悉拥抱脸的一个好方法，因为你可以使用预先训练和微调的变压器创建自己的语言模型。拥抱面为上述任务提供了管道，以及一些额外的管道，如这里所提到的。
 
-```
+```py
 from transformers import pipeline
 translator = pipeline("translation_en_to_de")
 text = "Hello world! Hugging Face is the best NLP tool."
@@ -145,7 +145,7 @@ print(translation)
 
 2.导入模型
 
-```
+```py
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-nl")
 ```
@@ -154,7 +154,7 @@ tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-nl")
 
 3.以 seq2seq 方式标记和编码文本
 
-```
+```py
 model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-nl")
 ```
 
@@ -167,14 +167,14 @@ model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-nl")
 
 4.批量翻译和解码元素
 
-```
+```py
 text = "Hello my friends! How are you doing today?"
 tokenized_text = tokenizer.prepare_seq2seq_batch([text])
 print(tokenized_text)
 
 ```
 
-```
+```py
 {'input_ids': [[16816, 187, 2493, 68, 650, 48, 41, 1531, 950, 31, 0]], 'attention_mask': [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]}
 
 ```
@@ -183,7 +183,7 @@ print(tokenized_text)
 
 正如我们所看到的，除了仅支持英语-德语、英语-法语和英语-罗马尼亚语翻译的简单管道之外，我们可以在 HuggingFace 中为任何预训练的 Seq2Seq 模型创建语言翻译管道。让我们看看哪些 transformer 模型支持翻译任务。
 
-```
+```py
 translation = model.generate(**tokenized_text)
 translated_text = tokenizer.batch_decode(translation, skip_special_tokens=True)[0]
 print(translated_text)
@@ -272,7 +272,7 @@ Marian 完全是用 C++写的。这个库支持更快的训练和翻译。由于
 
 您可以看到数据已经分为测试、训练和验证。训练集有大量的数据，因此我们的模型训练和微调需要时间。
 
-```
+```py
 from datasets import load_dataset, load_metric
 raw_datasets = load_dataset("wmt16", "de-en")
 raw_datasets
@@ -284,14 +284,14 @@ raw_datasets
 
 现在，我们将创建一个预处理函数，并将其应用于所有数据分割。
 
-```
+```py
 model_marianMT = "Helsinki-NLP/opus-mt-en-de"
 
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_marianMT,use_fast=False)
 ```
 
-```
+```py
 model_mbart = 'facebook/mbart-large-50-one-to-many-mmt'
 
 from transformers import MBart50TokenizerFast
@@ -299,7 +299,7 @@ from transformers import MBart50TokenizerFast
 tokenizer = MBart50TokenizerFast.from_pretrained(model_mbart,src_lang="en_XX",tgt_lang = "de_DE")
 ```
 
-```
+```py
 model_t5 = "t5-small"
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_marianMT,use_fast=False)
@@ -309,11 +309,11 @@ T5 模型需要一个特殊的前缀放在输入之前，您应该采用下面�
 
 3.创建数据集的子集
 
-```
+```py
 prefix = "translate English to German:" 
 ```
 
-```
+```py
 prefix = "" 
 max_input_length = 128
 max_target_length = 128
@@ -335,7 +335,7 @@ tokenized_datasets = raw_datasets.map(preprocess_function, batched=True)
 
 4.训练和微调模型
 
-```
+```py
 small_train_dataset = tokenized_datasets["train"].shuffle(seed=42).select(range(1000))
 small_eval_dataset = tokenized_datasets["test"].shuffle(seed=42).select(range(1000))
 ```
@@ -344,26 +344,26 @@ small_eval_dataset = tokenized_datasets["test"].shuffle(seed=42).select(range(10
 
  **为了我们的训练，我们还需要一些东西。首先，定制我们的培训所需的培训属性。
 
-```
+```py
 from transformers import AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
 
 model = AutoModelForSeq2SeqLM.from_pretrained(model_marianMT)
 
 ```
 
-```
+```py
 from transformers import MBartForConditionalGeneration
 model = MBartForConditionalGeneration.from_pretrained(model_mbart)
 ```
 
-```
+```py
 from transformers import AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
 model = AutoModelForSeq2SeqLM.from_pretrained(model_t5)
 ```
 
 其次，我们将定义一个数据排序器来填充输入并标记它们:
 
-```
+```py
 batch_size = 16
 model_name = model.split("/")[-1]
 args = Seq2SeqTrainingArguments(
@@ -381,13 +381,13 @@ args = Seq2SeqTrainingArguments(
 
 最后一件事是在我们训练模型时计算指标。
 
-```
+```py
 data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
 ```
 
 现在，我们可以将所有这些和数据集一起传递给训练器 API。
 
-```
+```py
 import numpy as np
 from datasets import load_metric
 metric = load_metric("sacrebleu")
@@ -420,7 +420,7 @@ def compute_metrics(eval_preds):
 
 在对模型进行微调之后，模型可以保存在目录中，我们应该能够像预训练模型一样使用它。我们还可以将该模式推广到拥抱脸集线器和共享。
 
-```
+```py
 trainer = Seq2SeqTrainer(
    model,
    args,
@@ -435,7 +435,7 @@ trainer.train()
 
 评估和跟踪模型性能–选择最佳模型
 
-```
+```py
 trainer.save_model()
 ```
 
@@ -449,7 +449,7 @@ trainer.save_model()
 
 #### MBart50 型号
 
-```
+```py
 import os
 for dirname, _, filenames in os.walk('/content/opus-mt-en-de-finetuned-en-to-de'):
    for filename in filenames:
@@ -467,7 +467,7 @@ translated = model.generate(**tokenizer(src_text, return_tensors="pt", padding=T
 
 #### T5 型号
 
-```
+```py
 import os
 for dirname, _, filenames in os.walk('/content/mbart-large-50-one-to-many-mmt-finetuned-en-to-de'):
    for filename in filenames:
@@ -488,7 +488,7 @@ translation
 
 #### 让我们比较一下 MarianMT、mBART 和 T5 型号的翻译文本:
 
-```
+```py
 import os
 for dirname, _, filenames in os.walk('/content/t5-small-finetuned-en-to-de'):
    for filename in filenames:
@@ -552,7 +552,7 @@ T5 是所有模型中表现最差的，因为它不能翻译整段。预训练�
 
 记录指标并在 Neptune UI 中查看它们:
 
-```
+```py
 pip install neptune-client
 import neptune.new as neptune
 %env NEPTUNE_PROJECT= natasha/pytorch-huggingface
@@ -571,7 +571,7 @@ Neptune 发布了与 HuggingFace Transformers 的集成[，所以你现在可以
 
 让我们看看它在海王星平台上是什么样子:
 
-```
+```py
 evaluate_results = trainer.evaluate()
 neptune.log_metric('epoch',evaluate_results['epoch'])
 neptune.log_metric('bleu',evaluate_results['eval_bleu'])

@@ -18,7 +18,7 @@ LightGBM 很棒，用 LightGBM 构建模型很容易。但是，当您使用不�
 
 任何模型开发过程都将从获取数据集开始。让我们使用 Scikit-learn 来生成一个回归数据集。之后，我们将它分成训练集和测试集。
 
-```
+```py
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
 
@@ -38,7 +38,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random
 *   根据`train`方法的要求，将训练集和验证集定义为`lgb.Dataset`格式
 *   定义培训参数
 
-```
+```py
 import lightgbm as lgb
 lgb_train = lgb.Dataset(X_train, y_train)
 lgb_eval = lgb.Dataset(X_test, y_test, reference=lgb_train)
@@ -59,14 +59,14 @@ gbm = lgb.train(params,
 
 培训之后，我们应该保存模型，以便在部署过程中使用。
 
-```
+```py
 gbm.save_model('mode.pkl')
 
 ```
 
 我们现在可以运行预测并将它们保存在 CSV 文件中。
 
-```
+```py
 import pandas as pd
 pd.DataFrame(predictions, columns=["Predictions"]).to_csv("light_predictions.csv")
 ```
@@ -83,21 +83,21 @@ pd.DataFrame(predictions, columns=["Predictions"]).to_csv("light_predictions.csv
 
 首先，我们需要安装 Neptune 客户端包。
 
-```
+```py
 pip install neptune-client
 
 ```
 
 使用 Neptune 笔记本，我们可以将笔记本检查点保存到 Neptune。让我们也安装它:
 
-```
+```py
 pip install neptune-notebooks
 
 ```
 
 为了完成集成，我们需要启用这个扩展:
 
-```
+```py
 jupyter nbextension enable --py neptune-notebooks
 
 ```
@@ -106,7 +106,7 @@ jupyter nbextension enable --py neptune-notebooks
 
 现在我们正在安装软件包，让我们也把 Neptune Contrib 软件包拿出来。这个包将使我们能够在训练 LightGBM 模型时将我们的度量记录到 Neptune。
 
-```
+```py
 pip install neptune-contrib[monitoring]
 
 ```
@@ -125,7 +125,7 @@ pip install neptune-contrib[monitoring]
 
 之后，我们使用`neptune.init`来初始化我们和 neptune.ai 项目之间的通信。
 
-```
+```py
 import neptune
 neptune.init(project_qualified_name='mwitiderrick/LightGBM, api_token='YOUR_API_KEY')
 ```
@@ -136,7 +136,7 @@ neptune.init(project_qualified_name='mwitiderrick/LightGBM, api_token='YOUR_API_
 
 让我们创建一个实验并记录模型超参数。
 
-```
+```py
 neptune.create_experiment('LightGBM',params=params)
 
 ```
@@ -155,7 +155,7 @@ neptune.create_experiment('LightGBM',params=params)
 
 有了回调设置，海王星照顾其余的。
 
-```
+```py
 import lightgbm as lgb
 gbm = lgb.train(params,
     lgb_train,
@@ -185,7 +185,7 @@ gbm = lgb.train(params,
 
 Neptune 还允许我们记录我们的测试指标。这是使用`neptune.log_metric`功能完成的。
 
-```
+```py
 neptune.log_metric('Root Mean Squared Error', np.sqrt(mean_squared_error(y_test, predictions)))
 neptune.log_metric('Mean Squarred Error', mean_squared_error(y_test, predictions))
 neptune.log_metric('Mean Absolute Error', mean_absolute_error(y_test, predictions))
@@ -195,7 +195,7 @@ neptune.log_metric('Mean Absolute Error', mean_absolute_error(y_test, prediction
 
 在 Neptune 中对数据集哈希进行版本控制也非常有用。这将使您能够在执行实验时跟踪数据集的不同版本。这可以用 Python 的`hashlib`模块和 Neptune 的`set_property`函数来完成。
 
-```
+```py
 import hashlib
 neptune.set_property('x_train_version', hashlib.md5(X_train.values).hexdigest())
 neptune.set_property('y_train_version', hashlib.md5(y_train.values).hexdigest())
@@ -210,14 +210,14 @@ neptune.set_property('y_test_version', hashlib.md5(y_test.values).hexdigest())
 
 为了做到这一点，你首先要添加文件到 dvc。这是在当前工作目录下的终端上完成的。
 
-```
+```py
 $ dvc add data.csv
 
 ```
 
 这将创建。dvc 文件，您可以登录到 Neptune。
 
-```
+```py
 neptune.log_artifact('data.csv.dvc')
 
 ```
@@ -232,7 +232,7 @@ Neptune 还提供了使用您最喜欢的绘图库记录其他东西的能力，
 
 记录[解释者](https://web.archive.org/web/20221206214705/https://modeloriented.github.io/DALEX/)是使用`log_explainer`函数完成的。
 
-```
+```py
 from neptunecontrib.api import log_explainer, log_global_explanations
 import dalex as dx
 
@@ -245,7 +245,7 @@ log_explainer('explainer.pkl', expl)
 
 同样重要的是要注意，即使您使用 LightGBM Scikit-learn 包装器，日志也可以工作。你唯一要做的就是在模型的拟合阶段通过 Neptune 回调。请注意，您可以添加评估集以及评估指标。
 
-```
+```py
 model.fit(X_test,y_test,eval_set=[(X_train,y_train),(X_test,y_test)],eval_metric=['mean_squared_error','root_mean_squared_error'],callbacks=[neptune_monitor()])
 ```
 
@@ -275,7 +275,7 @@ Neptune 还允许您将实验分组到视图中并保存它们。保存的视图
 
 Neptune 还允许你下载任何实验的文件。这使您能够从 Python 代码中下载单个文件。例如，您可以使用`download_artifact`方法下载单个文件。例如，要下载我们之前上传的模型，我们只需要获取实验对象并使用它来下载模型。该模型存储在我们当前工作目录的模型文件夹中。
 
-```
+```py
 project = neptune.init('mwitiderrick/LightGBM',api_token='YOUR_TOKEN')
 my_exp = project.get_experiments(id='LIG-8')[0]
 experiment.download_artifact("light.pkl","model")

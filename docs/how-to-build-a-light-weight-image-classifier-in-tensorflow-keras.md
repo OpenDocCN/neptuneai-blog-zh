@@ -130,7 +130,7 @@
 
 以下是项目中使用的自定义数据生成器的完整代码:
 
-```
+```py
 class DataGenerator(Sequence):
 
     """
@@ -318,7 +318,7 @@ Performance metrics shown on ImageNet dataset.*
 
 我们的项目并不复杂。这就是为什么 B1 是高效网络主干的理想深度。让我们导入 EfficientNet B1 并初始化这个类的一个对象。
 
-```
+```py
 from tensorflow.keras.applications.efficientnet import EfficientNetB1, preprocess_input
 
 backbone = EfficientNetB1(include_top = False,
@@ -342,7 +342,7 @@ backbone = EfficientNetB1(include_top = False,
 
 这是我为这个项目选择的顶部架构:
 
-```
+```py
 from tensorflow.keras.layers import Dense, BatchNormalization, LeakyReLU, Softmax
 from tensorflow.keras.models import Sequential
 
@@ -386,7 +386,7 @@ model.add(Softmax())
 
 我们模型的主干有 7 个模块。对于第一阶段，前四个块是冻结的，因此这些块中的所有层都是不可训练的。第五，第六和第七块，以及模型的顶部没有被冻结，将在第一阶段进行训练。下面是在代码中如何执行模型冻结:
 
-```
+```py
 block_to_unfreeze_from = 5
 trainable_flag = False
 
@@ -408,7 +408,7 @@ for layer in model.layers[0].layers:
 
 **2。模型已编译**
 
-```
+```py
 from tensorflow.keras.optimizers import Adam
 
 model.compile(optimizer=Adam(learning_rate=0.001), loss='sparse_categorical_crossentropy',
@@ -426,7 +426,7 @@ model.compile(optimizer=Adam(learning_rate=0.001), loss='sparse_categorical_cros
 
 **3。使用标准启动培训作业。Tensorflow / Keras 中的拟合方法:**
 
-```
+```py
 logdir = os.path.join(dir4saving, 'logs')
 os.makedirs(logdir, exist_ok=True)
 
@@ -463,7 +463,7 @@ model.fit_generator(generator = train_generator,
 
 以下是解冻是如何完成的:
 
-```
+```py
 for layer in model.layers:
     layer.trainable = True
 

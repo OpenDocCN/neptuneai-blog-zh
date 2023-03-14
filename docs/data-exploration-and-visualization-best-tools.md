@@ -30,7 +30,7 @@
 
 要了解有关 Matplotlib 的更多信息，让我们使用数据集来解锁并了解一些函数的工作原理:
 
-```
+```py
 
 import pandas as pd
 netflix_df = pd.read_csv('netflix_titles.csv')
@@ -40,7 +40,7 @@ netflix_df.head(2)
 
 我们有内容类型、标题、添加日期和其他信息。但是我们想用这些信息做什么呢？我们可以找到网飞有多少节目和电影(根据数据集)，或者我们可以看到哪个国家制作了更多的内容。
 
-```
+```py
 import matplotlib.pyplot as plt
 
 counts = netflix_df["type"].value_counts()
@@ -53,7 +53,7 @@ plt.show()
 
 这里需要记住的一点是，每次创建新的绘图时，我们都必须使用 plt.show()命令。如果想避免这种重复的任务，可以在导入 matplotlib 后使用下面的命令。
 
-```
+```py
 %matplotlib inline
 ```
 
@@ -61,7 +61,7 @@ plt.show()
 
 我们也可以使用 Matplotlib 来发现数据中的异常。让我们尝试创建一个定制的情节。
 
-```
+```py
 import pandas as pd
 from sklearn.datasets import load_boston
 import matplotlib.pyplot as plt
@@ -128,7 +128,7 @@ Scikit learn 是由 David Cournapeau 在 Google Summer code 项目中开发的�
 
 如果您正在寻找数据集进行实验，Scikit learn 有一个数据集模块，其中有一些流行的数据集集合。您可以像下面这样加载数据集，并且您不必将它下载到本地机器上。
 
-```
+```py
  from sklearn.datasets import load_iris
  data = load_iris()
 
@@ -143,7 +143,7 @@ Scikit learn 在进行预处理(即清洁和处理。假设您的数据集中几
 
 让我们看看如何使用 scikit 的 impute 模块来实现这一点。
 
-```
+```py
 import numpy as np
 import pandas as pd
 X = pd.DataFrame(
@@ -163,7 +163,7 @@ imp_mean.fit_transform(df)
 
 scikit learn 在数据探索方面处于领先地位，但在数据可视化方面用处很小。可视化模块仅用于可视化指标，如混淆指标、权衡曲线、roc 曲线或召回精度曲线。在下一个例子中，我们将看到如何使用可视化功能。
 
-```
+```py
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 iris = datasets.load_iris()
@@ -210,7 +210,7 @@ Plotly 开发在线数据分析和可视化工具。它为 Python、R 和 MATLAB
 
 让我们看看如何使用 plotly 在情节中引入交互性。
 
-```
+```py
 pip install plotly==4.14.3
 
 from sklearn import datasets
@@ -233,7 +233,7 @@ fig
 
 为了理解变量之间的关系，我们需要一个散点图，但当我们有许多数据点时，很难读懂这个图。鼠标悬停功能有助于轻松读取数据。
 
-```
+```py
 data = [go.Scatter(x = iris_df["Sepal.Length"],y = iris_df["Sepal.Width"],mode = 'markers')]
 layout = go.Layout(title='Iris Dataset - Sepal.Length vs Sepal.Width', xaxis=dict(title='Sepal.Length'), yaxis=dict(title='Sepal.Width'))
 fig = go.Figure(data=data, layout=layout)
@@ -270,7 +270,7 @@ Seaborn 从 Matplotlib 收集了一些常见的图，并对它们进行了分类
 
 让我们尝试一些情节，看看 seaborn 是多么容易。
 
-```
+```py
 import pandas as pd
 breast_cancer_df = pd.read_csv("data.csv")
 
@@ -280,7 +280,7 @@ sns.heatmap(breast_cancer_df.corr())
 
 只需两行就能创建热图！现在我们将尝试一些我们已经用其他工具尝试过的图。
 
-```
+```py
 plt.figure(figsize=(8,5))
 ax = sns.countplot(x="diagnosis", data=breast_cancer_df)
 plt.show()
@@ -309,7 +309,7 @@ Python 中最流行的用于数据分析和操作的库之一。它最初是作�
 
 让我们看看如何定义 series 和 dataframe，并了解一些特性。
 
-```
+```py
 ser1=pd.Series(breast_cancer_df['area_mean'])
 ser1.head()
 ```
@@ -318,7 +318,7 @@ ser1.head()
 
 你可以执行几乎所有的操作，使用我们将在熊猫系列中进一步讨论的所有功能。您还可以为您的系列提供索引。
 
-```
+```py
 data = pd.Series([5, 2, 3,7], index=['a', 'b', 'c', 'd'])
 data
 ```
@@ -327,7 +327,7 @@ data
 
 另外，你可以传递字典数据(键值对象)，它也可以被转换成序列。
 
-```
+```py
 breast_cancer_df.describe()
 ```
 
@@ -335,14 +335,14 @@ breast_cancer_df.describe()
 
 假设我们想要创建主数据帧的子集，这也可以用几行代码来完成。
 
-```
+```py
 subset_df=breast_cancer_df[["id", "diagnosis"]]
 subset_df
 ```
 
 ![Pandas dataframe ](img/571110e285f8bc5bfe5173488c5caa25.png)
 
-```
+```py
 
 print("print data for one column id: ",breast_cancer_df["id"])
 print("print all the data for one row: ",breast_cancer_df.iloc[3])
@@ -352,7 +352,7 @@ print("print all the data for one row: ",breast_cancer_df.iloc[3])
 
 **让我们看看熊猫是如何处理缺失数据的，首先检查哪一列有缺失值。**
 
-```
+```py
 data = {'Col1': [1,2,3,4,5,np.nan,6,7,np.nan,np.nan,8,9,10,np.nan],
         'Col2': ['a','b',np.nan,np.nan,'c','d','e',np.nan,np.nan,'f','g',np.nan,'h','i']
         }
@@ -370,14 +370,14 @@ Pandas 提供了查看数据(头部或尾部)、创建子集、搜索和排序�
 
 不仅如此，熊猫还有可视化工具。然而，它只画基本的情节，但是它们很容易使用。与 Matplotlib 或其他工具不同，您只需提供一个额外的命令 plt.show()来打印绘图。
 
-```
+```py
 breast_cancer_df[['area_mean','radius_mean','perimeter_mean']].plot.box()
 
 ```
 
 上面的图是用一行命令识别异常值。它还允许您改变图的颜色、标签等。
 
-```
+```py
 corr = breast_cancer_df[['area_mean','radius_mean','perimeter_mean']].corr()
 corr.style.background_gradient(cmap='coolwarm').set_precision(2)
 
@@ -435,7 +435,7 @@ Bokeh 有两个不同的接口/层，这让开发人员可以根据他们的需�
 
 这为开发人员提供了一个底层接口。可以通过设置各种属性的值来配置图表。这样，开发人员可以根据需要操作属性。
 
-```
+```py
 from bokeh.models import HoverTool
 
 hover = HoverTool(
@@ -456,7 +456,7 @@ show(p)
 
 在这个界面中，你可以自由地通过组合视觉元素来创建情节:圆形、三角形、线条等。，并添加交互工具:缩放、跨越等。交互元素将在 bokeh.model 的帮助下添加。
 
-```
+```py
 from bokeh.io import output_notebook, show
 from bokeh.plotting import figure 
 output_notebook() 
@@ -493,7 +493,7 @@ Altair 是一个声明式数据可视化库。它构建在 vega lite 上，允�
 
 Altair 提供内置图表。条形图，折线图，面积图，直方图，散点图等。让我们画一些图来看看 Altair 如何帮助我们通过视觉来探索数据。
 
-```
+```py
 import altair as alt
 import pandas as pd
 
@@ -537,7 +537,7 @@ YellowBrick 是一个机器学习可视化库，有两个主要依赖项:Scikit 
 
 该列表可以帮助您确定哪个图/实用程序应该用于哪种需求。为了更好地了解 YellowBrick，我们来看一些例子。
 
-```
+```py
 from sklearn.tree import DecisionTreeClassifier
 from yellowbrick.features import FeatureImportances
 
@@ -568,7 +568,7 @@ Folium 是一个用于可视化地理空间数据的 Python 库，是 js 库 fle
 
 让我们用叶子画出我们的第一张地图，看看它有多简单。
 
-```
+```py
 import folium
 from folium.plugins import MarkerCluster
 m = folium.Map(location=[28.7041, 77.1025], zoom_start=10)
@@ -580,7 +580,7 @@ m
 
 只需输入纬度和经度，我们就能画出地图并标记出来。让我们来看看，当您可以以不同格式查看地图时，我们如何添加功能。让我们添加瓷砖层。
 
-```
+```py
 import folium
 from branca.element import Figure
 from folium.plugins import MarkerCluster

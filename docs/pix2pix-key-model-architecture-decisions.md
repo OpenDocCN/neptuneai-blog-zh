@@ -22,7 +22,7 @@ gan 通过将整个问题作为一个二进制分类问题来处理，来学习�
 
 先简单了解一下 GANs 的架构。从这一节开始，大多数主题将使用代码进行解释。首先，让我们定义所有需要的依赖项。
 
-```
+```py
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -38,7 +38,7 @@ import torchvision.transforms as transforms
 
 生成器是 GAN 中的一个组件，它接收定义为高斯分布的噪声，并产生与原始数据集相似的样本。随着 GANs 多年来的发展，他们已经采用了在计算机视觉任务中非常突出的 CNN。但是为了简单起见，我们将使用 Pytorch 用线性函数来定义它。
 
-```
+```py
 class Generator(nn.Module):
    def __init__(self, z_dim, img_dim):
        super().__init__()
@@ -57,7 +57,7 @@ class Generator(nn.Module):
 
 鉴别器只是一个分类器，它对生成器生成的数据是真是假进行分类。它通过从真实数据中学习原始分布，然后在两者之间进行评估来实现这一点。我们将保持简单，使用线性函数定义鉴别器。
 
-```
+```py
 class Discriminator(nn.Module):
    def __init__(self, in_features):
        super().__init__()
@@ -80,13 +80,13 @@ class Discriminator(nn.Module):
 
 以上这一点很重要，我们必须记住。也就是说，我们将用于普通 GAN 的损失函数将是二进制交叉熵损失或 BCELoss，因为我们正在执行二进制分类。
 
-```
+```py
 criterion = nn.BCELoss()
 ```
 
 现在我们来定义一下**优化**方法以及其他相关参数。
 
-```
+```py
 opt_disc = optim.Adam(disc.parameters(), lr=lr)
 opt_gen = optim.Adam(gen.parameters(), lr=lr)
 
@@ -114,7 +114,7 @@ step = 0
 
 下面是训练循环的样子:
 
-```
+```py
 for epoch in range(num_epochs):
    for batch_idx, (real, _) in enumerate(loader):
        real = real.view(-1, 784).to(device)
@@ -311,7 +311,7 @@ PatchGAN 可以有效地将图像建模为马尔可夫随机场，其中 NxN 被
 
 数据可视化
 
-```
+```py
 !wget http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/facades.tar.gz
 !tar -xvf facades.tar.gz
 ```
@@ -322,7 +322,7 @@ PatchGAN 可以有效地将图像建模为马尔可夫随机场，其中 NxN 被
 
 从上面的图像中，我们可以看到数据有两个图像连接在一起。如果我们看到上面的图像的形状，我们发现宽度是 512，这意味着图像可以很容易地分成两部分。
 
-```
+```py
 import matplotlib.pyplot as plt
 import cv2
 import os
@@ -338,7 +338,7 @@ plt.imshow(cv2.imread(f'{path}91.jpg'))
 
 *> >图像的形状:(256，512，3)*
 
-```
+```py
 print('Shape of the image: ',cv2.imread(f'{path}91.jpg').shape)
 ```
 
@@ -346,7 +346,7 @@ print('Shape of the image: ',cv2.imread(f'{path}91.jpg').shape)
 
 左边的图像将是我们的基础真理，而右边的图像将是我们的条件图像。我们将它们分别称为 y 和 x。
 
-```
+```py
 image = cv2.imread(f'{path}91.jpg')
 w = image.shape[1]//2
 image_real = image[:, :w, :]
@@ -369,7 +369,7 @@ plt.show()
 
 2.在将数据输入神经网络之前，使用 Pytorch 的 DataLoader 函数加载数据以创建批处理。
 
-```
+```py
 class data(Dataset):
    def __init__(self, path='/content/facades/train/'):
        self.filenames = glob(path+'*.jpg')
@@ -394,7 +394,7 @@ class data(Dataset):
 
 请记住，我们将为培训和验证创建一个数据加载器。
 
-```
+```py
 train_dataset = data()
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
 
@@ -408,7 +408,7 @@ Utils
 
 发电机
 
-```
+```py
 def cnn_block(in_channels,out_channels,kernel_size,stride=1,padding=0, first_layer = False):
 
    if first_layer:
@@ -434,7 +434,7 @@ def tcnn_block(in_channels,out_channels,kernel_size,stride=1,padding=0,output_pa
 
 鉴别器
 
-```
+```py
 class Generator(nn.Module):
  def __init__(self,instance_norm=False):
    super(Generator,self).__init__()
@@ -482,7 +482,7 @@ class Generator(nn.Module):
 
 定义参数
 
-```
+```py
 class Discriminator(nn.Module):
  def __init__(self,instance_norm=False):
    super(Discriminator,self).__init__()
@@ -508,7 +508,7 @@ class Discriminator(nn.Module):
 
 初始化模型
 
-```
+```py
 batch_size = 4
 workers = 2
 
@@ -529,14 +529,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 我们还将定义优化器和损失函数。
 
-```
+```py
 G = Generator().to(device)
 D = Discriminator().to(device)
 ```
 
 培养
 
-```
+```py
 G_optimizer = optim.Adam(G.parameters(), lr=2e-4,betas=(0.5,0.999))
 D_optimizer = optim.Adam(D.parameters(), lr=2e-4,betas=(0.5,0.999))
 
@@ -548,7 +548,7 @@ L1_criterion = nn.L1Loss()
 
 监控我们的模型
 
-```
+```py
 for ep in range(epochs):
  for i, data in enumerate(train_loader):
 
@@ -645,7 +645,7 @@ Neptune 允许用户:
 
 3.登录后，[创建一个**新项目**](https://web.archive.org/web/20221117203630/https://docs.neptune.ai/administration/projects#create-project) 。
 
-```
+```py
 !pip install neptune-client
 ```
 
@@ -657,7 +657,7 @@ Neptune 允许用户:
 
 请记住，损耗、生成的图像和模型的权重都是使用“run”命令记录到 Neptune 仪表盘中的。
 
-```
+```py
 PARAMS = {'Epoch': epochs,
          'Batch Size': batch_size,
          'Input Channels': c_dim,
@@ -673,7 +673,7 @@ PARAMS = {'Epoch': epochs,
 
 例如，在上面的培训中，您会发现以下命令:
 
-```
+```py
 run['parameters'] = PARAMS
 ```
 
@@ -681,7 +681,7 @@ run['parameters'] = PARAMS
 
 培训初始化后，所有记录的信息将自动记录到仪表板中。Neptune 从训练中获取实时信息，允许[实时监控整个过程](https://web.archive.org/web/20221117203630/https://docs.neptune.ai/how-to-guides/model-monitoring)。
 
-```
+```py
    run["Gen Loss"].log(G_loss.item())
    run["Dis Loss"].log(D_loss.item())
    run['L1 Loss'].log(L1_loss.item())

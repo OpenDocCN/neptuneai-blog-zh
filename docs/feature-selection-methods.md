@@ -92,7 +92,7 @@
 
 *   th*e*` sk learn . feature _ selection。VarianceThreshold` transformer 将默认删除所有零方差特征。我们还可以传递一个阈值作为参数，让它移除方差低于阈值的特征。
 
-```
+```py
 from sklearn.feature_selection import VarianceThreshold
 
 sel = VarianceThreshold(threshold=0.05)
@@ -102,13 +102,13 @@ X_selection = sel.fit_transform(X)
 
 *   为了删除缺少值的列，可以在数据框上使用 pandas `. dropna(axis = 1)`方法。
 
-```
+```py
 X_selection = X.dropna(axis=1)
 ```
 
 *   要移除具有高度多重共线性的要素，我们首先需要测量它。一种流行的多重共线性测量方法是方差膨胀因子或 VIF。它是在 statsmodels 包中实现的。
 
-```
+```py
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 vif_scores = [variance_inflation_factor(X.values, feature)for feature in range(len(X.columns))]
@@ -137,7 +137,7 @@ vif_scores = [variance_inflation_factor(X.values, feature)for feature in range(l
 
 *   向后和向前特征选择可以通过 SequentialFeatureSelector 转换器实现。例如，为了使用 k-最近邻分类器作为正向选择中的评分模型，我们可以使用以下代码片段:
 
-```
+```py
 from sklearn.feature_selection import SequentialFeatureSelector
 
 knn = KNeighborsClassifier(n_neighbors=3)
@@ -149,7 +149,7 @@ X_selection = sfs.transform(X)
 
 *   递归特征消除以非常相似的方式实现。下面是一个基于支持向量分类器的特征重要性实现 RFE 的片段。
 
-```
+```py
 from sklearn.feature_selection import RFE
 
 svc = SVC(kernel="linear")
@@ -173,7 +173,7 @@ X_selection = rfe.transform(X)
 
 *   为了保留与目标具有最强 Pearson 相关性的前 2 个特征，我们可以运行:
 
-```
+```py
 from sklearn.feature_selection import r_regression, SelectKBest
 
 X_selection = SelectKBest(r_regression, k=2).fit_transform(X, y)
@@ -181,7 +181,7 @@ X_selection = SelectKBest(r_regression, k=2).fit_transform(X, y)
 
 *   类似地，为了保留前 30%的特性，我们将运行:
 
-```
+```py
 	from sklearn.feature_selection import r_regression, SelectPercentile
 
 	X_selection = SelectPercentile(r_regression, percentile=30).fit_transform(X, y)
@@ -191,7 +191,7 @@ X_selection = SelectKBest(r_regression, k=2).fit_transform(X, y)
 
 *   Spearman 的 Rho、Kendall Tau 和点-双列相关都可以在 scipy 包中获得。这就是如何获得 x 中每个特征的值。
 
-```
+```py
 from scipy import stats
 
 rho_corr = [stats.spearmanr(X[:, f], y).correlation for f in range(X.shape[1])]
@@ -204,7 +204,7 @@ pbs_corr = [stats.pointbiserialr(X[:, f], y).correlation for f in range(X.shape[
 
 *   卡方、互信息和 ANOVA F-score 都在 scikit-learn 中。请注意，互信息有一个单独的实现，这取决于目标是否是名义上的。
 
-```
+```py
 from sklearn.feature_selection import chi2
 from sklearn.feature_selection import mutual_info_regression
 from sklearn.feature_selection import mutual_info_classif
@@ -219,7 +219,7 @@ mi_class_corr = mutual_info_classif(X, y)
 
 *   Cramer 的 V 可以从最近的 scipy 版本(1.7.0 或更高版本)获得。
 
-```
+```py
 from scipy.stats.contingency import association
 
 v_corr = [association(np.hstack([X[:, f].reshape(-1, 1), y.reshape(-1, 1)]), method="cramer") for f in range(X.shape[1])]
@@ -433,7 +433,7 @@ Boruta 在许多 Kaggle 比赛中已经证明非常成功，总是值得尝试�
 
 进行进口。
 
-```
+```py
 from itertools import compress
 
 import pandas as pd
@@ -458,7 +458,7 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 这是整个类的代码。
 
-```
+```py
 class VotingSelector():
    def __init__(self):
        self.selectors = {
@@ -505,7 +505,7 @@ class VotingSelector():
 
 让我们看看它在实践中的效果。我们将加载 scikit-learn 内置的臭名昭著的波士顿住房数据。
 
-```
+```py
 from sklearn.datasets import load_boston
 boston = load_boston()
 X = pd.DataFrame(boston["data"], columns=boston["feature_names"])
@@ -515,14 +515,14 @@ y = boston["target"]
 
 现在，运行特征选择就像这样简单:
 
-```
+```py
 vs = VotingSelector()
 X_selection = vs.select(X, y)
 ```
 
 结果，我们得到的特征矩阵只剩下三个特征。
 
-```
+```py
       ZN  CHAS     RM
 0    18.0   0.0  6.575
 1     0.0   0.0  6.421
@@ -541,7 +541,7 @@ X_selection = vs.select(X, y)
 
 我们还可以通过打印*对*的投票来一瞥我们的每个方法是如何投票的
 
-```
+```py
         CRIM  ZN  INDUS  CHAS  NOX  RM  AGE  DIS  RAD  TAX  PTRATIO  B  LSTAT
 pearson     0   1      0     1    0   1    0    1    0    0        0  1      0
 vif         1   1      0     1    0   0    0    0    0    0        0  0      0
@@ -552,14 +552,14 @@ rfe         0   0      0     1    1   1    0    0    0    0        1  0      1
 
 皮尔逊和 RFE 方法需要保留预定数量的特征。默认值为 5，但我们可能希望将其增加到 8。我们还可以修改 VIF 阈值，该阈值是方差膨胀因子的值，高于该值时，由于多重共线性，我们会丢弃某个要素。按照惯例，这个阈值被设置为 10，但是增加到 15 会导致更多的特性被保留。
 
-```
+```py
 vs = VotingSelector()
 X_selection = vs.select(X, y, n_features_to_select=8, vif_threshold=15)
 ```
 
 这样，我们还剩下七个特征。
 
-```
+```py
         CRIM  ZN  INDUS  CHAS  NOX  RM  AGE  DIS  RAD  TAX  PTRATIO  B  LSTAT
 pearson     1   1      0     1    0   1    1    1    1    0        0  1      0
 vif         1   1      1     1    0   0    0    1    0    0        0  0      1

@@ -113,7 +113,7 @@ CycleGAN
 
 下面是一个例子，一个马的图像被转换成一个看起来像斑马的图像。
 
-```
+```py
 
 fake_y = generator_g(real_x, training=True)
 cycled_x = generator_f(fake_y, training=True)

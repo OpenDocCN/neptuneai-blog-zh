@@ -192,7 +192,7 @@ Kedro 有一个很好的方法将数据源从代码中抽象出来:数据目录�
 
 你可以在这里阅读更多相关信息[。这个 yaml 示例展示了如何导入位于本地的 CSV 数据集。](https://web.archive.org/web/20221206150330/https://kedro.readthedocs.io/en/stable/data/data_catalog.html)
 
-```
+```py
 ```
 cars:
   type: pandas.CSVDataSet
@@ -204,7 +204,7 @@ cars:
     date_format: '%Y-%m-%d %H:%M'
     decimal: .
 
-```
+```py
 ```
 
 将项目的数据集作为参数传递的主要优点是，如果您必须更改数据源(其路径、源或文件)，您不需要更新所有代码来匹配它。Catalog 是一个默认的 kedro 类，有几个集成可供使用。在最坏的情况下，数据清理节点需要更新，而管道的中间步骤不会改变。

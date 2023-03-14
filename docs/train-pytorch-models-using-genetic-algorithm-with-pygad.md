@@ -14,7 +14,7 @@ PyGAD 有一个模块叫做 [pygad.kerasga](https://web.archive.org/web/20230131
 
 PyGAD 是一个 Python 3 库，可以在 [PyPI (Python 包索引)](https://web.archive.org/web/20230131180157/https://pypi.org/project/pygad)获得。因此，您可以简单地使用这个 pip 命令来安装它:
 
-```
+```py
 pip install pygad>=2.10.0
 ```
 
@@ -22,7 +22,7 @@ pip install pygad>=2.10.0
 
 你也可以从[这个链接](https://web.archive.org/web/20230131180157/https://files.pythonhosted.org/packages/3b/28/06a37e94ac31a9fe0945f39e7e05ed2390225e45582ff144125433c2f598/pygad-2.10.0-py3-none-any.whl)下载 PyGAD 2.10.0 的轮子分发文件，用下面的命令安装(确保当前目录设置为带有。whl 文件)。
 
-```
+```py
 pip install pygad-2.10.0-py3-none-any.whl
 ```
 
@@ -49,7 +49,7 @@ TorchGA 类的构造函数接受以下两个参数:
 
 在 pygad.torchga.TorchGA 类的实例中，每个参数都用作一个属性。这意味着您可以通过使用模型属性来访问模型，如下所示:
 
-```
+```py
 torchga = TorchGA(model=---, num_solutions=---)
 torchga.model
 ```
@@ -58,7 +58,7 @@ torchga.model
 
 下面是一个创建 TorchGA 类实例的例子。模型参数可以分配给任何 PyTorch 模型。传递给 num_solutions 参数的值是 10，这意味着群体中有 10 个解决方案。
 
-```
+```py
 import pygad.torchga
 
 torch_ga = pygad.torchga.TorchGA(model=...,
@@ -120,7 +120,7 @@ TorchGA 类的构造函数调用一个名为 create_population()的方法，该�
 
 最后，该模型被创建为 [torch.nn.Sequential](https://web.archive.org/web/20230131180157/https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html) 类的一个实例，它接受所有先前按顺序创建的层。
 
-```
+```py
 import torch.nn
 
 input_layer = torch.nn.Linear(3, 2)
@@ -143,7 +143,7 @@ model = torch.nn.Sequential(input_layer,
 
 下面是一个将之前创建的模型传递给 TorchGA 类的构造函数的示例。
 
-```
+```py
 import pygad.torchga
 
 torch_ga = pygad.torchga.TorchGA(model=model,
@@ -158,7 +158,7 @@ torch_ga = pygad.torchga.TorchGA(model=model,
 
 这里有 5 个随机样本，每个样本有 3 个输入和 1 个输出。
 
-```
+```py
 import numpy
 
 data_inputs = numpy.array([[0.02, 0.1, 0.15],
@@ -175,7 +175,7 @@ data_outputs = numpy.array([[0.1],
 
 如果我们正在解决像 XOR 这样的二进制分类问题，那么它的数据如下所示，其中有 4 个样本，有 2 个输入和 1 个输出。
 
-```
+```py
 import numpy
 
 data_inputs = numpy.array([[0, 0],
@@ -206,7 +206,7 @@ data_outputs = numpy.array([[1, 0],
 
 下面是一个使用 torch.nn.BCELoss 类计算二进制交叉熵的例子。调用 [detach()](https://web.archive.org/web/20230131180157/https://pytorch.org/docs/stable/autograd.html#torch.Tensor.detach) 方法从图中分离张量，以返回其值。查看[这个链接](https://web.archive.org/web/20230131180157/http://www.bnikolic.co.uk/blog/pytorch-detach.html)以获得更多关于 [detach()](https://web.archive.org/web/20230131180157/https://pytorch.org/docs/stable/autograd.html#torch.Tensor.detach) 方法的信息。
 
-```
+```py
 loss_function = torch.nn.BCELoss()
 
 loss = loss_function(predictions, data_outputs).detach().numpy()
@@ -222,7 +222,7 @@ loss = loss_function(predictions, data_outputs).detach().numpy()
 
 当 loss=0.0 时，添加小值 0.00000001 是为了避免被零除。
 
-```
+```py
 fitness_value = (1.0 / (loss + 0.00000001))
 
 ```
@@ -249,27 +249,27 @@ PyGAD 中的 fitness 函数是作为常规 Python 函数构建的，但是它必
 
 传递给适应度函数的解是 1D 向量。这个向量不能直接用于 PyTorch 模型的参数，因为模型需要字典形式的参数。因此，在计算损失之前，我们需要将向量转换为字典。我们可以在 pygad.torchga 模块中使用 model_weights_as_dict()函数，如下所示:
 
-```
+```py
 model_weights_dict = torchga.model_weights_as_dict(model=model,
                                                    weights_vector=solution)
 ```
 
 一旦创建了参数字典，就调用 load_state_dict()方法来使用这个字典中的参数作为模型的当前参数。
 
-```
+```py
 model.load_state_dict(model_weights_dict)
 
 ```
 
 根据当前参数，模型对训练数据进行预测。
 
-```
+```py
 predictions = model(data_inputs)
 ```
 
 模型的预测被传递给损失函数，以计算解决方案的损失。平均绝对误差被用作损失函数。
 
-```
+```py
 loss_function = torch.nn.L1Loss()
 
 solution_fitness = 1.0 / (loss_function(predictions, data_outputs).detach().numpy() + 0.00000001)
@@ -278,7 +278,7 @@ solution_fitness = 1.0 / (loss_function(predictions, data_outputs).detach().nump
 
 最后，返回适应值。
 
-```
+```py
 loss_function = torch.nn.L1Loss()
 
 def fitness_func(solution, sol_idx):
@@ -301,7 +301,7 @@ def fitness_func(solution, sol_idx):
 
 这是二元分类问题的适应度函数。使用的损失函数是二元交叉熵。
 
-```
+```py
 loss_function = torch.nn.BCELoss()
 
 def fitness_func(solution, sol_idx):
@@ -332,7 +332,7 @@ def fitness_func(solution, sol_idx):
 
 使用这个实例，返回属性 generations_completed，它保存已完成的代的数量。best_solution()方法也被调用，它返回关于当前代中最佳解决方案的信息。
 
-```
+```py
 def callback_generation(ga_instance):
     print("Generation = {generation}".format(generation=ga_instance.generations_completed))
     print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
@@ -351,7 +351,7 @@ pygad 的建造者。GA 类接受许多参数，这些参数可以在[文档](ht
 *   fitness_func:适应函数。
 *   on_generation:生成回调函数。
 
-```
+```py
 num_generations = 250
 num_parents_mating = 5
 initial_population = torch_ga.population_weights
@@ -372,7 +372,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 
 pygad 的 ga _ 实例。GA 现在可以调用 run()方法来启动遗传算法。
 
-```
+```py
 ga_instance.run()
 
 ```
@@ -381,7 +381,7 @@ ga_instance.run()
 
 pygad 中有一个很有用的方法叫做 plot_result()。GA 类中，它显示了一个将适应值与代数相关联的图形。在 run()方法完成后，这很有用。
 
-```
+```py
 ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness")
 ```
 
@@ -395,7 +395,7 @@ ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness")
 
 下一段代码调用 best_solution()方法，并输出最佳解决方案的信息。
 
-```
+```py
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
 print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
@@ -404,7 +404,7 @@ print("Index of the best solution : {solution_idx}".format(solution_idx=solution
 
 最佳解决方案的参数可以转换成字典，输入 PyTorch 模型进行预测。
 
-```
+```py
 best_solution_weights = torchga.model_weights_as_dict(model=model,
                                                       weights_vector=solution)
 model.load_state_dict(best_solution_weights)
@@ -414,7 +414,7 @@ print("Predictions : n", predictions.detach().numpy())
 
 接下来的代码计算模型定型后的损失。
 
-```
+```py
 abs_error = loss_function(predictions, data_outputs)
 print("Absolute Error : ", abs_error.detach().numpy())
 
@@ -428,7 +428,7 @@ print("Absolute Error : ", abs_error.detach().numpy())
 
 对于使用平均绝对误差作为损失函数的回归问题，这里是完整的代码。
 
-```
+```py
 import torch
 import torchga
 import pygad
@@ -518,7 +518,7 @@ print("Absolute Error : ", abs_error.detach().numpy())
 
 下面是代码中打印语句的输出。平均汇率为 0.0069。
 
-```
+```py
 Fitness value of the best solution = 145.42425295191546
 Index of the best solution : 0
 Predictions :
@@ -540,7 +540,7 @@ Absolute Error :  0.006876422
 1.  [dataset_inputs.npy](https://web.archive.org/web/20230131180157/https://github.com/ahmedfgad/NumPyCNN/blob/master/dataset_inputs.npy)
 2.  [dataset_outputs.npy](https://web.archive.org/web/20230131180157/https://github.com/ahmedfgad/NumPyCNN/blob/master/dataset_outputs.npy)
 
-```
+```py
 import torch
 import torchga
 import pygad
@@ -644,7 +644,7 @@ print("Accuracy : ", accuracy.detach().numpy())
 
 以下是一些关于已训练模型的信息。
 
-```
+```py
 Fitness value of the best solution = 1.3009520689219258
 Index of the best solution : 0
 Crossentropy :  0.7686678

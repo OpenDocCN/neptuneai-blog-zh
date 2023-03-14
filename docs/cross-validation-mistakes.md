@@ -60,7 +60,7 @@ k-fold 交叉验证的关键配置参数是 k，它定义了数据集将被分�
 
 为了解决这个常见的错误，我们可以将目标值分成 n 个箱，然后使用这些箱值进行分层 k 折叠。让我们来看看这是如何做到的:
 
-```
+```py
 From sklearn.model_selection import StratifiedKFold
 def create_folds(df, n_grp, n_s=5):
 
@@ -83,7 +83,7 @@ def create_folds(df, n_grp, n_s=5):
 
 如果过采样对您的任务至关重要，您应该首先将数据拆分到相应的折叠中，然后在训练和验证循环中继续进行上采样。下面是实现这一点的伪代码:
 
-```
+```py
 kfold = KFold(n_splits=n_splits)
 scores = []
 for train,valid in kfold.split(data):
@@ -125,7 +125,7 @@ for train,valid in kfold.split(data):
 
 为了避免在用你坚持的测试数据集测试你的模型时出现任何意外，你应该在多个种子上做**交叉验证，并平均模型性能**。这将使您能够更好地理解您的模型性能。这是它的伪代码，
 
-```
+```py
 SEEDS = [1, 2, 3, 4, 5]
 ScoreMetric = []
 

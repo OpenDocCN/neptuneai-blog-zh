@@ -24,7 +24,7 @@
 
 从视频中提取了 152 幅图像，并使用下面的代码进行了处理。
 
-```
+```py
 vidcap = cv2.VideoCapture(ChelseaManCity)
 count = 0
 def getFrame(sec):
@@ -90,7 +90,7 @@ Labellmg 是一个用于图像处理和注释的开源图形标签工具。本�
 
 以下信息和步骤演示了如何在 Colab 上进行培训时安装 TensorFlow 2 对象检测 API。首先，使用下面的代码在 GitHub 上克隆 TensorFlow 模型库:
 
-```
+```py
 import os
 import pathlib
 
@@ -104,7 +104,7 @@ elif not pathlib.Path('models').exists():
 
 接下来是使用以下命令安装 TensorFlow 对象检测 API。
 
-```
+```py
 %%bash
 cd models/research/
 protoc object_detection/protos/*.proto --python_out=.
@@ -115,7 +115,7 @@ python -m pip install .
 
 安装了 TensorFlow 对象检测 API 后，下面的代码帮助我们确认已经安装了该 API。
 
-```
+```py
 import matplotlib
 import matplotlib.pyplot as plt
 import os
@@ -144,7 +144,7 @@ from object_detection.builders import model_builder
 
 既然 API 已经正确安装，我们可以继续训练数据，但是在此之前，让我们使用下面的代码构建模型测试器。model tester 文件有助于确认任何对象检测问题的正确建模所需的库的安装和导入。为此，请尝试实现下面的代码。
 
-```
+```py
 !python /content/models/research/object_detection/builders/model_builder_tf2_test.py
 
 ```
@@ -153,7 +153,7 @@ from object_detection.builders import model_builder
 
 务必注意，在使用[roboflow.com](https://web.archive.org/web/20221201165104/http://roboflow.ai/)平台生成 tfrecords 格式的数据时；数据可以导出为链接，下载到 Colab 中。将导出的链接插入下面的程序并运行，以便将数据下载到 Colab 中。
 
-```
+```py
 
 %cd /content
 !curl -L "[insert Link]" > roboflow.zip; unzip roboflow.zip; rm roboflow.zip
@@ -163,7 +163,7 @@ from object_detection.builders import model_builder
 
 刚刚从 roboflow.com 下载的训练和测试数据的目录可以在当前目录中找到。您的目录应该如下所示:
 
-```
+```py
 train_record_fname = '/content/train/foot.tfrecord'
 test_record_fname = '/content/test/foot.tfrecord'
 label_map_pbtxt_fname = '/content/train/foot_label_map.pbtxt'
@@ -176,7 +176,7 @@ label_map_pbtxt_fname = '/content/train/foot_label_map.pbtxt'
 
 对于这个问题，期望的对象检测架构是 EfficientDet。该架构有 4 个变体(D0、D1、D2 和 D3)。以下代码显示了 D0-D3 的模型配置，以及它们各自的模型名称和 base_pipeline_file(配置文件)。
 
-```
+```py
 MODELS_CONFIG = {
    'efficientdet-d0': {
        'model_name': 'efficientdet_d0_coco17_tpu-32',
@@ -210,7 +210,7 @@ MODELS_CONFIG = {
 
 下面的代码演示了上面的模型设置。
 
-```
+```py
 chosen_model = 'efficientdet-d0'
 num_steps = 5000 
 num_eval_steps = 500 
@@ -223,7 +223,7 @@ batch_size = MODELS_CONFIG[chosen_model]['batch_size']
 
 完成这些后，让我们继续下载指定架构的预训练权重，如上面的代码所示(D0、D1、D2 和 D3)。下面的代码帮助我们做到这一点:
 
-```
+```py
 %mkdir /content/models/research/deploy/
 %cd /content/models/research/deploy/
 import tarfile
@@ -250,7 +250,7 @@ tar.close()
 
 为了实现上述目标，让我们采取以下步骤。首先，让我们使用下面的代码下载定制配置文件。
 
-```
+```py
 %cd /content/models/research/deploy
 download_config = 'https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/configs/tf2/' + base_pipeline_file
 !wget {download_config}
@@ -259,7 +259,7 @@ download_config = 'https://raw.githubusercontent.com/tensorflow/models/master/re
 
 完成以上工作后，我们可以继续设置管道文件名和模型检查点目录。下面的代码说明了这一点。此外，您可以使用函数 get_num_classes 确认从 label_map_pbtxt 文件中提取的类的数量，如下所示。
 
-```
+```py
 pipeline_fname = '/content/models/research/deploy/' + base_pipeline_file
 fine_tune_checkpoint = '/content/models/research/deploy/' + model_name + '/checkpoint/ckpt-0'
 
@@ -289,7 +289,7 @@ num_classes = get_num_classes(label_map_pbtxt_fname)
 
 下面的代码帮助我们读取配置文件并将文件目录写入文件。
 
-```
+```py
 import re
 %cd /content/models/research/deploy
 print('writing custom configuration file')
@@ -326,14 +326,14 @@ with open('pipeline_file.config', 'w') as f:
 
 您可以通过运行下面的代码来确认 dir 已被写入文件:
 
-```
+```py
 %cat /content/models/research/deploy/pipeline_file.config
 
 ```
 
 现在我们有了一个配置文件，让我们开始训练吧。但是在训练之前，让我们记下配置文件的目录以及保存所有训练参数的目录。它们应该是这样的:
 
-```
+```py
 pipeline_file = '/content/models/research/deploy/pipeline_file.config'
 model_dir = '/content/training/'
 
@@ -350,7 +350,7 @@ model_dir = '/content/training/'
 
 下面的代码帮助我们做到这一点。
 
-```
+```py
 !python /content/models/research/object_detection/model_main_tf2.py
    --pipeline_config_path={pipeline_file}
    --model_dir={model_dir}
@@ -368,14 +368,14 @@ model_dir = '/content/training/'
 
 让我们通过运行这段代码来导出模型的训练推理图。
 
-```
+```py
 %ls '/content/training/'
 
 ```
 
 下一步是运行一个转换脚本，导出模型参数作为推理，以便在实时预测需要时重新加载。
 
-```
+```py
 import re
 import numpy as np
 output_directory = '/content/fine_tuned_model'
@@ -400,7 +400,7 @@ print(last_model_path)
 
 若要在训练后加载最后一个模型检查点，请运行以下代码:
 
-```
+```py
 pipeline_config = pipeline_file
 
 model_dir = '/content/training/ckpt-6'
@@ -434,7 +434,7 @@ detect_fn = get_model_detection_function(detection_model)
 
 下一步是读入视频帧，并将其通过对象检测模型进行边界框识别和正确类别的预测。下面的代码帮助我们方便地做到这一点:
 
-```
+```py
 label_map_path = configs['eval_input_config'].label_map_path
 label_map = label_map_util.load_labelmap(label_map_path)
 categories = label_map_util.convert_label_map_to_categories(

@@ -70,7 +70,7 @@ Figure 1: The high-level overview of the MLOps environment architectural design 
 *   图 3 很好地展示了部署的工作流中涉及的所有部分。组装工作流后，由事件调用的 lambda 函数将传递工作流存储库，并告诉 SageMaker 笔记本需要执行哪个脚本或笔记本。
 *   Lambda 功能可以通过 WebSocket 与笔记本进行通信(甚至“Boto3”也可以让你打开/关闭笔记本)。下面这段 Python 代码展示了如何与 notebook API 交互。但是，WebSocket 库应该作为一个层添加到 Lambda 函数中。在执行脚本时，任何问题都将被记录下来进行跟踪，最终报告将发送给订阅该主题的团队。
 
-```
+```py
  ```
 sm_client = boto3.client("sagemaker", region_name=region)
 Url = sm_client.create_presigned_notebook_instance_url(NotebookInstanceName)["AuthorizedUrl"]
@@ -97,7 +97,7 @@ ws = websocket.create_connection(
 commands = "pass commands here"
 ws.send(f"""[ "stdin", {commands}]""")
 
-``` 
+```py 
 ```
 
 ![ Workflow plumbing ](img/fe9c850ae67446cef187cbdf8089a29d.png)
@@ -122,7 +122,7 @@ ws.send(f"""[ "stdin", {commands}]""")
 
 *   我建议努力提高你的 Terraform 技能是一项很好的投资，不要止步于此，因为许多公司也采用 Terragrunt 来保持 IaC 代码库的干燥[3，4]。在使用 IaC 的过程中，让我印象深刻的是向 MLOps 授予跨环境权限，如“暂存”或“生产”,这些权限需要在目标环境中定义，然后授予 MLOps 角色策略。稍后，您可以通过在“Boto3”会话中指定配置文件名来访问这些资源。下面是在。hcl 配置文件。
 
-```
+```py
  ```
 IAM role in target environment:
 inputs = {
@@ -164,7 +164,7 @@ IAM role policy in MLOps environment within the “Statement”:
     "Resource": "arn:aws:iam::target-env-id:role/MLOps-env"
 }
 
-``` 
+```py 
 ```
 
 *   我意识到，尽管传统的 Git 的 CI 无法体现机器学习工件测试，但许多公司会在 Git 中为 CD 管道采用无服务器 bash 脚本。我决定建立一个集成的 Apache Airflow 来管理和执行 CI 测试过程和工作流。值得一提的是，我将开发 twin 用于培训任务，尽管如此，它也可以作为工作流自动化。

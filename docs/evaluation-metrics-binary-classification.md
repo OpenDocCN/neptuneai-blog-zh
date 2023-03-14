@@ -33,25 +33,25 @@
 
 *   定义的超参数值:
 
-```
+```py
 MODEL_PARAMS = {'random_state': 1234,
                 'learning_rate': 0.1,
                 'n_estimators': 10}
 ```
 
-```
+```py
 model = lightgbm.LGBMClassifier(**MODEL_PARAMS)
 model.fit(X_train, y_train)
 ```
 
-```
+```py
 y_test_pred = model.predict_proba(X_test)
 
 ```
 
 *   每次跑步的记录分数:
 
-```
+```py
 run["logs/score"] = score
 ```
 
@@ -59,7 +59,7 @@ run["logs/score"] = score
 
 *   每次运行的记录 matplolib 数字:
 
-```
+```py
 run["images/figure"].upload(neptune.types.File.as_image(fig))
 ```
 
@@ -85,7 +85,7 @@ run["images/figure"].upload(neptune.types.File.as_image(fig))
 
 它是基于类预测计算的，这意味着您的模型的输出需要首先进行阈值处理。
 
-```
+```py
 from sklearn.metrics import confusion_matrix
 
 y_pred_class = y_pred_pos > threshold
@@ -114,7 +114,7 @@ tn, fp, fn, tp = cm.ravel()
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import confusion_matrix
 
 y_pred_class = y_pred_pos > threshold
@@ -144,7 +144,7 @@ run[“logs/false_positive_rate”] = false_positive_rate
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import confusion_matrix
 
 y_pred_class = y_pred_pos > threshold
@@ -174,7 +174,7 @@ run[“logs/false_negative_rate”] = false_negative_rate
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import confusion_matrix
 
 y_pred_class = y_pred_pos > threshold
@@ -204,7 +204,7 @@ run[”logs/true_negative_rate”] = true_negative_rate
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import confusion_matrix
 
 y_pred_class = y_pred_pos > threshold
@@ -233,7 +233,7 @@ run[”logs/negative_predictive_value”] = negative_predictive_value
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import confusion_matrix
 
 y_pred_class = y_pred_pos > threshold
@@ -267,7 +267,7 @@ run[“logs/false_discovery_rate”] = false_discovery_rate
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import confusion_matrix, recall_score
 
 y_pred_class = y_pred_pos > threshold
@@ -299,7 +299,7 @@ run[“logs/recall_score”] = recall
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import confusion_matrix, precision_score
 
 y_pred_class = y_pred_pos > threshold
@@ -331,7 +331,7 @@ run[“logs/precision_score”] = precison
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 y_pred_class = y_pred_pos > threshold
@@ -365,7 +365,7 @@ run[“logs/accuracy”] = accuracy
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import fbeta_score
 
 y_pred_class = y_pred_pos > threshold
@@ -380,7 +380,7 @@ run["logs/fbeta_score"] = fbeta
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import f1_score
 y_pred_class = y_pred_pos > threshold
 f1= f1_score(y_true, y_pred_class)
@@ -409,7 +409,7 @@ run[“logs/f1_score”] = f1
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import fbeta_score
 
 y_pred_class = y_pred_pos > threshold
@@ -441,7 +441,7 @@ run[“logs/f2_score”] = f2
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import cohen_kappa_score
 
 cohen_kappa = cohen_kappa_score(y_true, y_pred_class)
@@ -470,7 +470,7 @@ run[“logs/cohen_kappa_score”] = cohen_kappa
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import matthews_corrcoef
 
 y_pred_class = y_pred_pos > threshold
@@ -502,7 +502,7 @@ Tom Fawcett 的这篇[文章对 ROC 曲线和 ROC AUC 评分进行了广泛讨�
 
 ### 如何计算:
 
-```
+```py
 from scikitplot.metrics import plot_roc
 
 fig, ax = plt.subplots()
@@ -524,7 +524,7 @@ run[“images/ROC”].upload(neptune.types.File.as_image(fig))
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import roc_auc_score
 
 roc_auc = roc_auc_score(y_true, y_pred_pos)
@@ -551,7 +551,7 @@ run[“logs/roc_auc_score”] = roc_auc
 
 ### 如何计算:
 
-```
+```py
 from scikitplot.metrics import plot_precision_recall
 
 fig, ax = plt.subplots()
@@ -573,7 +573,7 @@ run[“images/precision_recall”].upload(neptune.types.File.as_image(fig))
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import average_precision_score
 
 avg_precision = average_precision_score(y_true, y_pred_pos)
@@ -607,7 +607,7 @@ Log loss 经常被用作在机器学习模型的罩下被优化的目标函数�
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import log_loss
 
 loss = log_loss(y_true, y_pred)
@@ -634,7 +634,7 @@ run[“logs/log_loss”] = loss
 
 ### 如何计算:
 
-```
+```py
 from sklearn.metrics import brier_score_loss
 
 brier_loss = brier_score_loss(y_true, y_pred_pos)
@@ -664,7 +664,7 @@ run[“logs/brier_score_loss”] = brier_loss
 
 ### 如何计算:
 
-```
+```py
 from scikitplot.metrics import plot_cumulative_gain
 
 fig, ax = plt.subplots()
@@ -697,7 +697,7 @@ run[“images/cumulative_gains”].upload(neptune.types.File.as_image(fig))
 
 ### 如何计算:
 
-```
+```py
 from scikitplot.metrics import plot_lift_curve
 
 fig, ax = plt.subplots()
@@ -732,7 +732,7 @@ Riaz Khan 的这篇[文章对 KS 图和 KS 统计数据进行了很好的解释�
 
 ### 如何计算:
 
-```
+```py
 from scikitplot.metrics import plot_ks_statistic
 
 fig, ax = plt.subplots()
@@ -754,7 +754,7 @@ run[“images/kolmogorov-smirnov”].upload(neptune.types.File.as_image(fig))
 
 ### 如何计算:
 
-```
+```py
 from scikitplot.helpers import binary_ks_curve
 
 res = binary_ks_curve(y_true, y_pred_pos)
@@ -791,11 +791,11 @@ run[“logs/ks_statistic”] = ks_stat
 
 您可以**记录我们为您的机器学习项目覆盖的所有**指标** **和**性能**图表**，并使用我们的 [Python 客户端](https://web.archive.org/web/20221226161840/https://docs.neptune.ai/you-should-know/what-can-you-log-and-display)在 Neptune 中探索它们。**
 
-```
+```py
 pip install neptune-client
 ```
 
-```
+```py
 Import neptune.new as neptune
 
 run = neptune.init(...)

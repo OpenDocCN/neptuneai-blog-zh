@@ -48,7 +48,7 @@ PyTorch 可以被认为是一个平台，在这个平台上，你可以与张量
 
 如果你试图在你的 Windows 操作系统或任何 Linux 系统上安装 TensorFlow 的 GPU 版本，整个过程相当复杂。即使您正在使用 Anaconda 软件来开发您的深度学习项目，获得 TensorFlow 最新版本的过程也比您预期的要长一些。但是，如果您对使用任何版本的 TensorFlow 感兴趣，可以使用以下命令在您的虚拟环境中安装 TensorFlow 2.0。
 
-```
+```py
 conda install -c anaconda tensorflow-gpu
 ```
 
@@ -64,7 +64,7 @@ CUDA 和 CuDNN 版本由 Nvidia 不断更新，类似于它们的驱动程序。
 
 与 TensorFlow 安装相比，PyTorch 安装要简单得多。为了成功安装 PyTorch，您需要做的就是访问 PyTorch 官方网站获取安装指南，您可以通过此[链接](https://web.archive.org/web/20230131065431/https://pytorch.org/get-started/locally/)选择您的软件需求类型、您的开发包和您的计算平台。该网站将自动为您提供准确的命令，您可以复制粘贴在您的默认或虚拟环境中开始安装。安装语句示例如下:
 
-```
+```py
 conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 ```
 
@@ -80,7 +80,7 @@ conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 
 让我们比较并实现一些基本实现，开始从一个库到另一个库的转换。我们将首先看看如何导入这两个库，初始化张量，并用这些张量执行一些基本操作。初始化张量的张量流代码如下:
 
-```
+```py
 import tensorflow as tf
 
 rank_2_tensor = tf.constant([[1, 2],
@@ -90,7 +90,7 @@ rank_2_tensor = tf.constant([[1, 2],
 
 在 PyTorch 中，同样的实现可以按如下方式完成:
 
-```
+```py
 import torch
 
 rank_2_tensor = torch.tensor([[1, 2],
@@ -100,7 +100,7 @@ rank_2_tensor = torch.tensor([[1, 2],
 
 在这两个框架中，库的导入和张量的定义都非常简单。让我们分析一下如何在这两个库中执行一些基本的张量计算。首先，让我们看看下面的 TensorFlow 实现示例(注意，如果需要，您也可以将示例中显示的值直接定义为变量)。
 
-```
+```py
 a = tf.constant([[1, 2],
                  [3, 4]])
 b = tf.constant([[1, 1],
@@ -116,7 +116,7 @@ print(tf.matmul(a, b), "n")
 
 在 PyTorch 中，以下实现可以解释如下:
 
-```
+```py
 a = torch.tensor([1, 2, 3], dtype=torch.float)
 b = torch.tensor([7, 8, 9], dtype=torch.float)
 
@@ -143,7 +143,7 @@ print(a.dot(b))
 
 然而，有必要在静态图中定义一些可变参数，这有时被认为是不方便的，尤其是对于使用 RNN 型网络的任务。我建议查看下面的[网站](https://web.archive.org/web/20230131065431/https://cs230.stanford.edu/section/5/)，了解更多关于这些静态图如何工作的详细信息。让我们看看静态张量流图的实现。
 
-```
+```py
 import tensorflow as tf
 
 a = tf.Variable(15)
@@ -158,7 +158,7 @@ print(result)
 
 #### 输出
 
-```
+```py
  tf.Tensor(7.5, shape=(), dtype=float64)
 ```
 
@@ -182,7 +182,7 @@ TensorFlow 中的正常执行使用的是急切执行，这对于调试来说是
 
 应用梯度值，经历反向传播过程，最后更新训练度量。在模型完成训练后，我们可以返回我们想要的指标和值。
 
-```
+```py
 @tf.function
 def train_step(x, y):
     with tf.GradientTape() as tape:
@@ -198,7 +198,7 @@ def train_step(x, y):
 
 一旦模型完成前馈训练过程，我们就可以在 PyTorch 中一些预定义实体的帮助下计算元素的反向传播。我们计算梯度，应用反向传播方法，并执行参数更新。以下计算的代码如下所示。
 
-```
+```py
 for epoch in range(epochs):
     for batch, (data, target) in enumerate(train_loader):
 
@@ -221,7 +221,7 @@ for epoch in range(epochs):
 
 第一步是导入计算 MNIST 项目所需的所有基本库。因为我们正在从 TensorFlow 过渡到 PyTorch，所以我们将为这个项目导入所有需要的 PyTorch 库。使用这个深度学习框架，我们可以在我们将要构建的神经网络架构中构建所有需要的层。PyTorch 的必要导入在下面的代码块中描述如下。
 
-```
+```py
 
 import torch
 import torchvision
@@ -234,14 +234,14 @@ import matplotlib.pyplot as plt
 
 我们的下一步是相应地设置设备参数。我们可以选择是否要将 PyTorch 中用于训练的默认设备设置为 CPU 或 GPU。如果你有一个可以使用的 GPU，那么使用它总是更好。然而，对于这个项目，即使一个 CPU 设备也能满足要求，培训不需要太长时间。在 TensorFlow 中，默认设备通常根据您的安装设置为 GPU 版本。
 
-```
+```py
 
 device = torch.device('cuda' if torch.cuda.is_available() else cpu)
 ```
 
 我们的下一步是定义一些超参数，用于模型的构建和训练。定义了添加到总共 10 个类别中的类别数(0-9)。我们将设置默认输入大小为 784 (28×28 是 MNIST 数据的图像大小)，学习率为 0.0001，批量大小为 64，并且我们将在总共 3 个时期上训练构建的模型。
 
-```
+```py
 
 num_classes = 10
 input_size = 784
@@ -252,7 +252,7 @@ epochs = 3
 
 下一步，我们将加载我们的数据。PyTorch 框架类似于 TensorFlow 库，可以访问一些默认数据集，MNIST 就是其中之一。我们将以训练和测试数据集的形式分离图像(大约 60000 个)。DataLoader 函数在加载我们的数据时提供了非常好的工具。下面的代码片段展示了如何在 PyTorch 中加载数据。
 
-```
+```py
 
 T = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
 
@@ -267,7 +267,7 @@ test_loader = DataLoader(dataset=X_test, batch_size=batch_size, shuffle=True)
 
 使用 PyTorch 构建深度学习模型的过程非常简单，并且遵循 Pythonic 方法。我们将为神经网络定义一个类，并为我们的模型声明完全连接的层。功能。注意，在张量流的情况下，我们将对完全连接的层使用稠密函数。
 
-```
+```py
 
 class neural_network(nn.Module):
     def __init__(self, input_size, num_classes):
@@ -286,7 +286,7 @@ class neural_network(nn.Module):
 
 Adam 是最好的默认优化器之一，几乎可以在任何场景中找到效用。我们将为指定数量的纪元训练我们的模型。对于训练过程，我们将使用前馈完全卷积网络，然后应用反向传播来学习相应的最佳权重。
 
-```
+```py
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -309,7 +309,7 @@ for epoch in range(epochs):
 
 最后，现在我们的训练方法已经完成，我们可以继续训练和评估构建的模型，并相应地检查训练和测试的准确性。完成以下操作的步骤也非常简单，因为我们可以在正确分类的图像和错误分类的图像之间进行评估，并相应地计算准确度。
 
-```
+```py
 
 def check_accuracy(loader, model):
     num_correct = 0

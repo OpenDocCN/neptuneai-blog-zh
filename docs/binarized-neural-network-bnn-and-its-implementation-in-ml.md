@@ -105,7 +105,7 @@ BNN 论文的作者之一提供了一个 pytorch 实现，包括 alexnet 二进�
 
 尽管它有很棒的文档，但让我们看看文档中的一个例子，这样您就可以大致了解该库的易用性。
 
-```
+```py
 import tensorflow as tf
 import larq as lq
 
@@ -156,12 +156,12 @@ model = tf.keras.models.Sequential([
 
 **注意，如前所述，我们没有将希格诺和 STE 用于输入层。**我们来看看最终的架构。
 
-```
+```py
 model.summary()
 
 ```
 
-```
+```py
 Model: "sequential"
 _________________________________________________________________
 Layer (type)                 Output Shape              Param 

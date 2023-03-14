@@ -30,7 +30,7 @@
 
 借助 Neptune，您可以轻松做到这一点:
 
-```
+```py
 neptune.log_metric('train_auc', train_auc)
 neptune.log_metric('valid_auc', train_auc)
 neptune.log_metric('valid_f1', train_auc)
@@ -54,7 +54,7 @@ neptune.log_metric('valid_accuracy', train_auc)
 
 对于 Neptune 测井，这些图表是微不足道的:
 
-```
+```py
 neptune.log_image('diagnostics', 'confusion_matrix.png')
 neptune.log_image('diagnostics', 'roc_auc.png')
 neptune.log_image('diagnostics', 'prediction_dist.png')
@@ -75,7 +75,7 @@ t
 
 ![](img/c3f798d0d0722b36a787440f47f3a16c.png)
 
-```
+```py
 import neptunecontrib.monitoring.metrics as npt_metrics//r//n//r//nnpt_metrics.log_binary_classification_metrics(y_test, y_test_pred)
 
 ```
@@ -90,7 +90,7 @@ import neptunecontrib.monitoring.metrics as npt_metrics//r//n//r//nnpt_metrics.l
 
 对于简单的基于迭代的训练，它可能是这样的:
 
-```
+```py
 for i in range(iterations):
 
    train_loss = loss(y_pred, y)
@@ -99,7 +99,7 @@ for i in range(iterations):
 
 在大多数深度学习框架中使用的回调系统的情况下:
 
-```
+```py
 class NeptuneLoggerCallback(Callback):
     ...
     def on_batch_end(self, batch, logs={}):
@@ -121,7 +121,7 @@ Neptune 集成了大多数主要的机器学习框架，您可以毫不费力地
 
 在 Neptune 中你可以使用`.log_image`方法来做到这一点:
 
-```
+```py
 for epoch in epochs:
      …
      mask_preds = get_preds(model, images)
@@ -139,7 +139,7 @@ for epoch in epochs:
 
 幸运的是，用海王星更新实验很容易:
 
-```
+```py
 exp = project.get_experiments(id='PROJ-421')[0]
 
 exp.log_metric('test_auc'; 0.62)

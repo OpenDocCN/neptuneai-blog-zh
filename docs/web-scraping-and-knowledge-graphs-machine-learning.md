@@ -55,7 +55,7 @@ Web 抓取(或 web 采集)是用于数据提取的数据抓取。**一词通常�
 
 #### 安装依赖项并抓取数据
 
-```
+```py
 !pip install wikipedia-api neptune-client neptune-notebooks pandas spacy networkx scipy
 ```
 
@@ -64,7 +64,7 @@ Web 抓取(或 web 采集)是用于数据提取的数据抓取。**一词通常�
 
 下面的函数在维基百科中搜索给定的主题，并从目标页面及其内部链接中提取信息。
 
-```
+```py
 import wikipediaapi  
 import pandas as pd
 import concurrent.futures
@@ -73,7 +73,7 @@ from tqdm import tqdm
 
 below 函数允许您根据作为函数输入提供的主题获取文章。
 
-```
+```py
 def scrape_wikipedia(name_topic, verbose=True):
    def link_to_wikipedia(link):
        try:
@@ -116,25 +116,25 @@ def scrape_wikipedia(name_topic, verbose=True):
 
 让我们测试主题为“新冠肺炎”的函数。
 
-```
+```py
 wiki_data = wiki_scrape('COVID 19')
 
 ```
 
-```
+```py
 o/p: Links Scraped: 100%|██████████| 1965/1965 [04:30<00:00,  7.25/s]ages scraped: 1749
 
 ```
 
 将数据保存到 csv:
 
-```
+```py
 data_wikipedia.to_csv('scraped_data.csv')
 ```
 
 导入库:
 
-```
+```py
 import spacy
 import pandas as pd
 import requests
@@ -153,34 +153,34 @@ import neptune.new as neptune
 %matplotlib inline
 ```
 
-```
+```py
 run = neptune.init(api_token="your API key",
                    project="aravindcr/KnowledgeGraphs")
 ```
 
 上传数据到海王星:
 
-```
+```py
 run["data"].upload("scraped_data.csv")
 ```
 
 在这里下载数据[。在](https://web.archive.org/web/20221206032313/https://github.com/AravindR7/Web_Scraping_Knowledge_Graphs/blob/main/scraped_data.zip)[号海王](https://web.archive.org/web/20221206032313/https://app.neptune.ai/aravindcr/KnowledgeGraphs/e/KNOW-9/all?path=&attribute=data)号上也有:
 
-```
+```py
 data = pd.read_csv('scraped_data.csv')
 
 ```
 
 查看第 10 行的数据:
 
-```
+```py
 data['text'][10]
 
 ```
 
 输出:
 
-```
+```py
 The AbC-19 rapid antibody test is an immunological test for COVID-19 exposure
 developed by the UK Rapid Test Consortium and manufactured by Abingdon
 Health. It uses a lateral flow test to determine whether a person has IgG
@@ -192,7 +192,7 @@ drop of blood obtained from a finger prick and yields results in 20 minutes.
 
 构建知识图的第一步是将文本文档或文章分割成句子。然后我们把例子限制在只有一个主语和一个宾语的简单句上。
 
-```
+```py
 docu = nlp('''The AbC-19 rapid antibody test is an immunological test for COVID-19 exposure developed by
 the UK Rapid Test Consortium and manufactured by Abingdon Health. It uses a lateral flow test to determine
 whether a person has IgG antibodies to the SARS-CoV-2 virus that causes COVID-19\. The test uses a single
@@ -205,7 +205,7 @@ for tokn in docu:
 
 下载如下所示的预训练空间模型:
 
-```
+```py
 python -m spacy download en
 ```
 
@@ -227,7 +227,7 @@ SpaCy 管道分配单词向量、上下文特定的标记向量、词性标记�
 
 这个想法是通过一个句子，当主语和宾语被重构时，提取它们。
 
-```
+```py
 def extract_entities(sents):
 
    enti_one = ""
@@ -272,17 +272,17 @@ def extract_entities(sents):
    return [enti_one.strip(), enti_two.strip()]
 ```
 
-```
+```py
 extract_entities("The AbC-19 rapid antibody test is an immunological test for COVID-19 exposure developed by the UK Rapid Test")
 ```
 
-```
+```py
 ['AbC-19 rapid antibody test', 'COVID-19 UK Rapid Test']
 ```
 
 现在让我们使用函数来提取 800 个句子的实体对。
 
-```
+```py
 pairs_of_entities = []
 for i in tqdm(data['text'][:800]):
    pairs_of_entities.append(extract_entities(i))
@@ -291,14 +291,14 @@ for i in tqdm(data['text'][:800]):
 
 句子中的主语和宾语对:
 
-```
+```py
 pairs_of_entities[36:42]
 
 ```
 
 输出:
 
-```
+```py
 [['where aluminium powder', 'such explosives manufacturing'],
  ['310  people', 'Cancer Research UK'],
  ['Structural External links', '2 PDBe KB'],
@@ -312,7 +312,7 @@ pairs_of_entities[36:42]
 
 有了实体提取，一半的工作就完成了。为了构建知识图，我们需要连接节点(实体)。这些边是节点对之间的关系。下面的函数能够从这些句子中捕获这样的谓词。我用的是 spaCy 的基于规则的匹配。函数中定义的模式试图找到**词根**或句子中的主要动词。
 
-```
+```py
 def obtain_relation(sent):
 
    doc = nlp(sent)
@@ -336,13 +336,13 @@ def obtain_relation(sent):
 
 上面写的模式试图在句子中找到词根。一旦它被识别出来，它就会检查它后面是否跟有介词或代理词。如果答案是肯定的，那么它将被添加到词根中。
 
-```
+```py
 relations = [obtain_relation(j) for j in tqdm(data['text'][:800])]
 ```
 
 提取的最常见关系:
 
-```
+```py
 pd.Series(relations).value_counts()[:50]
 
 ```
@@ -353,7 +353,7 @@ pd.Series(relations).value_counts()[:50]
 
 让我们使用 [***networkX***](https://web.archive.org/web/20221206032313/https://networkx.org/documentation/stable/tutorial.html) 库来绘制网络。我们将创建一个节点大小与度中心性成比例的有向多图网络。换句话说，任何连接的节点对之间的关系都不是双向的。它们只是从一个节点到另一个节点。
 
-```
+```py
 source = [j[0] for j in pairs_of_entities]
 
 target = [k[1] for k in pairs_of_entities]
@@ -365,12 +365,12 @@ data_kgf = pd.DataFrame({'source':source, 'target':target, 'edge':relations})
 *   我们使用 networkx 库从数据帧创建一个网络。
 *   这里，节点将被表示为实体，而边表示节点之间的关系
 
-```
+```py
 graph = ntx.from_pandas_edgelist(data_kgf, "source", "target",
                          edge_attr=True, create_using=ntx.MultiDiGraph())
 ```
 
-```
+```py
 plot.figure(figsize=(14, 14))
 posn = ntx.spring_layout(graph)
 ntx.draw(graph, with_labels=True, node_color='green', edge_cmap=plot.cm.Blues, pos = posn)
@@ -380,7 +380,7 @@ plot.show()
 *   从上面的图表中，不清楚在图表中捕捉到了什么关系
 *   让我们用一些关系来形象化图表。我在这里选择:
 
-```
+```py
 graph = ntx.from_pandas_edgelist(data_kgf[data_kgf['edge']=="Information from"], "source", "target",
                          edge_attr=True, create_using=ntx.MultiDiGraph())
 
@@ -397,7 +397,7 @@ plot.show()
 
 我已经把上面的 networkx 图登录到[海王星](https://web.archive.org/web/20221206032313/https://docs.neptune.ai/you-should-know/logging-metadata)了。你可以找到那个特定的[路径](https://web.archive.org/web/20221206032313/https://app.neptune.ai/aravindcr/KnowledgeGraphs/e/KNOW-9/all?path=graphs)。根据获得的输出，将您的图像记录到不同的路径。
 
-```
+```py
 run['graphs/all_in_graph'].upload('graph.png')
 run['graphs/filtered_relations'].upload('info.png')
 run['graphs/filtered_relations2'].upload('links.png')
@@ -508,7 +508,7 @@ Jaccard 相似性得分在 **0 到 1** 的**范围**内。如果两个文档相�
 
 #### Python 代码查找 Jaccard 相似性
 
-```
+```py
 def jaccard_similarity(doc1, doc2):
 
  words_doc1 = set(doc1.lower().split())
@@ -521,7 +521,7 @@ def jaccard_similarity(doc1, doc2):
  return float(len(intersection)) / len(union)
 ```
 
-```
+```py
 docu_1 = "Work from home is the new normal in digital world"
 docu_2 = "Work from home is normal"
 

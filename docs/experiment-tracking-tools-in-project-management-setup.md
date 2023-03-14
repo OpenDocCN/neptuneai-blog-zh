@@ -83,7 +83,7 @@ Example from Jira.*
 
 顺便说一句，如果你想知道如何给实验添加标签，这是我的 jupyter 笔记本中的一个单元格，我在这里添加标签:
 
-```
+```py
 create_experiment = True
 log_aug_script = False
 

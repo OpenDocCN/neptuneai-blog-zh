@@ -110,13 +110,13 @@ AdaptNLP 为机器学习研究人员和科学家提供了一种模块化和**自
 
 **使用画中画**，
 
-```
+```py
 pip install adaptnlp
 ```
 
 或者如果你想为发展做贡献，
 
-```
+```py
 pip install adaptnlp[dev]
 ```
 
@@ -143,7 +143,7 @@ pip install adaptnlp[dev]
 
 **对于 MacOS** :
 
-```
+```py
 python3 -m pip install -U pip
 python3 -m pip install -U setuptools wheel
 python3 -m pip install -U "mxnet<2.0.0"
@@ -155,7 +155,7 @@ python3 -m pip install autogluon
 
 **对于 Linux** :
 
-```
+```py
 python3 -m pip install -U pip
 python3 -m pip install -U setuptools wheel
 python3 -m pip install -U "mxnet<2.0.0"
@@ -163,7 +163,7 @@ python3 -m pip install autogluon
 
 ```
 
-```
+```py
 python3 -m pip install -U pip
 python3 -m pip install -U setuptools wheel
 
@@ -190,7 +190,7 @@ python3 -m pip install autogluon
 
 在开始安装之前，请确保您的系统上有 MXNet 2 版本。以防万一，你可以从你的终端安装它。从以下选项中选择一个:
 
-```
+```py
 python3 -m pip install -U --pre "mxnet-cu102>=2.0.0a"
 
 python3 -m pip install -U --pre "mxnet-cu110>=2.0.0a"
@@ -201,13 +201,13 @@ python3 -m pip install -U --pre "mxnet>=2.0.0a"
 
 现在，您可以继续安装 GulonNLP 了。打开您的终端并键入:
 
-```
+```py
 python3 -m pip install -U -e
 ```
 
 您也可以通过键入以下命令来安装所有额外的要求:
 
-```
+```py
 python3 -m pip install -U -e ."[extras]"
 ```
 
@@ -235,15 +235,15 @@ Kashgari 要求您在系统上安装 Python 3.6+版本。
 
 **使用画中画**
 
-```
+```py
 pip install 'kashgari>=2.0.0
 ```
 
-```
+```py
 pip install 'kashgari>=2.0.0
 ```
 
-```
+```py
 pip install 'kashgari<1.0.0
 ```
 
@@ -263,7 +263,7 @@ pip install 'kashgari<1.0.0
 
 要求您已经安装了 Python 3.6
 
-```
+```py
 pip install lexnlp
 
 ```
@@ -286,7 +286,7 @@ TensorFlow Text 提供了一组与文本相关的类和操作，可用于 Tensor
 
 请注意:*使用 pip install 安装 TF Text 时，请注意您正在运行的 TensorFlow 的版本，因为您应该指定 TF Text 的相应次要版本(例如，对于 tensorflow==2.3.x，请使用 tensorflow_text==2.3.x)* 。
 
-```
+```py
 pip install -U tensorflow-text==<version>
 
 ```
@@ -326,14 +326,14 @@ pip install -U tensorflow-text==<version>
 
 **使用画中画(推荐)**
 
-```
+```py
 pip install snorkel
 
 ```
 
 **使用康达**
 
-```
+```py
 conda install snorkel -c conda-forge
 
 ```
@@ -355,7 +355,7 @@ Lingvo 是一个在 Tensorflow 中构建神经网络的框架，尤其是序列�
 
 **使用画中画**:
 
-```
+```py
 pip3 install lingvo
 
 ```
@@ -404,7 +404,7 @@ spaCy 带有预训练的管道，目前支持 60 多种语言的标记化和训�
 
 在继续安装之前，请确保您的 pip、setuptools 和 wheel 是最新的。
 
-```
+```py
 pip install -U pip setuptools wheel
 pip install spacy
 
@@ -412,7 +412,7 @@ pip install spacy
 
 **使用康达**
 
-```
+```py
 conda install -c conda-forge spacy
 ```
 
@@ -432,7 +432,7 @@ Flair 是最先进的 NLP 的简单框架。它允许您使用最先进的模型
 
 它要求你有 Pytorch 1.5+，目前支持 Python 3.6。[下面是如何为 Ubuntu 16.04](https://web.archive.org/web/20221206052610/https://vsupalov.com/developing-with-python3-6-on-ubuntu-16-04/) 。
 
-```
+```py
 pip install flair
 
 ```
@@ -464,14 +464,14 @@ Neuro MLOps platform 为您提供成功的大规模 ML 开发所需的基础设�
 
 建议首先创建一个新的虚拟环境。它要求您安装 Python 3.7。
 
-```
+```py
 pip install -U neuromation
 
 ```
 
 或者
 
-```
+```py
 <pre class="hljs" style="display: block; overflow-x: auto; padding: 0.5em; color: rgb(51, 51, 51); background: rgb(248, 248, 248);">pip install -U neuromation
 </pre>
 ```
@@ -494,7 +494,7 @@ AutoNLP 提供了一种自动训练最先进的 NLP 模型的方法，与拥抱�
 
 要使用画中画:
 
-```
+```py
 pip install -U autonlp
 
 ```
@@ -519,7 +519,7 @@ Neptune 跟踪机器学习实验，存储您的模型的元数据(日志度量�
 
 装置
 
-```
+```py
 pip install neptune-client
 ```
 
@@ -543,12 +543,12 @@ DataRobot 现在已经收购了 Algorithmia，它是一个平台，可以大规�
 
 *   它目前支持 python 2.7 和> =3.4
 
-```
+```py
 pip3 install datarobot
 
 ```
 
-```
+```py
 pip3 install requests requests-toolbelt
 
 ```

@@ -91,15 +91,15 @@ Tensorflow 的最新版本也支持通过 matplotlib 进行数据可视化。这
 
 现在复制下面的命令并粘贴到提示符中(检查版本)。
 
-```
+```py
 conda create --name tf2.5 python==3.8
 ```
 
-```
+```py
 conda activate tf2.5 (version)
 ```
 
-```
+```py
 pip install tensorflow (With GPU Support) //Install TensorFlow GPU command, pip install --upgrade tensorflow-gpu
 ```
 
@@ -115,7 +115,7 @@ pip install tensorflow (With GPU Support) //Install TensorFlow GPU command, pip 
 
 首先，要检查 TensorFlow GPU 是否已正确安装在您的计算机上，请运行以下代码:
 
-```
+```py
 import tensorflow as tf
 tf.test.is_built_with_cuda()
 tf.test.is_gpu_available(cuda_only=False, min_cuda_compute_capability=None)
@@ -131,7 +131,7 @@ tf.test.is_gpu_available(cuda_only=False, min_cuda_compute_capability=None)
 
 配置 env，创建一个新的 Python 文件，并粘贴以下代码:
 
-```
+```py
 import torch
 import torchvision
 import torch.nn.functional as F
@@ -167,7 +167,7 @@ MacOS 不支持最新版本的 Nvidia GPU，所以这将是一个纯 CPU 安装�
 
 安装 Miniconda 后，打开命令提示符。
 
-```
+```py
 conda install -y jupyter
 ```
 
@@ -175,7 +175,7 @@ conda install -y jupyter
 
 安装 jupyter 需要一些时间。接下来，安装 Mac [tensorflow.yml](https://web.archive.org/web/20230307230509/https://raw.githubusercontent.com/jeffheaton/t81_558_deep_learning/master/tensorflow.yml) 文件。还可以创建一个. yml 文件来安装 TensorFlow 和依赖项(下面会提到)。
 
-```
+```py
 dependencies:
     - python=3.8
     - pip>=19.0
@@ -201,7 +201,7 @@ dependencies:
 
 从包含 **tensorflow.yml** 的同一目录中运行以下命令。
 
-```
+```py
 conda env create -f tensorflow.yml -n tensorflow
 ```
 
@@ -209,7 +209,7 @@ conda env create -f tensorflow.yml -n tensorflow
 
 使用以下命令激活环境:
 
-```
+```py
 python -m ipykernel install --user --name tensorflow --display-name "Python 3.8 (tensorflow)"
 ```
 
@@ -217,13 +217,13 @@ python -m ipykernel install --user --name tensorflow --display-name "Python 3.8 
 
 为了测试整个过程，我们将使用 Jupyter 笔记本。使用以下命令启动 Jupyter:
 
-```
+```py
 jupyter notebook
 ```
 
 复制下面的代码并在 jupyter 笔记本上运行。
 
-```
+```py
 import sys
 
 import tensorflow.keras
@@ -263,19 +263,19 @@ print("GPU is", "available" if gpu else "NOT AVAILABLE")
 
 您可以通过运行以下命令安装 CUDA，
 
-```
+```py
 $ sudo apt install nvidia-cuda-toolkit
 ```
 
 安装 CUDA 后，运行以验证安装:
 
-```
+```py
 nvcc -V
 ```
 
 您将看到它的输出如下所示:
 
-```
+```py
 nvcc: NVIDIA (R) Cuda compiler driver
 Copyright (c) 2005-2021 NVIDIA Corporation
 Built on Sun_Jul_22_21:07:16_PDT_2019
@@ -289,20 +289,20 @@ Cuda compilation tools, release ‘version’
 
 下载后，解压缩文件:
 
-```
+```py
 tar -xvzf cudnn-10.1-linux-x64-'version'.tgz
 ```
 
 现在，我们将把提取的文件复制到 CUDA 安装路径:
 
-```
+```py
 sudo cp cuda/include/cudnn.h /usr/lib/cuda/include/
 sudo cp cuda/lib64/libcudnn* /usr/lib/cuda/lib64/
 ```
 
 设置 cuDNN 的文件权限:
 
-```
+```py
 $ sudo chmod a+r /usr/lib/cuda/include/cudnn.h /usr/lib/cuda/lib64/libcudnn*
 ```
 
@@ -310,7 +310,7 @@ $ sudo chmod a+r /usr/lib/cuda/include/cudnn.h /usr/lib/cuda/lib64/libcudnn*
 
 导出 CUDA 环境变量。要设置它们，请运行:
 
-```
+```py
 $ echo 'export LD_LIBRARY_PATH=/usr/lib/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 $ echo 'export LD_LIBRARY_PATH=/usr/lib/cuda/include:$LD_LIBRARY_PATH' >> ~/.bashrc
 ```
@@ -319,7 +319,7 @@ $ echo 'export LD_LIBRARY_PATH=/usr/lib/cuda/include:$LD_LIBRARY_PATH' >> ~/.bas
 
 安装 Miniconda 后，打开命令提示符。
 
-```
+```py
 conda install -y jupyter
 ```
 
@@ -327,19 +327,19 @@ conda install -y jupyter
 
 现在，检查 TensorFlow 站点的版本，并运行以下命令:
 
-```
+```py
 conda create --name tensorflow python=3.8
 ```
 
 要进入环境:
 
-```
+```py
 conda activate tensorflow
 ```
 
 让我们为您的新环境创建 Jupyter 支持:
 
-```
+```py
 conda install nb_conda
 
 ```
@@ -348,25 +348,25 @@ conda install nb_conda
 
 要仅安装 CPU，请使用以下命令:
 
-```
+```py
 conda install -c anaconda tensorflow
 ```
 
 要安装 GPU 和 CPU，请使用以下命令:
 
-```
+```py
 conda install -c anaconda tensorflow-gpu
 ```
 
 要添加其他库，更新或在根位置创建 ymp 文件，请使用:
 
-```
+```py
 conda env update --file tools.yml
 ```
 
 以下是您需要安装的附加库(您可以使用 pip 安装它们)。
 
-```
+```py
 dependencies:
     - jupyter
     - scikit-learn
@@ -394,7 +394,7 @@ dependencies:
 
 首先，您可以运行以下命令:
 
-```
+```py
 import tensorflow as tf
 tf.config.list_physical_devices("GPU")
 ```
@@ -403,13 +403,13 @@ tf.config.list_physical_devices("GPU")
 
 第二，也可以用 jupyter 笔记本。使用此命令启动 Jupyter。
 
-```
+```py
 jupyter notebook
 ```
 
 现在，运行下面的代码:
 
-```
+```py
 import sys
 
 import tensorflow.keras
@@ -429,7 +429,7 @@ print("GPU is", "available" if gpu else "NOT AVAILABLE")
 
 您会看到类似这样的结果:
 
-```
+```py
 TensorFlow Version: 'version'
 Keras Version: 'version'-tf
 

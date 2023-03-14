@@ -287,14 +287,14 @@ Guild AI 是一个开源的 ML 实验跟踪平台。它是轻量级的，并提�
 
 ##### 2\. Install Neptune client library
 
-```
+```py
 pip install neptune-client
 
 ```
 
 ##### 3\. Add logging to your script
 
-```
+```py
 import neptune.new as neptune
 
 run = neptune.init_run("Me/MyProject")

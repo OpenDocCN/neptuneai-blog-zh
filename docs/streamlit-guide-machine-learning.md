@@ -12,13 +12,13 @@
 
 准备好 Python 环境后，Streamlit 的安装非常简单:
 
-```
+```py
 $ pip install streamlit
 ```
 
 如果您只是尝试一下，您可以运行 hello world 示例:
 
-```
+```py
 $ streamlit hello
 ```
 
@@ -28,7 +28,7 @@ $ streamlit hello
 
 假设您已经在一个名为“app.py”的文件中编写了 Streamlit 代码，您可以使用以下命令运行该应用程序:
 
-```
+```py
 $ streamlit run app.py
 ```
 
@@ -53,7 +53,7 @@ Streamlit 有几个用于显示文本的小部件，例如:
 
 这里有一个例子说明了它们的作用:
 
-```
+```py
 import streamlit as st
 st.code("st.text()", language='python')
 st.text('Neptune AI Blog')
@@ -81,7 +81,7 @@ st.write('Can display many things')
 
 Streamlit 也可以显示数据。数据可以显示为 JSON、表或数据框。
 
-```
+```py
 df = pd.read_csv("data.csv")
 st.dataframe(df)
 st.table(df)
@@ -92,7 +92,7 @@ st.json(json_data)
 
 Streamlit 还允许您向应用程序添加媒体。您可以添加音频、视频或图像。为此，您可以使用“音频”、“视频”和“图像”小部件。
 
-```
+```py
 from PIL import Image
 icon = Image.open("icon.png")
 image = Image.open("logo.png")
@@ -111,7 +111,7 @@ st.audio(audio_bytes)
 
 使用' with st.echo()'命令显示其后的代码。例如，此代码将显示代码，然后显示数据框:
 
-```
+```py
 with st.echo():
     df = pd.read_csv("data.csv")
     st.dataframe(df)
@@ -130,7 +130,7 @@ with st.echo():
 *   ` st.success '显示成功消息
 *   ` st.exception '在应用程序中传达一个异常
 
-```
+```py
 import time
 my_bar = st.progress(0)
 for percent_complete in range(100):
@@ -170,7 +170,7 @@ Streamlit 还有一些小部件，让用户可以与您的应用程序进行交�
 *   日期和时间输入可用于收集时间和日期输入
 *   您还可以让用户使用文件上传器小部件上传文件(当您已经构建了图像分类器或对象检测模型，并且希望用户上传图像并查看结果时，这可能会很方便)
 
-```
+```py
 st.button('Click here')
 st.checkbox('Check')
 st.radio('Radio', [1,2,3])
@@ -191,7 +191,7 @@ st.color_picker('Color Picker')
 
 在任何应用程序中，缓存服务器通过确保数据和某些功能在用户需要时可用来改善用户体验。例如，您可以让应用程序缓存数据，以减少获取数据所花费的时间。您还可以缓存返回数据的函数的结果。
 
-```
+```py
 @st.cache
 def fetch_data():
     df = pd.read_csv("data.csv")
@@ -211,7 +211,7 @@ data = fetch_data()
 *   页面布局(居中或宽)
 *   是否最初加载侧边栏
 
-```
+```py
 icon = Image.open("icon.png")
 st.set_page_config(
     page_title="Data Application",
@@ -225,7 +225,7 @@ st.set_page_config(
 
 Streamlit 在默认配置下运行良好。您可以使用下面的命令检查您当前的配置。
 
-```
+```py
 $ streamlit config show
 ```
 
@@ -235,7 +235,7 @@ $ streamlit config show
 
 在这种情况下` ~/。编辑了适用于 macOS/Linux 的 streamlit/config.toml。在 Windows 中，将为“%userprofile%/”。例如，您可以更改运行 streamlit 的默认端口。
 
-```
+```py
 
 port = 8502
 ```
@@ -248,7 +248,7 @@ port = 8502
 
 这里,“STREAMLIT_*”环境变量通过终端传递:
 
-```
+```py
 $ export STREAMLIT_SERVER_PORT=8502
 ```
 
@@ -256,7 +256,7 @@ $ export STREAMLIT_SERVER_PORT=8502
 
 您也可以在执行 Streamlit“run”命令时使用标志来设置配置。
 
-```
+```py
 $ streamlit run app.py --server.port 8502
 ```
 
@@ -268,7 +268,7 @@ $ streamlit run app.py --server.port 8502
 
 在 Streamlit 中使用 Matplotlib 和 Seaborn 时，您唯一要做的事情就是定义一个图形并将其传递给' st.pyplot'。
 
-```
+```py
 fig = plt.figure(figsize=(12, 5))
 st.pyplot(fig)
 ```
@@ -277,7 +277,7 @@ st.pyplot(fig)
 
 使用 Plotly 时，您将定义一个图形，并将其传递给' plotly _ chart` Streamlit 函数。
 
-```
+```py
 fig = px.scatter(
       ….
     )
@@ -288,7 +288,7 @@ fig = px.scatter(
 
 如果您正在使用 Vega-Lite，您将使用“vega_lite_chart”函数，如下所示:
 
-```
+```py
 st.vega_lite_chart(
         df,
         {
@@ -309,7 +309,7 @@ st.vega_lite_chart(
 
 使用 Altair 时，您将使用` altair.Chart()'定义一个图表，然后使用` st.altair_chart()'显示它:
 
-```
+```py
 chart = (
             alt.Chart(data)
             .mark_bar()
@@ -324,14 +324,14 @@ st.altair_chart(chart)
 
 您可以使用' st.map()'在地图上绘制数据。它是“st.pydeck_chart”的包装器，在地图上创建散点图:
 
-```
+```py
 map_data = df[["lat", "lon"]]
 st.map(map_data)
 ```
 
 使用此功能时，您必须使用一个[个人地图框令牌](https://web.archive.org/web/20221207112623/https://www.mapbox.com/)。您可以在` ~/中设置它。streamlit/config.toml `:
 
-```
+```py
 [mapbox]
 token = "YOUR_MAPBOX_TOKEN"
 ```
@@ -340,7 +340,7 @@ token = "YOUR_MAPBOX_TOKEN"
 
 您可能会发现 Streamlit 并不正式支持您需要的某种功能。这就是 [Streamlit 组件](https://web.archive.org/web/20221207112623/https://www.streamlit.io/components)派上用场的地方。这些是社区在 Streamlit 之上构建的一组包。例如，您可以使用 [Streamlit embed code](https://web.archive.org/web/20221207112623/https://github.com/randyzwitch/streamlit-embedcode) 组件来嵌入来自 Github Gist、CodePen snippets、Gitlab snippets 等的代码片段。
 
-```
+```py
 from streamlit_embedcode import github_gist
 github_gist(gist_url)
 ```
@@ -353,7 +353,7 @@ Streamlit 允许您使用容器和列来布局应用程序。然而，这项功�
 
 ` beta_container '插入一个可用于保存多个元素的不可见容器。您可以使用的另一个函数是“beta_expander ”,它可以生成一个可以展开和折叠的多元素容器。下面是所有这些项目的一个实例。
 
-```
+```py
 with left_column:
     st.altair_chart(chart)
 with right_column:
@@ -370,7 +370,7 @@ with st.beta_expander("Some explanation"):
 
 另一种方法是使用这个[会话状态要点](https://web.archive.org/web/20221207112623/https://gist.github.com/tvst/036da038ab3e999a64497f42de966a92)来添加每个会话状态以简化它。您可以使用“st.empty”小部件来初始化单个元素容器。这很有用，因为一旦用户输入正确的密码，你就可以放弃它，显示你想要的功能。
 
-```
+```py
 PASSWORD = config('PASSWORD')
 session_state = SessionState.get(username='', password='')
 if (session_state.password == PASSWORD):
@@ -405,7 +405,7 @@ elif ( session_state.password != PASSWORD):
 *   用于加载预训练模型的“tensorflow_hub”
 *   用于扩展图像尺寸的“numpy”
 
-```
+```py
 import streamlit as st
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -424,7 +424,7 @@ from tensorflow.keras import preprocessing
 
 在 main 函数中，您使用“st.file_uploader”让用户上传图像。您也可以在文件上传程序中指定可接受的文件类型。上传图像后，枕头上的“图像”被用来打开它。接下来，运行预测函数并显示结果。您可以在结果下方绘制图像。
 
-```
+```py
 st.header("Predict if plant is healthy")
 
 def main():
@@ -448,7 +448,7 @@ def main():
 *   在图像维度中包含批量大小(这只是一个图像，因此批量大小为 1)
 *   运行预测并将它们映射到类名
 
-```
+```py
 def predict(image):
     classifier_model = "https://tfhub.dev/agripredict/disease-classification/1"
     IMAGE_SHAPE = (300, 300,3)
@@ -503,7 +503,7 @@ def predict(image):
 
 最后一步是运行主函数。
 
-```
+```py
 if __name__ == "__main__":
     main()
 ```
@@ -526,7 +526,7 @@ if __name__ == "__main__":
 
 您可以从导入本例所需的两个包开始，然后创建一个选择框，让用户选择一个任务。
 
-```
+```py
 import streamlit as st
 from transformers import pipeline
 
@@ -545,7 +545,7 @@ option = st.selectbox(
 
 运行任何任务都需要在任务的同时初始化“管道”。下面是一个文本分类和问答的例子。为了可读性，其他的都被省略了。
 
-```
+```py
 if option == "Classify Text":
     text = st.text_area(label="Enter a text here")
     if text:
@@ -591,13 +591,13 @@ Streamlit 共享是将您的 Streamlit 应用程序投入生产的最简单快�
 
 好的，首先，你需要从 Neptune 获取仪表板数据。第一步是用 API 键初始化 Neptune:
 
-```
+```py
 project = neptune.init(project_qualified_name='mwitiderrick/LightGBM', api_token='YOUR_API_KEY')
 ```
 
 接下来，定义一个从 Neptune 加载数据的函数。您还可以根据实验的频率来缓存数据。在这种情况下，使用 60 秒，这意味着缓存将在 60 秒后过期。该函数返回一个数据帧，该数据帧随后存储在一个“df”变量中。
 
-```
+```py
 @st.cache(ttl=60)
 def get_leaderboard_data():
     leaderboard = project.get_leaderboard()
@@ -608,7 +608,7 @@ df = get_leaderboard_data()
 
 下一步是使用您最喜欢的可视化工具绘制数据框中的列。这里就用 [Plotly](/web/20221207112623/https://neptune.ai/blog/plotly-python-tutorial-for-machine-learning-specialists) 吧。
 
-```
+```py
 def visualize_leaderboard_data():
     fig = px.pie(
         df,
@@ -634,7 +634,7 @@ if __name__ == "__main__":
 
 之后，您可以从排行榜数据框中提取进度信息。为此，您可以使用“neptunecontrib.api.utils”中的“extract_project_progress_info”函数。
 
-```
+```py
 def get_progress_data():
     leaderboard = project.get_leaderboard()
     progress_df = extract_project_progress_info(leaderboard,
@@ -651,7 +651,7 @@ def get_progress_data():
 
 该函数创建一个交互式项目进度探索图。由于它返回一个 Altair 图表，您可以使用“st.altair_chart”在您的 Streamlit 应用程序中显示它。
 
-```
+```py
 progress_df = get_progress_data()
 
 def visualize_progress():

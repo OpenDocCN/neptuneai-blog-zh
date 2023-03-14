@@ -74,7 +74,7 @@
 
 首先，让我们看一下 **FRCN** 网络的基本部分，即卷积块，由卷积层、批量归一化和激活函数组成。
 
-```
+```py
 def conv_block(channels: Tuple[int, int],
                size: Tuple[int, int],
                stride: Tuple[int, int]=(1, 1),
@@ -111,7 +111,7 @@ conv _ 块函数具有***【N】***个卷积层，具有 ***个*** 个滤波器�
 
 我不能详细说明每个模块实际上是如何实现的，因为它的理论和实用性是如此的密集，以至于仅仅介绍和解释它们的功能就需要一整篇文章。但是，总体框架可以描述如下:
 
-```
+```py
 self.model = nn.Sequential(
 
     conv_block(channels=(input_filters, 32), size=(3, 3), N=N),
@@ -138,7 +138,7 @@ self.model = nn.Sequential(
 
 DeConv 和 UpConv 由 4 个卷积块模块组成，通道数量逐渐减少，特征映射尺寸逐渐增大。它们在 Pytorch 中的实现如下所示:
 
-```
+```py
 def convt(in_channels):
             stride = 2
             padding = (kernel_size - 1) // 2
@@ -159,7 +159,7 @@ def convt(in_channels):
         self.layer4 = convt(in_channels // (2 ** 3))
 ```
 
-```
+```py
 class UpConv(Decoder):
     def upconv_module(self, in_channels):
 
@@ -213,7 +213,7 @@ class UpConv(Decoder):
 
 让我们定义 nyu_dataloader 类，它从根目录加载数据集，并执行数据转换和数据扩充。
 
-```
+```py
 height, width = 480, 640
 class NYUDataset(Dataloader):
     def __init__(self, root, type, sparsifier=None, modality='rgb'):
@@ -245,11 +245,11 @@ class NYUDataset(Dataloader):
 
 开始你的实验:
 
-```
+```py
 run = neptune.init(project='aymane.hachcham/FCRN, api_token='ANONYMOUS') # your credentials
 ```
 
-```
+```py
 run['config/dataset/path'] = 'Documents/FCRN/dataset'
 run['config/dataset/size'] = 407024
 run['config/dataset/transforms'] = {
@@ -268,7 +268,7 @@ run['config/dataset/transforms'] = {
 
 在开始培训之前，让我们记录我们想要使用的模型的超参数。
 
-```
+```py
 hparams = {
     'batch_size': 128,
     'decoder':'upproj',
@@ -287,7 +287,7 @@ run["params"] = hparams
 
 在记录了所有需要的超参数后，我们将启动 epochs 的培训课程。我们将把损失和所有指标记录到 Neptune，以跟踪进度。
 
-```
+```py
 def train(train_loader, model, criterion, optimizer, epoch, logger):
     average_meter = AverageMeter()
     model.train()  
@@ -342,7 +342,7 @@ def train(train_loader, model, criterion, optimizer, epoch, logger):
 
 因此，新运行的新超参数如下所示:
 
-```
+```py
 hparams = {
     'batch_size': 128,
     'decoder':'upproj',

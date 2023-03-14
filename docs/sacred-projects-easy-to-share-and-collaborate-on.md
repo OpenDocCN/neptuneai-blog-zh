@@ -63,20 +63,20 @@ Omniboard 是神圣的流行前端——然而，正如我们上面讨论的，�
 
 首先，您需要安装您的 [neptune 客户端](https://web.archive.org/web/20221206133152/https://github.com/neptune-ai/neptune-client):
 
-```
+```py
 pip install neptune-client
 
 ```
 
 确保创建一个实验:
 
-```
+```py
 ex = Experiment('iris_rbf_svm')
 ```
 
 然后，传递实验对象作为第一个参数:
 
-```
+```py
 from neptunecontrib.monitoring.sacred import NeptuneObserver
 ex.observers.append(NeptuneObserver(api_token='ANONYMOUS',
                                    project_name='shared/sacred-integration'))

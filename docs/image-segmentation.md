@@ -104,11 +104,11 @@ U-Net 的完整实现可以在[这里](https://web.archive.org/web/2023022420242
 
 *   2.2.4 之前的 Tensorflow 1+和 keras:
 
-```
+```py
 git clone https://github.com/matterport/Mask_RCNN.git
 ```
 
-```
+```py
 git clone https://github.com/akTwelve/Mask_RCNN.git updated_mask_rcnn
 ```
 
@@ -144,7 +144,7 @@ git clone https://github.com/akTwelve/Mask_RCNN.git updated_mask_rcnn
 
 导入所有必需的包:
 
-```
+```py
 import neptune.new as neptune
 
 import os
@@ -181,7 +181,7 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
 接下来，在 Python 中，创建一个连接到我们的图像分割项目的 Neptune 实验，以便我们可以记录和监视模型信息并输出到 Neptune:
 
-```
+```py
 import neptune
 import os
 
@@ -211,7 +211,7 @@ npt_exp = neptune.init(
 
 为了预热，让我们只为最简单的实现指定批量大小。
 
-```
+```py
 class InferenceConfig(coco.CocoConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
@@ -233,7 +233,7 @@ npt_exp['Model Config Pars'] = str(config.to_dict())
 
 下面演示如何定义我们的 Mask R-CNN 模型实例:
 
-```
+```py
 model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 
 model.load_weights(COCO_MODEL_PATH, by_name=True)
@@ -260,7 +260,7 @@ results = model.detect([img], verbose=1)
 
 为了可视化输出，我们可以使用下面的代码。
 
-```
+```py
 image_results = results[0]
 
 box, mask, classID, score = image_results['rois'], image_results['masks'], image_results['class_ids'], image_results['scores']
@@ -287,7 +287,7 @@ npt_exp['Predicted Image'].upload(neptune.types.File.as_image(fig_images))
 
 为了更好地组织代码，我们可以将前面提到的模型推理步骤编译成函数 runMaskRCNN，它接受两个主要参数。:模型配置和图像路径:
 
-```
+```py
 def runMaskRCNN(modelConfig, imagePath, MODEL_DIR=MODEL_DIR, COCO_MODEL_PATH=COCO_MODEL_PATH):
     '''
     Args:
@@ -310,7 +310,7 @@ def runMaskRCNN(modelConfig, imagePath, MODEL_DIR=MODEL_DIR, COCO_MODEL_PATH=COC
 
 在试验第一个模型时，我们使用与任务#1 相同的配置。这些信息将被发送到海王星进行跟踪和比较。
 
-```
+```py
 cur_image_path = path_to_image_teddybear
 image_results, img = runMaskRCNN(modelConfig=config, imagePath=cur_image_path)
 
@@ -333,7 +333,7 @@ npt_exp['Predicted Image'].upload(neptune.types.File.as_image(fig_images))
 
 我们可以构建一个定制的模型配置来覆盖基本配置类中的超参数。因此，要专门为这个泰迪熊图像定制建模过程:
 
-```
+```py
 class CustomConfig(coco.CocoConfig):
     """Configuration for inference on the teddybear image.
     Derives from the base Config class and overrides values specific
@@ -372,7 +372,7 @@ npt_exp.send_text('Model Config Pars', str(config.to_dict()))
 
 对于那些想用我们的模型深入杂草的极客观众来说，我们也可以收集并可视化这个 CNN 模型每一层的权重和偏差。下面的代码片段演示了如何对前 5 个卷积层执行此操作。
 
-```
+```py
 LAYER_TYPES = ['Conv2D']
 
 layers = model.get_trainable_layers()

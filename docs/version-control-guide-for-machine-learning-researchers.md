@@ -165,7 +165,7 @@ DVC 的好处:
 *   **易于安装**–DVC 是一款开源工具，您可以通过简单的命令轻松安装:
 *   **数据共享**——你可以在任何云平台上共享你的 ML 数据文件，比如亚马逊网络服务或者谷歌云平台。
 
-```
+```py
 pip install dvc
 ```
 
@@ -178,7 +178,7 @@ pip install dvc
 
 **文件数据版本:**
 
-```
+```py
 import neptune.new as neptune
 run = neptune.init('USER_NAME/PROJECT_NAME',
                    api_token=’ANONYMOUS’)
@@ -186,7 +186,7 @@ run = neptune.init('USER_NAME/PROJECT_NAME',
 
 **文件夹数据版本:**
 
-```
+```py
 from neptunecontrib.versioning.data import log_data_version
 FILEPATH = '/path/to/data/my_data.csv'
 with neptune.create_experiment():
@@ -195,7 +195,7 @@ with neptune.create_experiment():
 
 **S3 桶数据版本:** (可以记录版本和具体密钥，类似于文件版本控制)
 
-```
+```py
 from neptunecontrib.versioning.data import log_data_version
 DIRPATH = '/path/to/data/folder'
 with neptune.create_experiment():
@@ -204,7 +204,7 @@ log_data_version(DIRPATH)
 
 **前缀:** (您可以跟踪多个数据源，只需确保在登录前使用前缀)
 
-```
+```py
 BUCKET = 'my-bucket'
 PATH = 'training_dataset.csv'
 with neptune.create_experiment():
@@ -213,7 +213,7 @@ with neptune.create_experiment():
 
 **用子文件夹记录镜像目录快照:** (用 log_image_dir_snapshots 可以记录镜像目录的可视快照；查看[该实验](https://web.archive.org/web/20221218082900/https://ui.neptune.ai/jakub-czakon/examples/e/EX-96/logs)了解详细信息)
 
-```
+```py
 from neptunecontrib.versioning.data import log_data_version
 FILEPATH_TABLE_1 = '/path/to/data/my_table_1.csv'
 FILEPATH_TABLE_2 = '/path/to/data/my_table_2.csv'
@@ -224,7 +224,7 @@ log_data_version(FILEPATH_TABLE_2, prefix='table_2_')
 
 版本控制最佳实践
 
-```
+```py
 from neptunecontrib.versioning.data import log_image_dir_snapshots
 PATH = '/path/to/data/my_image_dir'
 with neptune.create_experiment():

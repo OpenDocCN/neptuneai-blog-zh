@@ -88,7 +88,7 @@
 
 可以使用以下 pip 命令安装 Deepchecks:
 
-```
+```py
 pip install deepchecks > 0.5.0
 ```
 
@@ -121,7 +121,7 @@ DeepChecks 引入了三个重要的术语:**检查**、**条件**和**套件**�
 
 在下面的例子中，我们将检查数据集是否有重复。我们将从 checks 模块导入类 DataDuplicates，并将数据集作为参数传递。这将返回一个包含数据集是否有重复值的相关信息的表。
 
-```
+```py
 from deepchecks.checks import DataDuplicates, FeatureFeatureCorrelation
 dup = DataDuplicates()
 dup.run(data)
@@ -136,7 +136,7 @@ dup.run(data)
 
 在以下示例中，我们将检查数据集中的要素之间的相关性。为此，我们将从 checks 模块导入 FeatureFeatureCorrelation 类。
 
-```
+```py
 ffc = FeatureFeatureCorrelation()
 ffc.run(data)
 
@@ -174,7 +174,7 @@ ffc.run(data)
 
 随机森林分类器的模型检查或检验示例:
 
-```
+```py
 from deepchecks.checks import ModelInfo
 info = ModelInfo()
 info.run(RF)
@@ -189,7 +189,7 @@ info.run(RF)
 
 它是可以添加到支票中的功能或属性。本质上，它包含一个预定义的参数，可以返回通过、失败或警告结果。这些参数也可以相应地修改。按照下面的代码片段来理解。
 
-```
+```py
 from deepchecks.checks import ModelInfo
 info = ModelInfo()
 info.run(RF)
@@ -216,7 +216,7 @@ info.run(RF)
 
 您可以运行以下代码来查看 DeepChecks 提供的 35 个检查及其条件的列表:
 
-```
+```py
 from deepchecks.suites import full_suite
 suites = full_suite()
 print(suites)
@@ -294,7 +294,7 @@ DeepChecks 允许以较少的努力实现 ML 管道的灵活性和即时验证�
 
 ##### Drifter ML 符合模型的 Scikit-Learn 蓝图，即模型必须包含. fit 和。预测方法。这实质上意味着您也可以测试深度学习模型，因为 Scikit-Learn 有一个集成的 Keras API。查看下面的[示例](https://web.archive.org/web/20230106144030/https://drifter-ml.readthedocs.io/en/latest/introduction.html)。
 
-```
+```py
 pip install drifter-ml
 ```
 
@@ -302,7 +302,7 @@ pip install drifter-ml
 
 为什么要用这个？
 
-```
+```py
 
 from keras.models import Sequential
 from keras.layers import Dense
@@ -347,7 +347,7 @@ df.to_csv("data.csv")
 
 Drifter-ML 是专门为 Scikit-learn 编写的，这个库充当了它的扩展。所有的类和方法都是与 Scikit-learn 同步编写的，因此数据和模型测试变得相对容易和简单。
 
-```
+```py
 def test_cv_precision_lower_boundary():
    df = pd.read_csv("data.csv")
    column_names = ["A", "B", "C"]
@@ -442,7 +442,7 @@ CAR class tested against several test cases to check the model’s performance o
 *   **1。人工智能压力测试(AI stress testing，**)包括数百项测试，以自动评估模型的性能并识别潜在的缺陷。
 *   **2。AI Firewall，**自动在训练好的模型周围创建一个包装器，以实时保护它免受不良数据的影响。包装器是基于模型配置的。它还会自动检查数据和模型，减少手动工作和时间。
 
-```
+```py
 pip3 install --extra-index-url "$CR_URL" kolena-client
 ```
 

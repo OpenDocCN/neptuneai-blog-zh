@@ -26,7 +26,7 @@ pandas 内置的可视化功能在帮助快速简单地绘制系列和数据帧�
 
 让我们导入可视化所需的必要库和提取的数据集:
 
-```
+```py
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -47,7 +47,7 @@ nifty_pharma = pd.read_csv('NIFTY PHARMA.csv',parse_dates=["Date"])
 
 接下来让我们看看数据集的前几列:
 
-```
+```py
 nifty_bank_2019 = nifty_bank[nifty_bank['Date'] > '2019-12-31']
 nifty_fmcg_2019 = nifty_fmcg[nifty_fmcg['Date'] > '2019-12-31']
 nifty_IT_2019 = nifty_IT[nifty_IT['Date'] > '2019-12-31']
@@ -75,7 +75,7 @@ df.head()
 
 要使用熊猫绘制图形，可以调用。dataframe 上的 plot()方法。plot 方法只是 matplotlib 的 [**plt.plot()**](https://web.archive.org/web/20221206012622/https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot) **的一个简单包装。**您还需要指定作为 x 和 y 轴参考的 x 和 y 坐标。因为日期已经是索引列，所以它将被配置为 X 轴。
 
-```
+```py
 df.plot(y='NIFTY Bank index')
 
 ```
@@ -102,7 +102,7 @@ df.plot(y='NIFTY Bank index')
 
 现在让我们用更多的参数绘制相同的数据帧，比如指定 **figsize** 和标签:
 
-```
+```py
 df.plot(y='NIFTY Bank index',figsize=(10,6),title='Nifty Bank Index values in 2020',ylabel = 'Value');
 
 ```
@@ -123,14 +123,14 @@ df.plot(y='NIFTY Bank index',figsize=(10,6),title='Nifty Bank Index values in 20
 
 *   使用**种类**参数。此参数接受字符串值，并决定您将创建哪种绘图。你可以这样做:
 
-```
+```py
 Dataframe.plot(kind='<kind of the desired plot e.g bar, area etc>', x,y)
 
 ```
 
 *   创建绘图的另一种方法是使用“DataFrame.plot. <kind>”方法，而不是提供 kind 关键字参数。这使得发现绘图方法及其使用的特定参数变得更加容易:</kind>
 
-```
+```py
 Dataframe.plot.<kind of the desired plot e.g bar, area, etc>()
 
 ```
@@ -147,7 +147,7 @@ Dataframe.plot.<kind of the desired plot e.g bar, area, etc>()
 
 为了创建漂亮数据的条形图，您需要在月末对数据进行重新采样/汇总。pandas 的库有一个 resample()函数，它对时间序列数据进行重采样。pandas 中的重采样方法与其 groupby 方法类似，因为它本质上是根据特定的时间跨度进行分组。resample()函数如下所示:
 
-```
+```py
 df_sample = df.resample(rule = 'M').mean()[:5]
 df_sample
 
@@ -165,7 +165,7 @@ df_sample
 
 现在，让我们创建如下条形图:
 
-```
+```py
 df_sample.plot(kind='bar',figsize=(10,6))
 
 ```
@@ -176,7 +176,7 @@ df_sample.plot(kind='bar',figsize=(10,6))
 
 如上所述，您也可以在不提供“kind”参数的情况下创建相同的情节:
 
-```
+```py
 df_sample.plot.bar()
 
 ```
@@ -195,7 +195,7 @@ df_sample.plot.bar()
 
 当你想水平而不是垂直的时候。通过将“条形图”指定为图表类型，可以创建水平条形图。
 
-```
+```py
 df_sample.plot(kind='barh',figsize=(10,6))
 
 ```
@@ -208,7 +208,7 @@ df_sample.plot(kind='barh',figsize=(10,6))
 
 要生成堆积条形图，请传递 stacked=True:
 
-```
+```py
 df_sample.plot(kind='bar',stacked=True) 
 df_sample.plot(kind='barh',stacked=True) 
 
@@ -222,7 +222,7 @@ df_sample.plot(kind='barh',stacked=True)
 
 一个[直方图](https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.hist.html#pandas.DataFrame.plot.hist)是数据分布的表示。让我们只为漂亮的快速消费品索引和漂亮的银行索引创建直方图。
 
-```
+```py
 df[['NIFTY FMCG index','NIFTY Bank index']].plot(kind='hist',bins=30,alpha=0.5)
 
 ```
@@ -243,7 +243,7 @@ df[['NIFTY FMCG index','NIFTY Bank index']].plot(kind='hist',bins=30,alpha=0.5)
 
 熊猫可以使用高斯核生成一个[**【KDE】**](https://web.archive.org/web/20221206012622/https://en.wikipedia.org/wiki/Kernel_density_estimation)核密度估计图。一个[核密度估计图显示了单个变量](https://web.archive.org/web/20221206012622/https://chemicalstatistician.wordpress.com/2013/06/09/exploratory-data-analysis-kernel-density-estimation-in-r-on-ozone-pollution-data-in-new-york-and-ozonopolis/)的分布，可以认为是一个平滑的直方图。
 
-```
+```py
 df[['NIFTY FMCG index','NIFTY Bank index']].plot(kind='kde');
 
 ```
@@ -256,7 +256,7 @@ df[['NIFTY FMCG index','NIFTY Bank index']].plot(kind='kde');
 
 [箱线图](https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.plot.box.html#pandas.Series.plot.box)用于通过其四分位数描绘数据。单个箱线图可以传达大量信息，包括关于四分位距、中位数和异常值的详细信息。让我们首先为我们的数据框架创建盒状图，然后你将看到如何解释它们。
 
-```
+```py
 df.plot(kind='box',figsize=(10,6))
 
 ```
@@ -269,7 +269,7 @@ df.plot(kind='box',figsize=(10,6))
 
 任何在异常点之外的都是那些超过胡须末端的点。您可以看到 NiFTY FMCG 比其他产品有更高的异常点。与条形图一样，也可以通过指定 vert=False 来创建水平箱线图。
 
-```
+```py
 df.plot(kind='box',figsize=(10,6),vert=False)
 
 ```
@@ -282,7 +282,7 @@ df.plot(kind='box',figsize=(10,6),vert=False)
 
 一个[面积图](https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.plot.area.html#pandas.Series.plot.area)直观显示定量数据。
 
-```
+```py
 df.plot(kind='area',figsize=(10,6));
 
 ```
@@ -293,7 +293,7 @@ df.plot(kind='area',figsize=(10,6));
 
 默认情况下，pandas 创建一个堆叠面积图，可以通过传递 stacked= **False 的值来取消堆叠。**
 
-```
+```py
 df.plot(kind='area',stacked=False,figsize=(10,6));
 
 ```
@@ -306,7 +306,7 @@ df.plot(kind='area',stacked=False,figsize=(10,6));
 
 [散点图](https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.scatter.html#pandas.DataFrame.plot.scatter)用于绘制两个变量之间的相关性。这些相关性以不同颜色和大小的标记形式绘制。如果你要绘制一个散点图，显示 NIFTY IT 指数和 NIFTY FMCG 之间的关系，你可以这样做:
 
-```
+```py
 df.plot(kind='scatter',x='NIFTY FMCG index', y='NIFTY Bank index',figsize=(10,6),color='Red');
 
 ```
@@ -319,7 +319,7 @@ df.plot(kind='scatter',x='NIFTY FMCG index', y='NIFTY Bank index',figsize=(10,6)
 
 六边形 bin 图，也称为 hexbin 图，可用作散点图的替代图。当数据点数量巨大，并且每个点不能单独绘制时，这种绘图特别有用。
 
-```
+```py
 df.plot(kind='hexbin',x='NIFTY FMCG index', y='NIFTY Bank index',gridsize=20,figsize=(10,6));
 ```
 
@@ -331,7 +331,7 @@ df.plot(kind='hexbin',x='NIFTY FMCG index', y='NIFTY Bank index',gridsize=20,fig
 
 [饼图](https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.pie.html#pandas.DataFrame.plot.pie)是一列中数字数据的比例表示。让我们以 NIFTY 银行指数的月末重采样数据为例，看看它是如何逐月分布的。
 
-```
+```py
 df_sample.index=['jan','feb','march','Apr','may']
 df_sample['NIFTY Bank index'].plot.pie(legend=False, autopct='%.f');
 
@@ -341,7 +341,7 @@ df_sample['NIFTY Bank index'].plot.pie(legend=False, autopct='%.f');
 
 参数 **autopct** 用于使用 Python 字符串格式显示百分比值。默认情况下启用的图例可以通过指定 legend=False 来禁用。此外，如果指定了 subplots=True，则每列的饼图将绘制为 subplots。
 
-```
+```py
 df_sample.plot.pie(subplots=True, figsize=(16, 10),legend=False);
 
 ```
@@ -358,7 +358,7 @@ Pandas 还有一个名为 [pandas.plotting](https://web.archive.org/web/20221206
 
 您已经看到了如何使用熊猫创建散点图。散点图矩阵，顾名思义，在 pandas 中使用 scatter_matrix 方法创建散点图矩阵。绘图:
 
-```
+```py
 from pandas.plotting import scatter_matrix
 scatter_matrix(df, alpha=0.5, figsize=(10, 6), diagonal='kde');
 
@@ -372,7 +372,7 @@ scatter_matrix(df, alpha=0.5, figsize=(10, 6), diagonal='kde');
 
 [Bootstrap plots](https://web.archive.org/web/20221206012622/https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html#bootstrap-plot) 直观评估统计的不确定性，如平均值、中间值、中间值等。Bootstrapping 涉及通过多次从相同的数据中随机采样来计算统计数据，然后对每个样本的单独结果进行平均。然后将从每个随机样本中获得的结果值绘制成线图和条形图。
 
-```
+```py
 pd.plotting.bootstrap_plot(df['NIFTY Bank index'])
 
 ```

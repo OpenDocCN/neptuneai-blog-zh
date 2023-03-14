@@ -106,17 +106,17 @@
 
 首先，让我们安装必要的库:
 
-```
+```py
  ```
 !pip install tensorflow==2.7.1
 !pip install tensorflow_io==0.23.1
 !pip install kafka-python
-``` 
+```py 
 ```
 
 导入所有函数和各自的库:
 
-```
+```py
  ```
 import os
 from datetime import datetime
@@ -131,14 +131,14 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import tensorflow as tf
 import tensorflow_io as tfio
-``` 
+```py 
 ```
 
 我们使用 Kafka 进行流处理，因为 Kafka 流提供了真正的一次记录处理能力。它是一个消息代理，从中可以轻松地使用消息(数据)。像 Spark 这样的工具也使用 Kafka 来读取消息，然后将它们分成小批来进一步处理。这取决于用例以及我们想要的工具。在这个练习中，我们使用 Kafka，因为它是最流行的工具之一。此外，python Kafka 库易于使用和理解。
 
 让我们在本地安装和设置 Kafka，这样我们就可以轻松地模拟流数据环境:
 
-```
+```py
  ```
 !curl -sSOL https://downloads.apache.org/kafka/3.3.2/kafka_2.13-3.3.2.tgz
 !tar -xzf kafka_2.13-3.3.2.tgz
@@ -148,16 +148,16 @@ import tensorflow_io as tfio
 ./kafka_2.13-3.3.2/config/server.properties
 !echo "Waiting for 10 secs until kafka and zookeeper services are up and running"
 !sleep 10
-``` 
+```py 
 ```
 
 为训练和测试数据创建 Kafka 主题:
 
-```
+```py
  ```
 !./kafka_2.13-3.3.2/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --replication-factor 1 --partitions 1 --topic cancer-train
 !./kafka_2.13-3.3.2/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --replication-factor 1 --partitions 2 --topic cancer-test
-``` 
+```py 
 ```
 
 ![Created topic cancer-train. 
@@ -165,25 +165,25 @@ Created topic cancer-test. ](img/b7161ada48139780c8ba64c0b5997d99.png)
 
 出于本练习的目的，我们将使用乳腺癌数据集，并在接下来的几个步骤中将其提供给 Kafka 主题。这个数据集是一个批处理数据集，但是通过将它存储在 Kafka 中，我们模拟了一个为训练和推理提供连续数据检索的环境。
 
-```
+```py
  ```
 cancer_df = pd.read_csv('breast-cancer-wisconsin.data.csv')
 cancer_df.head()
-``` 
+```py 
 ```
 
 用 0 和 1 替换列“Class”值
 
-```
+```py
  ```
 cancer_df['Class'] = cancer_df['Class'].replace(2,0)
 cancer_df['Class'] = cancer_df['Class'].replace(4,1)
-``` 
+```py 
 ```
 
 创建训练和测试子集:
 
-```
+```py
  ```
 train_df, test_df = train_test_split(cancer_df,                                     test_size=0.4,                                     shuffle=True)
 
@@ -195,7 +195,7 @@ y_train_df = train_df["Class"]
 
 x_test_df = test_df.drop(["Class"], axis=1)
 y_test_df = test_df["Class"]
-``` 
+```py 
 ```
 
 ![Number of training samples: 419 
@@ -203,17 +203,17 @@ Number of testing samples: 280 ](img/8bcfc83ee291bcef7efab4df7ef6f0a2.png)
 
 标签，即类标签，被设置为存储在多个分区中的 Kafka 消息的密钥。这使得使用消费者组进行高效的数据检索成为可能。
 
-```
+```py
  ```
 x_train = list(filter(None,                       x_train_df.to_csv(index=False).split("\n")[1:]))
                     y_train = list(filter(None,                       y_train_df.to_csv(index=False).split("\n")[1:]))
 x_test = list(filter(None,                      x_test_df.to_csv(index=False).split("\n")[1:]))                     y_test = list(filter(None,                      y_test_df.to_csv(index=False).split("\n")[1:]))
-``` 
+```py 
 ```
 
 是时候将数据推送到我们之前创建的 Kafka 主题了。
 
-```
+```py
 def error_callback(exc):
       raise Exception('Error while sending data to kafka: {0}'.format(str(exc)))
 
@@ -238,7 +238,7 @@ Wrote 280 messages into topic: cancer-test](img/d6ecb119c2262876eecbf05af401599a
 
 为了从 Kafka 主题中读取数据，我们需要对数据进行解码，并创建一个可用于模型训练的数据集。
 
-```
+```py
  ```
 def decode_kafka_item(item):
       message = tf.io.decode_csv(item.message,
@@ -253,25 +253,25 @@ train_ds = tfio.IODataset.from_kafka('cancer-train', partition=0, offset=0)
 train_ds = train_ds.shuffle(buffer_size=SHUFFLE_BUFFER_SIZE)
 train_ds = train_ds.map(decode_kafka_item)
 train_ds = train_ds.batch(BATCH_SIZE)
-``` 
+```py 
 ```
 
 让我们准备模型创建、设置优化器、损失和指标:
 
-```
+```py
  ```
 OPTIMIZER = "adam"
 LOSS = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 METRICS = ['accuracy']
 EPOCHS = 10
-``` 
+```py 
 ```
 
 设计和构建模型:
 
 现在，我们将编译该模型:
 
-```
+```py
  ```
 model = tf.keras.Sequential([
   tf.keras.layers.Input(shape=(9,)),
@@ -285,20 +285,20 @@ model = tf.keras.Sequential([
 ])
 
 print(model.summary())
-``` 
+```py 
 ```
 
 是时候用卡夫卡的主题来训练模型了。在线或增量学习不同于训练模型的传统方式，在传统方式中，您提供一批数据值，并让模型在相同的基础上进行训练。然而，对于流数据，当新的数据点到达管道时，模型应该继续递增地更新超参数。在在线学习/培训中，数据点一旦用于培训(或消息被阅读)就可能不可用。
 
-```
+```py
  ```
 model.compile(optimizer=OPTIMIZER, loss=LOSS, metrics=METRICS)
-``` 
+```py 
 ```
 
 我们将逐步训练我们的模型，也可以定期保存，以后，我们可以利用它来推断测试数据。
 
-```
+```py
  ```
 online_train_ds = tfio.experimental.streaming.KafkaBatchIODataset(
     topics=["cancer-train"],
@@ -311,12 +311,12 @@ online_train_ds = tfio.experimental.streaming.KafkaBatchIODataset(
         "auto.offset.reset=earliest"
     ],
 )
-``` 
+```py 
 ```
 
 这就是我们如何保持数据流入，并不断训练我们的模型。要了解更多关于 tensorflow streaming api 的信息，请查看[这个](https://web.archive.org/web/20230212113518/https://www.tensorflow.org/io/api_docs/python/tfio/experimental/streaming)页面。
 
-```
+```py
  ```
 def decode_kafka_online_item(raw_message, raw_key):
     message = tf.io.decode_csv(raw_message, [[0.0] for i in range(NUM_COLUMNS)])
@@ -329,7 +329,7 @@ for mini_ds in online_train_ds:
     mini_ds = mini_ds.batch(32)
     if len(mini_ds) > 0:
       model.fit(mini_ds, epochs=3)
-``` 
+```py 
 ```
 
 流式数据的重要性和含义

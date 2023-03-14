@@ -93,7 +93,7 @@
 
 让我们从一个随机的语言数据集开始，我们不期望你的新语言中的单词之间有任何关系。你可以在这里找到生成你自己语言[的所有相关代码。](https://web.archive.org/web/20221206214014/https://github.com/choran/word_embeddings/blob/main/custom_language_dataset.ipynb)
 
-```
+```py
 import string
 from random import choice
 
@@ -124,7 +124,7 @@ text_file.close()
 
 现在让我们用一些关系创建一个简单的语言。正如我们上面提到的，我们的语言会有相同长度的句子，这些句子中的“单词”总是彼此靠近。这就像一个简单的字母表的扩展，其中“aaa”总是靠近“bbb”和“ccc”。
 
-```
+```py
 import string
 from random import choice
 
@@ -169,7 +169,7 @@ Word2Vec 模型将读入我们创建的简单数据集，然后基于 word 2 vec
 
 下面的代码示例可以在一个笔记本[这里](https://web.archive.org/web/20221206214014/https://github.com/choran/word_embeddings/blob/main/train_track_embeddings.ipynb)找到。
 
-```
+```py
 
 def generate_training_data(sequences, window_size, num_ns, vocab_size, seed):
 
@@ -220,7 +220,7 @@ def generate_training_data(sequences, window_size, num_ns, vocab_size, seed):
 
 要设置 Neptune 实验，您只需设置您的凭证并初始化您的 Neptune 模块。
 
-```
+```py
 import neptune
 from neptunecontrib.api import log_table
 from neptunecontrib.api import log_chart
@@ -232,7 +232,7 @@ neptune.init(project_qualified_name='choran/sandbox',
 
 然后你需要做的就是开始你的实验，你已经准备好了！
 
-```
+```py
 neptune.create_experiment()
 
 ```
@@ -241,7 +241,7 @@ neptune.create_experiment()
 
 为了检查我们的单词嵌入之间的相似性，我们可以比较一个示例单词的相似性，并跟踪它在不同时期之间如何变化。
 
-```
+```py
 def get_similarity(word, X, X_vocab, vocab):
 
     vocab_d = {}
@@ -276,7 +276,7 @@ def get_similarity(word, X, X_vocab, vocab):
 
 您还可以看到，我们的回调函数是多么简单，可以将这些信息记录并跟踪到 Neptune。
 
-```
+```py
 class TrackLossAndSimilarity(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):

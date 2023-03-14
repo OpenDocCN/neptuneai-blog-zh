@@ -46,7 +46,7 @@
 
 这些原则规划了我们的设计空间。关于 **scikit-learn API** ，它最明显的表现在你**如何训练和预测**:
 
-```
+```py
 from skorch import NeuralNetClassifier
 
 net = NeuralNetClassifier(...)
@@ -73,7 +73,7 @@ net.predict(X_test)
 
 这是它在代码中的样子:
 
-```
+```py
 from sklearn.model_selection import GridSearchCV
 
 params = {
@@ -169,7 +169,7 @@ fastai 说，skorch 和其他一些高级框架的最大区别是 skorch 不“�
 
 为了实现这一点，我们研究了一个典型的深度学习项目，它通常具有以下结构:
 
-```
+```py
 for stage in stages:
     for epoch in epochs:
         for dataloader in dataloaders:
@@ -198,7 +198,7 @@ Catalyst 可以被 DL 新手和经验丰富的专家轻松采用，这得益于�
 
 *   您可以像平时一样定义加载器、模型、标准、优化器和调度器:
 
-```
+```py
 import torch
 
 loaders = {"train": ..., "valid": ...}
@@ -211,7 +211,7 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
 
 *   你把这些 PyTorch 对象传递给 Catalyst `Runner`
 
-```
+```py
 from catalyst.dl import SupervisedRunner
 
 logdir = "./logdir"
@@ -243,7 +243,7 @@ runner.train(
 *   [**状态** :](https://web.archive.org/web/20220926085913/https://github.com/catalyst-team/catalyst/blob/master/catalyst/core/state.py) 实验和运行程序之间的一些中间存储，保存实验的当前**状态**——模型、标准、优化器、调度器、度量、记录器、加载器等
 *   [**回调** :](https://web.archive.org/web/20220926085913/https://github.com/catalyst-team/catalyst/blob/master/catalyst/core/callback.py) 一个强大的抽象，让你**定制**你的实验运行逻辑。为了给用户最大的灵活性和可扩展性，我们允许在训练循环的任何地方执行回调:
 
-```
+```py
 on_stage_start
     on_epoch_start
        on_loader_start
@@ -391,7 +391,7 @@ Fastai 是一个深度学习库，它提供:
 
 这不是摘录。这是这项任务所需的所有代码行。每一行代码都执行一项重要的任务，让用户专注于他们需要做的事情，而不是次要的细节:
 
-```
+```py
 from fastai.vision.all import *
 
 path = untar_data(URLs.PETS)
@@ -407,21 +407,21 @@ learn.fine_tune(4)
 
 **从库中导入所有必需的棋子**。值得注意的是，这个库是经过精心设计的，以避免这些风格的导入搞乱名称空间。
 
-```
+```py
 from fastai.vision.all import * 
 
 ```
 
 **将标准数据集**从 fast.ai 数据集集合(如果之前没有下载)下载到一个可配置的位置，提取它(如果之前没有提取)，并返回一个带有提取位置的`pathlib.Path`对象。
 
-```
+```py
 path = untar_data(URLs.PETS)
 
 ```
 
 设置`Dataloaders`。注意**项目级和批次级转换的分离**:
 
-```
+```py
 dls = ImageDataloaders.from_name_re(path=path, bs=64,
     fnames = get_image_files(path/"images"), pat = r'/([^/]+)_\d+.jpg$',
     item_tfms=RandomResizedCrop(450, min_scale=0.75), 
@@ -437,7 +437,7 @@ dls = ImageDataloaders.from_name_re(path=path, bs=64,
 
 创建一个`Learner`，这个**结合了一个优化器、一个模型和一个用于训练的数据**。**每个应用程序(视觉、文本、表格)都有一个定制的函数，创建一个`Learner`** ，它能为用户自动处理任何细节。例如，在这个图像分类问题中，它将:
 
-```
+```py
 learn = cnn_learner(dls, resnet34, metrics=error_rate)
 
 ```
@@ -449,7 +449,7 @@ learn = cnn_learner(dls, resnet34, metrics=error_rate)
 *   设置适当的优化器、权重衰减、学习率等等
 *   微调模型。在这种情况下，它使用 1 周期策略，这是最近用于训练深度学习模型的最佳实践，但在其他库中并不广泛可用。很多事情发生在`.fine_tune()`的引擎盖下:
 
-```
+```py
 learn.fine_tune(4)
 
 ```
@@ -467,7 +467,7 @@ learn.fine_tune(4)
 
 用户在其他领域得到非常**相似的体验**，比如表格、时间序列或推荐系统。一旦一个`Learner`被训练，你可以用命令`learn.show_results()`来探索结果。这些结果如何呈现取决于应用，在视觉中你得到的是带标签的图片，在文本中你得到的是汇总样本、目标和预测的数据框架。在我们的宠物分类示例中，您会看到类似这样的内容:
 
-```
+```py
 from fastai2.text.all import *
 
 path = untar_data(URLs.IMDB)
@@ -485,7 +485,7 @@ learn.fine_tune(4, 1e-2)
 
 ***中低档 API***
 
-```
+```py
 mnist = DataBlock(
     blocks=(ImageBlock(cls=PILImageBW), CategoryBlock), 
     get_items=get_image_files, 
@@ -513,14 +513,14 @@ dls = mnist.databunch(untar_data(URLs.MNIST_TINY), batch_tfms=Normalize)
 
 或者**在分布式环境中培训**一样简单
 
-```
+```py
 learn = learn.to_fp16()
 
 ```
 
 fastai 还提供了一个**新的通用优化器抽象**，允许用几行代码实现最近的优化技术，如 LAMB、RAdam 或 AdamW。
 
-```
+```py
 learn = learn.to_distributed()
 
 ```
@@ -574,7 +574,7 @@ learn = learn.to_distributed()
 
 一个 **`Evaluator`(验证模型的对象)是一个以在线度量计算逻辑**为处理功能的`Engine`。
 
-```
+```py
 from ignite.engine import Engine
 
 def update_model(trainer, batch):
@@ -593,7 +593,7 @@ trainer.run(data, max_epochs=100)
 
 这段代码可以悄悄地训练一个模型，并计算总损失。
 
-```
+```py
 from ignite.engine import Engine
 
 total_loss = []
@@ -621,7 +621,7 @@ print(f”Loss: {torch.tensor(total_loss).mean()}”)
 
 在每次 *fire_event* 调用时，它的所有事件处理程序都会被执行。例如，用户可能希望在训练开始时设置一些运行相关变量(`Events.STARTED`)，并在每次迭代中更新学习率(`Events.ITERATION_COMPLETED`)。使用 Ignite，代码将如下所示:
 
-```
+```py
 fire_event(Events.STARTED)
 
 while epoch < max_epochs:
@@ -640,7 +640,7 @@ fire_event(Events.COMPLETED)
 
 **处理程序(相对于“回调”接口)的酷之处在于，它可以是任何具有正确签名的函数**(我们只要求第一个参数是 engine)，例如 lambda、简单函数、类方法等。我们不需要从一个接口继承，也不需要覆盖它的抽象方法。
 
-```
+```py
 train_loader = …
 model = …
 optimizer = …
@@ -664,7 +664,7 @@ trainer.run(train_loader, max_epochs=50)
 
 **内置事件过滤**
 
-```
+```py
 trainer.add_event_handler(
     Events.STARTED, lambda engine: print("Start training"))
 
@@ -692,7 +692,7 @@ trainer.add_event_handler(
 
 类似地，为了**在第 20 个时期**改变一些训练变量一次:
 
-```
+```py
 @trainer.on(Events.EPOCH_COMPLETED(every=5))
 def run_validation(_):
 
@@ -700,7 +700,7 @@ def run_validation(_):
 
 更一般地，用户可以提供自己的事件过滤功能:
 
-```
+```py
 @trainer.on(Events.EPOCH_STARTED(once=20))
 def change_training_variable(_):
 
@@ -708,7 +708,7 @@ def change_training_variable(_):
 
 **现成的处理程序**
 
-```
+```py
 @trainer.on(Events.EPOCH_STARTED(once=20))
 def change_training_variable(_):
 
@@ -731,7 +731,7 @@ Ignite 还为各种任务提供了一个现成的指标列表**:精度、召回�
 
 点击[此处](https://web.archive.org/web/20220926085913/https://pytorch.org/ignite/metrics.html#complete-list-of-metrics)和[此处](https://web.archive.org/web/20220926085913/https://pytorch.org/ignite/contrib/metrics.html)查看可用指标的完整列表。
 
-```
+```py
 from ignite.metrics import Accuracy
 
 def compute_predictions(_, batch):
@@ -750,7 +750,7 @@ Ignite 指标有一个很酷的特性，即**用户可以使用基本的算术�
 
 **库结构**
 
-```
+```py
 precision = Precision(average=False)
 recall = Recall(average=False)
 F1_per_class = (precision * recall * 2 / (precision + recall))
@@ -885,7 +885,7 @@ Lightning 还有另外两个更雄心勃勃的动机:**深度学习社区中研�
 
 如你所见，LightningModule **构建在纯 PyTorch 代码**之上，并简单地将它们组织在**的九个方法**中:
 
-```
+```py
 import pytorch_lightning as pl
 
 class MNISTExample(pl.LightningModule):
@@ -985,7 +985,7 @@ class MNISTExample(pl.LightningModule):
 
 这就是训练这个模型的全部！培训师为您处理所有事情，包括:
 
-```
+```py
 from pytorch_lightning import Trainer
 
 model = MNISTExample()
@@ -1014,39 +1014,39 @@ trainer.fit(model)
 
 随时间截断反向传播
 
-```
+```py
 Trainer(gpus=8)
 
 ```
 
-```
+```py
 Trainer(num_tpu_cores=8)
 
 ```
 
-```
+```py
 Trainer(gpus=8, num_nodes=8, distributed_backend=’ddp’)
 
 ```
 
-```
+```py
 Trainer(gradient_clip_val=2.0)
 
 ```
 
-```
+```py
 Trainer(accumulate_grad_batches=12)
 
 ```
 
-```
+```py
 Trainer(use_amp=True)
 
 ```
 
 *   如果你想看完整的免费魔法特性列表，请点击这里。
 
-```
+```py
 Trainer(truncated_bptt_steps=3)
 
 ```
@@ -1079,7 +1079,7 @@ Trainer(truncated_bptt_steps=3)
 
 *   需要**自己的放大器初始化**？覆盖此挂钩:
 
-```
+```py
 def backward(self, use_amp, loss, optimizer):
     if use_amp:
         with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -1090,7 +1090,7 @@ def backward(self, use_amp, loss, optimizer):
 
 *   想要深入到添加**您自己的 DDP 实现**？覆盖这两个挂钩:
 
-```
+```py
 def configure_apex(self, amp, model, optimizers, amp_level):
     model, optimizers = amp.initialize(
         model, optimizers, opt_level=amp_level,
@@ -1101,7 +1101,7 @@ def configure_apex(self, amp, model, optimizers, amp_level):
 
 像这样的钩子有 10 个，我们会根据研究人员的要求增加更多。
 
-```
+```py
 def configure_ddp(self, model, device_ids):
 
     model = LightningDistributedDataParallel(
@@ -1163,7 +1163,7 @@ def init_ddp_connection(self):
 
 使用上述标志将在 4 个 GPU 上运行该模型。如果您想在 16 个 GPU 上运行，其中有 4 台机器，每台机器有 4 个 GPU，请将教练标志更改为:
 
-```
+```py
 trainer = Trainer(gpus=4, distributed_backend='dp')    
 trainer.fit(model)
 
@@ -1171,7 +1171,7 @@ trainer.fit(model)
 
 并提交以下 SLURM 作业:
 
-```
+```py
 trainer = Trainer(gpus=4, nb_gpu_nodes=4, distributed_backend='ddp')    
 trainer.fit(model)
 
@@ -1179,7 +1179,7 @@ trainer.fit(model)
 
 考虑到引擎盖下发生了多少事情，这简直太简单了。
 
-```
+```py
 
 source activate $1
 

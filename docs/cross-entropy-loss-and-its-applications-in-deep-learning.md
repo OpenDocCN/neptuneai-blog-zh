@@ -335,61 +335,61 @@ PyTorch
 
 PyTorch 分类[交叉熵](https://web.archive.org/web/20221206001915/https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html)模块，softmax 激活函数已经应用于公式。因此，我们不会像在前面的例子中那样使用激活函数。
 
-```
+```py
 import torch
 import torch.nn as nn
 ```
 
 我们仍然使用 PyTorch 随机数来生成输入要素(X)和标注(y)值。
 
-```
+```py
 X = torch.randn(10)
 y = torch.randint(2, (10,), dtype=torch.float)
 ```
 
 由于这是一个多类问题，输入要素有五个类(class_0，class_1，class_2，class_3，class_4)
 
-```
+```py
 print(X)
 ```
 
-```
+```py
 tensor([ 0.0421, -0.6606,  0.6276,  1.2491, -1.1535, -1.4137,  0.8967, -1.1786,
         -1.3214,  0.2828])
 ```
 
 多类交叉熵计算如下:
 
-```
+```py
 print(y)
 ```
 
-```
+```py
 tensor([1., 0., 0., 1., 0., 0., 1., 0., 0., 0.])
 ```
 
 跨不同深度学习框架计算交叉熵是一样的；让我们看看如何在 TensorFlow 中实现同样的功能。
 
-```
+```py
 X_continous_values = torch.sigmoid(X)
 print(X_continous_values)
 
 ```
 
-```
+```py
 tensor([0.5105, 0.3406, 0.6519, 0.7772, 0.2398, 0.1957, 0.7103, 0.2353, 0.2106,
         0.5702])
 ```
 
 海王星与 [PyTorch](https://web.archive.org/web/20221206001915/https://docs.neptune.ai/essentials/integrations/deep-learning-frameworks/pytorch) 的融合
 
-```
+```py
 loss = nn.BCELoss()(X_continous_values, y)
 print(loss)
 
 ```
 
-```
+```py
 tensor(1.0966)
 ```
 
@@ -401,13 +401,13 @@ TensorFlow
 
 使用 tensor flow[BinaryCrossentropy()](https://web.archive.org/web/20221206001915/https://www.tensorflow.org/api_docs/python/tf/keras/losses/BinaryCrossentropy)模块:
 
-```
+```py
 X = torch.randn(10, 5)
 print(X)
 
 ```
 
-```
+```py
 tensor([[-0.5698, -0.0558, -0.2550,  1.6812,  0.0238],
         [-2.1786,  1.3923, -0.2363, -0.4601, -1.4949],
         [ 1.3679,  1.2853,  0.4087, -0.5743, -0.2752],
@@ -420,24 +420,24 @@ tensor([[-0.5698, -0.0558, -0.2550,  1.6812,  0.0238],
         [ 0.1003,  0.6604, -1.3535, -0.3053, -0.4034]])
 ```
 
-```
+```py
 y = torch.randint(5, (10,))
 print(y)
 ```
 
-```
+```py
 tensor([3, 0, 1, 1, 2, 4, 0, 2, 1, 3])
 ```
 
 **2。分类交叉熵**
 
-```
+```py
 loss = nn.CrossEntropyLoss()(X, y)
 print(loss)
 
 ```
 
-```
+```py
 tensor(1.9732)
 ```
 
@@ -449,26 +449,26 @@ tensor(1.9732)
 
 海王星与[张量流](https://web.archive.org/web/20221206001915/https://docs.neptune.ai/essentials/integrations/deep-learning-frameworks/tensorflow-keras)的融合
 
-```
+```py
 import tensorflow as tf
 ```
 
 结论
 
-```
+```py
 actual_values = [0, 1, 0, 0, 0, 0]
 predicted_values = [.5, .7, .2, .3, .5, .6]
 ```
 
 本文涵盖了损失函数的核心概念，主要是交叉熵。我希望它能让你更好地理解交叉熵，以及它是如何用于二元和多类分类问题的，并且你能够在你的案例场景中应用它。
 
-```
+```py
 binary_cross_entropy = tf.keras.losses.BinaryCrossentropy()
 loss = binary_cross_entropy(actual_values, predicted_values)
 print(loss.numpy)
 ```
 
-```
+```py
 0.53984624
 ```
 
@@ -476,26 +476,26 @@ print(loss.numpy)
 
 Let’s say we have three classes(cat, dog, bear) to predict. Our actual image/class is a dog; therefore, we have theoretically (0, 1, 0). Where 1 represents the actual image and 0, where the image is not a dog. Our values will be:
 
-```
+```py
 actual_values = [0, 1, 0]
 ```
 
 Hypothetically the model predicts that the image is 5% likely to be a cat, 85% a dog, and 10% a bear. Then our predicted values will be:
 
-```
+```py
 predicted_values = [0.05, 0.85, 0.10]
 ```
 
 Using the TensorFlow [Categorical Cross Entropy()](https://web.archive.org/web/20221206001915/https://www.tensorflow.org/api_docs/python/tf/keras/losses/CategoricalCrossentropy) module, we calculate loss as follows:
 
-```
+```py
 loss = tf.keras.losses.CategoricalCrossentropy()
 loss = loss(actual_values, predicted_values)
 print(loss.numpy)
 
 ```
 
-```
+```py
 0.1625189
 ```
 

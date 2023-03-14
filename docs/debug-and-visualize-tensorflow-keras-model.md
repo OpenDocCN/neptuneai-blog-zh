@@ -72,7 +72,7 @@
 
 我们将使用整个数据集的较小版本，并使用 TensorFlow.data API 下载它。
 
-```
+```py
 data_dir = pathlib.Path('Documents/SpeechRecognition/data/mini_speech_commands')
 if not data_dir.exists():
   tf.keras.utils.get_file(
@@ -84,14 +84,14 @@ if not data_dir.exists():
 
 开始你的海王星实验:
 
-```
+```py
 run = neptune.init(project='aymane.hachcham/Speech-Recognition-TF',
                    api_token='YOUR_API_TOKEN') 
 ```
 
 将所有相关元数据记录到您的 Neptune 仪表盘:
 
-```
+```py
 run['config/dataset/path'] = 'Documents/SpeechRecognition/data/mini_speech_commands'
 run['config/dataset/size'] = 105000
 run['config/dataset/total_examples'] = 8000
@@ -101,7 +101,7 @@ run['config/dataset/list_commands'] = ['down', 'go', 'left', 'no', 'right', 'sto
 
 您还可以将音频样本记录到您的 Neptune dashboard，以便将所有元数据放在一起。目前，Neptune 支持 MP3、MA4、OGA 和 WAVE 音频格式。
 
-```
+```py
 run['config/audio'] = neptune.types.File('/content/data/right_commad_Sample.wav')
 ```
 
@@ -109,7 +109,7 @@ run['config/audio'] = neptune.types.File('/content/data/right_commad_Sample.wav'
 
 现在我们需要将所有的音频文件提取到一个列表中，并对其进行洗牌。然后，我们将把数据分割和隔离成训练集、测试集和验证集。
 
-```
+```py
 train_samples = list_samples[:6400]
 val_samples = list_samples[6400: 6400 + 800]
 test_samples = list_samples[-800:]
@@ -127,7 +127,7 @@ print('Test set size', len(test_samples))
 
 让我们解码音频文件，得到相应的标签和波形。
 
-```
+```py
 def decode_audio(audio_binary):
 
   audio, _ = tf.audio.decode_wav(audio_binary)
@@ -147,7 +147,7 @@ def audio_waveform(file_path):
 
 一旦我们的函数设置好了，我们将使用它们来处理训练数据，以便获得所有样本的波形和相应的标签。
 
-```
+```py
 AUTOTUNE = tf.data.AUTOTUNE  
 files_ds = tf.data.Dataset.from_tensor_slices(train_samples)
 waveform_data = files_ds.map(audio_waveform, num_parallel_calls=AUTOTUNE)
@@ -171,7 +171,7 @@ STFT 将信号划分为时间窗口，并在每个窗口上执行傅立叶变换
 
 我们需要设置先验参数来使用该函数。首先，设置帧长度和帧步长参数，使生成的谱图“图像”接近正方形。此外，我们希望各个波形与频谱图具有相同的长度，这样当我们将波形转换为频谱图时，结果将有望具有相同的维度。
 
-```
+```py
 def get_spectrogram(waveform_sample):
 
   zero_pad = tf.zeros([16000] - tf.shape(waveform_sample), dtype=tf.float32)
@@ -188,7 +188,7 @@ def get_spectrogram(waveform_sample):
 
 并排绘制频谱图及其相应的波形:
 
-```
+```py
 for waveform, label in waveform_data.take(1):
   label = label.numpy().decode('utf-8')
   spectrogram = get_spectrogram(waveform)
@@ -220,7 +220,7 @@ for waveform, label in waveform_data.take(1):
 
 在我们的例子中，我们将使用 scikit learn 提供的 DummyClassifier 模块。这是相当简单的，并有所有的要求，以弥补一个完美的候选人。
 
-```
+```py
 train_audio = []
 train_labels = []
 
@@ -252,7 +252,7 @@ accuracy_score(dummy_true, dummy_pred)
 
 我们将使用一批 64 个数据加载器。
 
-```
+```py
 batch_size = 64
 train_samples = train_samples.batch(batch_size)
 val_samples = val_samples.batch(batch_size)
@@ -267,7 +267,7 @@ val_samples = val_samples.batch(batch_size)
 
 如果我们使用 Pytorch，我们通常会首先应用数据转换，通常包括调整大小、规范化、裁剪等。但是，在 TensorFlow 中，这可以通过专门设计的模块轻松实现。
 
-```
+```py
 normalization_layer = preprocessing.Normalization()
 normalization_layer.adapt(spectrogram_ds.map(lambda x, _: x))
 
@@ -288,7 +288,7 @@ sound_model = models.Sequential([
 
 我们还可以在 Neptune 中记录架构，以保存它供以后运行。
 
-```
+```py
 from contextlib import redirect_stdout
 
 with open(f'./{model_name}_arch.txt', 'w') as f:
@@ -300,7 +300,7 @@ run[f"io_files/artifacts/{model_name}_arch"].upload(f"./{model_name}_arch.txt")
 
 建立架构后，我们来编译模型。我们最终将使用 Adam 优化器和稀疏分类交叉熵损失度量来严格评估模型随时间的准确性。
 
-```
+```py
 hparams = {
     'batch_size': 64,
     'image_size': 120,
@@ -316,7 +316,7 @@ run["params"] = hparams
 
 跟踪我们模型训练进度最好的方法就是 [*海王 TF/Keras 扩展*](https://web.archive.org/web/20221206081625/https://docs.neptune.ai/api-reference/integrations/tensorflow-keras) 。它作为一个回调函数，同时实时记录我们三个集合的值:训练、测试和验证。
 
-```
+```py
 sound_model.compile(
     optimizer=tf.keras.optimizers.Adam(),
     loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -348,7 +348,7 @@ history = model.fit(
 
 我们还可以显示混淆矩阵，以检查模型在测试集的每个命令上的表现。它显示了模型在预测每个命令时的准确性，并显示了模型是否对每个命令之间的差异有大致的了解。
 
-```
+```py
 y_pred = np.argmax(model.predict(test_audio), axis=1) 
 y_true = test_labels 
 

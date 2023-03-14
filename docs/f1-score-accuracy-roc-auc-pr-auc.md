@@ -47,7 +47,7 @@ PR AUC 和 F1 分数是非常稳健的[评估指标](/web/20230215020452/https:/
 
 在 Python 中，您可以通过以下方式计算它:
 
-```
+```py
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 y_pred_class = y_pred_pos > threshold
@@ -87,7 +87,7 @@ accuracy_score(y_true, y_pred_class)
 
 可以通过运行以下命令轻松计算:
 
-```
+```py
 from sklearn.metrics import f1_score
 
 y_pred_class = y_pred_pos > threshold
@@ -129,7 +129,7 @@ Tom Fawcett 的这篇[文章对 ROC 曲线和 ROC AUC 评分进行了广泛讨�
 
 或者，[可以显示【ROC AUC 分数等同于计算预测和目标之间的等级相关性。从解释的角度来看，它更有用，因为它告诉我们这个度量向**展示了你的模型**在预测排名方面有多好。它告诉你随机选择的正面实例比随机选择的负面实例排名更高的概率是多少。](https://web.archive.org/web/20230215020452/https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test#Area-under-curve_(AUC)_statistic_for_ROC_curves)
 
-```
+```py
 from sklearn.metrics import roc_auc_score
 
 roc_auc = roc_auc_score(y_true, y_pred_pos)
@@ -158,7 +158,7 @@ roc_auc = roc_auc_score(y_true, y_pred_pos)
 
 您也可以**将 PR AUC 视为针对每个回忆阈值**计算的精确度分数的平均值。如果需要，您还可以通过选择/剪裁召回阈值来调整此定义，以满足您的业务需求。
 
-```
+```py
 from sklearn.metrics import average_precision_score
 
 average_precision_score(y_true, y_pred_pos)
@@ -185,25 +185,25 @@ average_precision_score(y_true, y_pred_pos)
 
 *   定义的超参数值:
 
-```
+```py
 MODEL_PARAMS = {'random_state': 1234,
                 'learning_rate': 0.1,
                 'n_estimators': 10}
 ```
 
-```
+```py
 model = lightgbm.LGBMClassifier(**MODEL_PARAMS)
 model.fit(X_train, y_train)
 ```
 
-```
+```py
 y_test_pred = model.predict_proba(X_test)
 
 ```
 
 *   记录每次运行的所有指标:
 
-```
+```py
 y_test_pred = model.predict_proba(X_test)
 
 ```
@@ -308,11 +308,11 @@ y_test_pred = model.predict_proba(X_test)
 
 ## 您可以**记录我们为您的机器学习项目覆盖的所有度量和性能图表**，并使用我们的 [Python 客户端](https://web.archive.org/web/20230215020452/https://docs.neptune.ai/usage/)和[集成](https://web.archive.org/web/20230215020452/https://docs.neptune.ai/integrations/)在 Neptune 中探索它们(在下面的示例中，我使用 [Neptune-LightGBM 集成](https://web.archive.org/web/20230215020452/https://docs.neptune.ai/integrations/lightgbm/))。
 
-```
+```py
 pip install neptune-client neptune-lightgbm
 ```
 
-```
+```py
 Import neptune.new as neptune
 
 run = neptune.init(...)

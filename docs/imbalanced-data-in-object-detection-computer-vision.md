@@ -149,7 +149,7 @@ Figure 8 – Feature Pyramid Network (FPN). | [Source](https://web.archive.org/w
 
 在 PyTorch，你可以简单地从 torchvision.ops 获得 FPN；
 
-```
+```py
 from torchvision.ops import FeaturePyramidNetwork
 net = FeaturePyramidNetwork([10, 20, 30], 5)
 print(net)
@@ -157,7 +157,7 @@ print(net)
 
 输出:
 
-```
+```py
 FeaturePyramidNetwork(
   (inner_blocks): ModuleList(
     (0): Conv2d(10, 5, kernel_size=(1, 1), stride=(1, 1))
@@ -359,7 +359,7 @@ wregLregLcls
 
 *Figure 18 – Splitted high-resolution image, each tile in the grid can be used as an input for the object detection model. | [Source](https://web.archive.org/web/20221201164647/https://earth.google.com/web/search/Spa,+Belgium/@50.44795575,30.51214238,186.93009383a,5379.28236026d,35y,360h,0t,0r/data=CigiJgokCVAWE6UtZ0lAERAzNE6cBUlAGbwpwG5UDhdAIXSS7ZbWrwtA)*
 
-```
+```py
 import cv2
 from matplotlib.pyplot import plt
 

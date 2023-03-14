@@ -433,7 +433,7 @@ E=0.35567134660719907
 
 下一个代码使用 NumPy 来准备输入(x1=0.1 和 x2=0.4)，值为 **0.7** 的输出，值为 **0.01** 的学习速率，并为两个权重 w1 和 w2 分配初始值。最后，创建两个空列表来保存每个时期的网络预测和误差。
 
-```
+```py
 import numpy
 x1=0.1
 x2=0.4
@@ -460,7 +460,7 @@ network_error = []
 
 update_w():更新单个权重。
 
-```
+```py
 import numpy
 
 def sigmoid(sop):
@@ -484,7 +484,7 @@ def update_w(w, grad, learning_rate):
 
 现在，根据下一个代码，使用“for”循环，我们准备对多个时期进行向前和向后传递计算。循环经过 80，000 个纪元。
 
-```
+```py
 for k in range(80000):
 
     y = w1*x1 + w2*x2
@@ -510,7 +510,7 @@ for k in range(80000):
 
 在正向传递中，执行以下代码行来计算 SOP，应用 sigmoid 激活函数来获得预测输出，并计算误差。这将分别在 predicted_output 和 network_error 列表中追加当前网络预测和误差。
 
-```
+```py
     y = w1*x1 + w2*x2
     predicted = sigmoid(y)
     err = error(predicted, target)
@@ -522,7 +522,7 @@ for k in range(80000):
 
 在向后传递中，执行“for”循环中的剩余行来计算所有链中的导数。误差 W.R.T 对权重的导数保存在变量 gradw1 和 gradw2 中。最后，通过调用 update_w()函数来更新权重。
 
-```
+```py
     g1 = error_predicted_deriv(predicted, target)
 
     g2 = sigmoid_sop_deriv(y)
@@ -539,7 +539,7 @@ for k in range(80000):
 
 完整的代码如下。它在每个时期后打印预测的输出。此外，它使用 matplotlib 库创建 2 个图，显示预测输出和误差如何随时间演变。
 
-```
+```py
 import numpy
 import matplotlib.pyplot
 
@@ -620,7 +620,7 @@ matplotlib.pyplot.ylabel("Prediction")
 
 GitHub 项目也给出了一个更简单的接口来构建 [Ch09 目录](https://web.archive.org/web/20230103154737/https://github.com/ahmedfgad/IntroDLPython/tree/master/Ch09)中的网络。有一个例子，建立一个有 3 个输入和 1 个输出的网络。在代码的最后，调用函数 **predict()** 来要求网络预测一个新样本[0.2，3.1，1.7]的输出。
 
-```
+```py
 import MLP
 import numpy
 

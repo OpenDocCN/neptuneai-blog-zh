@@ -163,7 +163,7 @@ gcn 首先在“图上的谱网络和深度局部连接网络”(布鲁纳等人
 
 在 Python 中，我们可以使用 PyTorch 轻松构建 GCN:
 
-```
+```py
 import torch
 from torch import nn
 

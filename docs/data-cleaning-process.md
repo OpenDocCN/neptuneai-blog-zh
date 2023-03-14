@@ -69,7 +69,7 @@ LightGBM 和 [XGboost](https://web.archive.org/web/20221206100436/https://stacko
 
 下面，您将看到一个函数，它实现了我们在上一段中讨论的思想。
 
-```
+```py
 def missing_removal(df, thresh, confirm= None):
     holder= {}
     for col in df.columns:
@@ -101,7 +101,7 @@ Scikit-learn 提供了一个名为[simple imputr](https://web.archive.org/web/20
 
 下面的简短描述将有助于更好地理解统计插补。
 
-```
+```py
 from sklearn.impute import SimpleImputer
 
 cols= df.columns
@@ -121,7 +121,7 @@ Scikit-learn 提供了一个名为[iterative inputr](https://web.archive.org/web
 
 下面是一个简短的描述，希望能让你巩固这个概念。
 
-```
+```py
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 
@@ -189,7 +189,7 @@ df= pd.DataFrame(df, columns= cols)
 
 下面描述了该方法在 python 中的实现:
 
-```
+```py
 import pandas as pd
 data= pd.get_dummies(data, columns, drop_first= True)
 
@@ -201,7 +201,7 @@ data= pd.get_dummies(data, columns, drop_first= True)
 
 下面描述了该方法在 python 中的实现:
 
-```
+```py
 
 def freq_enc(df, cols):
     for col in cols:
@@ -225,7 +225,7 @@ def count_enc(df, cols):
 
 下面描述了该方法在 python 中的实现:
 
-```
+```py
 
 def target_mean_enc(df, cols, target_col):
     mean_holder= {}
@@ -255,7 +255,7 @@ def target_mean_enc(df, cols, target_col):
 
 下面描述了该方法在 python 中的实现:
 
-```
+```py
 def ordered_interger_encoder(data, cols, target_col):
     mean_holder= {}
     for col in cols:
@@ -271,7 +271,7 @@ def ordered_interger_encoder(data, cols, target_col):
 
 下面描述了该方法在 python 中的实现:
 
-```
+```py
 from category_encoders import leave_one_out
 binary= leave_one_out(cols= ['STATUS'])
 binary.fit(data)
@@ -286,7 +286,7 @@ test= binary.transform(test_data)
 
 下面描述了使用 category_encoders 库的方法演示:
 
-```
+```py
 from category_encoders import BinaryEncoder
 binary= BinaryEncoder(cols= ['STATUS'])
 binary.fit(data)
@@ -308,7 +308,7 @@ test= binary.transform(test_data)
 
 下面描述了使用 category_encoders 的这种方法的实现:
 
-```
+```py
 from category_encoders import WOEEncoder
 binary= WOEEncoder(cols= ['STATUS'])
 binary.fit(data)
@@ -323,7 +323,7 @@ test= binary.transform(test_data)
 
 下面描述了该方法在 python 中的实现:
 
-```
+```py
 df['size']= df['size'].map({'small':1, 'medium':2, 'big':3})
 df
 ```

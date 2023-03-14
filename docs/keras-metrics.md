@@ -23,7 +23,7 @@ Keras 指标是用于评估深度学习模型性能的函数。为您的问题�
 
 在 Keras 中，度量在编译阶段传递，如下所示。您可以通过逗号分隔来传递多个指标。
 
-```
+```py
 from keras import metrics
 
 model.compile(loss='mean_squared_error', optimizer='sgd',
@@ -49,21 +49,21 @@ Keras 提供了丰富的内置指标。根据你的问题，你会使用不同�
 
 ***binary_accuracy** ，*例如，计算二进制分类问题的所有预测的平均准确率。
 
-```
+```py
 keras.metrics.binary_accuracy(y_true, y_pred, threshold=0.5)
 
 ```
 
 ***准确性*** 指标计算所有预测的准确率。 *y_true* 代表真实标签，而 *y_pred* 代表预测标签。
 
-```
+```py
 keras.metrics.accuracy(y_true, y_pred)
 
 ```
 
 ***confusion_matrix*** 显示一个表格，显示真阳性、真阴性、假阳性和假阴性。
 
-```
+```py
 keras.metrics.confusion_matrix(y_test, y_pred)
 
 ```
@@ -88,21 +88,21 @@ keras.metrics.confusion_matrix(y_test, y_pred)
 
 ***category _ accuracy***指标计算所有预测的平均准确率。
 
-```
+```py
 keras.metrics.categorical_accuracy(y_true, y_pred)
 
 ```
 
 ***sparse _ categorial _ accuracy***与*categorial _ accuracy*类似，但大多在对稀疏目标进行预测时使用**。一个很好的例子是在深度学习问题中处理文本，如 word2vec。在这种情况下，一个人用**数千个类**工作，目的是预测下一个单词。这个任务会产生一种情况，y_true 是一个几乎全是零的巨大矩阵，这是使用稀疏矩阵的最佳位置。**
 
-```
+```py
 keras.metrics.sparse_categorical_accuracy(y_true, y_pred)
 
 ```
 
 ***top _ k _ category _ accuracy***计算 top-k 分类准确率。我们从我们的模型中取出前 k 个预测类，并查看正确的类是否被选为前 k 个。如果是，我们说我们的模型是正确的。
 
-```
+```py
 keras.metrics.top_k_categorical_accuracy(y_true, y_pred, k=5)
 
 ```
@@ -111,7 +111,7 @@ keras.metrics.top_k_categorical_accuracy(y_true, y_pred, k=5)
 
 回归问题中使用的度量包括**均方误差、平均绝对误差和平均绝对百分比误差。**这些指标用于预测房屋销售和价格等数值。查看这个参考资料，获得关于回归度量的[完整指南。](https://web.archive.org/web/20220926093651/https://scikit-learn.org/stable/modules/model_evaluation.html#regression-metrics)
 
-```
+```py
 from keras import metrics
 
 model.compile(loss='mse', optimizer='adam', 
@@ -129,7 +129,7 @@ model.compile(loss='mse', optimizer='adam',
 
 可以在深度学习模型的编译阶段传递函数来使用。
 
-```
+```py
 model.compile(...metrics=[your_custom_metric])
 ```
 
@@ -139,7 +139,7 @@ model.compile(...metrics=[your_custom_metric])
 
 f1 分数是精确度和召回率的加权平均值。因此，为了计算 f1，我们需要首先创建计算精度和召回率的函数。请注意，在多类场景中，您需要查看所有的类，而不仅仅是正类(这是二进制分类的情况)
 
-```
+```py
 def recall(y_true, y_pred):
     y_true = K.ones_like(y_true) 
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
@@ -165,21 +165,21 @@ def f1_score(y_true, y_pred):
 
 下一步是在我们深度学习模型的编译阶段使用这些函数。我们还添加了默认可用的 Keras *准确性*指标。
 
-```
+```py
 model.compile(...,metrics=['accuracy', f1_score, precision, recall])
 
 ```
 
 现在让我们根据训练集和测试集来调整模型。
 
-```
+```py
 model.fit(x_train, y_train, epochs=5)
 
 ```
 
 现在您可以评估您的模型，并访问您刚刚创建的指标。
 
-```
+```py
 (loss, 
 accuracy, 
 f1_score, precision, recall) = model.evaluate(x_test, y_test, verbose=1)
@@ -198,7 +198,7 @@ f1_score, precision, recall) = model.evaluate(x_test, y_test, verbose=1)
 
 例如:
 
-```
+```py
 tf.keras.metrics.Accuracy() 
 
 ```
@@ -211,14 +211,14 @@ keras 指标和 tf.keras 之间有很多重叠。但是，有一些指标你只�
 
 ***TF . keras . metrics . AUC***通过[黎曼和](https://web.archive.org/web/20220926093651/https://www.khanacademy.org/math/ap-calculus-ab/ab-integration-new/ab-6-2/a/left-and-right-riemann-sums)计算 ROC 曲线的近似 AUC(曲线下面积)。
 
-```
+```py
 model.compile('sgd', loss='mse', metrics=[tf.keras.metrics.AUC()])
 
 ```
 
 您可以使用 precision，回想一下我们以前在 tf.keras 中实现的开箱即用。
 
-```
+```py
 model.compile('sgd', loss='mse', 
                metrics=[tf.keras.metrics.Precision(), 
                         tf.keras.metrics.Recall()])
@@ -231,7 +231,7 @@ model.compile('sgd', loss='mse',
 
 所有班级的平均值。
 
-```
+```py
 model.compile(... metrics=[tf.keras.metrics.MeanIoU(num_classes=2)])
 
 ```
@@ -244,7 +244,7 @@ model.compile(... metrics=[tf.keras.metrics.MeanIoU(num_classes=2)])
 
 因此，平均相对误差是相对误差的平均值。
 
-```
+```py
 tf.keras.metrics.MeanRelativeError(normalizer=[1, 3, 2, 3])
 ```
 
@@ -258,7 +258,7 @@ tf.keras.metrics.MeanRelativeError(normalizer=[1, 3, 2, 3])
 *   ***result()*** 从状态变量中返回度量值，
 *   ***reset_state()*** 将每个时期开始时的度量值设置为预定义的常数(通常为 0)
 
-```
+```py
 class MulticlassTruePositives(tf.keras.metrics.Metric):
     def __init__(self, name='multiclass_true_positives', **kwargs):
         super(MulticlassTruePositives, self).__init__(name=name, **kwargs)
@@ -283,7 +283,7 @@ class MulticlassTruePositives(tf.keras.metrics.Metric):
 
 然后我们简单地在编译阶段传递它:
 
-```
+```py
 model.compile(...,metrics=[MulticlassTruePositives()])
 
 ```
@@ -296,7 +296,7 @@ model.compile(...,metrics=[MulticlassTruePositives()])
 
 首先，我们需要一个回调，在每个时期结束时创建 ROC 曲线和混淆矩阵。
 
-```
+```py
 import os
 
 from keras.callbacks import Callback
@@ -330,7 +330,7 @@ class PerformanceVisualizationCallback(Callback):
 
 现在我们简单地将它传递给 *model.fit()* callbacks 参数。
 
-```
+```py
 performance_cbk = PerformanceVisualizationCallback(
                       model=model,
                       validation_data=validation_data,
@@ -349,7 +349,7 @@ history = model.fit(x=x_train,
 
 你也可以像 Neptune 一样把一切记录到实验跟踪工具中。这种方法将让您在一个地方拥有所有的模型元数据。为此，您可以使用 [Neptune + TensorFlow / Keras 集成](https://web.archive.org/web/20220926093651/https://docs.neptune.ai/integrations-and-supported-tools/model-training/tensorflow-keras):
 
-```
+```py
 from neptune.new.integrations.tensorflow_keras import NeptuneCallback
 import neptune.new as neptune
 from scikitplot.metrics import plot_confusion_matrix
@@ -365,7 +365,7 @@ run = neptune.init(
 
 一旦你做到了这一点，一切照常。
 
-```
+```py
 neptune_cbk = NeptuneCallback(run=run, base_namespace='metrics')
 
 history = model.fit(x=x_train,
@@ -389,7 +389,7 @@ run['confusion_matrix'].upload(neptune.types.File.as_image(fig))
 
 例如，让我们提取“*准确性*”指标，并使用 matplotlib 绘制它。
 
-```
+```py
 import matplotlib.pyplot as plt
 
 history = model.fit(x_train, y_train, 
@@ -411,7 +411,7 @@ plt.show()
 
 我们将从 mnist 数据集开始，并创建一个简单的 CNN 模型:
 
-```
+```py
 import tensorflow as tf
 
 mnist = tf.keras.datasets.mnist
@@ -431,7 +431,7 @@ model = tf.keras.models.Sequential([
 
 我们将在 keras 中创建一个自定义指标、多类别 **f1 分数:**
 
-```
+```py
 def recall(y_true, y_pred):
     y_true = K.ones_like(y_true) 
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
@@ -457,7 +457,7 @@ def f1_score(y_true, y_pred):
 
 我们将创建一个定制的 tf.keras 度量:**multiclasstruepoints**确切地说:
 
-```
+```py
 class MulticlassTruePositives(tf.keras.metrics.Metric):
     def __init__(self, name='multiclass_true_positives', **kwargs):
         super(MulticlassTruePositives, self).__init__(name=name, **kwargs)
@@ -482,7 +482,7 @@ class MulticlassTruePositives(tf.keras.metrics.Metric):
 
 我们将**用我们的指标编译 keras 模型**:
 
-```
+```py
 import keras
 
 model.compile(optimizer='sgd',
@@ -498,7 +498,7 @@ model.compile(optimizer='sgd',
 
 我们将实现 keras **回调，它将 ROC 曲线和混淆矩阵**绘制到一个文件夹中:
 
-```
+```py
 import os
 
 from keras.callbacks import Callback
@@ -536,7 +536,7 @@ performance_viz_cbk = PerformanceVisualizationCallback(
 
 我们将**进行培训**并监控表现:
 
-```
+```py
 history = model.fit(x=x_train,
                     y=y_train,
                     epochs=5,
@@ -546,7 +546,7 @@ history = model.fit(x=x_train,
 
 我们将**可视化来自 keras 历史对象的指标:**
 
-```
+```py
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
 plt.title('Model accuracy')
@@ -561,7 +561,7 @@ plt.show()
 
 ## 海王星
 
-```
+```py
 run = neptune.init(
         project='YOUR_WORKSAPCE/YOUR_PROJECT_NAME',
         api_token='YOUR_API_TOKEN')
@@ -579,7 +579,7 @@ history = model.fit(..., callbacks=[neptune_cbk])
 
 您只需要**添加另一个回调或者修改您之前已经**创建的回调:
 
-```
+```py
 from  tf.keras.callbacks import TensorBoard
 
 tensorboard_cbk = TensorBoard(log_dir="logs/training-example/")
@@ -590,7 +590,7 @@ history = model.fit(..., callbacks=[performance_viz_cbk,
 
 使用 TensorBoard，您需要启动本地服务器并在浏览器中浏览您的跑步记录。
 
-```
+```py
 tensorboard --logdir logs/training-example/
 ```
 

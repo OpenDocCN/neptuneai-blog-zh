@@ -43,7 +43,7 @@ NLP 的深度学习模型的最新发展可以用于此。例如，谷歌最近�
 
 ## 步骤 1:加载预先训练的模型
 
-```
+```py
 !wget https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip
 !unzip uncased_L-12_H-768_A-12.zip
 !pip install bert-serving-server --no-deps
@@ -57,7 +57,7 @@ NLP 的深度学习模型的最新发展可以用于此。例如，谷歌最近�
 
 (用于此实现的 tensorflow 版本是 tensorflow==1.15.2)
 
-```
+```py
 import os
 import tensorflow as tf
 import tensorflow.compat.v1 as tfc
@@ -111,7 +111,7 @@ print("nSerialized graph to {}".format(graph_fout))
 **input_fn** 将数据获取到模型中。这包括执行整个文本预处理管道，并为 BERT 准备一个 feed_dict。
 每个文本样本被转换成一个 tf。示例实例，具有在**输入名称**中列出的必要特征。bert_tokenizer 对象包含了*单词表*并执行文本处理。之后，示例在 *feed_dict* 中按照特性名称重新分组。
 
-```
+```py
 import logging
 import numpy as np
 
@@ -128,14 +128,14 @@ log.setLevel(logging.INFO)
 log.handlers = []
 ```
 
-```
+```py
 GRAPH_PATH = "/content/graph/extractor.pbtxt" 
 VOCAB_PATH = "/content/uncased_L-12_H-768_A-12/vocab.txt" 
 
 SEQ_LEN = 256 
 ```
 
-```
+```py
 INPUT_NAMES = ['input_ids', 'input_mask', 'input_type_ids']
 bert_tokenizer = FullTokenizer(VOCAB_PATH)
 
@@ -160,7 +160,7 @@ tf。估算器有一个特性，使它们在每次调用 predict 函数时重建
 
 因此，为了避免开销，我们将**将生成器传递给预测函数**，生成器将在一个永无止境的循环中为模型生成特征。
 
-```
+```py
 def build_input_fn(container):
 
    def gen():
@@ -191,7 +191,7 @@ class DataContainer:
 
 **model_fn** 包含模型的规格。在我们的例子中，它是从我们在上一步中保存的 *pbtxt* 文件中加载的。这些特征通过**输入映射**明确映射到相应的输入节点。
 
-```
+```py
 def model_fn(features, mode):
    with tf.gfile.GFile(GRAPH_PATH, 'rb') as f:
        graph_def = tf.GraphDef()
@@ -209,7 +209,7 @@ estimator = Estimator(model_fn=model_fn)
 
 现在我们已经准备好了，我们需要进行推理。
 
-```
+```py
 def batch(iterable, n=1):
    l = len(iterable)
    for ndx in range(0, l, n):
@@ -233,7 +233,7 @@ def build_vectorizer(_estimator, _input_fn_builder, batch_size=128):
 bert_vectorizer = build_vectorizer(estimator, build_input_fn)
 ```
 
-```
+```py
 bert_vectorizer(64*['sample text']).shape
 o/p: (64, 768)
 
@@ -247,7 +247,7 @@ o/p: (64, 768)
 
 首先让我们得到文章嵌入。
 
-```
+```py
 from nltk.corpus import reuters
 
 import nltk
@@ -276,7 +276,7 @@ X.shape
 
 …然后运行以下命令，其中-d 后面的相对路径将给出文件解压缩的位置:
 
-```
+```py
 !unzip /root/nltk_data/corpora/reuters.zip -d /root/nltk_data/corpora
 
 ```
@@ -287,7 +287,7 @@ X.shape
 
 要重现用于该可视化的输入文件，请运行下面的代码片段。然后将文件下载到您的机器上，并上传到投影仪。
 
-```
+```py
 with open("embeddings.tsv", "w") as fo:
  for x in X.astype('float'):
    line = "t".join([str(v) for v in x])
@@ -302,7 +302,7 @@ with open('metadata.tsv', 'w') as fo:
 
 这是我用投影仪捕捉到的。
 
-```
+```py
 from IPython.display import HTML
 
 HTML("""
@@ -315,7 +315,7 @@ HTML("""
 
 使用生成的特征构建监督模型非常简单:
 
-```
+```py
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
@@ -358,7 +358,7 @@ print(classification_report(Yts, mlp.predict(Xts)))
 
 我们可以为 **Q** 和 **S:** 创建占位符
 
-```
+```py
 graph = tf.Graph()
 
 sess = tf.InteractiveSession(graph=graph)
@@ -371,7 +371,7 @@ S = tf.placeholder("float", [None, dim])
 
 定义欧几里德距离计算:
 
-```
+```py
 squared_distance = tf.reduce_sum(tf.pow(Q - S, 2), reduction_indices=1)
 distance = tf.sqrt(squared_distance)
 
@@ -379,7 +379,7 @@ distance = tf.sqrt(squared_distance)
 
 获取最相似的指数:
 
-```
+```py
 top_k = 10
 
 top_neg_dists, top_indices = tf.math.top_k(tf.negative(distance), k=top_k)
@@ -387,7 +387,7 @@ top_dists = tf.negative(top_neg_dists)
 
 ```
 
-```
+```py
 from sklearn.metrics.pairwise import euclidean_distances
 
 top_indices.eval({Q:X[0], S:X})
@@ -400,7 +400,7 @@ np.argsort(euclidean_distances(X[:1], X)[0])[:10]
 
 在 tensorflow 中，这可以按如下方式完成:
 
-```
+```py
 Q = tf.placeholder("float", [dim])
 S = tf.placeholder("float", [None, dim])
 
@@ -427,7 +427,7 @@ top_neg_dists, top_indices = tf.math.top_k(tf.negative(distance), k=top_k)
 
 让我们一起努力。
 
-```
+```py
 class L2Retriever:
  def __init__(self, dim, top_k=3, use_norm=False, use_gpu=True):
    self.dim = dim

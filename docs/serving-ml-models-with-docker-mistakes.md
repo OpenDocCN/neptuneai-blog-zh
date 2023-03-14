@@ -116,14 +116,14 @@ gRPC 和 REST API 在操作方式上有不同的特点。下表比较了两种 A
 
 **步骤 2:** 要使用 Tensorflow 服务，您需要从容器存储库中提取 Tensorflow 服务图像。
 
-```
+```py
 docker pull tensorflow/serving
 
 ```
 
 第三步:建立并训练一个简单的模型
 
-```
+```py
 import matplotlib.pyplot as plt
 import time
 from numpy import asarray
@@ -173,14 +173,14 @@ print('Accuracy: %.3f' % acc)
 
 保存 TensorFlow 模型时，可以将其保存为协议缓冲文件，通过在 save_format 参数中传递“tf”将模型保存到协议缓冲文件中。
 
-```
+```py
 file_path = f"./img_classifier/{ts}/"
 model.save(filepath=file_path, save_format='tf')
 ```
 
 可以使用 ***saved_model_cli*** 命令对保存的模型进行调查。
 
-```
+```py
 !saved_model_cli show --dir {export_path} --all
 ```
 
@@ -188,7 +188,7 @@ model.save(filepath=file_path, save_format='tf')
 
 您需要安装 gRPC 库。
 
-```
+```py
 Import grpc
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
@@ -197,14 +197,14 @@ from tensorboard.compat.proto import types_pb2
 
 您需要使用端口 8500 在客户端和服务器之间建立一个通道。
 
-```
+```py
 channel = grpc.insecure_channel('127.0.0.1:8500')
 stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
 ```
 
 服务器的请求有效负载需要通过指定模型的名称、存储模型的路径、预期的数据类型以及数据中的记录数来设置为协议缓冲区。
 
-```
+```py
 request = predict_pb2.PredictRequest()
 request.model_spec.name = 'mnist-model'
 request.inputs['flatten_input'].CopyFrom(tf.make_tensor_proto(X_test[0],dtype=types_pb2.DT_FLOAT,  shape=[28,28,1]))
@@ -212,13 +212,13 @@ request.inputs['flatten_input'].CopyFrom(tf.make_tensor_proto(X_test[0],dtype=ty
 
 最后，要用 Docker 部署您的模型，您需要运行 Docker 容器。
 
-```
+```py
 docker run -p 8500:8500 --mount type=bind,source=<absolute_path>,target=/models/mnist-model/ -e MODEL_NAME=mnist -t tensorflow/serving
 ```
 
 现在服务器可以接受客户端请求了。从存根调用 Predict 方法来预测请求的结果。
 
-```
+```py
 stub.Predict(request, 10.0)
 ```
 
@@ -266,19 +266,19 @@ stub.Predict(request, 10.0)
 
 1.  您需要创建自己的自定义桥接网络。您可以通过运行 Docker network create 命令来实现这一点。这里我们创建一个名为“虚拟网络”的网络。
 
-```
+```py
 Docker network create dummy-network
 ```
 
 2.  用 ***docker run*** 命令正常运行你的容器。使用***—网络选项*** 将其添加到您自定义的桥接网络中。您还可以使用–name 选项添加别名。
 
-```
+```py
 docker run --rm --net dummy-network --name tulipnginx -d nginx
 ```
 
 3.  将另一个容器连接到您创建的自定义桥接网络。
 
-```
+```py
 docker run --net dummy-network -it busybox 
 ```
 
@@ -294,7 +294,7 @@ docker run --net dummy-network -it busybox
 
 让我通过一个例子来说明这一点。这是我过去用于一个项目的 docker 文件样本。
 
-```
+```py
 FROM tiangolo/uvicorn-gunicorn:python3.9
 
 RUN mkdir /fastapi
@@ -314,11 +314,11 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 第一件事是构建一个 Docker 映像并运行 Docker 容器，您可以用这个命令来完成
 
-```
+```py
 docker build -t getting-started .
 ```
 
-```
+```py
 docker run -d p 8000:8000 getting-started
 ```
 
@@ -334,7 +334,7 @@ docker run -d p 8000:8000 getting-started
 
 使用 dockerfile 文件:
 
-```
+```py
 
 FROM debian:stretch
 
@@ -363,14 +363,14 @@ Neptune.ai 允许您[跟踪您的实验](https://web.archive.org/web/20221201155
 
 第一步是确保您已经安装了 [neptune python 客户端](https://web.archive.org/web/20221201155629/https://docs.neptune.ai/integrations-and-supported-tools/languages/neptune-client-python)。根据您的操作系统，打开您的终端并运行以下命令:
 
-```
+```py
 pip install neptune-client
 
 ```
 
 在训练好你的模型之后，[你可以在 Neptune](https://web.archive.org/web/20221201155629/https://docs.neptune.ai/how-to-guides/model-registry/registering-a-model) 中注册它来追踪任何相关的元数据。首先，需要初始化一个 Neptune 模型对象。模型对象适用于保存在训练过程中由所有模型版本共享的通用元数据。
 
-```
+```py
 import neptune.new as neptune
 model = neptune.init_model(project='<project name>’',
     name="<MODEL_NAME>",
@@ -389,7 +389,7 @@ model = neptune.init_model(project='<project name>’',
 
 要在 Neptune 上创建模型版本，您需要运行以下命令:
 
-```
+```py
 import neptune.new as neptune
 model_version = neptune.init_model_version(
     model="MODEL_ID",
@@ -413,7 +413,7 @@ model_version = neptune.init_model_version(
 
 创建一个新脚本来提供和导入必要的依赖项。您所需要做的就是指定您需要在生产中使用的模型版本。您可以通过将您的 [NEPTUNE_API_TOKEN](https://web.archive.org/web/20221201155629/https://docs.neptune.ai/api-reference/environment-variables#neptune_api_token) 和您的 [MODEL_VERSION](https://web.archive.org/web/20221201155629/https://app.neptune.ai/common/showcase-model-registry/m/SHOW2-MOD21/v/SHOW2-MOD21-13/metadata) 作为 Docker 环境变量来运行您的 Docker 容器:
 
-```
+```py
 import neptune.new as neptune
 import pickle,requests
 
@@ -449,12 +449,12 @@ def predict(data):
 
 通过创建 Docker 文件并提供 requirements.txt 文件上的依赖项列表，可以使用 Docker 将机器学习模型服务容器化。
 
-```
+```py
 neptune-client
 sklearn==1.0.2
 ```
 
-```
+```py
 FROM python:3.8-slim-buster
 
 RUN apt-get update
@@ -469,7 +469,7 @@ CMD [ "python3", "-W ignore" ,"src/serving.py"]
 
 要从上面的 Docker 文件构建 Docker 映像，您需要运行以下命令:
 
-```
+```py
 docker build --tag <image-name> . 
 
 docker run -e NEPTUNE_API_TOKEN="<YOUR_API_TOKEN>"  -e MODEL_VERSION =”<YOUR_MODEL_VERSION>” <image-name>
@@ -478,7 +478,7 @@ docker run -e NEPTUNE_API_TOKEN="<YOUR_API_TOKEN>"  -e MODEL_VERSION =”<YOUR_M
 
 在 Docker 容器上管理数据有几种替代方法，您可以在开发期间[绑定挂载目录](https://web.archive.org/web/20221201155629/https://docs.docker.com/storage/bind-mounts/)。这是调试代码的一个很好的选择。您可以通过运行以下命令来实现这一点:
 
-```
+```py
 docker run -it <image-name>:<image-version> -v /home/<user>/my_code:/code
 
 ```
@@ -487,7 +487,7 @@ docker run -it <image-name>:<image-version> -v /home/<user>/my_code:/code
 
 要启动 Docker 容器，您需要运行以下命令:
 
-```
+```py
 docker run -d -e NEPTUNE_API_TOKEN="<YOUR_API_TOKEN>"  -e MODEL_VERSION =”<YOUR_MODEL_VERSION>” <image-name>
 
 ```

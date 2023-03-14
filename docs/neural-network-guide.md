@@ -230,7 +230,7 @@ CNN 利用图像数据中的分层模式；在每一层中，它们捕捉小的�
 
 首先，导入库。
 
-```
+```py
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -240,7 +240,7 @@ import torch.nn.functional as F
 
 下载培训和测试数据集。
 
-```
+```py
 transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5,), (0.5,))]
@@ -251,7 +251,7 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=64,
                                           shuffle=True, num_workers=2)
 ```
 
-```
+```py
 testset = torchvision.datasets.MNIST(
     root='./data', train=False, download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=20,
@@ -260,7 +260,7 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=20,
 
 让我们想象一下我们将要用作输入的训练图像。
 
-```
+```py
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -277,13 +277,13 @@ imshow(torchvision.utils.make_grid(images[:6], nrow=3))
 
 ![Neural network visualization](img/623a00accf3dff203f48cac3bbb5bca4.png)
 
-```
+```py
 device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 ```
 
 现在，是时候建立我们的 cnn 了。
 
-```
+```py
 class NumClassifyNet(nn.Module):
   def __init__(self):
     super(NumClassifyNet, self).__init__()
@@ -313,7 +313,7 @@ net = NumClassifyNet()
 net = net.to(device)
 ```
 
-```
+```py
 import torch.optim as optim
 
 criterion = nn.CrossEntropyLoss()
@@ -322,7 +322,7 @@ optimizer = optim.SGD(net.parameters(), lr = 0.001)
 
 是时候让模型接受训练了！
 
-```
+```py
 test_data_iter = iter(testloader)
 test_images, test_labels = test_data_iter.next()
 for epoch in range(10):
@@ -373,28 +373,28 @@ print('Training finished')
 
 3.将 Google Drive 安装到 Colab :这将确保您不必在每次重启运行时下载数据。
 
-```
+```py
 from google.colab import drive
 drive.mount('/content/gdrive')
 ```
 
 4.**使用操作系统**配置“Kaggle 环境”:这将把 API 键和值存储为操作系统环境对象[t](https://web.archive.org/web/20230103154737/https://www.geeksforgeeks.org/python-os-environ-object/)/变量。当您运行 Kaggle 终端命令时(在下一步中)，您的机器将通过您的 API 令牌链接到您的帐户。链接到驱动器中的私有目录可以确保您的令牌信息保持隐藏。
 
-```
+```py
 import os
 os.environ['KAGGLE_CONFIG_DIR'] = "/content/gdrive/MyDrive/kaggle"
 ```
 
 5.**下载数据**
 
-```
+```py
 os.chdir('../content/gdrive/MyDrive/kaggle')
 !kaggle datasets download -d paultimothymooney/breast-histopathology-images
 ```
 
 现在我们有了数据集，让我们开始构建我们的网络吧！
 
-```
+```py
 import torch
 import torchvision
 from torchvision import transforms
@@ -410,7 +410,7 @@ import numpy as np
 
 将图像转换为张量。
 
-```
+```py
 data_dir = "/content/gdrive/MyDrive"
 folder_name = "kaggle"
 image_folders = os.path.join(data_dir, folder_name)
@@ -427,7 +427,7 @@ datasets = torch.utils.data.ConcatDataset(images)
 
 检查数据集，找出每个类中的样本数。
 
-```
+```py
 i=0
 for dataset in datasets.datasets:
     if i==0:
@@ -448,7 +448,7 @@ print("""Total Number of Images for each Class:
 
 现在，将数据集分成 75%的训练集和 25%的测试集。
 
-```
+```py
 random_seed = 42
 torch.manual_seed(random_seed)
 
@@ -458,7 +458,7 @@ train_size = len(datasets) - test_size
 train_dataset, test_dataset = random_split(datasets, [train_size, test_size])
 ```
 
-```
+```py
 trainloader = torch.utils.data.DataLoader(train_dataset, batch_size=128,
                                           shuffle=True, num_workers=2)
 testloader = torch.utils.data.DataLoader(test_dataset, batch_size=64,
@@ -467,7 +467,7 @@ testloader = torch.utils.data.DataLoader(test_dataset, batch_size=64,
 
 现在，看看我们的数据集。
 
-```
+```py
 
 def imshow(img):
     npimg = img.numpy()
@@ -488,13 +488,13 @@ labels[:6]
 
 使用 GPU。
 
-```
+```py
 device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 ```
 
 建立乳腺癌分类神经网络。
 
-```
+```py
 class BreastCancerClassifyNet(nn.Module):
   def __init__(self):
     super(BreastCancerClassifyNet, self).__init__()
@@ -530,14 +530,14 @@ net = net.to(device)
 
 使用二元交叉熵损失，就像我们做二元分类一样。
 
-```
+```py
 criterion = nn.BCELoss()
 optimizer = optim.SGD(net.parameters(), lr = 0.001)
 ```
 
 该训练了！
 
-```
+```py
 test_data_iter = iter(testloader)
 test_images, test_labels = test_data_iter.next()
 for epoch in range(20):
@@ -565,7 +565,7 @@ print('Training finished')
 
 最后，在所有数据集上测试我们训练的模型并计算准确性。
 
-```
+```py
 correct = 0
 total = 0
 with torch.no_grad():

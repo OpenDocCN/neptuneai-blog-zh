@@ -89,7 +89,7 @@
 *   从冗余要素和信息要素中随机抽取的重复要素的数量。
 *   每个类的聚类数。
 
-```
+```py
 from numpy import where
 from numpy import unique
 from sklearn.datasets import make_classification
@@ -236,7 +236,7 @@ DBSCAN 算法的一个优点是:
 
 *   它不需要预定义的集群数量。它还识别噪声和异常值。此外，该算法可以很好地找到任意大小和形状的聚类。
 
-```
+```py
 from numpy import where
 from numpy import unique
 from sklearn.datasets import make_classification
@@ -321,7 +321,7 @@ GMM 可以像 K-Means 一样用来寻找聚类。一个点属于分布中心的�
 *   获取唯一的集群，以及
 *   如下图所示绘制聚类图。
 
-```
+```py
 from numpy import where
 from numpy import unique
 from sklearn.datasets import make_classification
@@ -393,11 +393,11 @@ plot.show()
 
 安装依赖项:
 
-```
+```py
 !pip install numpy pandas plotly seaborn scikit-learn
 ```
 
-```
+```py
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plot
@@ -416,13 +416,13 @@ data.head()
 
 让我们从删除聚类过程中不需要的列开始。
 
-```
+```py
 data.drop('CustomerID', axis=1, inplace=True)
 ```
 
 我们可以检查数据中列的分布，以了解数据在各个列中的分布情况。
 
-```
+```py
 plot.figure(figsize = (22, 10))
 plotnum = 1
 
@@ -439,7 +439,7 @@ plot.show()
 
 现在，让我们创建一个条形图来检查特定年龄组的客户分布。您还可以应用同样的方法来可视化客户数量与支出分数的关系，以及基于年收入的客户数量。
 
-```
+```py
 age_55above = data.Age[data.Age >= 55]
 age_46_55 = data.Age[(data.Age >= 46) & (data.Age <= 55)]
 age_36_45 = data.Age[(data.Age >= 36) & (data.Age <= 45)]
@@ -447,7 +447,7 @@ age_26_35 = data.Age[(data.Age >= 26) & (data.Age <= 35)]
 age_18_25 = data.Age[(data.Age >= 18) & (data.Age <= 25)]
 ```
 
-```
+```py
 x_age_ax = ['18-25', '26-35', '36-45', '46-55', '55+']
 y_age_ax = [len(age_18_25.values), len(age_26_35.values), len(age_36_45.values), len(age_46_55.values),
      len(age_55above.values)]
@@ -464,7 +464,7 @@ pxp.bar(data_frame = data, x = x_age_ax, y = y_age_ax, color = x_age_ax,
 
 在我们的例子中，从下面的图表来看，通过肘方法找到的 K 的最佳值是 4。我们希望最大化聚类的数量，并限制每个数据点成为其聚类质心的情况。
 
-```
+```py
 x_input = data.loc[:, ['Age', 'SpendingScore']].values
 wcss = []
 for k in range(1, 12):
@@ -483,7 +483,7 @@ plot.show()
 
 让我们检查一下这个特殊实现的轮廓系数是怎样的。
 
-```
+```py
 from sklearn.metrics import silhouette_score
 label = k_means.predict(x_input)
 
@@ -495,7 +495,7 @@ label)}')
 
 从下面的年龄与花费的对比图中，你可以看到一些集群没有很好的分离。簇之间的簇内距离几乎不显著，这就是为什么 n=4 的 SC 是 0.40，这是更小的。尝试不同的 K 值以找到最佳的聚类数。
 
-```
+```py
 k_means=KMeans(n_clusters=4)
 labels=k_means.fit_predict(x_input)
 print(k_means.cluster_centers_)
@@ -505,7 +505,7 @@ print(k_means.cluster_centers_)
 
 现在，让我们绘制一个图表来检查这些聚类是如何从数据中形成的。
 
-```
+```py
 plot.figure(figsize = (16, 10))
 plot.scatter(x_input[:, 0], x_input[:, 1], c =
 k_means.labels_, s = 105)
@@ -547,7 +547,7 @@ plot.show()
 
 下面导入了此任务所需的一些包:
 
-```
+```py
 import matplotlib.pyplot as plt
 from matplotlib.image import imread
 import pandas as pd
@@ -558,7 +558,7 @@ from sklearn.cluster import KMeans
 
 从[这里](https://web.archive.org/web/20221206013350/https://github.com/AravindR7/Clustering-Algorithms/blob/main/palace.jpg)下载图片并读入。
 
-```
+```py
 img = imread('palace.jpg')
 img_size = img.shape
 ```
@@ -569,7 +569,7 @@ img_size = img.shape
 
 遵循这种方法将有助于我们使用 25 个质心来表示图像，并减少图像的大小。当我们使用质心作为像素颜色的查找时，会有一个相当大的不同，这将把每个像素位置的大小减少到 4 位，而不是 8 位。
 
-```
+```py
 X = img.reshape(img_size[0] * img_size[1], img_size[2])
 ```
 
@@ -577,27 +577,27 @@ X = img.reshape(img_size[0] * img_size[1], img_size[2])
 
 上一节给出了 K-means 算法的详细说明。在本例中，我们将重点关注压缩部分。
 
-```
+```py
 km = KMeans(n_clusters=25)
 km.fit(X)
 ```
 
 使用质心来压缩图像。
 
-```
+```py
 X_cmpresd = km.cluster_centers_[km.labels_]
 X_cmpresd = np.clip(X_cmpresd.astype('uint8'), 0, 255)
 ```
 
 将 X_cmpresd 整形为与原始图像 128 * 128 * 3 相同的尺寸
 
-```
+```py
 X_cmpresd = X_cmpresd.reshape(img_size[0], img_size[1], img_size[2])
 ```
 
 现在，将原始图像和压缩图像相邻绘制。
 
-```
+```py
 figre, axs = plt.subplots(1, 2, figsize = (14, 10))
 axs[1].imshow(img)
 axs[1].set_title('Initial image')
@@ -616,13 +616,13 @@ plot.tight_layout();
 
 安装依赖项:
 
-```
+```py
 pip install keras tensorflow
 ```
 
 导入库:
 
-```
+```py
 import sys
 import sklearn
 import matplotlib
@@ -633,7 +633,7 @@ import matplotlib.pyplot as plt
 
 加载 MNIST 数据集。可以通过 [Keras](https://web.archive.org/web/20221206013350/https://keras.io/) 买到。
 
-```
+```py
 figur, axi = plt.subplots(3, 3, figsize=(14, 14))
 plt.gray()
 
@@ -649,7 +649,7 @@ figur.show()
 
 存储为 Numpy 数组的图像是二维数组。Scikit-learn 提供的小批量 K 均值聚类算法吸收了 1D 数组。因此，我们需要重塑形象。MNIST 包含 28 x 28 像素的图像；因此，一旦我们将它们成形为 1D 阵列，它们的长度将为 784。
 
-```
+```py
 X = x_train.reshape(len(x_train), -1)
 Y = y_train
 
@@ -662,7 +662,7 @@ print(X[0].shape)
 
 由于数据集的大小，我们使用 K-Means 的小批量实现。该算法需要更少的时间来拟合数据。MNIST 数据集包含整数 0-9 的图像。因此，让我们通过将聚类数设置为 10 来开始聚类。
 
-```
+```py
 from sklearn.cluster import MiniBatchKMeans
 n_digits = len(np.unique(y_test))
 print(n_digits)
@@ -677,7 +677,7 @@ kmeans.labels_
 
 Mini-Batch K-means 是一种无监督的 ML 方法，这意味着由算法分配的标签指的是每个阵列被分配到的聚类，而不是实际的目标整数。为了解决这个问题，让我们定义一些函数来预测哪个整数对应于每个聚类。
 
-```
+```py
 def cluster_labels_infer(kmeans, actual_lbls):
     """
     returns: dictionary(clusters assigned to labels)
@@ -703,7 +703,7 @@ def cluster_labels_infer(kmeans, actual_lbls):
     return infrd_labels
 ```
 
-```
+```py
 def data_labels_infer(X_labels, clstr_labels):
     """
     Depending on the cluster assignment find the label
@@ -721,7 +721,7 @@ def data_labels_infer(X_labels, clstr_labels):
 
 让我们测试上面写的函数来预测哪个整数对应于每个集群。
 
-```
+```py
 clstr_labels = cluster_labels_infer(kmeans, Y)
 input_clusters = kmeans.predict(X)
 pred_labels = data_labels_infer(input_clusters, clstr_labels)
@@ -738,7 +738,7 @@ print(Y[:20])
 
 之前，我们在选择 K 的特定值时做了假设，但情况可能并不总是如此。让我们将小批量 K-Means 算法适用于不同的 K 值，并使用我们的指标评估性能。计算模型指标的函数定义如下。
 
-```
+```py
 from sklearn import metrics
 
 def calculate_metrics(estimator, data, labels):
@@ -750,7 +750,7 @@ def calculate_metrics(estimator, data, labels):
 
 现在我们已经定义了指标，让我们为不同数量的集群运行模型。
 
-```
+```py
 clusters = [10, 16, 36, 64, 144, 256]
 
 for n_clusters in clusters:
@@ -769,7 +769,7 @@ for n_clusters in clusters:
 
 让我们使用 256 作为分类数在测试集中运行模型，因为它对于这个特定的数字有更高的准确性。
 
-```
+```py
 
 X_test = x_test.reshape(len(x_test),-1)
 
@@ -793,7 +793,7 @@ predicted_labels)))
 
 质心是每个聚类中有代表性的点。如果我们处理 A，B 点，质心就是图上的一个点。因为我们使用长度为 784 的数组，所以我们的质心也是长度为 784 的数组。我们可以将这个数组重新整形为 28×28 像素的图像，并绘制出来。
 
-```
+```py
 kmeans = MiniBatchKMeans(n_clusters = 36)
 kmeans.fit(X)
 
@@ -862,7 +862,7 @@ V-measure 聚类标记给出了一个基本事实。V 测度是同质性和完�
 
 示例:
 
-```
+```py
 from sklearn import metrics
 true_labels = [2, 2, 3, 1, 1, 1]
 pred_labels = [1, 1, 2, 3, 3, 3]

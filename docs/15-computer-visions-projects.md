@@ -54,7 +54,7 @@
 
 Canny 边缘检测代码:
 
-```
+```py
 import cv2
 import matplotlib.pyplot as plt
 
@@ -72,7 +72,7 @@ plt.show()
 
 查找轮廓的代码:
 
-```
+```py
 import cv2
 import numpy as np
 
@@ -130,7 +130,7 @@ cv2.destroyAllWindows()
 
 处理图像和轮廓检测后的示例代码:
 
-```
+```py
 def contours_text(orig, img, contours):
 for cnt in contours: 
 x, y, w, h = cv2.boundingRect(cnt) 
@@ -152,7 +152,7 @@ print(text)
 
 使用 tesseract 检测文本的代码:
 
-```
+```py
 import cv2
 import pytesseract
 
@@ -184,7 +184,7 @@ text
 
 **下面是从图像中识别人脸的完整代码:**
 
-```
+```py
 import cv2
 import face_recognition
 
@@ -213,7 +213,7 @@ cv2.waitKey(0)
 
 从网络摄像头或直播摄像机中识别人脸的代码:
 
-```
+```py
 cv2.imshow("Frame", frame)
     if cv2.waitKey(1) &amp; 0xFF == ord('q'):
         break
@@ -229,7 +229,7 @@ cv2.destroyAllWindows()
 
 **下面是检测物体的完整代码:**
 
-```
+```py
 import cv2
 
 cap = cv2.VideoCapture(0)
@@ -284,7 +284,7 @@ cv2.destroyWindow('face_detect')
 
 **用手势玩恐龙游戏的完整代码:**
 
-```
+```py
 
 contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 try:
@@ -356,7 +356,7 @@ cv2.putText(frame, "JUMP", (115, 80), cv2.FONT_HERSHEY_SIMPLEX, 2, 2, 2)
 
 用于分类的 Gradcam 库代码:
 
-```
+```py
 from tf_explain.callbacks.occlusion_sensitivity import OcclusionSensitivityCallback
 import datetime
 %load_ext tensorboard

@@ -94,7 +94,7 @@ Multi-horizon forecasting with many inputs | [Source](https://web.archive.org/we
 
 让我们安装 Pytorch-Forecasting 并导入必要的库。
 
-```
+```py
  ```
 !pip install pytorch-forecasting
 
@@ -109,7 +109,7 @@ from pytorch_forecasting import Baseline, TimeSeriesDataSet, TemporalFusionTrans
 from pytorch_forecasting.data import GroupNormalizer
 
 from pytorch_forecasting.metrics import QuantileLoss
-``` 
+```py 
 ```
 
 Pytorch-Forecasting 提供了一个名为“TimeSeriesDataSet”的数据集对象。其本质上根据模型的要求准备数据。该数据集包括以下功能。见下图。
@@ -120,7 +120,7 @@ Pytorch-Forecasting 提供了一个名为“TimeSeriesDataSet”的数据集对�
 
 这些功能必须小心处理，以便模型可以提取和捕获信息。使用时间序列数据集，我们可以为训练目的准备数据集。
 
-```
+```py
  ```
 training = TimeSeriesDataSet(
    df_train[lambda x: x.time_idx <= training_cutoff],
@@ -160,12 +160,12 @@ training = TimeSeriesDataSet(
    add_encoder_length=True,
    allow_missing_timesteps=True
 
-``` 
+```py 
 ```
 
 您还可以查看准备好的数据集的参数。
 
-```
+```py
  ```
 print(training.get_parameters())
 
@@ -178,7 +178,7 @@ print(training.get_parameters())
 	method_kwargs={}
 ), 'categorical_encoders': …}
 
-``` 
+```py 
 ```
 
 如您所见，数据集被分成子样本，其中包括静态分类特征、时变已知分类特征、时变已知真实特征和时变未知真实特征。
@@ -187,7 +187,7 @@ print(training.get_parameters())
 
 在 Pytorch-Forecasting 中构建模型非常简单，您只需要调用模型对象并根据您的需求配置它，类似于我们看到的数据集。您只需要调用 TemporalFusionTransformer 对象并相应地配置模型。
 
-```
+```py
  ```
 tft = TemporalFusionTransformer.from_dataset(
    training,
@@ -203,20 +203,20 @@ tft = TemporalFusionTransformer.from_dataset(
 
    reduce_on_plateau_patience=4)
 
-``` 
+```py 
 ```
 
 ## 训练和评估模型
 
 在开始培训之前，让我们首先定义基线。如果你还记得的话，我们将使用持久方法来得到我们的基线分数。在 Pytorch 预测中，您可以调用 Baseline()。predict 函数根据最后一个已知的目标值来预测值。一旦生成了值，就可以计算 MAE 来找出误差差。
 
-```
+```py
  ```
 actuals = torch.cat([y for x, (y, weight) in iter(val_dataloader)])
 baseline_predictions = Baseline().predict(val_dataloader)
 print((actuals - baseline_predictions).abs().mean().item())
 
-``` 
+```py 
 ```
 
 ### ML 模型性能监控:可视化学习曲线
@@ -231,30 +231,30 @@ print((actuals - baseline_predictions).abs().mean().item())
 
 为了监控模型，您可以使用类似于 [neptune](/web/20230124065351/https://neptune.ai/) .ai 的平台。neptune 提供了一个[实时监控仪表板](https://web.archive.org/web/20230124065351/https://docs.neptune.ai/tutorials/monitoring_training_live/)，使我们能够随时随地查看模型的性能。您可以使用下面的代码下载这个包。
 
-```
+```py
  ```
 !pip install neptune-client
 
-``` 
+```py 
 ```
 
 由于我们使用 Pytorch Lightning，我们可以使用以下代码导入 Neptune 记录器:
 
-```
+```py
  ```
 from pytorch_lightning.loggers import NeptuneLogger
 
-``` 
+```py 
 ```
 
 现在，让我们通过运行以下 Pytorch-Lightning 脚本来开始培训:
 
-```
+```py
  ```
 trainer.fit(tft, train_dataloaders=train_dataloader, 
 val_dataloaders=val_dataloader)
 
-``` 
+```py 
 ```
 
 [![Examples of Neptune's dashboard ](img/6c0c704da243ef005539595f6f263d75.png)](https://web.archive.org/web/20230124065351/https://i0.wp.com/neptune.ai/wp-content/uploads/2023/01/model-monitoring-for-time-series-6.png?ssl=1)
@@ -289,7 +289,7 @@ val_dataloaders=val_dataloader)
 
 给定的代码片段可以帮助您在新数据集或现有数据集上评估模型。
 
-```
+```py
  ```
 encoder_data = new_data[lambda x: x.time_idx > x.time_idx.max() - max_encoder_length]
 
@@ -312,7 +312,7 @@ new_raw_predictions, new_x = best_tft.predict(new_prediction_data, mode="raw", r
 for idx in range(10):  
    best_tft.plot_prediction(new_x, new_raw_predictions, idx=idx, show_future_observed=False)
 
-``` 
+```py 
 ```
 
 ![Model drift](img/f08f3b08d21b15d9e9d940b5cb33742c.png)
@@ -321,7 +321,7 @@ Source: Author
 
 您还可以添加一些额外的技术来评估性能。例如，您可以评估模型如何对每个要素进行预测。
 
-```
+```py
  ```
 predictions, x = best_tft.predict(val_dataloader, return_x=True)
 predictions_vs_actuals = 
@@ -329,7 +329,7 @@ best_tft.calculate_prediction_actual_by_variable(x, predictions)
 
 best_tft.plot_prediction_actual_by_variable(predictions_vs_actuals)
 
-``` 
+```py 
 ```
 
 ![Model predictions for different features](img/3e67a576d0cd3f382e028517a30e220c.png)
@@ -340,12 +340,12 @@ Model predictions for different features | Source: Author
 
 我要举的另一个例子是检查模型的可解释性。例如:
 
-```
+```py
  ```
 interpretation = best_tft.interpret_output(raw_predictions, reduction="sum")
 best_tft.plot_interpretation(interpretation)
 
-``` 
+```py 
 ```
 
 ![Interpretability of the model](img/f5bbb20c043ca8be17ee50cf5aa0fa24.png)
@@ -362,7 +362,7 @@ Checking the interpretability of the model | Source: Author
 
 > 显然，ai 是一种监控工具，它使用户能够评估、测试和监控数据和机器学习模型。它为用户提供了一个交互式的仪表板，所有的结果和报告都在这里生成。？
 
-```
+```py
 !pip install evidently
 from evidently.dashboard import Dashboard
 from evidently.report import Report
@@ -389,11 +389,11 @@ from evidently.dashboard.tabs import (
 
 报告对象将指标作为参数之一，并生成关于数据的完整报告。很好用，也挺有效的。
 
-```
+```py
  ```
 report = Report(metrics=[DataDriftPreset()])
 
-``` 
+```py 
 ```
 
 一旦初始化了对象，就需要有两个样本数据集。其中一个将用作基准的参考数据集，另一个将用作当前数据集。实质上，这两个数据集将用于相互比较统计特性的漂移。
@@ -402,20 +402,20 @@ report = Report(metrics=[DataDriftPreset()])
 
 在本例中，我们将从原始数据集创建两个样本数据集。
 
-```
+```py
  ```
 reference = df_train.sample(n=5000, replace=False)
 current = df_train.sample(n=5000, replace=False)
-``` 
+```py 
 ```
 
 一旦创建了两个样本，您就可以在下面的函数中传递它们并查看报告。
 
-```
+```py
  ```
 report.run(reference_data=reference, current_data=current)
 
-``` 
+```py 
 ```
 
 [![Comparison of the two datasets distribution](img/f2ea1247797033475522ebb937c5d1b3.png)](https://web.archive.org/web/20230124065351/https://i0.wp.com/neptune.ai/wp-content/uploads/2023/01/model-monitoring-for-time-series-11.png?ssl=1)
@@ -444,7 +444,7 @@ Dataset drift | Source: Author
 
 以下是使用仪表板和列映射的示例:
 
-```
+```py
  ```
 column_mapping = ColumnMapping()
 column_mapping.prediction = None  
@@ -476,12 +476,12 @@ column_mapping.categorical_features=["store_nbr",
 
 column_mapping.task = "regression"
 
-``` 
+```py 
 ```
 
 在上面的代码中，您会发现列(我觉得这个任务很有趣)是在一个列表中指定的，该列表由数字、分类、id、日期、时间等组成。这是一项繁琐的任务，但是您可以使用这个 df_train.info()函数来获取列并为特定的类别创建一个列表。
 
-```
+```py
 >>> <class>Int64Index: 3000888 entries, 0 to 3000887
 Data columns (total 23 columns):
  #   Column                   Dtype         
@@ -513,12 +513,12 @@ Data columns (total 23 columns):
 
 一旦初始化了 ColumnMapping，就可以将它传递给下面的函数。
 
-```
+```py
  ```
 datadrift_dashboard = Dashboard(tabs=[DataDriftTab(verbose_level=1)])
 datadrift_dashboard.calculate(reference, current, column_mapping=column_mapping)
 datadrift_dashboard.show()
-``` 
+```py 
 ```
 
 [![Detection of the drift ](img/07691c0b60f3c458795931e00bbca248.png)](https://web.archive.org/web/20230124065351/https://i0.wp.com/neptune.ai/wp-content/uploads/2023/01/model-monitoring-for-time-series-14.png?ssl=1)
@@ -533,7 +533,7 @@ Detection of the drift | Source: Author
 
 下面是一个实现 SMAPE 的示例:
 
-```
+```py
  ```
 from pytorch_forecasting.metrics import SMAPE
 
@@ -545,7 +545,7 @@ for idx in range(10):
        x, raw_predictions, idx=indices[idx], add_loss_to_title=SMAPE(quantiles=best_tft.loss.quantiles)
    )
 
-``` 
+```py 
 ```
 
 ![Example of SMAPE implementation ](img/99f2581869ea3d4084e331ac9f9e077f.png)

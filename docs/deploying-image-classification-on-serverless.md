@@ -281,7 +281,7 @@ AWS Lambda 是亚马逊网络服务的托管功能即服务(FaaS)平台。可以
 
 9.向下滚动并点击**保存更改**:
 
-```
+```py
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -341,7 +341,7 @@ AWS Lambda 是亚马逊网络服务的托管功能即服务(FaaS)平台。可以
 
 前往[https://console.aws.amazon.com/dynamodb/](https://web.archive.org/web/20221206031244/https://console.aws.amazon.com/dynamodb/)并检查可用的桌子。如果表创建成功，您应该会看到:
 
-```
+```py
 aws dynamodb create-table
     --table-name PredictionsTable
     --attribute-definitions
@@ -356,7 +356,7 @@ aws dynamodb create-table
 
 创建一个弹性容器注册库
 
-```
+```py
 aws dynamodb describe-table --table-name PredictionsTable | grep TableStatus
 ```
 
@@ -370,7 +370,7 @@ aws dynamodb describe-table --table-name PredictionsTable | grep TableStatus
 
 检查控制台以确认您新创建的 ECR 存储库。您应该会看到类似的视图:
 
-```
+```py
 aws ecr create-repository
     --repository-name image-app-repo
     --image-scanning-configuration scanOnPush=true
@@ -403,7 +403,7 @@ aws ecr create-repository
 
 接下来，我们将看看 Lambda 函数的代码。完整的代码可以在这个[库](https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app/blob/master/app.py)中找到。从 lambda 函数开始，一旦事件触发了该函数，它就运行这个脚本，从包含用于推理的图像的 S3 桶中收集事件细节(**`用于推理的图像`**)。此外，如果客户端上传同名图像，对象将使用 **`versionId`** 进行版本控制，而不是被覆盖。
 
-```
+```py
 tensorflow==2.4.0
 pytz>=2013b
 ```
@@ -412,7 +412,7 @@ pytz>=2013b
 
 使用模型和概率得分进行预测。也获取预测的类名:
 
-```
+```py
 def lambda_handler(event, context):
 
   bucket_name = event['Records'][0]['s3']['bucket']['name']
@@ -423,7 +423,7 @@ def lambda_handler(event, context):
 
 做出预测后，代码检查 DynamoDB 表，查看当天是否已经做出了相同的预测。如果有，应用程序将更新当天预测类的计数，并用更新后的计数创建一个新条目。请注意，如果您计划在这个数据库中存储大量项目，那么使用 **` [table.scan](https://web.archive.org/web/20221206031244/https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.scan) `** 可能会成为[的低效和高成本](https://web.archive.org/web/20221206031244/https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-query-scan.html)。您可能需要找到一种方法来用 **` [table.query](https://web.archive.org/web/20221206031244/https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.query) `** 或其他方式编写您的逻辑，例如` **[GetItem](https://web.archive.org/web/20221206031244/https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.get_item) `** 和**`[batch GetItem](https://web.archive.org/web/20221206031244/https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb.html#DynamoDB.Client.batch_get_item)`**API。
 
-```
+```py
   class_names = ['AAW', 'ECLW', 'FAW']
   image = readImageFromBucket(key, bucket_name).resize((224, 224))
   image = image.convert('RGB')
@@ -434,7 +434,7 @@ def lambda_handler(event, context):
 
 如果这是当天的第一个预测，代码会将其作为新项添加到表中。
 
-```
+```py
   prediction = model.predict(image)
   pred_probability = "{:2.0f}%".format(100*np.max(prediction))
   index = np.argmax(prediction[0], axis=-1)
@@ -443,7 +443,7 @@ def lambda_handler(event, context):
 
 这段代码从桶中读取图像，并将其作为将由 Lambda 函数使用的[枕头图像](https://web.archive.org/web/20221206031244/https://pillow.readthedocs.io/en/stable/reference/Image.html)返回:
 
-```
+```py
   for i in class_names:
 
     if predicted_class == i:
@@ -479,7 +479,7 @@ def lambda_handler(event, context):
 
 完整文件
 
-```
+```py
       elif details['Count'] == 0:
         new_count = 1
         table_items = table.put_item(
@@ -501,7 +501,7 @@ def lambda_handler(event, context):
 
 您完成的代码(也在这个[存储库](https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app/blob/master/app.py)中)应该类似于下面的代码，确保您将 **` <替换为您的表名> `** 替换为您的 DynamoDB 表名，将 **` <替换为您的推理映像桶> `** 替换为您之前创建的 S3 桶:
 
-```
+```py
 def readImageFromBucket(key, bucket_name):
   """
   Read the image from the triggering bucket.
@@ -522,7 +522,7 @@ def readImageFromBucket(key, bucket_name):
 
 检查 **`buildspec.yml`** 文件，将 **` <替换为您的 ECR REPO URI > `** **替换为您在上一节中创建的 ECR 库的 URI**:
 
-```
+```py
 import json
 import boto3
 import datetime
@@ -658,7 +658,7 @@ def readImageFromBucket(key, bucket_name):
 
 就是这样！确保将您的代码与本指南的[库](https://web.archive.org/web/20221206031244/https://github.com/NonMundaneDev/image-classification-app)中的代码进行比较。我们现在将设置 CI/CD 管道来推送我们的应用程序代码和配置文件。
 
-```
+```py
 FROM public.ecr.aws/lambda/python:3.8
 
 LABEL maintainer="<YOUR NAME> <YOUR EMAIL>"
@@ -706,7 +706,7 @@ CMD ["app.lambda_handler"]
 
 创建代码提交 Git 存储库
 
-```
+```py
 version: 0.2
 
 phases:
@@ -764,7 +764,7 @@ phases:
 
 6.在**` image-class ification-app`**文件夹中，使用以下命令查看哪些文件尚未提交:
 
-```
+```py
 git clone
 https://git-codecommit.us-east-2.amazonaws.com/v1/repos/image-app-repo ../image-classification-app/
 ```
@@ -773,19 +773,19 @@ https://git-codecommit.us-east-2.amazonaws.com/v1/repos/image-app-repo ../image-
 
 8.检查文件是否准备好提交:
 
-```
+```py
 git status
 ```
 
 您应该会看到类似的输出:
 
-```
+```py
 git add *
 ```
 
 9.或者，您可能需要为此提交配置您的姓名，您可以用您的详细信息替换下面的标签:
 
-```
+```py
 git status
 ```
 
@@ -798,14 +798,14 @@ git status
 
 您应该会看到类似的输出:
 
-```
+```py
 git config user.email "<YOUR EMAIL ADDRESS>"
 git config user.name  "<YOUR NAME>"
 ```
 
 现在，您的代码和配置文件已经准备好被推送到您之前创建的 CodeCommit 存储库中。要将它们推送到存储库，请遵循以下说明:
 
-```
+```py
 git commit -m "Initial commit to CodeCommit."
 ```
 
@@ -815,7 +815,7 @@ git commit -m "Initial commit to CodeCommit."
 
 使用 CodeBuild 构建容器映像
 
-```
+```py
 git push -u origin master
 ```
 
@@ -963,14 +963,14 @@ git push -u origin master
 
 您可能需要输入 CodeCommit git 凭据。确保您输入了正确的详细信息。
 
-```
+```py
 git add *
 git commit -m "Final commit"
 ```
 
 主分支的推送成功后，返回到 CodePipeline 页面，确认您的推送已经触发了管道中的新构建:
 
-```
+```py
 git push
 ```
 

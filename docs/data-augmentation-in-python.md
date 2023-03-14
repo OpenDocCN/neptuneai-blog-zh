@@ -71,7 +71,7 @@
 
 让我们更仔细地看看第一种技术，定义一个可视化图像的函数，然后使用 **tf.image** 将翻转应用于该图像。您可以在下面看到代码和结果。
 
-```
+```py
 def visualize(original, augmented):
     fig = plt.figure()
     plt.subplot(1,2,1)
@@ -87,7 +87,7 @@ def visualize(original, augmented):
 
 为了更好的控制，你可以写你自己的增强管道。在大多数情况下，对整个数据集而不是单个图像应用增强是有用的。您可以如下实现它。
 
-```
+```py
 import tensorflow_datasets as tfds 
 
 def augment(image, label):
@@ -117,7 +117,7 @@ train_ds = train_ds
 
 如上所述， **Keras** 有多种预处理层，可用于**数据扩充**。您可以按如下方式应用它们。
 
-```
+```py
 data_augmentation = tf.keras.Sequential([
      layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),
      layers.experimental.preprocessing.RandomRotation(0.2)])
@@ -136,7 +136,7 @@ for i in range(9):
 
 此外，您可以使用**imagedata generator**(**TF . keras . preprocessing . image . image data generator**)，它可以使用实时 **DA** 生成批量张量图像。
 
-```
+```py
 datagen = ImageDataGenerator(rotation_range=90)
 datagen.fit(x_train)
 
@@ -157,7 +157,7 @@ for X_batch, y_batch in datagen.flow(x_train, y_train, batch_size=9):
 
 要安装**转换**你只需要安装**火炬视觉**:
 
-```
+```py
 pip3 install torch torchvision
 
 ```
@@ -174,7 +174,7 @@ pip3 install torch torchvision
 
 让我们看看如何使用**变换**来应用增强。你应该记住，**变换**只适用于 **PIL** 的图像。这就是为什么你要么阅读 PIL 格式的图像，要么对你的增强管道进行必要的转换。
 
-```
+```py
 from torchvision import transforms as tr
 from torchvision.transfroms import Compose
 
@@ -187,7 +187,7 @@ augmented_image = pipeline(img = img)
 
 有时你可能想为训练编写一个定制的**数据加载器**。让我们看看如何通过**变换**来应用增强，如果你这样做的话。
 
-```
+```py
 from torchvision import transforms
 from torchvision.transforms import Compose as C
 
@@ -215,7 +215,7 @@ trainset = Dataloader(train=True, csv='/path/to/file/', transform=aug)
 
 **MxNet 转换的示例用法**
 
-```
+```py
 color_aug = transforms.RandomColorJitter(
                                brightness=0.5,
                                contrast=0.5,
@@ -266,7 +266,7 @@ apply(example_image, color_aug)
 
 通过 pip 安装**增强器**非常容易:
 
-```
+```py
 pip install Augmentor
 ```
 
@@ -304,7 +304,7 @@ pip install Augmentor
 
 请注意，当使用**样本**时，您需要指定您想要获得的增强图像的数量。
 
-```
+```py
 import Augmentor
 
 p = Augmentor.Pipeline("/path/to/images")
@@ -319,7 +319,7 @@ p.sample(10000)
 
 让我们通过 pip 安装**相册**。如果你想以其他方式做这件事，检查官方文件。
 
-```
+```py
 pip install albumentations
 
 ```
@@ -338,7 +338,7 @@ pip install albumentations
 
 让我们看看如何使用**相册**来放大图像。您需要使用 **Compose** 方法定义管道(或者您可以使用单个增强)，向其传递一个图像，并获得增强的图像。
 
-```
+```py
 import albumentations as A
 import cv2
 
@@ -380,7 +380,7 @@ ImgAug 也是一个图像增强库。它在功能上与增强器和缓冲区非�
 
 **ImgAug** 可通过 pip 或 [conda](https://web.archive.org/web/20220928201835/https://imgaug.readthedocs.io/en/latest/source/installation.html) 轻松安装。
 
-```
+```py
 pip install imgaug
 
 ```
@@ -389,7 +389,7 @@ pip install imgaug
 
 与其他图像增强库 ***，* ImgAug** 一样，使用起来也很方便。要定义一个扩充管道，使用**顺序**方法，然后像在其他库中一样简单地堆叠不同的转换操作。
 
-```
+```py
 from imgaug import augmenters as iaa
 
 seq = iaa.Sequential([
@@ -413,7 +413,7 @@ for batch_idx in range(1000):
 
 因此，让我们更仔细地看看 **DeepAugment** ，它比**自动增强**更快、更灵活。 **DeepAugment** 与 **AutoAugment** 除了一般的想法之外没有什么强有力的联系，是由一群爱好者开发的。您可以通过 pip 安装它:
 
-```
+```py
 pip install deepaugment
 
 ```
@@ -422,7 +422,7 @@ pip install deepaugment
 
 请记住，**当您使用优化方法时，您应该指定用于找到最佳增强策略的样本数量**。
 
-```
+```py
 from deepaugment.deepaugment import DeepAugment
 
 deepaug = DeepAugment(my_images, my_labels)

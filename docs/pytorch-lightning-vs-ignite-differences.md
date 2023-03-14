@@ -87,7 +87,7 @@ Lightning 为 pytorch 函数提供了一种结构，在这种结构中，函数�
 
 如您所见，LightningModule 很简单，类似于 Pytorch。它负责所有需要定义的重要方法，比如:
 
-```
+```py
 class MNISTModel(pl.LightningModule):
 
     def __init__(self):
@@ -124,7 +124,7 @@ class MNISTModel(pl.LightningModule):
 
 韵律学
 
-```
+```py
 mnist_model = MNISTModel()
 
 train_ds = MNIST(os.getcwd(), train=True, download=True, transform=transforms.ToTensor())
@@ -148,7 +148,7 @@ Lightning 有两种指标:
 
 Pytorch 还提供:
 
-```
+```py
 import torch
 
 from pytorch_lightning.metrics import tensor_metric
@@ -168,7 +168,7 @@ numpy_metric:用 numpy 实现的度量函数的包装器
 
 使用模块度量接口的另一种方法是使用普通 pytorch 创建一个度量函数，并从 lightning 基类派生一个类，然后在 forward 中调用您的度量:
 
-```
+```py
 import torch
 
 from pytorch_lightning.metrics import TensorMetric
@@ -180,7 +180,7 @@ class RMSE(TensorMetric):
 
 钩住
 
-```
+```py
 import torch
 
 from pytorch_lightning.metrics import TensorMetric
@@ -200,7 +200,7 @@ class RMSE(TensorMetric):
 
 为了启用挂钩，请确保您覆盖了您的 **LightningModule** 中的方法，并定义了需要在期间完成的操作或任务，培训师将在正确的时间调用它。
 
-```
+```py
 def on_epoch_start(self):
 
 ```
@@ -209,7 +209,7 @@ def on_epoch_start(self):
 
 要了解更多关于钩子的信息，请点击[链接](https://web.archive.org/web/20221206042755/https://pytorch-lightning.readthedocs.io/en/0.4.9/Trainer/hooks)。
 
-```
+```py
 def on_epoch_end(self):
 
 ```
@@ -228,7 +228,7 @@ def on_epoch_end(self):
 
 注意，为了使用分片发行版，您需要从 plugins 参数中调用它。
 
-```
+```py
 Trainer = Trainer(distributed_backend = None)
 
 Trainer = Trainer(distributed_backend ='dp')
@@ -236,7 +236,7 @@ Trainer = Trainer(distributed_backend ='dp')
 Trainer = Trainer(distributed_backend ='ddp')
 ```
 
-```
+```py
 trainer = Trainer(gpus=4, plugins='ddp_sharded')
 ```
 
@@ -246,7 +246,7 @@ deepspeed 也是如此:
 
 要了解更多关于 **deepspeed** 的信息，请查看这篇[文章](https://web.archive.org/web/20221206042755/https://pytorch-lightning.medium.com/pytorch-lightning-v1-2-0-43a032ade82bhttps://pytorch-lightning.medium.com/pytorch-lightning-v1-2-0-43a032ade82b)。
 
-```
+```py
 trainer = Trainer(gpus=4, plugins='deepspeed', precision=16)
 ```
 
@@ -256,7 +256,7 @@ trainer = Trainer(gpus=4, plugins='deepspeed', precision=16)
 
 有了上面的配置，您现在可以放大模型，甚至不用担心模型的工程方面。请放心，一切都由闪电模块负责。
 
-```
+```py
 from pytorch_lightning import Trainer, seed_everything
 
 seed_everything(23)
@@ -277,7 +277,7 @@ Trainer = Trainer(deterministic = True)
 
 如上所示设置所有需要的参数，然后将其作为一个参数传递给 trainer 函数，您就可以通过 Neptune 仪表盘监视您的模型了。
 
-```
+```py
 from pytorch_lightning.loggers.neptune import NeptuneLogger
 
 neptune_logger = NeptuneLogger(
@@ -292,7 +292,7 @@ neptune_logger = NeptuneLogger(
 
 生产
 
-```
+```py
 trainer = pl.Trainer(logger=neptune_logger,
                     checkpoint_callback=model_checkpoint,
                     callbacks=[lr_logger],
@@ -356,7 +356,7 @@ Lightning 的[文档](https://web.archive.org/web/20221206042755/https://pytorch
 
 正如你所看到的，用于训练深度学习模型的抽象或基础被包含在函数 *update_model* 中，然后被传递到引擎中。这只是包含反向传播的训练函数。没有定义额外的参数或事件。
 
-```
+```py
 def update_model(engine, batch):
     inputs, targets = batch
     optimizer.zero_grad()
@@ -371,7 +371,7 @@ trainer = Engine(update_model)
 
 要开始训练，您只需调用**。从训练器运行**方法，根据要求定义 *max_epochs* 。
 
-```
+```py
 trainer.run(data_loader, max_epochs=5)
 ```
 
@@ -383,7 +383,7 @@ trainer.run(data_loader, max_epochs=5)
 
 如您所见，函数中的主要元素是 train_evaluator，它主要对训练数据执行评估并返回指标。可以使用相同的度量来发现准确性、损失等。您所要做的就是给出一个打印件或一个 return 语句，以便获得值。
 
-```
+```py
 @trainer.on(Events.EPOCH_COMPLETED)
 def log_training_results(trainer):
     train_evaluator.run(train_loader)
@@ -401,7 +401,7 @@ def log_training_results(trainer):
 
 上面的代码使用验证数据集来操作指标。这个和上一个一模一样。唯一的区别是我们在**中传递这个函数。训练器**、**的 add_event_handler** 方法，它将像前面的函数一样工作。
 
-```
+```py
 def log_validation_results(trainer):
     val_evaluator.run(val_loader)
     metrics = val_evaluator.state.metrics
@@ -427,7 +427,7 @@ trainer.add_event_handler(Events.EPOCH_COMPLETED, log_validation_results)
 
 从上面的代码中，您可以看到用户必须**将度量实例**连接到引擎。然后使用引擎的 **process_function** 的输出来计算度量值。
 
-```
+```py
 from ignite.metrics import Accuracy
 
 def predict_on_batch(engine, batch)
@@ -462,7 +462,7 @@ Ignite 自动处理随机状态的能力，这可以确保批处理在不同的�
 
 有趣的是，您可以附加许多事件处理程序，这样所有数据都将显示在 Neptune 仪表盘中，这将有助于您监控训练。
 
-```
+```py
 from ignite.contrib.handlers.neptune_logger import *
 
 npt_logger = NeptuneLogger(api_token="ANONYMOUS",
@@ -480,7 +480,7 @@ npt_logger = NeptuneLogger(api_token="ANONYMOUS",
 
 社区
 
-```
+```py
 npt_logger.attach(trainer,
                   log_handler=OutputHandler(tag="training",
                                             output_transform=lambda loss: {'batchloss': loss},
@@ -525,7 +525,7 @@ npt_logger.attach(validation_evaluator,
 
 **PyTorch-Ignite**
 
-```
+```py
 model = Net()
 train_loader, val_loader = get_data_loaders(train_batch_size, val_batch_size)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.8)
@@ -576,7 +576,7 @@ for epoch in range(max_epochs):
 
 [*来源*](https://web.archive.org/web/20221206042755/https://colab.research.google.com/drive/1gFIPXmUX73HWlLSxFvvYEweQBD_OPx1t#scrollTo=FnUEHqN9lPcb)
 
-```
+```py
 model = Net()
 train_loader, val_loader = get_data_loaders(train_batch_size, val_batch_size)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.8)

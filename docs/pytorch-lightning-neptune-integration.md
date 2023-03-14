@@ -54,7 +54,7 @@
 
 在最简单的情况下，您只需创建`NeptuneLogger`:
 
-```
+```py
 from pytorch_lightning.loggers import NeptuneLogger
 
 neptune_logger = NeptuneLogger(
@@ -64,7 +64,7 @@ neptune_logger = NeptuneLogger(
 
 并将其传递给`Trainer`的 logger 参数，以符合您的模型。
 
-```
+```py
 from pytorch_lightning import Trainer
 
 trainer = Trainer(logger=neptune_logger)
@@ -104,7 +104,7 @@ Neptune 为您提供了许多定制选项，您可以简单地记录更多特定
 
 只需将这些信息传递给你的记录器:
 
-```
+```py
 neptune_logger = NeptuneLogger(
     api_key="ANONYMOUS",
     project="shared/pytorch-lightning-integration",
@@ -127,7 +127,7 @@ neptune_logger = NeptuneLogger(
 
 例如，我们可以记录每个时期后的损失直方图:
 
-```
+```py
 class CoolSystem(pl.LightningModule):
 
     def validation_epoch_end(self, outputs):
@@ -166,7 +166,7 @@ class CoolSystem(pl.LightningModule):
 
 要做到这一点，你只需要告诉`NeptuneLogger`不要在安装后关闭:
 
-```
+```py
 neptune_logger = NeptuneLogger(
     api_key="ANONYMOUS",
     project_name="shared/pytorch-lightning-integration",
@@ -179,13 +179,13 @@ neptune_logger = NeptuneLogger(
 
 **测试指标:**
 
-```
+```py
 trainer.test(model)
 ```
 
 **其他(外部)指标:**
 
-```
+```py
 from sklearn.metrics import accuracy_score
 ...
 accuracy = accuracy_score(y_true, y_pred)
@@ -194,7 +194,7 @@ neptune_logger.experiment['test/accuracy'].log(accuracy)
 
 **测试集上的性能图表:**
 
-```
+```py
 from scikitplot.metrics import plot_confusion_matrix
 import matplotlib.pyplot as plt
 ...
@@ -205,7 +205,7 @@ neptune_logger.experiment['test/confusion_matrix'].upload(File.as_image(fig))
 
 **整个模型检查点目录:**
 
-```
+```py
 neptune_logger.experiment('checkpoints').upload('my/checkpoints')
 
 ```
@@ -224,7 +224,7 @@ neptune_logger.experiment('checkpoints').upload('my/checkpoints')
 
 例如，让我们将实验仪表板提取到熊猫数据帧:
 
-```
+```py
 import neptune.new as neptune
 
 project = neptune.init('shared/pytorch-lightning-integration')
@@ -234,14 +234,14 @@ project.fetch_runs_table().to_pandas()
 
 或者获取一个单独的实验并用训练后计算的一些外部度量来更新它:
 
-```
+```py
 exp = neptune.init(project='shared/pytorch-lightning-integration', id='PYTOR-63')
 exp['some_external_metric'].log(0.92)
 ```
 
 或者获取一个单独的实验并用训练后计算的一些外部度量来更新它:
 
-```
+```py
 exp = project.get_experiments(id='PYTOR-63')[0]
 exp.log_metric('some_external_metric', 0.92)
 
@@ -269,14 +269,14 @@ Pytorch Lightning 是一个很棒的库，可以帮助您:
 
 ## 完整的 PyTorch 闪电追踪脚本
 
-```
+```py
 pip install --upgrade torch pytorch-lightning>=1.5.0
     neptune-client
     matplotlib scikit-plot
 
 ```
 
-```
+```py
 import os
 
 import numpy as np

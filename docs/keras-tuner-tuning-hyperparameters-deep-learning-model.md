@@ -44,7 +44,7 @@
 
 我已经导入了模型，我将初始化模型类的一个对象。让我们看一下文档来了解可变参数:
 
-```
+```py
 Signature:
 unet(
     input_size=(512, 512, 1),
@@ -103,7 +103,7 @@ Type:      function
 
 Keras tuner 提供了一种优雅的方式来定义模型和调谐器将使用的参数的搜索空间——您可以通过创建一个**模型构建器函数**来完成这一切。为了向您展示它是多么简单和方便，下面是我们项目的模型构建器功能:
 
-```
+```py
 def model_builder(hp):
     """
     Build model for hyperparameters tuning
@@ -151,7 +151,7 @@ def model_builder(hp):
 
 对于我们正在进行的图像分割项目，我决定坚持使用`Hyperband`算法，因此我的初始化代码如下所示:
 
-```
+```py
 tuner = kt.Hyperband(hypermodel = model_builder,
                      objective = kt.Objective("val_f1", direction="max"),
                      max_epochs = 20,
@@ -169,7 +169,7 @@ tuner = kt.Hyperband(hypermodel = model_builder,
 
 启动 hypertuning 过程类似于在 Keras/TensorFlow 中拟合模型，除了我们在 tuner 对象上使用`.search`方法而不是常规的`.fit`方法。下面是我如何开始该项目的调优工作:
 
-```
+```py
 tuner.search(training_data=train_dg,
              steps_per_epoch=batches_per_epoch,
              validation_data=valid_dg,
@@ -185,7 +185,7 @@ tuner.search(training_data=train_dg,
 
 `.search`方法和其中使用的所有参数你应该已经很熟悉了，我唯一想指出的是`ClearTrainingOutput()`回调，它本质上只是在每个训练周期结束时清除输出。下面是`ClearTrainingOutput`回调的代码:
 
-```
+```py
 class ClearTrainingOutput(tf.keras.callbacks.Callback):
     def on_train_end(*args, **kwargs):
         IPython.display.clear_output(wait = True)
@@ -197,13 +197,13 @@ class ClearTrainingOutput(tf.keras.callbacks.Callback):
 
 要检查超调作业的摘要，我们只需在一个`tuner`实例上使用`.results_summary()`。以下是完整的代码:
 
-```
+```py
 tuner.results_summary()
 ```
 
 运行时，我们在项目中使用的调谐器的输出如下所示:
 
-```
+```py
 Results summary:
 
 Results in hyperband_tuner
@@ -321,7 +321,7 @@ Score: 0.5064906477928162
 
 相反，我将把重点放在将 Neptune 应用到您的项目工作流中所需的代码更改上。唯一的变化是调谐器初始化部分。下面是进行更改后初始化的样子:
 
-```
+```py
 import neptunecontrib.monitoring.kerastuner as npt_utils
 
 tuner = kt.Hyperband(hypermodel = model_builder,
@@ -339,7 +339,7 @@ tuner = kt.Hyperband(hypermodel = model_builder,
 
 除此之外，我还利用`.log_tuner_info()`方法将更多信息从 Keras Tuner 对象记录到 Neptune。我是这样做的:
 
-```
+```py
 npt_utils.log_tuner_info(tuner)
 ```
 

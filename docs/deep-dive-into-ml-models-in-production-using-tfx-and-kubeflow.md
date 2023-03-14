@@ -133,7 +133,7 @@ Python 中提供了用于实现上述不同任务的 TFX 库，这些库可以�
 
 在笔记本的第一个单元中，你将安装 TFX、库比弗洛(kfp)和一个名为 skaffold 的软件包:
 
-```
+```py
 # Install tfx and kfp Python packages.
 import sys
 !{sys.executable} -m pip install --user --upgrade -q tfx==0.22.0
@@ -147,7 +147,7 @@ import sys
 
 运行第一个单元后，您会得到一些警告——现在忽略它们。其中一个通知您您的安装不在您的 env 路径中。通过将它们添加到 PATH 中，您可以在下一个单元格中解决这个问题。
 
-```
+```py
 # Set `PATH` to  ``
 PATH=%env 
 %env /home//.local/
@@ -156,7 +156,7 @@ PATH=%env
 
 接下来，设置一些重要的环境变量，Kubeflow 稍后将使用这些变量来编排管道。将下面的代码复制到新的单元格中:
 
-```
+```py
 # Read GCP project id from env.
 shell_output=!gcloud config list --format 'value(core.project)' 2>/dev/null
 GOOGLE_CLOUD_PROJECT=shell_output[0]
@@ -171,7 +171,7 @@ print("GCP project ID:" + GOOGLE_CLOUD_PROJECT)
 
 将复制的 URL 分配给变量**端点**:
 
-```
+```py
 ENDPOINT='https://2adfdb83b477n893-dot-us-central2.pipelines.googleusercontent.com'
 
 ```
@@ -180,14 +180,14 @@ ENDPOINT='https://2adfdb83b477n893-dot-us-central2.pipelines.googleusercontent.c
 
 接下来，您将创建一个 Docker 名称，Skaffold 将使用它来捆绑您的管道。
 
-```
+```py
 CUSTOM_TFX_IMAGE='gcr.io/' + GOOGLE_CLOUD_PROJECT + '/advert-pred-pipeline'
 
 ```
 
 最后，您将设置基本路径，并将当前工作目录设置为项目文件夹。
 
-```
+```py
 #set base 
 BASE_PATH  
 %cd 
@@ -206,7 +206,7 @@ TFX 附带了一个内置的 orchestrator，允许您在 Jupyter 笔记本中交
 
 现在，让我们来看看实际情况。在新的代码单元格中，导入以下包:
 
-```
+```py
 import os
 import pprint
 import absl
@@ -256,7 +256,7 @@ from tfx.utils.dsl_utils import external_input
 
 上传完毕，让我们先来看一下最上面的几排。
 
-```
+```py
 data_root = 'data'
 data_filepath = os.path.join(data_root, "advertising.csv")
 !head {data_filepath}
@@ -281,7 +281,7 @@ data_filepath = os.path.join(data_root, "advertising.csv")
 
 在新单元格中，创建并运行 InteractiveContext，如下所示:
 
-```
+```py
 context = InteractiveContext()
 
 ```
@@ -292,7 +292,7 @@ context = InteractiveContext()
 
 在下面的代码单元格中，您将把数据源传递给 ExampleGen 输入参数，并使用上下文运行它:
 
-```
+```py
 example_gen = CsvExampleGen(input=external_input(_data_root))
 context.run(example_gen)
 
@@ -304,7 +304,7 @@ context.run(example_gen)
 
 您还可以查看存储工件和 URI 的位置:
 
-```
+```py
 artifact = example_gen.outputs['examples'].get()[0]
 print(artifact.split_names, artifact.uri)
 
@@ -322,7 +322,7 @@ print(artifact.split_names, artifact.uri)
 
 为了计算数据的统计信息，您将把 ExampleGen 的输出作为输入传入。
 
-```
+```py
 statistics_gen = StatisticsGen(
    examples=example_gen.outputs['examples'])
 context.run(statistics_gen)
@@ -331,7 +331,7 @@ context.run(statistics_gen)
 
 这些统计数据可以使用上下文的 show 方法可视化，如下所示:
 
-```
+```py
 context.show(statistics_gen.outputs['statistics'])
 
 ```
@@ -358,7 +358,7 @@ context.show(statistics_gen.outputs['statistics'])
 
 在下面的代码单元格中，您将把 StatisticsGen 输出传递给 SchemaGen 输入，然后可视化输出。
 
-```
+```py
 schema_gen = SchemaGen(
    statistics=statistics_gen.outputs['statistics'],
    infer_feature_shape=False)
@@ -377,7 +377,7 @@ ML 管道中的下一个组件是 ExampleValidator。该组件根据定义的模
 
 在下面的代码单元格中，我们将 StatisticsGen 和 SchemaGen 输出传递给 ExampleValidator:
 
-```
+```py
 example_validator = ExampleValidator(
    statistics=statistics_gen.outputs['statistics'],
    schema=schema_gen.outputs['schema'])
@@ -402,7 +402,7 @@ context.show(example_validator.outputs['anomalies'])
 
 在 **constants.py** 中，您将定义一些变量，如分类特征、数字特征以及需要编码的特征的名称。在我们的例子中，您将使用如下所示的一些选定功能:
 
-```
+```py
 DENSE_FLOAT_FEATURE_KEYS = ['DailyTimeSpentOnSite', 'Age',                                     'AreaIncome', 'DailyInternetUsage' ]
 VOCAB_FEATURE_KEYS = ['City', 'Male', 'Country' ]
 
@@ -423,7 +423,7 @@ def transformed_name(key):
 
 在 advert-transform.py 中，您将导入您的联系人，然后定义转换步骤。这是所有处理、清理、填充缺失值的代码所在的位置。
 
-```
+```py
 import tensorflow as tf
 import tensorflow_transform as tft
 from model import constants
@@ -467,7 +467,7 @@ return outputs
 
 现在回到您的笔记本，在新的单元格中添加以下代码:
 
-```
+```py
 advert_transform = 'model/advert-transform.py'
 transform = Transform(
    examples=example_gen.outputs['examples'],
@@ -483,7 +483,7 @@ context.run(transform)
 
 您可以通过调用如下所示的转换输出来轻松查看这一点:
 
-```
+```py
 transform.outputs
 
 ```
@@ -504,7 +504,7 @@ transform.outputs
 
 上面的代码很长，所以我们将逐一介绍:
 
-```
+```py
 import os
 import absl
 import datetime
@@ -668,7 +668,7 @@ model.save(fn_args.serving_model_dir, save_format='tf', signatures=signatures)
 
 培训师接受培训师模块、来自转换输出的转换示例、转换图、模式以及用于培训和评估步骤的培训师参数。
 
-```
+```py
 advert_trainer = 'model/advert-trainer.py'
 trainer = Trainer(
    module_file=advert_trainer,
@@ -696,7 +696,7 @@ context.run(trainer)
 
 接下来，您将把此配置以及示例和训练模型输出传递给评估者，如下所示:
 
-```
+```py
 eval_config = tfma.EvalConfig(
    model_specs=[tfma.ModelSpec(label_key='ClickedOnAd')],
    metrics_specs=[
@@ -724,7 +724,7 @@ context.run(model_resolver)
 
 要可视化评估器的输出，请使用如下所示的 show 方法:
 
-```
+```py
 evaluator = Evaluator(
    examples=example_gen.outputs['examples'],
    model=trainer.outputs['model'],
@@ -736,7 +736,7 @@ context.run(evaluator)
 
 上面，您可以看到评估者报告的指标。如果你训练一个新的模型，性能将与基线模型进行比较，在我们的例子中，基线模型不存在，因为这是我们的第一个模型。
 
-```
+```py
 context.show(evaluator.outputs['evaluation'])
 
 ```
@@ -747,7 +747,7 @@ context.show(evaluator.outputs['evaluation'])
 
 //输出
 
-```
+```py
 blessing_uri = evaluator.outputs.blessing.get()[0].uri
 !ls -l {blessing_uri}
 
@@ -767,7 +767,7 @@ blessing_uri = evaluator.outputs.blessing.get()[0].uri
 
 首先，您可以指定服务模型目录，您的训练模型将被推送到该目录。这可以是云存储或本地文件系统。
 
-```
+```py
 serving_model_dir = 'serving_model/advert-pred'
 pusher = Pusher(
     model=trainer.outputs['model'],
@@ -795,7 +795,7 @@ pusher = Pusher(
 
 如果您注意到，上面的代码类似于您在交互式探索阶段编写的代码，这里您只需删除 InteractiveContext，并将每个组件添加到组件列表中。
 
-```
+```py
 from ml_metadata.proto import metadata_store_pb2
 from tfx.components import CsvExampleGen
 from tfx.components import Evaluator
@@ -946,7 +946,7 @@ return pipeline.Pipeline(
 
 这个脚本是特定于 Kubeflow 的，是通用的，所以你可以在你的项目中使用它。在这里，您可以定义所有变量，例如数据路径、输出的存储位置、管道名称以及训练和评估参数。
 
-```
+```py
 import os
 from absl import logging
 import pipeline
@@ -1020,7 +1020,7 @@ if __name__ == '__main__':
 
 可以导航到云存储[浏览器](https://web.archive.org/web/20221201153827/https://console.cloud.google.com/storage/browser)确认文件已经上传。
 
-```
+```py
 ## copy data to cloud storage for easy access from Kubeflow
 !gsutil cp data/advertising.csv gs://{GOOGLE_CLOUD_PROJECT}-kubeflowpipelines-default/advert-pred/data/data.csv
 
@@ -1036,7 +1036,7 @@ if __name__ == '__main__':
 
 运行上面的命令需要几分钟才能完成。这是因为 TFX 使用我们之前安装的 **skaffold** 包来构建管道的 docker 映像。
 
-```
+```py
 !tfx pipeline create
 --pipeline-path=kubeflow_dag_runner.py --endpoint={ENDPOINT} --build-target-image={CUSTOM_TFX_IMAGE} 
 ```
@@ -1045,7 +1045,7 @@ if __name__ == '__main__':
 
 您的 Kubeflow 管道已成功推出！要对此进行监控，请转到您的 Kubeflow 实例页面(从这里复制端点 URL)，单击 **Experiments，**，然后选择您的管道名称。
 
-```
+```py
 !tfx run create --pipeline-name={PIPELINE_NAME} --endpoint={ENDPOINT}
 ```
 
@@ -1061,7 +1061,7 @@ if __name__ == '__main__':
 
 **就这样！您已经使用 TFX 和 Kubeflow** 成功地编排了一个端到端的 ML 管道。结合本教程中使用的工具，您可以轻松有效地构建整个 ML 工作流。
 
-```
+```py
 !tfx pipeline update
 
 !tfx run create 

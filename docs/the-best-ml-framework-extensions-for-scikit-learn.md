@@ -18,7 +18,7 @@
 
 首先，创建一个虚拟数据帧:
 
-```
+```py
 data =pd.DataFrame({
     'Name':['Ken','Jeff','John','Mike','Andrew','Ann','Sylvia','Dorothy','Emily','Loyford'],
     'Age':[31,52,56,12,45,50,78,85,46,135],
@@ -34,7 +34,7 @@ data =pd.DataFrame({
 
 例如，' [LabelBinarizer](https://web.archive.org/web/20230204025453/https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelBinarizer.html) 可应用于' Uni '列，而' Age '列则使用' [StandardScaler](https://web.archive.org/web/20230204025453/https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) 进行缩放。
 
-```
+```py
 from sklearn_pandas import DataFrameMapper
 mapper = DataFrameMapper([
      ('Uni', sklearn.preprocessing.LabelBinarizer()),
@@ -44,13 +44,13 @@ mapper = DataFrameMapper([
 
 定义映射器后，接下来我们用它来拟合和转换数据。
 
-```
+```py
 mapper.fit_transform(data)
 ```
 
 映射器的“transformed_names_”属性可用于显示转换后的结果名称。
 
-```
+```py
 mapper.transformed_names_
 ```
 
@@ -58,7 +58,7 @@ mapper.transformed_names_
 
 向映射器传递“df_out=True”将会以熊猫数据帧的形式返回您的结果。
 
-```
+```py
 mapper = DataFrameMapper([
      ('Uni', sklearn.preprocessing.LabelBinarizer()),
      (['Age'], sklearn.preprocessing.StandardScaler())
@@ -80,7 +80,7 @@ Sklearn-xarray 基本上是 xarray 和 Scikit-learn 之间的桥梁。为了使�
 
 这个包有包装器，允许您在 xarray 数据数组和数据集上使用 sklearn 估计器。为了说明这一点，让我们首先创建一个“数据阵列”。
 
-```
+```py
 import numpy as np
 import xarray as xr
 data = np.random.rand(16, 4)
@@ -91,7 +91,7 @@ my_xarray = xr.DataArray(data)
 
 从 Sklearn 中选择一个转换以应用于此“数据阵列”。在这种情况下，[让我们应用](https://web.archive.org/web/20230204025453/https://phausamann.github.io/sklearn-xarray/content/wrappers.html)“标准缩放器”。
 
-```
+```py
 from sklearn.preprocessing import StandardScaler
 Xt = wrap(StandardScaler()).fit_transform(X)
 
@@ -101,7 +101,7 @@ Xt = wrap(StandardScaler()).fit_transform(X)
 
 包装估计器可以无缝地用于 Sklearn 管道中。
 
-```
+```py
 pipeline = Pipeline([
     ('pca', wrap(PCA(n_components=50), reshapes='feature')),
     ('cls', wrap(LogisticRegression(), reshapes='feature'))
@@ -115,7 +115,7 @@ pipeline = Pipeline([
 
 为此，您需要从“sklearn-xarray”创建一个“CrossValidatorWrapper”实例。
 
-```
+```py
 from sklearn_xarray.model_selection import CrossValidatorWrapper
 from sklearn.model_selection import GridSearchCV, KFold
 cv = CrossValidatorWrapper(KFold())
@@ -137,7 +137,7 @@ gridsearch = GridSearchCV(
 
 有了这个，你就可以用 Scikit-learn 进行自动化的机器学习了。对于设置，您需要手动安装一些依赖项。
 
-```
+```py
 $ curl https://raw.githubusercontent.com/automl/auto-sklearn/master/requirements.txt | xargs -n 1 -L 1 pip install
 
 ```
@@ -150,7 +150,7 @@ $ curl https://raw.githubusercontent.com/automl/auto-sklearn/master/requirements
 
 要使用它，您需要选择一个分类器或回归器，并使其适合训练集。
 
-```
+```py
 from autosklearn.classification import AutoSklearnClassifier
 cls = AutoSklearnClassifier()
 cls.fit(X_train, y_train)
@@ -171,7 +171,7 @@ predictions = cls.predict(X_test)
 
 要查看它的运行，请通过 pip 安装“autoviml”。
 
-```
+```py
 from sklearn.model_selection import train_test_split, cross_validate
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
@@ -191,7 +191,7 @@ model, features, train, test = Auto_ViML(train,"target",test,verbose=2)
 
 下面的代码片段展示了如何在 digits 数据集上创建分类管道。
 
-```
+```py
 from tpot import TPOTClassifier
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
@@ -216,7 +216,7 @@ tpot.export('tpot_digits_pipeline.py')
 
 下一步是将实体、关系列表和目标实体传递给 DFS。这将为您提供特性矩阵和相应的特性定义列表。
 
-```
+```py
 import featuretools as ft
 
 entities = {
@@ -260,7 +260,7 @@ SciKit-Learn Laboratory 是一个命令行工具，可以用来运行机器学�
 之后，您需要获得一个“SKLL”格式的数据集。
 接下来，为实验创建一个[配置文件](https://web.archive.org/web/20230204025453/https://skll.readthedocs.io/en/latest/run_experiment.html#create-config)，并在终端中运行实验。
 
-```
+```py
 $ run_experimen experiment.cfg
 ```
 
@@ -270,7 +270,7 @@ $ run_experimen experiment.cfg
 
 Neptune 与 Scikit-learn 的集成让你可以使用 Neptune 记录你的实验。例如，您可以记录 Scikit-learn 回归器的摘要。
 
-```
+```py
 from neptunecontrib.monitoring.sklearn import log_regressor_summary
 
 log_regressor_summary(rfr, X_train, X_test, y_train, y_test)
@@ -291,7 +291,7 @@ Scikit-optimize 可用于通过基于贝叶斯定理的贝叶斯优化来执行�
 
 拟合后，您可以通过' best_params_ '属性获得模型的最佳参数。
 
-```
+```py
 from skopt.space import Real, Categorical, Integer
 from skopt import BayesSearchCV
 regressor = BayesSearchCV(
@@ -316,7 +316,7 @@ Sklearn-deap 是一个用来实现[进化算法](https://web.archive.org/web/202
 
 用于生产的模型出口
 
-```
+```py
 from evolutionary_search import EvolutionaryAlgorithmSearchCV
 cv = EvolutionaryAlgorithmSearchCV(estimator=SVC(),
                                    params=paramgrid,
@@ -340,7 +340,7 @@ sklearn-onnx 支持将 sklearn 模型转换为 [ONNX](https://web.archive.org/we
 
 这是一个决策树集成的模型编译器。
 
-```
+```py
 from skl2onnx import to_onnx
 onx = to_onnx(pipeline, X_train[:1].astype(numpy.float32))
 
@@ -352,7 +352,7 @@ onx = to_onnx(pipeline, X_train[:1].astype(numpy.float32))
 
 模型检查和可视化
 
-```
+```py
 import treelite.sklearn
 model = treelite.sklearn.import_model(model)
 
@@ -364,7 +364,7 @@ dtreeviz 用于决策树可视化和模型解释。
 
 eli5 是一个可以用来调试和检查机器学习分类器的包。你也可以用它来解释他们的预测。
 
-```
+```py
 from dtreeviz.trees import dtreeviz
 viz = dtreeviz(
               model,
@@ -382,7 +382,7 @@ viz = dtreeviz(
 
 [dabl](https://web.archive.org/web/20230204025453/https://github.com/amueller/dabl)–数据分析基线库
 
-```
+```py
 import eli5
 eli5.show_weights(model)
 ```
@@ -393,7 +393,7 @@ eli5.show_weights(model)
 
 Skorch 是 PyTorch 的 Scikit-learn 包装器。
 
-```
+```py
 import dabl
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_digits
@@ -407,7 +407,7 @@ print("Accuracy score", sc.score(X_test, y_test))
 
 最后的想法
 
-```
+```py
 from skorch import NeuralNetClassifier
 net = NeuralNetClassifier(
     MyModule,

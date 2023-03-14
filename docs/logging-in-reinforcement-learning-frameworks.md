@@ -32,7 +32,7 @@
 
  **下面是旋转(纪元)记录器 API。我删掉了不太重要的代码。
 
-```
+```py
 class Logger:
     """
     A Logger tailored for tracking average values over epochs.
@@ -90,7 +90,7 @@ class Logger:
 
 现在让我们看一下在旋转 VPG 实现中使用“存储然后记录”方法和 EpochLogger 的代码示例(同样，为了清楚起见，稍微做了修改和删减)。
 
-```
+```py
 def update():
     ...some policy optimization code...
     logger.store(LossPi=pi_l_old, LossV=v_l_old)
@@ -127,7 +127,7 @@ for epoch in range(epochs):
 
 要使用日志程序，请用上面提供的实现替换正在运行的代码中的 *logx.py* 文件(在[安装](https://web.archive.org/web/20221206025247/https://spinningup.openai.com/en/latest/user/installation.html#installing-spinning-up)期间克隆的)。然后，您可以在启动中运行任何现有的代理，如下所示:
 
-```
+```py
 import gym
 import neptune
 import tensorflow as tf
@@ -157,7 +157,7 @@ ppo(env_fn=env_fn, ac_kwargs=ac_kwargs, steps_per_epoch=5000, epochs=250, logger
 
 现在让我们看看如何在稳定的基线中实现 Neptune 实验的定制日志输出。
 
-```
+```py
 from stable_baselines import logger
 class NeptuneLogger(logger.KVWriter):
     """Stable Baselines Neptune logger."""
@@ -175,7 +175,7 @@ class NeptuneLogger(logger.KVWriter):
 
 在这里你可以看到如何使用我们的记录器。我们首先导入它，然后创建 Neptune 实验，并将我们的记录器添加到默认的记录器输出中。
 
-```
+```py
 import neptune
 import stable_baselines  
 from stable_baselines import logger
@@ -226,7 +226,7 @@ Neptune 将获取所有这些细粒度的值，对它们进行平均，并将它
 
  **下面是取自 Acme *EnvironmentLoop* 类的“立即编写”方法(为了清楚起见，稍作修改)。
 
-```
+```py
 def run_episode():
     ...reset any counts and start the environment...
 
@@ -260,7 +260,7 @@ def run_episode():
 
 #### **记录器**
 
-```
+```py
 import collections
 import re
 
@@ -300,7 +300,7 @@ class NeptuneLogger(acme_loggers.base.Logger):
 
 #### **平滑滤波器**
 
-```
+```py
 class SmoothingFilter(acme_loggers.base.Logger):
     """Logger which writes to another logger, smoothing matching data.
     Args:
@@ -354,7 +354,7 @@ class SmoothingFilter(acme_loggers.base.Logger):
 
 #### **聚集过滤器**
 
-```
+```py
 class AggregateFilter(acme_loggers.base.Logger):
     """Logger which writes to another logger, aggregating matching data.
     Args:
@@ -405,7 +405,7 @@ class AggregateFilter(acme_loggers.base.Logger):
 
 您可以通过包装记录器来使用过滤器。请看下面的摘录。
 
-```
+```py
 import acme.utils.loggers as acme_loggers
 import logger as neptune_loggers
 
@@ -449,7 +449,7 @@ def make_logger(experiment,
 
 然后，使用这个方法为代理、训练循环和评估循环创建记录器。下面我包括了代码片段，完整的运行示例是[这里是](https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging/blob/master/acme/run_d4pg.py)。
 
-```
+```py
 [...]
 
   agent = d4pg.D4PG(
@@ -493,7 +493,7 @@ def make_logger(experiment,
 
 与稳定基线的情况一样，RLlib 是一个更高级的框架，它使用与 Acme 相同的日志记录策略。我为您提供了允许您将 Neptune 日志添加到 RLlib 的代码。[在这里](https://web.archive.org/web/20221206025247/https://github.com/piojanu/RLlogging/tree/master/rllib)您将找到日志程序代码和示例运行脚本。让我们先看看伐木工。
 
-```
+```py
 import neptune
 import numpy as np
 from ray import tune
@@ -516,7 +516,7 @@ class NeptuneLogger(tune.logger.Logger):
         },
         loggers=tune.logger.DEFAULT_LOGGERS + (NeptuneLogger,),
     )
-    ```
+    ```py
     """
 
     def _init(self):
@@ -580,7 +580,7 @@ class NeptuneLogger(tune.logger.Logger):
 
 下面你可以看到如何添加您的自定义记录器到 RLlib 培训。
 
-```
+```py
 import ray
 from ray import tune
 

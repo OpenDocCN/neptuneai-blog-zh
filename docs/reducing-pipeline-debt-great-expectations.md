@@ -67,7 +67,7 @@ Pi **peline 债务是数据管道中的技术债务。**当您的数据管道为
 
 例如，要断言某个表中“num_complaints”列的值在 1 到 5 之间，您可以编写:
 
-```
+```py
 expect_column_values_to_be_between(
     column="num_complaints",
     min_value=1,
@@ -79,7 +79,7 @@ expect_column_values_to_be_between(
 
 正如我们已经提到的，你并不总是控制你的数据，而是被动地观察它的流动。通常情况下，一个非典型的值会不时地出现在您的数据中，但不一定是令人苦恼的原因。伟大的期望通过“mostly”关键字来适应这一点，该关键字允许描述期望应该多久匹配一次。
 
-```
+```py
 expect_column_values_to_be_between(
     column="num_complaints",
     min_value=1,
@@ -92,7 +92,7 @@ expect_column_values_to_be_between(
 
 为了更好地理解数据，关键是要有一些关于为什么我们期望从数据中得到某些属性的背景。我们可以简单地添加它，方法是将“meta”参数传递给带有任何相关信息的期望。我们的同事甚至我们未来的自己都会为此感谢我们。
 
-```
+```py
 expect_column_values_to_be_between(
     column="num_complaints",
     min_value=1,
@@ -140,13 +140,13 @@ expect_column_values_to_be_between(
 
 让我们从安装包开始。远大前程需要 Python 3，可以用 pip 安装。
 
-```
+```py
 pip install great_expectations
 ```
 
 上面的命令不仅安装了 Python 包本身，还安装了附带的 CLI(命令行界面),它提供了从终端可用的便利实用程序。我们现在将使用其中的一个命令 *init* 来建立远大前程项目。
 
-```
+```py
 great_expectations init
 ```
 
@@ -160,7 +160,7 @@ great_expectations init
 
 要将新的数据源连接到我们的数据上下文，我们只需在终端中运行以下命令。
 
-```
+```py
 great_expectations datasource new
 ```
 
@@ -192,7 +192,7 @@ great_expectations datasource new
 
 为了运行自动化概要分析，我们需要导航到终端中数据上下文所在的目录，并运行以下命令。
 
-```
+```py
 great_expectations suite new
 ```
 
@@ -222,7 +222,7 @@ great_expectations suite new
 
 一个检查点针对一批数据运行一个期望套件。我们可以通过将“checkpoint new”关键字传递给 great_expectations，后跟所选的检查点名称来实例化它。在这里，我将我的称为“2 月 28 日检查点”。
 
-```
+```py
 great_expectations checkpoint new feb_28_checkpoint
 ```
 
@@ -244,7 +244,7 @@ great_expectations checkpoint new feb_28_checkpoint
 
 如前所述，expectation suite 仅仅是一个 JSON 文件，包含我们在本文开头看到的格式的期望，例如:
 
-```
+```py
   {
       "expectation_type": "expect_column_values_to_not_be_null",
       "kwargs": {

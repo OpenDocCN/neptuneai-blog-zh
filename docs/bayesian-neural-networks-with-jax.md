@@ -105,7 +105,7 @@ HumbleSL 是我写的直接监督学习(SL) Python 库。它提供了进行深�
 
 第 56-61 行下载训练和测试数据集。
 
-```
+```py
 train_dataset = hsl.load_dataset(
      'mnist:3.*.*', 'train', is_training=True, batch_size=FLAGS.batch_size)
  train_eval_dataset = hsl.load_dataset(
@@ -118,7 +118,7 @@ train_dataset 用于训练。train_eval_dataset 用于对训练数据集进行�
 
 数据集是迭代器，您可以通过以下方式访问图像(和标签)的连续批次:
 
-```
+```py
 batch_image, batch_label = next(train_dataset)
 
 ```
@@ -127,7 +127,7 @@ batch_image, batch_label = next(train_dataset)
 
 第 71-74 行创建了 MLP 模型。
 
-```
+```py
 net = hk.without_apply_rng(hk.transform(
      hsl.mlp_fn,
      apply_rng=True  
@@ -147,7 +147,7 @@ net = hk.without_apply_rng(hk.transform(
 
 第 79-85 行获取 MLP 模型参数，并使用它来初始化贝叶斯神经网络参数。
 
-```
+```py
 prior = dict(
 
      mu=params,
@@ -164,7 +164,7 @@ prior = dict(
 
 第 89-90 行定义并初始化 ADAM 优化器。
 
-```
+```py
 opt = optix.adam(FLAGS.lr)
  opt_state = opt.init(prior)
 ```
@@ -175,7 +175,7 @@ opt = optix.adam(FLAGS.lr)
 
 第 92-110 行定义了 ELBO 目标。
 
-```
+```py
 def elbo(aprx_posterior, batch, rng):
      """Computes the Evidence Lower Bound."""
      batch_image, batch_label = batch
@@ -201,7 +201,7 @@ def elbo(aprx_posterior, batch, rng):
 
 hsl.gaussian_kl 以封闭形式计算后者。由 flagsβ加权的两者的组合产生 ELBO。这与上面 ELBO 的数学表达式相匹配。损失是负面的 ELBO:
 
-```
+```py
 def loss(params, batch, rng):
      """Computes the Evidence Lower Bound loss."""
      return -elbo(params, batch, rng)[0]
@@ -213,7 +213,7 @@ def loss(params, batch, rng):
 
 第 116-126 行定义了 SGD 更新步骤。这是我们进行培训所需的最后一块。
 
-```
+```py
 @jax.jit
  def sgd_update(params, opt_state, batch, rng):
      """Learning rule (stochastic gradient descent)."""
@@ -234,7 +234,7 @@ def loss(params, batch, rng):
 
 第 128-140 行计算诊断。
 
-```
+```py
 def calculate_metrics(params, data):
      """Calculates metrics."""
      images, labels = data
@@ -260,7 +260,7 @@ def calculate_metrics(params, data):
 
 第 41-49 行运行预测。
 
-```
+```py
 def predict(net, prior, batch_image, rng, num_samples):
      probs = []
      for i in range(num_samples):
@@ -280,7 +280,7 @@ def predict(net, prior, batch_image, rng, num_samples):
 
 您运行代码并看到以下内容:
 
-```
+```py
       0 | test/accuracy                       0.122
       0 | test/elbo                         -94.269
       0 | test/kl_divergence                 26.404
@@ -304,7 +304,7 @@ def predict(net, prior, batch_image, rng, num_samples):
 
 让我们运行 10k 步，再次查看诊断结果:
 
-```
+```py
   10000 | test/accuracy                       0.104
   10000 | test/elbo                         -5.796
   10000 | test/kl_divergence                 2.516
@@ -340,7 +340,7 @@ def predict(net, prior, batch_image, rng, num_samples):
 
 现在我们已经将超参数更改为正确的参数，让我们看看 10k 步后的诊断结果:
 
-```
+```py
   10000 | test/accuracy                       0.979
   10000 | test/elbo                         -0.421
   10000 | test/kl_divergence               318.357

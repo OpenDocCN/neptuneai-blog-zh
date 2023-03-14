@@ -120,7 +120,7 @@ NLP 驱动计算机程序执行各种各样非常有用的任务，如文本翻�
 
 数据集的示例如下所示:
 
-```
+```py
 {
   "reviewerID": "A2SUAM1J3GNN3B",
   "asin": "0000013714",
@@ -155,31 +155,31 @@ NLP 驱动计算机程序执行各种各样非常有用的任务，如文本翻�
 
 1.  使用 conda 创建您的虚拟环境:
 
-```
+```py
 conda create --name bert_env python=3.6
 ```
 
 2.  安装支持 cuda 的 Pytorch(如果您有专用的 GPU，或者没有专用的 CPU 版本):
 
-```
+```py
 conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 ```
 
 3.  从 conda 通道安装变压器版本 4.0.0:
 
-```
+```py
 conda install -c huggingface transformers
 ```
 
 4.  安装火炬视觉:
 
-```
+```py
 pip install torchvision
 ```
 
 5.  安装 pytorch-nlp 包中的 Bert 预训练版本:
 
-```
+```py
 pip install pytorch-pretrained-bert pytorch-nlp
 ```
 
@@ -191,7 +191,7 @@ pip install pytorch-pretrained-bert pytorch-nlp
 
 对于训练数据，我们只需要“总体”和“回顾”属性。我们将使用包含 **1** (正值)、 **2** (负值)和 **0** (中性)的“情绪数据”创建一个新列。根据总体得分，每一行都将标有这些数字。
 
-```
+```py
 import pandas as pd
 review_data = pd.read_json('/content/Dataset_final.json', lines=True)
 sentiment_data = []
@@ -211,7 +211,7 @@ review_data['sentiment'] = sentiment
 
 将[CLS]和[SEP]标签放在每个复习句子的前面。
 
-```
+```py
 sentences = ["[CLS] " + query + " [SEP]" for query in review_data['reviewText']]
 ```
 
@@ -227,7 +227,7 @@ BERT 使用内部算法将输入的单词分解成记号。BERT 实施的流程�
 
 PyTorch 的 BertTokenizer 模块将负责内部的所有逻辑。将每个输入句子分成合适的记号，然后将它们编码成数字向量。
 
-```
+```py
 from pytorch_pretrained_bert import BertTokenizer
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
@@ -236,7 +236,7 @@ tokenized_texts = [tokenizer.tokenize(sent) for sent in sentences]
 
 填充输入标记，并使用 BERT 标记器将标记转换为它们在 BERT 词汇表中的索引号:
 
-```
+```py
 from keras.preprocessing.sequence import pad_sequences
 
 MAX_LEN = 512
@@ -250,7 +250,7 @@ input_ids = pad_sequences(input_ids, maxlen=MAX_LEN, dtype="long", truncating="p
 
 创建注意掩码，每个标记的掩码为 1，后跟填充的 0:
 
-```
+```py
 attention_masks = []
 for seq in input_ids:
   seq_mask = [float(i>0) for i in seq]
@@ -261,7 +261,7 @@ for seq in input_ids:
 
 拆分列车并测试拆分:
 
-```
+```py
 from sklearn.model_selection import train_test_split
 train_inputs, validation_inputs, train_labels, validation_labels = train_test_split(input_ids, labels.values,  random_state=2018, test_size=0.2)
 train_masks, validation_masks, _, _ = train_test_split(attention_masks, input_ids, random_state=2018, test_size=0.2)
@@ -269,7 +269,7 @@ train_masks, validation_masks, _, _ = train_test_split(attention_masks, input_id
 
 将数据转换为 torch 张量，并使用特定的 batch_size 创建 Dataloader 迭代器:
 
-```
+```py
 import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler,
 SequentialSampler
@@ -292,7 +292,7 @@ validation_dataloader = DataLoader(validation_data, sampler=validation_sampler, 
 
 实例化模型:
 
-```
+```py
 from pytorch_pretrained_bert import BertAdam, BertForSequenceClassification
 model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=3)
 model.cuda()
@@ -300,7 +300,7 @@ model.cuda()
 
 定义优化的超参数:
 
-```
+```py
 param_optimizer = list(model.named_parameters())
 no_decay = ['bias', 'gamma', 'beta']
 optimizer_grouped_parameters = [
@@ -314,7 +314,7 @@ optimizer = BertAdam(optimizer_grouped_parameters, lr=2e-5, warmup=.1)
 
 定义训练循环:
 
-```
+```py
 train_loss_set = []
 
 epochs = 2
@@ -350,14 +350,14 @@ for _ in range(epochs, desc="Epoch"):
 
 将模型置于评估模式，评估一个批次的预测:
 
-```
+```py
   model.eval()
 
   eval_loss, eval_accuracy = 0, 0
   nb_eval_steps, nb_eval_examples = 0, 0
 ```
 
-```
+```py
 for batch in validation_dataloader:
 
     batch = tuple(t.to(device) for t in batch)
@@ -377,7 +377,7 @@ for batch in validation_dataloader:
 
 可以通过绘制 train_loss_set 列表来看一下训练损耗。
 
-```
+```py
 import matplotlib.pyplot as plt
 plt.figure(figsize=(15,8))
 plt.title("Training loss")
@@ -393,7 +393,7 @@ plt.show()
 
 训练完成后，您可以使用 torch.save()将其保存为检查点。
 
-```
+```py
 torch.save(model, '/bert_final_version.pth')
 ```
 

@@ -123,20 +123,20 @@ LightGBM 可以处理海量数据。这是训练和预测最快的算法之一�
 
 安装所需的 Neptune 客户端库:
 
-```
+```py
 pip install neptune-client
 
 ```
 
 安装 Neptune 笔记本插件，保存你所有的工作，并与 Neptune UI 平台链接:
 
-```
+```py
 pip install -U neptune-notebooks
 ```
 
 启用 jupyter 集成:
 
-```
+```py
 jupyter nbextension enable --py neptune-notebooks
 ```
 
@@ -146,7 +146,7 @@ jupyter nbextension enable --py neptune-notebooks
 
 要完成设置，请在笔记本中导入 Neptune 客户端库，并调用 neptune.init()方法初始化连接:
 
-```
+```py
 import neptune
 neptune.init(project_qualified_name='aymane.hachcham/XGBoostStudy)
 ```
@@ -169,7 +169,7 @@ neptune.init(project_qualified_name='aymane.hachcham/XGBoostStudy)
 
 *   *按种族分列的数学、阅读和写作成绩*:
 
-```
+```py
 import plotly.graph_objects as go
 
 groupe_math_eth = data_exams.groupby(['race/ethnicity'])['math score'].sum().reset_index()
@@ -189,7 +189,7 @@ C 组在所有得分指标上都很突出。这表明，在与种族和民族血
 
 *   按性别分列的数学、阅读和写作成绩
 
-```
+```py
 groupe_math_gen = data_exams.groupby(['gender'])['math score'].sum().reset_index()
 groupe_reading_gen = data_exams.groupby('gender')['reading score'].sum().reset_index()
 groupe_writing_gen = data_exams.groupby('gender')['writing score'].sum().reset_index()
@@ -210,7 +210,7 @@ fig.show()
 
 为了对数据进行采样，我们将使用 XGBoost Python 库中的 DMatrix 对象。将数据采样到子集的过程称为数据分离。DMatrix 是一种内部数据结构，有助于内存管理和数据优化。我们将把数据分成训练和测试子集，然后开始训练。
 
-```
+```py
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
 
@@ -224,7 +224,7 @@ target = data_exams.iloc[:,-3:]
 
 1.  首先，使用 pandas 将对象数据类型转换为字符串:
 
-```
+```py
 features['gender'].astype('string')
 features['race/ethnicity'].astype('string')
 features['parental level of education'].astype('string')
@@ -233,14 +233,14 @@ features['test preparation course'].astype('string')
 
 2.  将性别转换为 0/1 值:
 
-```
+```py
 features.loc[features['gender'] == 'male', 'gender'] = 0
 features.loc[features['gender'] == 'female', 'gender'] = 1
 ```
 
 3.  改变父母的教育水平:
 
-```
+```py
 features.loc[features['parental level of education'] == 'high school', 'parental level of education'] = 1
 features.loc[features['parental level of education'] == 'some college', 'parental level of education'] = 2
 features.loc[features['parental level of education'] == 'some high school', 'parental level of education'] = 3
@@ -251,7 +251,7 @@ features.loc[features['parental level of education'] == 'master's degree', 'pare
 
 4.  转变午餐价值观:
 
-```
+```py
 features.loc[features['lunch'] == 'standard', 'lunch'] = 0
 features.loc[features['lunch'] == 'free/reduced', 'lunch'] = 1
 
@@ -259,14 +259,14 @@ features.loc[features['lunch'] == 'free/reduced', 'lunch'] = 1
 
 5.  转变备考课程:
 
-```
+```py
 features.loc[features['test preparation course'] == 'none', 'test preparation course'] = 0
 features.loc[features['test preparation course'] == 'completed', 'test preparation course'] = 1
 ```
 
 区分数据特征、我们将尝试用于预测的列以及数据目标，数据目标是代表这些学生获得的数学、阅读和写作分数的最后 3 列。
 
-```
+```py
 x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=0.30, random_state=123)
 d_matrix_train = xgb.DMatrix(x_train, y_train, enable_categorical=True)
 d_matrix_test = xgb.DMatrix(x_test, y_test, enable_categorical=True)
@@ -278,7 +278,7 @@ d_matrix_test = xgb.DMatrix(x_test, y_test, enable_categorical=True)
 
 *   使用您的 Neptune 凭据连接您的脚本[阅读如何](https://web.archive.org/web/20230304041944/https://docs.neptune.ai/getting-started/hello-world)。
 
-```
+```py
 import neptune.new as neptune
 experiment = neptune.init(project='aymane.hachcham/XGBoost-Complete-Guide', api_token='API TOKEN')
 ```
@@ -293,7 +293,7 @@ experiment = neptune.init(project='aymane.hachcham/XGBoost-Complete-Guide', api_
 
 为了开始使用 Neptune 进行日志记录，我们创建了一个实验和一个定义每个模型版本的超参数列表。
 
-```
+```py
 import neptune
 from neptunecontrib.monitoring.xgboost import neptune_callback
 
@@ -314,7 +314,7 @@ neptune.create_experiment(
 
 使用我们之前设置的参数和 DMatrix 数据开始训练过程。我们还添加了 neptune_callback()函数，它自动完成所有必要的工作，以实时监控损失和评估指标。
 
-```
+```py
 watchlist = [(d_matrix_test, 'test'), (d_matrix_train, 'train')]
 num_round = 20
 
@@ -382,7 +382,7 @@ XGBRegressor 通常对用于预测的每个特征的重要性顺序进行分类�
 
 让我们创建一个每个超参数可以取值的范围:
 
-```
+```py
 parameters = {
     'learning_rate': [0.1, 0.01, 0.05],
     'max_depth': range (2, 10, 1),
@@ -393,7 +393,7 @@ parameters = {
 
 配置您的 GridSearchCV。在这种情况下，评估性能的最佳指标是比较 10 倍交叉验证结果的 [ROC AUC 曲线](https://web.archive.org/web/20230304041944/https://towardsdatascience.com/understanding-auc-roc-curve-68b2303cc9c5)。
 
-```
+```py
 from sklearn.model_selection import GridSearchCV
 
 grid_search = GridSearchCV(
@@ -408,13 +408,13 @@ grid_search = GridSearchCV(
 
 发布培训:
 
-```
+```py
 grid_search.fit(x_train, y_train)
 ```
 
 处理步骤如下所示:
 
-```
+```py
 Fitting 10 folds for each of 96 candidates, totalling 960 fits
 [Parallel(n_jobs=10)]: Using backend LokyBackend with 10 concurrent workers.
 [Parallel(n_jobs=10)]: Done  30 tasks      | elapsed:   11.0s
@@ -426,7 +426,7 @@ Fitting 10 folds for each of 96 candidates, totalling 960 fits
 
 可以使用字段 best_estimator_ 访问最佳估计值:
 
-```
+```py
 xgb_best = grid_search.best_estimator_
 ```
 

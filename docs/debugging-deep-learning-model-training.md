@@ -32,7 +32,7 @@
 
 软件缺陷可能会被深度学习的力量隐藏起来。例如，我们在 Keras 中实现了以下卷积神经网络:
 
-```
+```py
 inp = Input(shape=(28, 28, 1))
 x = Conv2D(32, kernel_size=(3, 3), activation="relu")(inp)
 x = MaxPooling2D(pool_size=(2, 2))(x)

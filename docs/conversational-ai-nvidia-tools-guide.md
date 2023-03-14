@@ -72,7 +72,7 @@ NeMo 是一个编程库，它利用可重用神经组件的能力来帮助您轻
 
 ### Tacotron 处理器
 
-```
+```py
 class TacotronHandler(nn.Module):
    def __init__(self):
        super().__init__()
@@ -159,7 +159,7 @@ class TacotronHandler(nn.Module):
 
 ### 石英网装载机
 
-```
+```py
 class Quartznet_loader():
    def __init__(self, torch_device=None):
        if torch_device is None:
@@ -208,7 +208,7 @@ class Quartznet_loader():
 
 ### Bert Loader
 
-```
+```py
 class Bert_loader():
    def __init__(self, torch_device=None):
        if torch_device is None:
@@ -259,7 +259,7 @@ class Bert_loader():
 *   创建相应的序列化程序；
 *   构建您的视图(发布、删除)和路由。
 
-```
+```py
 class ASRText(models.Model):
    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
    name = models.CharField(max_length=255,null=True, blank=True)
@@ -290,7 +290,7 @@ class TTSSound(models.Model):
 
 但是在实际实现 API 视图之前，我们需要在项目的全局范围内实例化模型处理程序，以便可以将繁重的配置文件和检查点加载到内存中并准备使用。
 
-```
+```py
 bert_punctuator = Bert_loader()
 quartznet_asr =Quartznet_loader()
 tacotron2_tts = TTS_loader()
@@ -299,7 +299,7 @@ ASR_SAMPLING_RATE = 22050
 
 ### ASR 发布请求
 
-```
+```py
 @api_view(['POST'])
 def asr_conversion(request):
    data = request.FILES['audio']
@@ -327,7 +327,7 @@ def asr_conversion(request):
 
 ### TTS 发布请求
 
-```
+```py
 @api_view(['POST'])
 def tts_transcription(request):
    text = request.data.get('text')
@@ -369,7 +369,7 @@ tts_transcription post 方法也是如此，我们对输入文本进行推理，
 
 *   如下修改 SceneDelegate.swift 文件中的代码，使 **AudioViewController** 成为主 **UINavigationController**
 
-```
+```py
 func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
        guard let windowScence = (scene as? UIWindowScene) else { return }
 
@@ -399,7 +399,7 @@ AudioViewController 有两个按钮:一个用于录音，一个用于停止录�
 
 下面的代码可以做到这一点:
 
-```
+```py
 func constrainstInit(){
    NSLayoutConstraint.activate([
 
@@ -424,7 +424,7 @@ func constrainstInit(){
 
 将布局添加到主视图:
 
-```
+```py
 override func viewDidLoad() {
    super.viewDidLoad()
    view.backgroundColor = .white
@@ -448,7 +448,7 @@ override func viewDidLoad() {
 
 使用 AVAudioRecorder 共享实例处理与语音录制相关的所有逻辑，并设置内部目录路径以保存生成的音频文件。
 
-```
+```py
 @objc
 func recordAudio(){
    recordingButton.isEnabled = false
@@ -477,7 +477,7 @@ func recordAudio(){
 
 完成录音会话并使默认 iphone 扬声器静音，以避免原始录音上出现任何不必要的噪音。
 
-```
+```py
 @objc
 func stopRecording() {
    stopRecordingButton.isEnabled = false
@@ -495,7 +495,7 @@ func stopRecording() {
 
 当 AVAudioRecorder 会话成功结束且未引发任何硬件相关错误时触发。它将记录器文件的路径发送给 ASRViewController。
 
-```
+```py
 func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
    if flag {
        asrController.recorderAudioURL = audioRecorder.url
@@ -519,7 +519,7 @@ API 期望一个[**String**:**String**]类型的字典——键是“audio”，
 
 *   处理 API 响应结果。如果成功，我们将把 API 响应解析为 JSON 对象，并提取输出文本来显示它。
 
-```
+```py
 func transcribeAudio() {
    let audioFilePath = audioRecorder.url! as String
 
